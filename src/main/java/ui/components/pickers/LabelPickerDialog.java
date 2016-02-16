@@ -42,7 +42,6 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
     private static final Insets GROUP_PAD = new Insets(0, 0, 10, 10);
     private static final Logger logger = HTLog.get(LabelPickerDialog.class);
 
-    private final LabelPickerUILogic uiLogic;
     private final List<TurboLabel> repoLabels;
     private final TurboIssue issue;
     private LabelPickerState state;
@@ -64,7 +63,6 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
         this.repoLabels = repoLabels;
         this.issue = issue;
         this.state = getCleanState(issue.getLabels(), getRepoLabelsSet());
-        uiLogic = new LabelPickerUILogic();
 
         initUI(stage, issue);
         setupEvents(stage);
@@ -345,7 +343,7 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
 
     private void initialiseAndregisterQueryHandler() {
         listener = (observable, oldValue, newValue) -> {
-            state = uiLogic.determineState(
+            state = LabelPickerState.determineState(
                     getCleanState(issue.getLabels(), getRepoLabelsSet()),
                     getRepoLabelsSet(), queryField.getText().toLowerCase());
             populatePanes(state);

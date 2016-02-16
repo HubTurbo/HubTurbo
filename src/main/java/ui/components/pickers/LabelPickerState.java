@@ -49,6 +49,26 @@ public class LabelPickerState {
         this.currentSuggestionIndex = OptionalInt.empty();
     }
 
+    /**
+     * Determines next state based on given previous state and query
+     * @param initialState
+     * @param repoLabels
+     * @param userInput 
+     * @return new state that corresponds with query
+     */
+    public static LabelPickerState determineState(LabelPickerState initialState, Set<String> repoLabels, String userInput) {
+        String[] keywords = userInput.split("\\s+");
+        LabelPickerState state = initialState;
+        for (int i = 0; i < keywords.length; i++) {
+            if (isConfirmedKeyword(keywords, userInput, i)) {
+                state = state.toggleLabel(repoLabels, keywords[i]);
+            } else {
+                state = state.updateMatchedLabels(repoLabels, keywords[i]);
+            }
+        }
+        return state;
+    }
+
     public LabelPickerState clearMatchedLabels() {
         return new LabelPickerState(initialLabels, addedLabels, removedLabels,
                     new ArrayList<>(), currentSuggestionIndex);
@@ -149,6 +169,10 @@ public class LabelPickerState {
     /*
      * Helper functions
      */
+
+    private static boolean isConfirmedKeyword(String[] keywords, String userInput, int keywordIndex) {
+        return !(keywordIndex == keywords.length - 1 && !userInput.endsWith(" "));
+    }
 
     private String getMatchedLabelName(Set<String> repoLabels, String keyword) {
         List<String> newMatchedLabels = new ArrayList<>();
