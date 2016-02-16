@@ -5,6 +5,7 @@ import static org.loadui.testfx.Assertions.assertNodeExists;
 import static org.loadui.testfx.controls.Commons.hasText;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.junit.Before;
@@ -103,20 +104,20 @@ public class BoardAutoCreatorTest extends UITest {
 
         waitUntilNodeAppears(SAMPLE_BOARD_DIALOG);
         click("OK");
-
-        assertEquals(panelControl.getPanelCount(), BoardAutoCreator.getSamplePanelDetails().size());
-        assertEquals(panelControl.getCurrentlySelectedPanel(), Optional.of(0));
-        assertEquals(panelControl.getNumberOfSavedBoards(), 1);
-        testSamplePanelInfos(panelControl);
+        verifyBoard(panelControl, BoardAutoCreator.getSamplePanelDetails());
     }
 
     /**
-     * Tests whether the sample panels along with their filters are rightly created and present in the UI
+     * Tests panelControl properties associated with panels.
+     * PanelDetails obtained from Boards are tested against current Panel infos as well.
      */
-    public static void testSamplePanelInfos(PanelControl pc){
+    public static void verifyBoard(PanelControl pc, Map<String, String> panelDetails){
         List<PanelInfo> panelInfos = pc.getCurrentPanelInfos();
+        assertEquals(pc.getPanelCount(), panelDetails.size());
+        assertEquals(pc.getCurrentlySelectedPanel(), Optional.of(0));
+        assertEquals(pc.getNumberOfSavedBoards(), 1);
         int i = 0;
-        for (String panelName : BoardAutoCreator.getSamplePanelDetails().keySet()) {
+        for (String panelName : panelDetails.keySet()) {
             assertEquals(panelInfos.get(i).getPanelName(), panelName);
             assertEquals(panelInfos.get(i).getPanelFilter(), BoardAutoCreator.getSamplePanelDetails().get(panelName));
             i++;

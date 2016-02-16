@@ -155,6 +155,8 @@ public class UI extends Application implements EventDispatcher {
     }
 
     private void showMainWindow(String repoId) {
+        //We infer this is the first time HT is being used if there are no repo data stored at the start up.
+        //This check needs to be done at the very beginning of the startup, before HT downloads any repo data.
         boolean isAFirstTimeUser = logic.getStoredRepos().isEmpty();
         logic.openPrimaryRepository(repoId);
         logic.setDefaultRepo(repoId);

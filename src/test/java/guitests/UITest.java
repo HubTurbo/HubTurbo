@@ -362,6 +362,29 @@ public class UITest extends GuiTest {
     }
 
     /**
+     * Performs logout from File -> Logout on HubTurbo's pView.
+     */
+    public void logout(){
+        clickMenu("File", "Logout");
+    }
+
+    /**
+     * Performs UI login on the login dialog box.
+     * @param owner The owner of the repo.
+     * @param repoName The repository name
+     * @param username The Github username
+     * @param password The Github password
+     */
+    public void login(String owner, String repoName, String username, String password){
+        selectAll();
+        type(owner).push(KeyCode.TAB);
+        type(repoName).push(KeyCode.TAB);
+        type(username).push(KeyCode.TAB);
+        type(password);
+        click("Sign in");
+    }
+
+    /**
      * Automate menu traversal by clicking them in order of input parameter
      *
      * @param menuNames array of strings of menu item names in sequence of traversal
