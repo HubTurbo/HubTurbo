@@ -2,6 +2,7 @@ package ui.components.issue_creators;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.fxmisc.richtext.InlineCssTextArea;
@@ -11,6 +12,8 @@ import org.pegdown.PegDownProcessor;
 import util.Utility;
 import backend.resource.TurboIssue;
 import backend.resource.TurboUser;
+import javafx.scene.image.Image;
+import javafx.scene.input.Clipboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyEvent;
@@ -265,4 +268,8 @@ public class IssueContentPane extends StackPane {
         return new PegDownProcessor();
     }
 
+    private Optional<Image> getImageFromClipboard() {
+        Clipboard cb = Clipboard.getSystemClipboard();
+        return Optional.ofNullable(cb.getImage());
+    }
 }
