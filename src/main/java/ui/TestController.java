@@ -100,7 +100,7 @@ public final class TestController {
      * so don't need boards created on startup.
      */
     public static boolean shouldOpenSampleBoard() {
-        return !TestController.isTestMode() || TestController.shouldTestStartupBoard();
+        return !isTestMode() || shouldTestStartupBoard();
     }
 
     /**

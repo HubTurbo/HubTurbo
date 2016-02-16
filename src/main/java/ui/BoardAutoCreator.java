@@ -14,10 +14,7 @@ import util.DialogMessage;
 import util.Utility;
 import util.events.BoardSavedEvent;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class BoardAutoCreator {
@@ -30,26 +27,24 @@ public class BoardAutoCreator {
     private static final String SECOND_SAMPLE_REPO_NAME = "HubTurbo/HubTurbo";
     public static final String SAMPLE_BOARD_DIALOG = String.format("%s has been created and loaded.", SAMPLE_BOARD);
 
-    public static final List<String> SAMPLE_PANEL_NAMES =
-            Collections.unmodifiableList(Arrays.asList(
-                    "Seven Recent unread updates from my repos",
-                    "All issues in my two sample repos",
-                    "Open issues assigned to Darius or Manmeet",
-                    "Progress of the current milestone",
-                    "Issues awaiting prioritization"
-            ));
+    public static final Map<String, String> getSamplePanelDetails(){
+        Map<String, String> panelMap = new HashMap<>();
+        panelMap.put("Seven Recent unread updates from my repos",
+                String.format("repo:%s;%s count:7 is:unread updated<24 sort:!updated",
+                FIRST_SAMPLE_REPO_NAME, SECOND_SAMPLE_REPO_NAME));
+        panelMap.put("All issues in my two sample repos",
+                String.format("repo:%s;%s is:issue sort:!updated,comments",
+                FIRST_SAMPLE_REPO_NAME, SECOND_SAMPLE_REPO_NAME));
+        panelMap.put("Open issues assigned to Darius or Manmeet",
+                String.format("repo:%s is:issue is:open (assignee:dariusf || assignee:codemanmeet)",
+                FIRST_SAMPLE_REPO_NAME));
+        panelMap.put("Progress of the current milestone",
+                String.format("repo:%s m:curr sort:status", FIRST_SAMPLE_REPO_NAME));
+        panelMap.put("Issues awaiting prioritization",
+                String.format("repo:%s is:open is:issue !label:priority.", FIRST_SAMPLE_REPO_NAME));
+        return Collections.unmodifiableMap(panelMap);
 
-    public static final List<String> SAMPLE_PANEL_FILTERS =
-            Collections.unmodifiableList(Arrays.asList(
-                    String.format("repo:%s;%s count:7 is:unread updated<24 sort:!updated",
-                            FIRST_SAMPLE_REPO_NAME, SECOND_SAMPLE_REPO_NAME),
-            String.format("repo:%s;%s is:issue sort:!updated,comments",
-                    FIRST_SAMPLE_REPO_NAME, SECOND_SAMPLE_REPO_NAME),
-            String.format("repo:%s is:issue is:open (assignee:dariusf || assignee:codemanmeet)",
-                    FIRST_SAMPLE_REPO_NAME),
-            String.format("repo:%s m:curr sort:status", FIRST_SAMPLE_REPO_NAME),
-            String.format("repo:%s is:open is:issue !label:priority.", FIRST_SAMPLE_REPO_NAME)
-            ));
+    }
 
     private final UI ui;
     private final PanelControl panelControl;
@@ -133,7 +128,8 @@ public class BoardAutoCreator {
 
     /**
      * Creates a sample board to showcase HubTurbo's functionality with sample repos in filters.
-     * The confirmation dialog pops up for the creation of the sample board if isDialogShown is set to true.
+     * The dialog box shows a confirmation message for the successful
+     * creation and loading of the sample board if isDialogShown is set to true.
      * @param isDialogShown
      */
     public void createSampleBoard(boolean isDialogShown) {
@@ -143,8 +139,8 @@ public class BoardAutoCreator {
 
         List<PanelInfo> panelData = new ArrayList<>();
 
-        for (int i = 0; i < SAMPLE_PANEL_NAMES.size(); i++) {
-            panelData.add(new PanelInfo(SAMPLE_PANEL_NAMES.get(i), SAMPLE_PANEL_FILTERS.get(i)));
+        for (Map.Entry<String, String> entry : getSamplePanelDetails().entrySet()) {
+            panelData.add(new PanelInfo(entry.getKey(), entry.getValue()));
         }
 
         createBoard(panelData, SAMPLE_BOARD);

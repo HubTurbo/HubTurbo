@@ -143,7 +143,7 @@ public class UI extends Application implements EventDispatcher {
         getMainWindowHandle(mainStage.getTitle());
     }
 
-    private void openSampleBoard(){
+    private void createAndLoadSampleBoard(){
         BoardAutoCreator boardCreator = new BoardAutoCreator(this, panels, prefs);
         boardCreator.createSampleBoard(false);
     }
@@ -155,8 +155,7 @@ public class UI extends Application implements EventDispatcher {
     }
 
     private void showMainWindow(String repoId) {
-        boolean isFirstTimeUser = logic.getStoredRepos().isEmpty();
-
+        boolean isAFirstTimeUser = logic.getStoredRepos().isEmpty();
         logic.openPrimaryRepository(repoId);
         logic.setDefaultRepo(repoId);
         repoSelector.setText(repoId);
@@ -181,8 +180,8 @@ public class UI extends Application implements EventDispatcher {
         // Should only be called after panels have been initialized
         ensureSelectedPanelHasFocus();
         initialisePickers();
-        if (isFirstTimeUser && TestController.shouldOpenSampleBoard()){
-            openSampleBoard();
+        if (isAFirstTimeUser && TestController.shouldOpenSampleBoard()){
+            createAndLoadSampleBoard();
         }
     }
 

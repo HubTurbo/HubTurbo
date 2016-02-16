@@ -12,14 +12,13 @@ import org.junit.Test;
 
 import prefs.PanelInfo;
 import prefs.Preferences;
+import ui.BoardAutoCreator;
 import ui.TestController;
 import ui.UI;
 import ui.issuepanel.PanelControl;
 import util.PlatformEx;
 import static ui.BoardAutoCreator.SAMPLE_BOARD;
 import static ui.BoardAutoCreator.SAMPLE_BOARD_DIALOG;
-import static ui.BoardAutoCreator.SAMPLE_PANEL_FILTERS;
-import static ui.BoardAutoCreator.SAMPLE_PANEL_NAMES;
 
 public class BoardAutoCreatorTest extends UITest {
 
@@ -105,14 +104,22 @@ public class BoardAutoCreatorTest extends UITest {
         waitUntilNodeAppears(SAMPLE_BOARD_DIALOG);
         click("OK");
 
-        assertEquals(panelControl.getPanelCount(), SAMPLE_PANEL_NAMES.size());
+        assertEquals(panelControl.getPanelCount(), BoardAutoCreator.getSamplePanelDetails().size());
         assertEquals(panelControl.getCurrentlySelectedPanel(), Optional.of(0));
         assertEquals(panelControl.getNumberOfSavedBoards(), 1);
+        testSamplePanelInfos(panelControl);
+    }
 
-        List<PanelInfo> panelInfos = panelControl.getCurrentPanelInfos();
-        for (int i = 0; i < SAMPLE_PANEL_NAMES.size(); i++){
-            assertEquals(panelInfos.get(i).getPanelFilter(), SAMPLE_PANEL_FILTERS.get(i));
-            assertEquals(panelInfos.get(i).getPanelName(), SAMPLE_PANEL_NAMES.get(i));
+    /**
+     * Tests whether the sample panels along with their filters are rightly created and present in the UI
+     */
+    public static void testSamplePanelInfos(PanelControl pc){
+        List<PanelInfo> panelInfos = pc.getCurrentPanelInfos();
+        int i = 0;
+        for (String panelName : BoardAutoCreator.getSamplePanelDetails().keySet()) {
+            assertEquals(panelInfos.get(i).getPanelName(), panelName);
+            assertEquals(panelInfos.get(i).getPanelFilter(), BoardAutoCreator.getSamplePanelDetails().get(panelName));
+            i++;
         }
     }
 
