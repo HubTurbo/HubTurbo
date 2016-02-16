@@ -53,6 +53,10 @@ public class BrowserComponent {
     private static HWND browserWindowHandle;
     private static User32 user32;
 
+    // The minimum fraction of available width to total screen width for the browser to be
+    // resized to available width.
+    private double maximiseThreshold = 0.1;
+
     private final UI ui;
     private ChromeDriverEx driver = null;
 
@@ -126,19 +130,25 @@ public class BrowserComponent {
         ChromeDriverEx driver = new ChromeDriverEx(options, isTestChromeDriver);
         WebDriver.Options manage = driver.manage();
         if (!isTestChromeDriver) {
-            Rectangle availableDimensions = ui.getAvailableDimensions();
-            if (availableDimensions.getWidth() > 0) {
-                manage.window().setPosition(new Point((int) ui.getCollapsedX(), 0));
-                manage.window().setSize(new Dimension((int) ui.getAvailableDimensions().getWidth(),
-                        (int) ui.getAvailableDimensions().getHeight()));
-            } else {
-                manage.window().setPosition(new Point(0, 0));
-                manage.window().setSize(new Dimension((int) ui.getScreenWidth(),
-                        (int) ui.getAvailableDimensions().getHeight()));
-            }
+            setWindowSize(manage);
             initialiseJNA();
         }
         return driver;
+    }
+
+    public void setWindowSize(WebDriver.Options manage) {
+        Rectangle availableDimensions = ui.getAvailableDimensions();
+        Rectangle screenDimensions = ui.getDimensions();
+
+        if (availableDimensions.getWidth() > 0.1 * screenDimensions.getWidth()) {
+            manage.window().setPosition(new Point((int) ui.getCollapsedX(), 0));
+            manage.window().setSize(new Dimension((int) ui.getAvailableDimensions().getWidth(),
+                    (int) ui.getAvailableDimensions().getHeight()));
+        } else {
+            manage.window().setPosition(new Point(0, 0));
+            manage.window().setSize(new Dimension((int) ui.getDimensions().getWidth(),
+                    (int) ui.getAvailableDimensions().getHeight()));
+        }
     }
 
     private void removeChromeDriverIfNecessary() {
