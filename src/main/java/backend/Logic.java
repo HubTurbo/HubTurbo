@@ -77,12 +77,7 @@ public class Logic {
         return repoIO.isRepositoryValid(repoId);
     }
 
-    public void refresh(boolean isNotificationPaneShowing) {
-        // TODO fix refresh to take into account the possible pending actions associated with the notification pane
-        if (isNotificationPaneShowing) {
-            logger.info("Notification Pane is currently showing, not going to refresh. ");
-            return;
-        }
+    public void refresh() {
         String message = "Refreshing " + models.toModels().stream()
                 .map(Model::getRepoId)
                 .collect(Collectors.joining(", "));
@@ -197,21 +192,25 @@ public class Logic {
     }
 
     /**
-     * Replaces labels of issue on GitHub
+     * Replaces existing labels with new labels in the issue object, the UI, and the server, in that order.
+     * Server update is done after the local update to reduce the lag between the user action and the UI response
      *
-     * @param issue The issue whose labels are to be replaced on GitHub.
-     * @param newLabels The list of new labels to be applied on the issue.
-     * @return True if label replacement on GitHub was a success, false otherwise.
+     * @param issue The issue object whose labels are to be replaced.
+     * @param newLabels The list of new labels to be assigned to the issue.
+     * @return true if label replacement on GitHub was a success, false otherwise.
      */
     public CompletableFuture<Boolean> replaceIssueLabels(TurboIssue issue, List<String> newLabels) {
+        logger.info("Changing labels for " + issue + " on UI");
+        issue.setLabels(newLabels);
+        refreshUI();
+
+        return updateIssueLabelsOnRepo(issue, newLabels);
+    }
+
+    private CompletableFuture<Boolean> updateIssueLabelsOnRepo(TurboIssue issue, List<String> newLabels) {
         logger.info("Changing labels for " + issue + " on GitHub");
-        return repoIO.replaceIssueLabels(issue, newLabels)
-                .thenApply(labels -> {
-                    logger.info("Changing labels for " + issue + " on UI");
-                    issue.setLabels(labels);
-                    refreshUI();
-                    return true;
-                })
+        return repoOpControl.replaceIssueLabels(issue, newLabels)
+                .thenApply(labels -> labels.containsAll(newLabels))
                 .exceptionally(Futures.withResult(false));
     }
 
