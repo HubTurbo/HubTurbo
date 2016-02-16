@@ -5,9 +5,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+
 import org.fxmisc.richtext.InlineCssTextArea;
 import org.fxmisc.richtext.PopupAlignment;
+import org.json.JSONObject;
 import org.pegdown.PegDownProcessor;
+
 
 import util.Utility;
 import backend.resource.TurboIssue;
@@ -33,7 +36,7 @@ public class IssueContentPane extends StackPane {
     public static final int MAX_SUGGESTION_ENTRIES = 5;
     public static final String CONTENT_ID = "body";
 
-    public static final KeyCodeCombination PREVIEW = new KeyCodeCombination(KeyCode.F1, 
+    public static final KeyCodeCombination PREVIEW = new KeyCodeCombination(KeyCode.P, 
             KeyCodeCombination.ALT_DOWN);
     public static final KeyCodeCombination MENTION = new KeyCodeCombination(KeyCode.DIGIT2, 
             KeyCodeCombination.SHIFT_DOWN);
@@ -44,6 +47,7 @@ public class IssueContentPane extends StackPane {
     public static final KeyCodeCombination HIDE_SUGGGESTIONS =
             new KeyCodeCombination(KeyCode.SPACE);
 
+    private static final String IMAGE_LINK = "![screenshot](%s)";
     private static final String LINK_STYLE = "-fx-font-weight: bold; -fx-fill: red";
     private static final double CONTENT_WIDTH = 200;
     private static final String MENTION_KEY = "@";
@@ -110,6 +114,15 @@ public class IssueContentPane extends StackPane {
     private void bodyKeyPressHandler(KeyEvent e) {
         if (PASTE.match(e)) {
             Optional<Image> paste = getImageFromClipboard();
+            if (paste.isPresent()) {
+                new UploadImageTask(paste.get()).response.ifPresent(json -> {
+                    try {
+                        body.appendText(" " + String.format(IMAGE_LINK, ((JSONObject) json.get("data")).getString("link")));
+                    } catch (Exception e1) {
+                        e1.printStackTrace();
+                    }
+                });
+            }
         }
 
         if (PREVIEW.match(e)) {

@@ -32,9 +32,15 @@ public class UploadImageTask {
     
     public final Optional<JSONObject> response;
 
-    public UploadImageTask(Image fxImage) throws UnsupportedEncodingException {
-        String data = URLEncoder.encode("image", "UTF-8") + "="
-                + URLEncoder.encode(convertToBase64String(fxImage), "UTF-8");
+    public UploadImageTask(Image fxImage) {
+        String data = "";
+        try {
+            data = URLEncoder.encode("image", "UTF-8") + "="
+                    + URLEncoder.encode(convertToBase64String(fxImage), "UTF-8");
+            System.out.println("success encode");
+        } catch (UnsupportedEncodingException e) {
+            logger.error(e.getMessage());
+        }
         response = setupConnection(data);
     }
     
