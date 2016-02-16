@@ -10,6 +10,7 @@ import com.sun.jna.platform.win32.WinDef.HWND;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -23,6 +24,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,13 +43,11 @@ import util.events.testevents.PrimaryRepoChangedEvent;
 import util.events.testevents.UILogicRefreshEventHandler;
 
 import javax.swing.*;
-import java.awt.*;
+import java.awt.Rectangle;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static ui.components.KeyboardShortcuts.SWITCH_DEFAULT_REPO;
 
@@ -169,7 +169,6 @@ public class UI extends Application implements EventDispatcher {
             browserComponent.initialise();
         }
 
-        setExpandedWidth(false);
         panels.init(guiController, panelsScrollPane);
         // Should only be called after panels have been initialized
         ensureSelectedPanelHasFocus();
@@ -229,8 +228,13 @@ public class UI extends Application implements EventDispatcher {
         guiController = new GUIController(this, panels, apiBox);
 
         Scene scene = new Scene(createRootNode());
+
         setupMainStage(scene);
         setupGlobalKeyboardShortcuts(scene);
+
+        setupStageDimensions(stage);
+        setupPositionListener(stage);
+
         notificationController = new NotificationController(notificationPane);
         notificationPane.setId("notificationPane");
 
@@ -331,6 +335,65 @@ public class UI extends Application implements EventDispatcher {
         });
     }
 
+    /**
+     * Calculates initial stage dimensions using graphics environment calculations, and then
+     * attempts to set stage dimensions using screen information.
+     *
+     * @param stage The stage whose bounds will be set.
+     */
+    private void setupStageDimensions(Stage stage) {
+        // Reasonable defaults.
+        Rectangle dimensions = getDimensions();
+        stage.setMinWidth(panels.getPanelWidth());
+        stage.setMaxWidth(dimensions.getWidth());
+        stage.setMinHeight(dimensions.getHeight());
+        stage.setMaxHeight(dimensions.getHeight());
+        stage.setX(0);
+        stage.setY(0);
+        // Then calculate sizes using screen information.
+        setBoundsFromScreen(stage);
+    }
+
+    /**
+     * Configure setBoundsFromScreen to trigger whenever the x-coordinate of the given stage changes.
+     *
+     * @param stage The stage which contains the x-coordinate to listen.
+     */
+    private void setupPositionListener(Stage stage) {
+        stage.xProperty().addListener((observableValue, oldX, newX) -> setBoundsFromScreen(stage));
+    }
+
+    /**
+     * Searches for all screens that the given stage is in, and then sets the following bounds for
+     * the stage's dimensions:
+     * - Minimum height: Minimum height of the screens
+     * - Maximum height: Maximum height of the screens
+     * - Maximum width: Total width of the screens
+     *
+     * @param stage The stage whose bounds are to be set.
+     */
+    private void setBoundsFromScreen(Stage stage) {
+        List<Rectangle2D> occupyingBounds = Screen.getScreensForRectangle(
+                stage.getX(),
+                stage.getY(),
+                stage.getWidth(),
+                stage.getHeight()
+        ).stream().map(Screen::getVisualBounds).collect(Collectors.toList());
+
+        List<Double> occupyingHeights = occupyingBounds.stream()
+                .map(Rectangle2D::getHeight).collect(Collectors.toList());
+        Optional<Double> maxHeight = occupyingHeights.stream().max(Double::compare);
+        Optional<Double> minHeight = occupyingHeights.stream().min(Double::compare);
+
+        double sumWidths = occupyingBounds.stream().mapToDouble(Rectangle2D::getWidth).sum();
+
+        if (maxHeight.isPresent() && minHeight.isPresent()) {
+            stage.setMinHeight(minHeight.get());
+            stage.setMaxHeight(maxHeight.get());
+            stage.setMaxWidth(sumWidths);
+        }
+    }
+
     private static void getMainWindowHandle(String windowTitle) {
         if (PlatformSpecific.isOnWindows()) {
             mainWindowHandle = User32.INSTANCE.FindWindow(null, windowTitle);
@@ -387,18 +450,6 @@ public class UI extends Application implements EventDispatcher {
     }
 
     /**
-     * Returns the maximum usable size of the stage, or to the screen size if this fails.
-     */
-    public Rectangle getDimensions() {
-        Optional<Rectangle> dimensions = Utility.getUsableScreenDimensions();
-        if (dimensions.isPresent()) {
-            return dimensions.get();
-        } else {
-            return Utility.getScreenDimensions();
-        }
-    }
-
-    /**
      * UI operations
      */
 
@@ -423,6 +474,18 @@ public class UI extends Application implements EventDispatcher {
 
     public BrowserComponent getBrowserComponent() {
         return browserComponent;
+    }
+
+    /**
+     * Returns the maximum usable size of the stage, or to the screen size if this fails.
+     */
+    public Rectangle getDimensions() {
+        Optional<Rectangle> dimensions = Utility.getUsableScreenDimensions();
+        if (dimensions.isPresent()) {
+            return dimensions.get();
+        } else {
+            return Utility.getScreenDimensions();
+        }
     }
 
     /**
@@ -453,26 +516,6 @@ public class UI extends Application implements EventDispatcher {
         return new Rectangle(
                 (int) (dimensions.getWidth() - mainStage.getWidth() - mainStage.getX()),
                 (int) dimensions.getHeight());
-    }
-
-    /**
-     * Controls whether or not the main window is expanded (occupying the
-     * whole screen) or not (occupying a percentage).
-     * @param expanded
-     */
-    private void setExpandedWidth(boolean expanded) {
-        Rectangle dimensions = getDimensions();
-        double width = expanded
-                ? dimensions.getWidth()
-                : dimensions.getWidth() * WINDOW_DEFAULT_PROPORTION;
-
-        mainStage.setMinWidth(panels.getPanelWidth());
-        mainStage.setMinHeight(dimensions.getHeight());
-        mainStage.setMaxWidth(width);
-        mainStage.setMaxHeight(dimensions.getHeight());
-        mainStage.setX(0);
-        mainStage.setY(0);
-        mainStage.setMaxWidth(dimensions.getWidth());
     }
 
     public HashMap<String, String> getCommandLineArgs() {
