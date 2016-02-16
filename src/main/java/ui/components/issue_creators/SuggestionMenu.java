@@ -29,8 +29,12 @@ public class SuggestionMenu extends ContextMenu {
      */
     public void loadSuggestions(List<String> searchResult) {
         getItems().clear();
+        // Resets selection for every new trigger 
+        selected = Optional.empty();
 
         searchResult.stream().limit(maxEntries).forEach(this::addMenuItem);
+        // Sets focus on first item if not empty
+        if (!searchResult.isEmpty()) getSkin().getNode().lookup(".menu-item").requestFocus();
     }
 
     /**
@@ -44,7 +48,8 @@ public class SuggestionMenu extends ContextMenu {
      *  Wraps a label inside a menu item.
      */
     private void addMenuItem(String content) {
-        CustomMenuItem item = new CustomMenuItem(new Label(content), false);
+        Label label = new Label(content);
+        CustomMenuItem item = new CustomMenuItem(label, false);
         item.setText(content);
         getItems().add(item);
         item.setOnAction(this::onActionHandler);

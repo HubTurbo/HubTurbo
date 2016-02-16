@@ -28,8 +28,9 @@ public class IssueContentPane extends StackPane {
             "<!DOCTYPE html><html><head></head><body>%s</body></html>";
     public static final String REFERENCE_ISSUE = "#%d %s";
     public static final int MAX_SUGGESTION_ENTRIES = 5;
+    public static final String CONTENT_ID = "body";
 
-    public static final KeyCodeCombination PREVIEW = new KeyCodeCombination(KeyCode.P,
+    public static final KeyCodeCombination PREVIEW = new KeyCodeCombination(KeyCode.F1, 
             KeyCodeCombination.ALT_DOWN);
     public static final KeyCodeCombination MENTION = new KeyCodeCombination(KeyCode.DIGIT2, 
             KeyCodeCombination.SHIFT_DOWN);
@@ -95,6 +96,7 @@ public class IssueContentPane extends StackPane {
     @SuppressWarnings("PMD")
     private void mouseClickHandler(MouseEvent e) {
         body.toFront();
+        body.requestFocus();
     }
 
     /**
@@ -114,18 +116,20 @@ public class IssueContentPane extends StackPane {
         if (canShowSuggestions(REFERENCE, e)) {
             showSuggestions(getMatchedIssues(presenter.getIssues(), ""));
         }
-        
-        if (HIDE_SUGGGESTIONS.match(e)) hideSuggestions();
-        
     }
 
     @SuppressWarnings("PMD")
     private void querySuggestionsHandler(KeyEvent event) {
-        if (body.getCaretPosition() > initialCaretPosition && suggestions.isShowing()) {
+        if (body.getCaretPosition() > initialCaretPosition 
+            && !(event.getCode() == KeyCode.UP || event.getCode() == KeyCode.DOWN)
+            && !canMatchSequence(body.getCaretPosition(), 1, " ")) {
+
+            if (!suggestions.isShowing()) suggestions.show(this.getScene().getWindow());
+
             querySuggestions(body.getText(initialCaretPosition, body.getCaretPosition()));
-        } else {
-            suggestions.hide();
-        }
+        } 
+        
+        if (HIDE_SUGGGESTIONS.match(event)) suggestions.hide();
     }
 
     @SuppressWarnings("PMD")
@@ -148,10 +152,6 @@ public class IssueContentPane extends StackPane {
         suggestions.show(this.getScene().getWindow());
     }
 
-    private void hideSuggestions() {
-        initialCaretPosition = body.getCaretPosition();
-    }
-
     private void querySuggestions(String input) {
         String symbol = input.substring(0, 1);
         String query = input.substring(1, input.length());
@@ -165,11 +165,14 @@ public class IssueContentPane extends StackPane {
         }
     }
 
+    /**
+     * Only trigger suggestions after "@" or "#" is pressed at the beginning of 
+     * a new token i.e suggestions will not be triggered for "#hello#'
+     */
     private boolean canShowSuggestions(KeyCodeCombination key, KeyEvent event) {
         int caretPosition = body.getCaretPosition();
 
-        return key.match(event) && !suggestions.isShowing() 
-           && body.getText(caretPosition - 1, caretPosition).equals(" ");
+        return canMatchSequence(caretPosition, 1, " ") && key.match(event);
     }
 
     private String processSelectedContent(String input) {
@@ -211,6 +214,18 @@ public class IssueContentPane extends StackPane {
             .collect(Collectors.toList());
     }
 
+    // ===============
+    // Textarea helper 
+    // ===============
+    
+    /**
+     * Checks last n characters from given caret position with a query
+     * @param pos position of caret in text area
+     */
+    private boolean canMatchSequence(int pos, int n, String query) {
+        return body.getText(pos - n, pos).equals(query);
+    }
+
     // =================
     // UI initialization
     // =================
@@ -230,6 +245,7 @@ public class IssueContentPane extends StackPane {
      */
     private InlineCssTextArea initContent() {
         InlineCssTextArea content = new InlineCssTextArea();
+        content.setId(CONTENT_ID);
         content.setPrefWidth(CONTENT_WIDTH);
         content.setWrapText(true);
         content.setPopupWindow(suggestions);
