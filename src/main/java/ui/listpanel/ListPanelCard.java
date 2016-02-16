@@ -235,21 +235,26 @@ public class ListPanelCard extends VBox {
             issueDetails.getChildren().add(new Label(milestone.getTitle()));
         }
 
-        if (guiElement.getAuthor().isPresent()) {
-            TurboUser author = guiElement.getAuthor().get();
+        if (issue.isPullRequest()) {
             Label authorLabel = new Label("Author: ");
             Label authorNameLabel = new Label(issue.getCreator());
 
-            ImageView authorAvatar = new ImageView();
-            if (author.getAvatarURL().length() != 0) {
-                Image image = author.getAvatar();
-                assert image != null;
-                authorAvatar.setImage(image);
-            }
-
             HBox authorBox = new HBox();
             authorBox.setAlignment(Pos.BASELINE_CENTER);
-            authorBox.getChildren().addAll(authorLabel, authorAvatar, authorNameLabel);
+
+            if (guiElement.getAuthor().isPresent()) {
+                TurboUser author = guiElement.getAuthor().get();
+                ImageView authorAvatar = new ImageView();
+                if (author.getAvatarURL().length() != 0) {
+                    Image image = author.getAvatar();
+                    assert image != null;
+                    authorAvatar.setImage(image);
+                }
+
+                authorBox.getChildren().addAll(authorLabel, authorAvatar, authorNameLabel);
+            } else {
+                authorBox.getChildren().addAll(authorLabel, authorNameLabel);
+            }
             authorBox.setPrefWidth(CARD_WIDTH / 2);
             authorAssigneeBox.getChildren().add(authorBox);
         }
