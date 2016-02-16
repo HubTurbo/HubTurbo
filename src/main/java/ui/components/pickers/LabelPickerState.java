@@ -7,7 +7,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * This class is used to represent the state of the label picker. In additional to representing a state,
+ * This class is used to represent the state of the label picker. In addition to representing a state,
  * it contains the logic which handles toggling/highlighting of labels and simplifies the retrieval of
  * the resulting status for UI to display.
  */
@@ -16,61 +16,47 @@ public class LabelPickerState {
     List<String> addedLabels;
     List<String> removedLabels;
     List<String> matchedLabels;
+    List<String> repoLabels;
     OptionalInt currentSuggestionIndex;
 
-    /*
-     * Constructors
-     */
-
-    public LabelPickerState(Set<String> initialLabels) {
-        this.initialLabels = initialLabels;
-        this.addedLabels = new ArrayList<>();
-        this.removedLabels = new ArrayList<>();
-        this.matchedLabels = new ArrayList<>();
-        this.currentSuggestionIndex = OptionalInt.empty();
+    public LabelPickerState(Set<String> initialLabels, List<String> repoLabels) {
+        this(initialLabels, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), repoLabels,
+                OptionalInt.empty());
     }
 
-    private LabelPickerState(Set<String> initialLabels,
-                             List<String> addedLabels,
-                             List<String> removedLabels,
-                             List<String> matchedLabels,
-                             OptionalInt currentSuggestionIndex) {
+    private LabelPickerState(Set<String> initialLabels, List<String> addedLabels, List<String> removedLabels,
+                             List<String> matchedLabels, List<String> repoLabels) {
+        this(initialLabels, addedLabels, removedLabels, matchedLabels, repoLabels, OptionalInt.empty());
+    }
+
+    private LabelPickerState(Set<String> initialLabels, List<String> addedLabels, List<String> removedLabels,
+                             List<String> matchedLabels, List<String> repoLabels, OptionalInt currentSuggestionIndex) {
         this.initialLabels = initialLabels;
         this.addedLabels = addedLabels;
         this.removedLabels = removedLabels;
         this.matchedLabels = matchedLabels;
+        this.repoLabels = repoLabels;
         this.currentSuggestionIndex = currentSuggestionIndex;
-    }
-
-    private LabelPickerState(Set<String> initialLabels,
-                             List<String> addedLabels,
-                             List<String> removedLabels,
-                             List<String> matchedLabels) {
-        this.initialLabels = initialLabels;
-        this.addedLabels = addedLabels;
-        this.removedLabels = removedLabels;
-        this.matchedLabels = matchedLabels;
-        this.currentSuggestionIndex = OptionalInt.empty();
     }
 
     /**
      * Determines resulting state based on given initial state and user input
-     * @param initialState
-     * @param repoLabels
+     *
+     * @param initialState the state of the label picker before the user has typed anything
      * @param userInput 
      * @return new state that corresponds with the user input
      */
-    public static LabelPickerState determineState(LabelPickerState initialState, Set<String> repoLabels,
+    public static LabelPickerState determineState(LabelPickerState initialState,
                                                   String userInput) {
         LabelPickerState state = initialState;
         List<String> confirmedKeywords = getConfirmedKeywords(userInput);
         for (String confirmedKeyword : confirmedKeywords) {
-            state = state.toggleLabel(repoLabels, confirmedKeyword);
+            state = state.toggleLabel(confirmedKeyword);
         }
 
         Optional<String> keywordInProgess = getKeywordInProgress(userInput);
         if (keywordInProgess.isPresent()) {
-            state = state.updateMatchedLabels(repoLabels, keywordInProgess.get());
+            state = state.updateMatchedLabels(keywordInProgess.get());
         }
 
         return state;
@@ -80,15 +66,14 @@ public class LabelPickerState {
      * Gives a new state with the label that contains keyword toggled.
      *
      * This will simply return the same state if there are more than 1
-     * labels that contains the keyword
+     * labels that contain the keyword
      *
      * keyword is case-insensitive
      *
-     * @param repoLabels
      * @param keyword
      * @return
      */
-    public LabelPickerState toggleLabel(Set<String> repoLabels, String keyword) {
+    public LabelPickerState toggleLabel(String keyword) {
         if (!hasExactlyOneMatchedLabel(repoLabels, keyword)) return this;
         String labelName = getMatchedLabelName(repoLabels, keyword);
 
@@ -110,7 +95,7 @@ public class LabelPickerState {
             }
         }
 
-        return new LabelPickerState(initialLabels, addedLabels, removedLabels, convertToList(repoLabels));
+        return new LabelPickerState(initialLabels, addedLabels, removedLabels, repoLabels, repoLabels);
     }
 
     /**
@@ -119,12 +104,11 @@ public class LabelPickerState {
      *
      * The suggestion index will be pointed to the first label that fits the query, if there is.
      *
-     * @param repoLabels
      * @param query
      * @return
      */
-    public LabelPickerState updateMatchedLabels(Set<String> repoLabels, String query) {
-        List<String> newMatchedLabels = convertToList(repoLabels);
+    public LabelPickerState updateMatchedLabels(String query) {
+        List<String> newMatchedLabels = repoLabels;
 
         newMatchedLabels = filterByName(newMatchedLabels, getName(query));
         newMatchedLabels = filterByGroup(newMatchedLabels, getGroup(query));
@@ -136,7 +120,8 @@ public class LabelPickerState {
             newSuggestionIndex = OptionalInt.of(0);
         }
 
-        return new LabelPickerState(initialLabels, addedLabels, removedLabels, newMatchedLabels, newSuggestionIndex);
+        return new LabelPickerState(initialLabels, addedLabels, removedLabels, newMatchedLabels, repoLabels,
+                newSuggestionIndex);
     }
 
     /*
@@ -275,7 +260,7 @@ public class LabelPickerState {
         return !(keywordIndex == userInput.split("\\s+").length - 1 && !userInput.endsWith(" "));
     }
 
-    private static String getMatchedLabelName(Set<String> repoLabels, String keyword) {
+    private static String getMatchedLabelName(List<String> repoLabels, String keyword) {
         List<String> newMatchedLabels = new ArrayList<>();
         newMatchedLabels.addAll(repoLabels);
         newMatchedLabels = filterByName(newMatchedLabels, getName(keyword));
@@ -283,7 +268,7 @@ public class LabelPickerState {
         return newMatchedLabels.get(0);
     }
 
-    private static boolean hasExactlyOneMatchedLabel(Set<String> repoLabels, String keyword) {
+    private static boolean hasExactlyOneMatchedLabel(List<String> repoLabels, String keyword) {
         List<String> newMatchedLabels = new ArrayList<>();
         newMatchedLabels.addAll(repoLabels);
         newMatchedLabels = filterByName(newMatchedLabels, getName(keyword));

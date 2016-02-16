@@ -6,9 +6,12 @@ import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
 import org.eclipse.egit.github.core.Label;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("unused")
 public class TurboLabel implements Comparable<TurboLabel> {
@@ -210,5 +213,30 @@ public class TurboLabel implements Comparable<TurboLabel> {
     @Override
     public int compareTo(TurboLabel o) {
         return actualName.compareTo(o.getActualName());
+    }
+
+    /**
+     * To return the TurboLabel in labels that matches labelName
+     * Assumption: the labelName matches exactly 1 TurboLabel
+     *
+     * @param labels
+     * @param labelName
+     * @return
+     */
+    public static TurboLabel getMatchingTurboLabel(List<TurboLabel> labels, String labelName) {
+        assert labels.stream()
+                .filter(label -> label.getActualName().equals(labelName))
+                .findFirst()
+                .isPresent();
+        return labels.stream()
+                .filter(label -> label.getActualName().equals(labelName))
+                .findFirst()
+                .get();
+    }
+
+    public static List<String> getLabelsNameList(List<TurboLabel> labels) {
+        return labels.stream()
+                .map(TurboLabel::getActualName)
+                .collect(Collectors.toList());
     }
 }

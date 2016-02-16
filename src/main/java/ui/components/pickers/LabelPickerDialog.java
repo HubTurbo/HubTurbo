@@ -17,7 +17,6 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -25,7 +24,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.Logger;
 
@@ -42,6 +40,9 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
     private static final Insets GROUP_PAD = new Insets(0, 0, 10, 10);
     private static final Logger logger = HTLog.get(LabelPickerDialog.class);
 
+    /**
+     * This should contain the list of labels defined in the current repository
+     */
     private final List<TurboLabel> repoLabels;
     private final TurboIssue issue;
     private LabelPickerState state;
@@ -62,16 +63,16 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
     LabelPickerDialog(TurboIssue issue, List<TurboLabel> repoLabels, Stage stage) {
         this.repoLabels = repoLabels;
         this.issue = issue;
-        this.state = getCleanState(issue.getLabels(), getRepoLabelsSet());
+        this.state = getCleanState(new HashSet(issue.getLabels()), TurboLabel.getLabelsNameList(repoLabels));
 
         initUI(stage, issue);
         setupEvents(stage);
         Platform.runLater(queryField::requestFocus);
     }
 
-    private LabelPickerState getCleanState(List<String> initialLabels, Set<String> repoLabels) {
-        LabelPickerState state = new LabelPickerState(new HashSet<>(initialLabels));
-        state = state.updateMatchedLabels(repoLabels, "");
+    private LabelPickerState getCleanState(Set<String> initialLabels, List<String> repoLabels) {
+        LabelPickerState state = new LabelPickerState(initialLabels, repoLabels);
+        state = state.updateMatchedLabels("");
         return state;
     }
 
@@ -88,7 +89,7 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
         title.setTooltip(createTitleTooltip(issue));
         createButtons();
 
-        populatePanes(getCleanState(issue.getLabels(), getRepoLabelsSet()));
+        populatePanes(getCleanState(new HashSet(issue.getLabels()), TurboLabel.getLabelsNameList(repoLabels)));
     }
 
     private void initialiseDialog(Stage stage, TurboIssue issue) {
@@ -136,7 +137,7 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
 
     private Node processInitialLabel(String initialLabel, List<String> removedLabels, 
                                             Optional<String> suggestion) {
-        TurboLabel repoInitialLabel = getRepoTurboLabel(initialLabel);
+        TurboLabel repoInitialLabel = TurboLabel.getMatchingTurboLabel(repoLabels, initialLabel);
         if (!removedLabels.contains(initialLabel)) {
             if (suggestion.isPresent() && initialLabel.equals(suggestion.get())) {
                 return getStyledPickerLabel(repoInitialLabel, true, false, true, false, true);
@@ -164,24 +165,6 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
         return node;
     }
 
-    /**
-     * To return the repo's TurboLabel that matches labelName
-     * Assumption: the labelName matches exactly 1 TurboLabel
-     *
-     * @param labelName
-     * @return
-     */
-    private TurboLabel getRepoTurboLabel(String labelName) {
-        assert repoLabels.stream()
-                .filter(label -> label.getActualName().equals(labelName))
-                .findFirst()
-                .isPresent();
-        return repoLabels.stream()
-                .filter(label -> label.getActualName().equals(labelName))
-                .findFirst()
-                .get();
-    }
-
     private void populateToBeAddedLabels(List<String> addedLabels, Optional<String> suggestion) {
         if (!addedLabels.isEmpty() || hasNewSuggestion(addedLabels, suggestion)) {
             assignedLabels.getChildren().add(new Label("|"));
@@ -199,9 +182,11 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
 
     private Node processAddedLabel(String addedLabel, Optional<String> suggestion) {
         if (!suggestion.isPresent() || !addedLabel.equals(suggestion.get())) {
-            return getStyledPickerLabel(getRepoTurboLabel(addedLabel), false, false, false, false, true);
+            return getStyledPickerLabel(TurboLabel.getMatchingTurboLabel(repoLabels, addedLabel),
+                    false, false, false, false, true);
         }
-        return getStyledPickerLabel(getRepoTurboLabel(addedLabel), true, false, true, false, true);
+        return getStyledPickerLabel(TurboLabel.getMatchingTurboLabel(repoLabels, addedLabel),
+                true, false, true, false, true);
     }
 
     private void populateSuggestedLabel(List<String> addedLabels, Optional<String> suggestion) {
@@ -216,7 +201,8 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
     }
 
     private Node processSuggestedLabel(String suggestedLabel) {
-        return getStyledPickerLabel(getRepoTurboLabel(suggestedLabel), true, false, false, false, true);
+        return getStyledPickerLabel(TurboLabel.getMatchingTurboLabel(repoLabels, suggestedLabel),
+                true, false, false, false, true);
     }
 
     private void populateFeedbackLabels(List<String> assignedLabels, List<String> matchedLabels,
@@ -268,8 +254,8 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
     private Node processMatchedLabel(String repoLabel, List<String> matchedLabels, 
                                             List<String> assignedLabels, Optional<String> suggestion) {
         boolean shouldHighlight = suggestion.isPresent() && suggestion.get().equals(repoLabel);
-        return getStyledPickerLabel(getRepoTurboLabel(repoLabel), !matchedLabels.contains(repoLabel), 
-                                    shouldHighlight, false, assignedLabels.contains(repoLabel), false);
+        return getStyledPickerLabel(TurboLabel.getMatchingTurboLabel(repoLabels, repoLabel),
+                !matchedLabels.contains(repoLabel), shouldHighlight, false, assignedLabels.contains(repoLabel), false);
     }
 
     private void createMainLayout() {
@@ -343,15 +329,15 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
     private void initialiseAndregisterQueryHandler() {
         listener = (observable, oldValue, newValue) -> {
             state = LabelPickerState.determineState(
-                    getCleanState(issue.getLabels(), getRepoLabelsSet()),
-                    getRepoLabelsSet(), queryField.getText().toLowerCase());
+                    getCleanState(new HashSet(issue.getLabels()), TurboLabel.getLabelsNameList(repoLabels)),
+                    queryField.getText().toLowerCase());
             populatePanes(state);
         };
         queryField.textProperty().addListener(listener);
     }
 
     private void handleLabelClick(PickerLabel label) {
-        state.toggleLabel(getRepoLabelsSet(), label.getActualName());
+        state.toggleLabel(label.getActualName());
         populatePanes(state);
 
         if (!queryField.isDisabled()) {
@@ -373,12 +359,6 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
     // getHeight() returns NaN when the height is not set
     private Optional<Double> getDialogHeight() {
         return Double.isNaN(getHeight()) ? Optional.empty() : Optional.of(getHeight());
-    }
-
-    private Set<String> getRepoLabelsSet() {
-        return repoLabels.stream()
-                .map(TurboLabel::getActualName)
-                .collect(Collectors.toSet());
     }
 
 }
