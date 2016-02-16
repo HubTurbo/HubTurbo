@@ -169,8 +169,8 @@ public class LabelPickerState {
      * @return
      */
     public Optional<String> getCurrentSuggestion() {
-        assert isValidSuggestionIndex();
         if (currentSuggestionIndex.isPresent()) {
+            assert isValidSuggestionIndex();
             return Optional.of(getSuggestedLabel());
         }
         return Optional.empty();
