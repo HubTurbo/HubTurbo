@@ -165,9 +165,8 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
     }
 
     /**
-     * To return the repo's TurboLabel that contains labelName
-     * <p>
-     * labelName MUST match a repo label's name
+     * To return the repo's TurboLabel that matches labelName
+     * Assumption: the labelName matches exactly 1 TurboLabel
      *
      * @param labelName
      * @return

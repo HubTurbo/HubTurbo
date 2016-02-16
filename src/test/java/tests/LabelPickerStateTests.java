@@ -34,40 +34,6 @@ public class LabelPickerStateTests {
     }
 
     @Test
-    public void matchedLabelsTest() {
-        LabelPickerState initialState = setupState();
-        LabelPickerState nextState = initialState.updateMatchedLabels(
-                getTestRepoLabels(),
-                "p.h"
-        );
-
-        assertEquals(2, nextState.getMatchedLabels().size());
-
-        nextState = nextState.clearMatchedLabels();
-        assertEquals(0, nextState.getMatchedLabels().size());
-    }
-
-    @Test
-    public void currentSuggestionTest() {
-        LabelPickerState initialState = setupState();
-        LabelPickerState nextState = initialState.updateMatchedLabels(
-                getTestRepoLabels(),
-                "p.h"
-        );
-
-        assertEquals(true, nextState.getCurrentSuggestion().isPresent());
-        assertEquals("priority.high", nextState.getCurrentSuggestion().get());
-
-        nextState = nextState.nextSuggestion();
-        assertEquals(true, nextState.getCurrentSuggestion().isPresent());
-        assertEquals("Problem.Heavy", nextState.getCurrentSuggestion().get());
-
-        nextState = nextState.previousSuggestion();
-        assertEquals(true, nextState.getCurrentSuggestion().isPresent());
-        assertEquals("priority.high", nextState.getCurrentSuggestion().get());
-    }
-
-    @Test
     public void toggleLabelTest() {
         Set<String> repoLabels = getTestRepoLabels();
         LabelPickerState initialState = setupState();
