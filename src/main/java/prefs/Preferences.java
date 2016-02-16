@@ -138,21 +138,32 @@ public class Preferences { // NOPMD
     }
     
     public Optional<String> switchBoard() {
-
-        List<String> boardNames = getAllBoardNames();
-        if (getLastOpenBoard().isPresent() && getAllBoardNames().size() > 1) {
-            int lastBoard = boardNames.indexOf(getLastOpenBoard().get());
-            int index = (lastBoard + 1) % boardNames.size();
-            
-            setLastOpenBoard(boardNames.get(index));
-        } else if (getLastDeletedBoardIndex().isPresent() && getAllBoardNames().size() > 1) {
-            int lastDeletedBoardIndex = getLastDeletedBoardIndex().get();
-            int index = lastDeletedBoardIndex % boardNames.size();
-
-            setLastOpenBoard(boardNames.get(index));
-        }
-        
+        setBoardToSwitch();
         return getLastOpenBoard();
+    }
+
+    /**
+     * Sets the lastOpenBoard to the board to switch to
+     */
+    private void setBoardToSwitch(){
+        List<String> boardNames = getAllBoardNames();
+        boolean hasLastOpenBoard = getLastOpenBoard().isPresent();
+        boolean hasLastDeletedBoardOpen = getLastDeletedBoardIndex().isPresent();
+        int index = 0;
+
+        if (getAllBoardNames().size() <= 1 ) {
+            return;
+        }
+
+        if (hasLastOpenBoard) {
+            int lastBoard = boardNames.indexOf(getLastOpenBoard().get());
+            index = (lastBoard + 1) % boardNames.size();
+        } else if (hasLastDeletedBoardOpen) {
+            int lastDeletedBoardIndex = getLastDeletedBoardIndex().get();
+            index = lastDeletedBoardIndex % boardNames.size();
+        }
+
+        setLastOpenBoard(boardNames.get(index));
     }
     
     public void clearLastOpenBoard() {
