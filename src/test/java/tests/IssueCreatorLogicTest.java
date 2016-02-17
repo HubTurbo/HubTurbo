@@ -1,7 +1,5 @@
 package tests;
 
-import java.util.Optional;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -21,7 +19,7 @@ public class IssueCreatorLogicTest {
     public void init() {
         repo = mock(Model.class);
         issue = new TurboIssue("dummy/dummy", 1, "Old Issue");
-        presenter = new IssueCreatorPresenter(repo, Optional.of(issue));
+        presenter = new IssueCreatorPresenter(repo, issue);
     }
 
     @Test
