@@ -9,7 +9,6 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Pair;
-import util.Utility;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,10 +21,10 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
     private static final String ASSIGNED_MILESTONE = "Assigned Milestone";
 
     private final List<PickerMilestone> originalMilestones = new ArrayList<>();
-    private List<PickerMilestone> milestonesToDisplay = new ArrayList<>();
     private VBox milestoneBox;
     FlowPane openMilestones, closedMilestones, assignedMilestone;
     private TextField inputField;
+    private MilestonePickerState state;
 
     /**xxxx
      * Constructor to create a MilestonePickerDialog
@@ -39,15 +38,29 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
         initOwner(stage);
         setTitle(DIALOG_TITLE);
         setupButtons(getDialogPane());
-        convertToPickerMilestones(issue, milestones);
+        originalMilestones.addAll(convertToPickerMilestones(issue, milestones));
+        state = new MilestonePickerState(originalMilestones, this);
         initUI();
         setupKeyEvents();
     }
 
+    public void toggleMilestone(String milestoneName) {
+        MilestonePickerState curState = state;
+        inputField.clear();
+        inputField.setDisable(true);
+        state.toggleMilestone(milestoneName);
+    }
+
     private void setupKeyEvents() {
         inputField.textProperty().addListener((observable, oldValue, newValue) -> {
-            processInput(newValue);
+            updateUI(newValue);
         });
+    }
+
+    private void updateUI(String userInput) {
+        state = new MilestonePickerState(originalMilestones, this);
+        state.processInput(userInput);
+        refreshUI(state);
     }
 
     private boolean hasHighlightedMilestone(List<PickerMilestone> milestones) {
@@ -57,17 +70,20 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
                 .isPresent();
     }
 
-    private void convertToPickerMilestones(TurboIssue issue, List<TurboMilestone> milestones) {
+    private List<PickerMilestone> convertToPickerMilestones(TurboIssue issue, List<TurboMilestone> milestones) {
+        List<PickerMilestone> originalMilestones = new ArrayList<>();
         for (int i = 0; i < milestones.size(); i++) {
             PickerMilestone convertedMilestone = new PickerMilestone(milestones.get(i), this);
             if (isExistingMilestone(issue, convertedMilestone)) {
                 convertedMilestone.setExisting(true);
             }
-            this.originalMilestones.add(convertedMilestone);
+            originalMilestones.add(convertedMilestone);
         }
 
-        Collections.sort(this.originalMilestones);
-        selectAssignedMilestone(issue);
+        Collections.sort(originalMilestones);
+        selectAssignedMilestone(originalMilestones, issue);
+
+        return originalMilestones;
     }
 
     private boolean isExistingMilestone(TurboIssue issue, PickerMilestone milestone) {
@@ -78,39 +94,8 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
         }
     }
 
-    private boolean hasMatchingMilestone(List<PickerMilestone> milestoneList) {
-        return milestoneList.stream()
-                .filter(milestone -> !milestone.isFaded())
-                .findAny()
-                .isPresent();
-    }
-
-    private void highlightFirstMatchingMilestone() {
-        if (hasMatchingMilestone(this.milestonesToDisplay)) {
-            this.milestonesToDisplay.stream()
-                    .filter(milestone -> !milestone.isFaded())
-                    .findAny()
-                    .get()
-                    .setHighlighted(true);
-        }
-    }
-
-    private boolean hasSelectedMilestone() {
-        return this.milestonesToDisplay.stream()
-                .filter(milestone -> milestone.isSelected())
-                .findAny()
-                .isPresent();
-    }
-
-    private PickerMilestone getSelectedMilestone() {
-        return this.milestonesToDisplay.stream()
-                .filter(milestone -> milestone.isSelected())
-                .findAny()
-                .get();
-    }
-
-    private void selectAssignedMilestone(TurboIssue issue) {
-        this.originalMilestones.stream()
+    private void selectAssignedMilestone(List<PickerMilestone> milestones, TurboIssue issue) {
+        milestones.stream()
                 .filter(milestone -> isExistingMilestone(issue, milestone))
                 .forEach(milestone -> milestone.setSelected(true));
     }
@@ -124,9 +109,9 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
 
     private void setConfirmResultConverter(ButtonType confirmButtonType) {
         setResultConverter((dialogButton) -> {
-
-            if (hasSelectedMilestone()) {
-                return new Pair<>(dialogButton, getSelectedMilestone().getId());
+            List<PickerMilestone> finalList = state.getCurrentMilestonesList();
+            if (hasSelectedMilestone(finalList)) {
+                return new Pair<>(dialogButton, getSelectedMilestone(finalList).getId());
             }
             return new Pair<>(dialogButton, null);
 
@@ -134,8 +119,6 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
     }
 
     private void initUI() {
-        milestonesToDisplay.addAll(originalMilestones);
-
         milestoneBox = new VBox();
         inputField = new TextField();
 
@@ -158,51 +141,14 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
 
         getDialogPane().setContent(milestoneBox);
         Platform.runLater(inputField::requestFocus);
-        refreshUI();
+        refreshUI(state);
     }
 
-    private void refreshUI() {
+    private void refreshUI(MilestonePickerState state) {
+        List<PickerMilestone> milestonesToDisplay = state.getCurrentMilestonesList();
         populateAssignedMilestone(milestonesToDisplay, assignedMilestone);
         populateOpenMilestones(milestonesToDisplay, openMilestones);
         populateClosedMilestones(milestonesToDisplay, closedMilestones);
-    }
-
-    private void processInput(String userInput) {
-        resetDisplayedMilestones();
-        if (userInput.isEmpty()) {
-            refreshUI();
-            return;
-        }
-
-        String[] userInputWords = userInput.split(" ");
-        for (int i = 0; i < userInputWords.length; i++) {
-            String currentWord = userInputWords[i];
-            if (i < userInputWords.length - 1 || userInput.endsWith(" ")) {
-                toggleMilestone(currentWord);
-            } else {
-                filterMilestone(currentWord);
-            }
-        }
-
-        refreshUI();
-    }
-
-    private void resetDisplayedMilestones() {
-        milestonesToDisplay.clear();
-        originalMilestones.stream()
-                .forEach(milestone -> {
-                    milestonesToDisplay.add(new PickerMilestone(milestone, this));
-                });
-    }
-
-    private void filterMilestone(String query) {
-        milestonesToDisplay.stream()
-                .forEach(milestone -> {
-                    boolean matchQuery = Utility.containsIgnoreCase(milestone.getTitle(), query);
-                    milestone.setFaded(!matchQuery);
-                });
-
-        highlightFirstMatchingMilestone();
     }
 
     private void populateAssignedMilestone(List<PickerMilestone> pickerMilestoneList, FlowPane assignedMilestoneStatus) {
@@ -275,39 +221,17 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
         return milestoneGroup;
     }
 
-    private String getMilestoneName(String query) {
-        if (hasExactlyOneMatchingMilestone(milestonesToDisplay, query)) {
-            return getMatchingMilestoneName(milestonesToDisplay, query);
-        }
-        return null;
-    }
-
-    private boolean hasExactlyOneMatchingMilestone(List<PickerMilestone> milestoneList, String query) {
+    private boolean hasSelectedMilestone(List<PickerMilestone> milestoneList) {
         return milestoneList.stream()
-                .filter(milestone -> Utility.containsIgnoreCase(milestone.getTitle(), query))
-                .count() == 1;
+                .filter(milestone -> milestone.isSelected())
+                .findAny()
+                .isPresent();
     }
 
-    private String getMatchingMilestoneName(List<PickerMilestone> milestoneList, String query) {
+    private PickerMilestone getSelectedMilestone(List<PickerMilestone> milestoneList) {
         return milestoneList.stream()
-                .filter(milestone -> Utility.containsIgnoreCase(milestone.getTitle(), query))
-                .findFirst()
-                .get()
-                .getTitle();
-    }
-
-    /**
-     * Finds the PickerMilestone in the milestoneToDisplay list which has milestoneQuery in title,
-     * then toggles the selection status
-     * @param milestoneQuery
-     */
-    public void toggleMilestone(String milestoneQuery) {
-        String milestoneName = getMilestoneName(milestoneQuery);
-        if (milestoneName == null) return;
-        this.milestonesToDisplay.stream()
-                .forEach(milestone -> {
-                    milestone.setSelected(milestone.getTitle().equals(milestoneName)
-                            && !milestone.isSelected());
-                });
+                .filter(milestone -> milestone.isSelected())
+                .findAny()
+                .get();
     }
 }

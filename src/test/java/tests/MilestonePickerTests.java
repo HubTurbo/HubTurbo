@@ -4,7 +4,7 @@ import org.junit.Test;
 
 public class MilestonePickerTests {
     @Test
-    public void milestonePicker() {
+    public void toggleMilestone_noMilestone_milestoneAssigned() {
 
     }
 }
