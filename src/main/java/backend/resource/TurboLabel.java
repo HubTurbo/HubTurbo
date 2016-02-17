@@ -82,11 +82,12 @@ public class TurboLabel implements Comparable<TurboLabel> {
 
     /**
      * Extracts delimiters from a label that belongs to a group to classify 
-     * a label as exclusive or not.
-     * @param name
+     * a label as exclusive or not. Only extracts first matching delimiter 
+     * i.e "priority.high-low" will return "."
+     * @param labelName
      * @return
      */
-    public static Optional<String> getDelimiter(String name) {
+    public static Optional<String> getDelimiter(String labelName) {
 
         // Escaping due to constants not being valid regexes
         Pattern p = Pattern.compile(String.format("^[^\\%s\\%s]+(\\%s|\\%s)",
@@ -94,7 +95,7 @@ public class TurboLabel implements Comparable<TurboLabel> {
             NONEXCLUSIVE_DELIMITER,
             EXCLUSIVE_DELIMITER,
             NONEXCLUSIVE_DELIMITER));
-        Matcher m = p.matcher(name);
+        Matcher m = p.matcher(labelName);
 
         if (m.find()) {
             return Optional.of(m.group(1));
@@ -250,33 +251,34 @@ public class TurboLabel implements Comparable<TurboLabel> {
     }
 
     /**
-     * Returns the list of labels which name contains labelName
+     * Returns the list of label names that matches a query
+     * Uses partial matching and matching is case-insensitive
      * @param repoLabels
-     * @param labelName
+     * @param queryLabelName
      * @return
      */
-    public static List<String> filterByPartialName(List<String> repoLabels, String labelName) {
+    public static List<String> filterByPartialName(List<String> repoLabels, String queryLabelName) {
         return repoLabels
                 .stream()
-                .filter(name -> Utility.containsIgnoreCase(getName(name), labelName))
+                .filter(name -> Utility.containsIgnoreCase(getName(name), queryLabelName))
                 .collect(Collectors.toList());
     }
 
     /**
-     * Returns the list of labels which group contains labelGroup.
-     * Uses partial keyword matching and keyword is case-insensitive
+     * Returns the list of label names that belongs to a group and matches a query
+     * Uses partial matching and matching is case-insensitive
      * @param repoLabels
-     * @param labelGroup
+     * @param queryLabelGroup
      * @return
      */
-    public static List<String> filterByPartialGroupName(List<String> repoLabels, String labelGroup) {
-        if (labelGroup.isEmpty()) return repoLabels;
+    public static List<String> filterByPartialGroupName(List<String> repoLabels, String queryLabelGroup) {
+        if (queryLabelGroup.isEmpty()) return repoLabels;
 
         return repoLabels
                 .stream()
                 .filter(name -> {
                     if (hasGroup(name)) {
-                        return Utility.containsIgnoreCase(getGroup(name), labelGroup);
+                        return Utility.containsIgnoreCase(getGroup(name), queryLabelGroup);
                     }
                     return false;
                 })
@@ -321,7 +323,7 @@ public class TurboLabel implements Comparable<TurboLabel> {
      * @param labelName
      * @return
      */
-    public static boolean hasExclusiveGroup(String labelName) {
+    public static boolean isInExclusiveGroup(String labelName) {
         return TurboLabel.getDelimiter(labelName).isPresent() && TurboLabel.getDelimiter(labelName).get().equals(".");
     }
 
@@ -337,7 +339,8 @@ public class TurboLabel implements Comparable<TurboLabel> {
     }
 
     /**
-     * Returns the name of labelName after removing its group
+     * Returns the name of labelName after omitting its group name
+     * i.e "priority.high" will return "high"
      * @param labelName
      * @return
      */
@@ -346,7 +349,7 @@ public class TurboLabel implements Comparable<TurboLabel> {
         return labelName.substring(labelName.indexOf(TurboLabel.getDelimiter(labelName).get()) + 1);
     }
 
-    public static boolean hasGroup(String name) {
-        return TurboLabel.getDelimiter(name).isPresent();
+    public static boolean hasGroup(String labelName) {
+        return TurboLabel.getDelimiter(labelName).isPresent();
     }
 }

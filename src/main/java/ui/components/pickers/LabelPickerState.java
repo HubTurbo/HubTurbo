@@ -7,8 +7,7 @@ import java.util.stream.Collectors;
 
 /**
  * This class is used to represent the state of the label picker. In addition to representing a state,
- * it contains the logic which handles toggling/highlighting of labels and simplifies the retrieval of
- * the resulting status for UI to display.
+ * it contains the logic that handles every state transitions
  */
 public class LabelPickerState {
     Set<String> initialLabels;
@@ -188,7 +187,7 @@ public class LabelPickerState {
      */
 
     private void removeConflictingLabels(String name) {
-        if (!TurboLabel.hasExclusiveGroup(name)) return;
+        if (!TurboLabel.isInExclusiveGroup(name)) return;
 
         String group = TurboLabel.getGroup(name);
         // Remove from addedLabels
