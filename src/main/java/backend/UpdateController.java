@@ -110,7 +110,7 @@ public class UpdateController {
             boolean hasUpdatedQualifier = Qualifier.hasUpdatedQualifier(filterExpr);
 
             FilterExpression filterExprNoRepoAlias
-                    = Qualifier.replaceRepoAliases(UI.prefs.getRepoAliasMap(), filterExpr);
+                    = Qualifier.replaceRepoAliases(UI.prefs.getRepoConfig(), filterExpr);
             FilterExpression filterExprNoAlias
                     = Qualifier.replaceMilestoneAliases(models, filterExprNoRepoAlias);
 

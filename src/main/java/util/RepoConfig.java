@@ -8,30 +8,27 @@ import org.apache.logging.log4j.Logger;
 import java.util.Map;
 
 /**
- * This class acts like a bi-directional map that maps repo ids with their aliases, if the aliases exist.
- * The mapping is a bijection i.e. a repo id can only have one alias, and an alias can only be mapped to one repo id.
+ * This class holds HubTurbo-specific configuration metadata for repositories.
  */
-public final class RepoAliasMap {
+public final class RepoConfig {
 
-    private static final Logger logger = LogManager.getLogger(RepoAliasMap.class.getName());
+    private static final Logger logger = LogManager.getLogger(RepoConfig.class.getName());
 
     // Original mapping:
     //   Key = repoId, Value = alias.
     // Inverted mapping:
     //   Key = alias, Value = repoId.
-    private final BiMap<String, String> aliasMap;
-
-    public RepoAliasMap(Map<String, String> map) {
-        aliasMap = HashBiMap.create(map);
-    }
+    // We'll need to cast to BiMap when we want to work with the inverse mapping
+    // Problem is that Gson creates a linked tree map
+    private final Map<String, String> repoIdToAliasMap = HashBiMap.create();
 
     /**
      * Checks whether a string is an alias of a repo or not
      * @param potentialAlias the potential alias to check
      * @return true if the given string is an alias
      */
-    public boolean isAlias(String potentialAlias) {
-        return aliasMap.containsValue(potentialAlias);
+    public boolean isRepoAlias(String potentialAlias) {
+        return repoIdToAliasMap.containsValue(potentialAlias);
     }
 
     /**
@@ -39,8 +36,8 @@ public final class RepoAliasMap {
      * @param repoId the repo id to check
      * @return true if the repo id has an alias
      */
-    public boolean hasAlias(String repoId) {
-        return aliasMap.containsKey(repoId);
+    public boolean hasRepoAlias(String repoId) {
+        return repoIdToAliasMap.containsKey(repoId);
     }
 
     /**
@@ -48,9 +45,9 @@ public final class RepoAliasMap {
      * @param repoId the repo id
      * @return the alias, or null if the mapping doesn't exist
      */
-    public String getAlias(String repoId) {
+    public String getRepoAlias(String repoId) {
         assert Utility.isWellFormedRepoId(repoId);
-        return aliasMap.get(repoId);
+        return repoIdToAliasMap.get(repoId);
     }
 
     /**
@@ -61,7 +58,8 @@ public final class RepoAliasMap {
     public String getRepoId(String alias) {
         assert Utility.isWellFormedRepoAlias(alias);
         // use the inverse mapping (alias -> repoId)
-        return aliasMap.inverse().get(alias);
+        BiMap<String, String> repoAliasBiMap = HashBiMap.create(repoIdToAliasMap);
+        return repoAliasBiMap.inverse().get(alias);
     }
 
     /**
@@ -73,7 +71,7 @@ public final class RepoAliasMap {
     public String resolveRepoId(String repoIdOrAlias) {
         String repoId;
         // initialise the repoId with the appropriate values
-        if (isAlias(repoIdOrAlias)) {
+        if (isRepoAlias(repoIdOrAlias)) {
             String repoAlias = repoIdOrAlias;
             logger.info("Repo alias supplied: " + repoAlias);
             repoId = getRepoId(repoAlias);
@@ -91,10 +89,10 @@ public final class RepoAliasMap {
      * @param repoId A well-formed repoId
      * @param repoAlias A well-formed alphanumeric repoAlias
      */
-    public void addMapping(String repoId, String repoAlias) {
+    public void addAliasMapping(String repoId, String repoAlias) {
         assert Utility.isWellFormedRepoId(repoId);
         assert Utility.isWellFormedRepoAlias(repoAlias);
-        aliasMap.put(repoId, repoAlias);
+        repoIdToAliasMap.put(repoId, repoAlias);
     }
 
     /**
@@ -103,10 +101,10 @@ public final class RepoAliasMap {
      * @param repoId A well-formed repoId
      * @param repoAlias A well-formed alphanumeric repoAlias
      */
-    public void removeMapping(String repoId, String repoAlias) {
+    public void removeAliasMapping(String repoId, String repoAlias) {
         assert Utility.isWellFormedRepoId(repoId);
         assert Utility.isWellFormedRepoAlias(repoAlias);
-        aliasMap.remove(repoId, repoAlias);
+        repoIdToAliasMap.remove(repoId, repoAlias);
     }
 
     /**
@@ -114,7 +112,7 @@ public final class RepoAliasMap {
      * If the map contains more than Integer.MAX_VALUE elements, returns Integer.MAX_VALUE.
      * @return the number of repo id to alias mappings in the map
      */
-    public int size() {
-        return aliasMap.size();
+    public int getAliasCount() {
+        return repoIdToAliasMap.size();
     }
 }

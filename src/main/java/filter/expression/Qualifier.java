@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 import backend.resource.*;
 import filter.ParseException;
-import util.RepoAliasMap;
+import util.RepoConfig;
 import util.Utility;
 import backend.interfaces.IModel;
 import filter.MetaQualifierInfo;
@@ -115,14 +115,14 @@ public class Qualifier implements FilterExpression {
 
     /**
      * Returns a filter expression with all the repo aliases replaced with their mapped repo ids.
-     * @param repoAliasMap The repo alias mapping
+     * @param repoConfig The repo alias mapping
      * @param expr The filter expression before replacement
      * @return The filter expression after replacement
      */
-    public static FilterExpression replaceRepoAliases(RepoAliasMap repoAliasMap, FilterExpression expr) {
+    public static FilterExpression replaceRepoAliases(RepoConfig repoConfig, FilterExpression expr) {
         return expr.map(q -> {
             if (Qualifier.isRepoQualifier(q)) {
-                return q.convertRepoAliasQualifier(repoAliasMap);
+                return q.convertRepoAliasQualifier(repoConfig);
             } else {
                 return q;
             }
@@ -1008,15 +1008,15 @@ public class Qualifier implements FilterExpression {
 
     /**
      * Converts the current repo id or alias into the mapped repo id.
-     * @param repoAliasMap The repo alias mapping
+     * @param repoConfig The repo alias mapping
      * @return The qualifier with the actual repo id
      */
-    private Qualifier convertRepoAliasQualifier(RepoAliasMap repoAliasMap) {
+    private Qualifier convertRepoAliasQualifier(RepoConfig repoConfig) {
         if (!content.isPresent()) {
             return Qualifier.EMPTY;
         }
         String repoIdOrAlias = content.get();
-        return new Qualifier(type, repoAliasMap.resolveRepoId(repoIdOrAlias));
+        return new Qualifier(type, repoConfig.resolveRepoId(repoIdOrAlias));
     }
 
     private Qualifier convertMilestoneAliasQualifier(List<TurboMilestone> allMilestones, int currentIndex) {

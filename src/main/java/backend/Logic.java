@@ -14,8 +14,7 @@ import ui.TestController;
 import ui.UI;
 import util.Futures;
 import util.HTLog;
-import util.RepoAliasMap;
-import util.Utility;
+import util.RepoConfig;
 import util.events.RepoOpenedEvent;
 import util.events.RepoOpeningEvent;
 import util.events.testevents.ClearLogicModelEvent;
@@ -112,7 +111,7 @@ public class Logic {
      */
     private CompletableFuture<Boolean> openRepository(String repoIdOrAlias, boolean isPrimaryRepository) {
         // First resolves the given string to a repo id.
-        final String repoId = prefs.getRepoAliasMap().resolveRepoId(repoIdOrAlias);
+        final String repoId = prefs.getRepoConfig().resolveRepoId(repoIdOrAlias);
 
         if (isPrimaryRepository) prefs.setLastViewedRepository(repoId);
         if (isAlreadyOpen(repoId) || models.isRepositoryPending(repoId)) {
@@ -161,8 +160,8 @@ public class Logic {
      */
     public Set<String> getStoredReposWithAlias() {
         return repoIO.getStoredRepos().stream().map(repoId -> {
-            RepoAliasMap repoAliasMap = prefs.getRepoAliasMap();
-            return repoAliasMap.hasAlias(repoId) ? repoAliasMap.getAlias(repoId) : repoId;
+            RepoConfig repoConfig = prefs.getRepoConfig();
+            return repoConfig.hasRepoAlias(repoId) ? repoConfig.getRepoAlias(repoId) : repoId;
         }).collect(Collectors.toSet());
     }
 

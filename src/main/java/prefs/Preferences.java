@@ -1,7 +1,7 @@
 package prefs;
 
 import org.eclipse.egit.github.core.RepositoryId;
-import util.RepoAliasMap;
+import util.RepoConfig;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -190,9 +190,9 @@ public class Preferences { // NOPMD
     }
 
     /**
-     * Gets the repo alias mapping
+     * Returns the repo configuration as a RepoConfig object.
      */
-    public RepoAliasMap getRepoAliasMap() {
-        return global.getRepoAliasMap();
+    public RepoConfig getRepoConfig() {
+        return global.getRepoConfig();
     }
 }

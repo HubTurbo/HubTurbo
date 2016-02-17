@@ -5,7 +5,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
-import util.RepoAliasMap;
+import util.RepoConfig;
 import util.Utility;
 
 import static ui.components.KeyboardShortcuts.REMOVE_FOCUS;
@@ -49,8 +49,8 @@ public class RepositorySelector extends HBox {
                 return;
             }
 
-            RepoAliasMap repoAliasMap = UI.prefs.getRepoAliasMap();
-            String repoId = repoAliasMap.resolveRepoId(repoIdOrAlias);
+            RepoConfig repoConfig = UI.prefs.getRepoConfig();
+            String repoId = repoConfig.resolveRepoId(repoIdOrAlias);
 
             if (Utility.isWellFormedRepoId(repoId) && !changesDisabled) {
                 onValueChangeCallback.accept(repoId);

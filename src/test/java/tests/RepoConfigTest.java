@@ -1,15 +1,14 @@
 package tests;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import prefs.Preferences;
 import ui.TestController;
-import util.RepoAliasMap;
+import util.RepoConfig;
 
 import static org.junit.Assert.*;
 
-public class RepoAliasMapTest {
+public class RepoConfigTest {
 
     /**
      * These mappings must be in the test map:
@@ -28,41 +27,41 @@ public class RepoAliasMapTest {
     private static final String REPO_ID_DNE_1 = "DoesNotExist/DNE";
     private static final String REPO_ALIAS_DNE_1 = "dne";
 
-    private RepoAliasMap testMap;
+    private RepoConfig testMap;
 
     @Before
     public void init() {
         Preferences testPrefs = TestController.createTestPreferences();
-        testMap = testPrefs.getRepoAliasMap();
+        testMap = testPrefs.getRepoConfig();
         // The test map should be empty at this point i.e size == 0
-        assertEquals(0, testMap.size());
-        testMap.addMapping(REPO_ID_1, REPO_ALIAS_1);
-        testMap.addMapping(REPO_ID_2, REPO_ALIAS_2);
-        assertEquals(2, testMap.size());
+        assertEquals(0, testMap.getAliasCount());
+        testMap.addAliasMapping(REPO_ID_1, REPO_ALIAS_1);
+        testMap.addAliasMapping(REPO_ID_2, REPO_ALIAS_2);
+        assertEquals(2, testMap.getAliasCount());
     }
 
     @Test
     public void testHasAlias() {
-        assertTrue(testMap.hasAlias(REPO_ID_1));
-        assertTrue(testMap.hasAlias(REPO_ID_2));
+        assertTrue(testMap.hasRepoAlias(REPO_ID_1));
+        assertTrue(testMap.hasRepoAlias(REPO_ID_2));
 
-        assertFalse(testMap.hasAlias(REPO_ID_DNE_1));
+        assertFalse(testMap.hasRepoAlias(REPO_ID_DNE_1));
     }
 
     @Test
     public void testGetAlias() {
-        assertEquals(REPO_ALIAS_1, testMap.getAlias(REPO_ID_1));
-        assertEquals(REPO_ALIAS_2, testMap.getAlias(REPO_ID_2));
+        assertEquals(REPO_ALIAS_1, testMap.getRepoAlias(REPO_ID_1));
+        assertEquals(REPO_ALIAS_2, testMap.getRepoAlias(REPO_ID_2));
 
-        assertEquals(null, testMap.getAlias(REPO_ID_DNE_1));
+        assertEquals(null, testMap.getRepoAlias(REPO_ID_DNE_1));
     }
 
     @Test
     public void testIsAlias() {
-        assertTrue(testMap.isAlias(REPO_ALIAS_1));
-        assertTrue(testMap.isAlias(REPO_ALIAS_2));
+        assertTrue(testMap.isRepoAlias(REPO_ALIAS_1));
+        assertTrue(testMap.isRepoAlias(REPO_ALIAS_2));
 
-        assertFalse(testMap.isAlias(REPO_ALIAS_DNE_1));
+        assertFalse(testMap.isRepoAlias(REPO_ALIAS_DNE_1));
     }
 
     @Test
@@ -78,15 +77,15 @@ public class RepoAliasMapTest {
         final String REPO_ID_NEW = "hello/world";
         final String REPO_ALIAS_NEW = "hw";
 
-        int sizeBefore = testMap.size();
-        testMap.addMapping(REPO_ID_NEW, REPO_ALIAS_NEW);
-        assertEquals(sizeBefore + 1, testMap.size());
-        assertEquals(REPO_ALIAS_NEW, testMap.getAlias(REPO_ID_NEW));
+        int sizeBefore = testMap.getAliasCount();
+        testMap.addAliasMapping(REPO_ID_NEW, REPO_ALIAS_NEW);
+        assertEquals(sizeBefore + 1, testMap.getAliasCount());
+        assertEquals(REPO_ALIAS_NEW, testMap.getRepoAlias(REPO_ID_NEW));
         assertEquals(REPO_ID_NEW, testMap.getRepoId(REPO_ALIAS_NEW));
 
-        testMap.removeMapping(REPO_ID_NEW, REPO_ALIAS_NEW);
-        assertEquals(sizeBefore, testMap.size());
-        assertEquals(null, testMap.getAlias(REPO_ID_NEW));
+        testMap.removeAliasMapping(REPO_ID_NEW, REPO_ALIAS_NEW);
+        assertEquals(sizeBefore, testMap.getAliasCount());
+        assertEquals(null, testMap.getRepoAlias(REPO_ID_NEW));
         assertEquals(null, testMap.getRepoId(REPO_ALIAS_NEW));
     }
 
