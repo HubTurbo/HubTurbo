@@ -35,6 +35,7 @@ public class ListPanelCard extends VBox {
     private static final String OCTICON_PULL_REQUEST = "\uf009";
     private static final int CARD_WIDTH = 350;
     private static final String OCTICON_COMMENT = "\uf02b";
+    private static final String OCTICON_ARROW_RIGHT = "\uf03e";
 
     /**
      * A card that is constructed with an issue as argument. Its components
@@ -240,7 +241,9 @@ public class ListPanelCard extends VBox {
             HBox authorBox = createDisplayUserBox(guiElement.getAuthor(), issue.getCreator());
             authorAssigneeBox.getChildren().add(authorBox);
             if (issue.getAssignee().isPresent()) {
-                authorAssigneeBox.getChildren().add(new Label("--->"));
+                Label rightArrow = new Label(OCTICON_ARROW_RIGHT);
+                rightArrow.getStyleClass().addAll("octicon", "pull-request-assign-icon");
+                authorAssigneeBox.getChildren().add(rightArrow);
             }
         }
 
