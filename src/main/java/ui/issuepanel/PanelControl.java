@@ -318,6 +318,10 @@ public class PanelControl extends HBox {
         return prefs.getAllBoards().size();
     }
 
+    public List<String> getAllBoardNames() {
+        return prefs.getAllBoardNames();
+    }
+
     private void scrollToPanel(int panelIndex) {
         setHvalue(panelIndex * (panelsScrollPane.getHmax()) / (getPanelCount() - 1));
     }

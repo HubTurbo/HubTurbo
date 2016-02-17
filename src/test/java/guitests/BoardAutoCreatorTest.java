@@ -108,8 +108,7 @@ public class BoardAutoCreatorTest extends UITest {
     }
 
     /**
-     * Tests panelControl properties associated with panels.
-     * PanelDetails obtained from Boards are tested against current Panel infos as well.
+     * Confirms the currently displayed board consists the set of panels specified in panelDetails
      */
     public static void verifyBoard(PanelControl pc, Map<String, String> panelDetails){
         List<PanelInfo> panelInfos = pc.getCurrentPanelInfos();
