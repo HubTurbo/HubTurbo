@@ -273,7 +273,7 @@ public class ModelTests {
      * issue given in the argument can't be found
      */
     @Test
-    public void testReplaceIssueLabelsIssueNotFound() {
+    public void replaceIssueLabels_issueNotFound() {
         Model model = new Model("testrepo");
         assertEquals(Optional.empty(), model.replaceIssueLabels(1, new ArrayList<>()));
     }
@@ -282,7 +282,7 @@ public class ModelTests {
      * Tests that replaceIssueLabels finds issue with the right id and successfully modify the issue's labels
      */
     @Test
-    public void testReplaceIssueLabels() {
+    public void replaceIssueLabels_successful() {
         String repoId = "testowner/testrepo";
         List<String> originalLabels = Arrays.asList("label1", "label2");
         List<String> newLabels = Arrays.asList("label3", "label4");

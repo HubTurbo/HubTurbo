@@ -5,6 +5,7 @@ import backend.interfaces.IModel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import prefs.Preferences;
+import util.Utility;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -84,7 +85,7 @@ public class MultiModel implements IModel {
     }
 
     /**
-     * Assigns {@code labels} to issue {@code issueId} in {@code repoId}
+     * Replaces labels of an issue specified by {@code issueId} in {@code repoId} with {@code labels}
      * @param repoId
      * @param issueId
      * @param labels
@@ -92,11 +93,9 @@ public class MultiModel implements IModel {
      */
     public synchronized Optional<TurboIssue> replaceIssueLabels(String repoId, int issueId, List<String> labels) {
         Optional<Model> modelLookUpResult = getModelById(repoId);
-        if (!modelLookUpResult.isPresent()) {
-            logger.error("Model " + repoId + " not found in models");
-            return Optional.empty();
-        }
-        return modelLookUpResult.get().replaceIssueLabels(issueId, labels);
+        return Utility.safeFlatMapOptional(modelLookUpResult,
+                (model) -> model.replaceIssueLabels(issueId, labels),
+                () -> logger.error("Model " + repoId + " not found in models"));
     }
 
     public synchronized void insertMetadata(String repoId, Map<Integer, IssueMetadata> metadata, String currentUser) {

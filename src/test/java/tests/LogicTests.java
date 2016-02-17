@@ -59,7 +59,7 @@ public class LogicTests {
      * Tests that replaceIssueLabels succeed when both models and repoIO succeeded
      */
     @Test
-    public void testReplaceIssueLabelsSuccessful() throws ExecutionException, InterruptedException {
+    public void replaceIssueLabels_successful() throws ExecutionException, InterruptedException {
         TurboIssue issue = createIssueWithLabels(1, Arrays.asList("label1", "label2"));
         mockRepoIOReplaceIssueLabelsResult(true);
         mockMultiModelReplaceIssueLabels(Optional.of(issue), Optional.empty());
@@ -71,7 +71,7 @@ public class LogicTests {
      * Tests that replaceIssueLabels failed when models return empty result
      */
     @Test
-    public void testReplaceIssueLabelsRepoIOFailed() throws ExecutionException, InterruptedException {
+    public void replaceIssueLabels_repoIOFailed() throws ExecutionException, InterruptedException {
         TurboIssue issue = createIssueWithLabels(1, Arrays.asList("label1", "label2"));
         mockRepoIOReplaceIssueLabelsResult(true);
         mockMultiModelReplaceIssueLabels(Optional.empty(), Optional.empty());
@@ -83,7 +83,7 @@ public class LogicTests {
      * Tests that replaceIssueLabels failed when repoIO failed to update labels
      */
     @Test
-    public void testReplaceIssueLabelsModelsFailed() throws ExecutionException, InterruptedException {
+    public void replaceIssueLabels_modelsFailed() throws ExecutionException, InterruptedException {
         TurboIssue issue = createIssueWithLabels(1, Arrays.asList("label1", "label2"));
         mockRepoIOReplaceIssueLabelsResult(false);
         mockMultiModelReplaceIssueLabels(Optional.of(issue), Optional.empty());
@@ -96,7 +96,7 @@ public class LogicTests {
      * new labels then revert back to original labels when repoIO failed to update labels
      */
     @Test
-    public void testReplaceIssueLabelsRevert() throws ExecutionException, InterruptedException {
+    public void replaceIssueLabels_modelsFailed_revert() throws ExecutionException, InterruptedException {
         List<String> originalLabels = Arrays.asList("label1", "label2");
         List<String> newLabels = Arrays.asList("label3", "label4");
 
@@ -116,13 +116,13 @@ public class LogicTests {
      * {@link Logic#replaceIssueLabels(TurboIssue, List)} is called
      */
     @Test
-    public void testReplaceIssueLabelsNoRevert() throws ExecutionException, InterruptedException {
+    public void replaceIssueLabels_timeNotMatched_noRevert() throws ExecutionException, InterruptedException {
         List<String> originalLabels = Arrays.asList("label1", "label2");
         List<String> newLabels = Arrays.asList("label3", "label4");
 
         TurboIssue issue = createIssueWithLabels(1, originalLabels);
-        Thread.sleep(10);
-        TurboIssue modifiedIssue = createIssueWithLabels(1, originalLabels);
+        TurboIssue modifiedIssue = TestUtils.delayThenGet(
+                10, () -> createIssueWithLabels(1, originalLabels));
 
         Model mockedModel = mock(Model.class);
         when(mockedModel.replaceIssueLabels(issue.getId(), newLabels)).thenReturn(Optional.of(issue));

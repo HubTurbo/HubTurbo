@@ -5,6 +5,7 @@ import backend.interfaces.IBaseModel;
 import backend.resource.serialization.SerializableModel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import util.Utility;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -191,19 +192,19 @@ public class Model implements IBaseModel {
     }
 
     /**
-     * Assigns {@code labels} to issue {@code issueId}
+     * Replaces labels of an issue specified by {@code issueId} with {@code labels}
      * @param issueId
      * @param labels
      * @return the modified TurboIssue if successful
      */
     public synchronized Optional<TurboIssue> replaceIssueLabels(int issueId, List<String> labels) {
         Optional<TurboIssue> issueLookUpResult = getIssueById(issueId);
-        if (!issueLookUpResult.isPresent()) {
-            logger.error("Issue " + issueId + " not found in model for " + repoId);
-            return Optional.empty();
-        }
-        issueLookUpResult.get().setLabels(labels);
-        return Optional.of(new TurboIssue(issueLookUpResult.get()));
+        return Utility.safeFlatMapOptional(issueLookUpResult,
+                (issue) -> {
+                    issue.setLabels(labels);
+                    return Optional.of(new TurboIssue(issue));
+                },
+                () -> logger.error("Issue " + issueId + " not found in model for " + repoId));
     }
 
     @SuppressWarnings("unused")

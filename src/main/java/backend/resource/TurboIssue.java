@@ -255,7 +255,9 @@ public class TurboIssue {
             int id = issue.getId();
 
             Optional<Integer> correspondingIssueIndex = findIssueWithId(existingCopy, id);
-            if (correspondingIssueIndex.isPresent()) {
+            if (!correspondingIssueIndex.isPresent()) {
+                existingCopy.add(new TurboIssue(issue));
+            } else {
                 TurboIssue existingIssue = existingCopy.get(correspondingIssueIndex.get());
                 TurboIssue newIssue = new TurboIssue(issue);
 
@@ -266,8 +268,6 @@ public class TurboIssue {
                 newIssue.reconcile(existingIssue);
 
                 existingCopy.set(correspondingIssueIndex.get(), newIssue);
-            } else {
-                existingCopy.add(new TurboIssue(issue));
             }
         }
         return existingCopy;

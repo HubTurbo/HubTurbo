@@ -118,7 +118,7 @@ public class TurboIssueTests {
      * modified time is equal to the issue's updatedAt time
      */
     @Test
-    public void testGetLabelsModifiedAtInitially() {
+    public void getLabelsModifiedAt_initial() {
         TurboIssue issue = new TurboIssue("testrepo", 1, "Issue title");
         assertEquals(issue.getUpdatedAt(), issue.getLabelsLastModifiedAt());
     }
@@ -127,22 +127,19 @@ public class TurboIssueTests {
      * Tests that labels modified time is updated properly when methods mutating the issue' labels is called
      */
     @Test
-    public void testGetLabelsModifiedAtUpdate() throws InterruptedException {
+    public void getLabelsModifiedAt_updated() throws InterruptedException {
         TurboIssue issue = new TurboIssue("testrepo", 1, "Issue title");
 
         LocalDateTime checkPoint = issue.getLabelsLastModifiedAt();
-        Thread.sleep(10);
-        issue.setLabels(new ArrayList<>());
+        TestUtils.delayThenRun(10, () -> issue.setLabels(new ArrayList<>()));
         assertTrue(issue.getLabelsLastModifiedAt().isAfter(checkPoint));
 
         checkPoint = issue.getLabelsLastModifiedAt();
-        Thread.sleep(10);
-        issue.addLabel("label");
+        TestUtils.delayThenRun(10, () -> issue.addLabel("label"));
         assertTrue(issue.getLabelsLastModifiedAt().isAfter(checkPoint));
 
         checkPoint = issue.getLabelsLastModifiedAt();
-        Thread.sleep(10);
-        issue.addLabel(new TurboLabel("testrepo", "label"));
+        TestUtils.delayThenRun(10, () -> issue.addLabel(new TurboLabel("testrepo", "label")));
         assertTrue(issue.getLabelsLastModifiedAt().isAfter(checkPoint));
     }
 
@@ -151,11 +148,11 @@ public class TurboIssueTests {
      * it overrides the original issue's labels
      */
     @Test
-    public void testReconcileUpdatedLabelsOverride() throws InterruptedException {
+    public void reconcile_moreRecentlyUpdated_Override() throws InterruptedException {
         TurboIssue originalIssue = LogicTests.createIssueWithLabels(1, new ArrayList<>());
-        Thread.sleep(10);
         List<String> newLabels = Arrays.asList("label1", "label2");
-        TurboIssue updatedIssue = LogicTests.createIssueWithLabels(1, newLabels);
+        TurboIssue updatedIssue = TestUtils.delayThenGet(
+                10, () -> LogicTests.createIssueWithLabels(1, newLabels));
 
         List<TurboIssue> updatedList = TurboIssue.reconcile(Arrays.asList(originalIssue),
                                                             Arrays.asList(updatedIssue));
@@ -167,11 +164,11 @@ public class TurboIssueTests {
      * then the updated issue's labels
      */
     @Test
-    public void testReconcileUpdatedLabelsRetained() throws InterruptedException {
+    public void reconcile_stale_retained() throws InterruptedException {
         TurboIssue updatedIssue = LogicTests.createIssueWithLabels(1, new ArrayList<>());
-        Thread.sleep(10);
         List<String> originalLabels = Arrays.asList("label1", "label2");
-        TurboIssue originalIssue = LogicTests.createIssueWithLabels(1, originalLabels);
+        TurboIssue originalIssue = TestUtils.delayThenGet(
+                10, () -> LogicTests.createIssueWithLabels(1, originalLabels));
 
         List<TurboIssue> updatedList = TurboIssue.reconcile(Arrays.asList(originalIssue),
                                                             Arrays.asList(updatedIssue));

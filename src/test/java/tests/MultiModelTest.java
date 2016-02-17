@@ -72,7 +72,7 @@ public class MultiModelTest {
      * issue given in the argument can't be found
      */
     @Test
-    public void testReplaceIssueLabelsModelNotFound() {
+    public void replaceIssueLabels_modelNotFound() {
         MultiModel models = new MultiModel(mock(Preferences.class));
         assertEquals(Optional.empty(), models.replaceIssueLabels("nonexistentrepo", 1, new ArrayList<>()));
     }
@@ -82,7 +82,7 @@ public class MultiModelTest {
      * repoId and invoke replaceIssueLabels on that Model
      */
     @Test
-    public void testReplaceIssueLabels() {
+    public void replaceIssueLabels_successful() {
         String repoId = "testowner/testrepo";
         int issueId = 1;
         List<String> labels = Arrays.asList("label1", "label2");
