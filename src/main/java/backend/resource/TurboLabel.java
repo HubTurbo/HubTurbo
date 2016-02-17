@@ -80,6 +80,12 @@ public class TurboLabel implements Comparable<TurboLabel> {
     private void ______METHODS______() {
     }
 
+    /**
+     * Extracts delimiters from a label that belongs to a group to classify 
+     * a label as exclusive or not.
+     * @param name
+     * @return
+     */
     public static Optional<String> getDelimiter(String name) {
 
         // Escaping due to constants not being valid regexes
@@ -309,7 +315,8 @@ public class TurboLabel implements Comparable<TurboLabel> {
     }
 
     /**
-     * The labelName is considered to be in an exclusive group if it has a '.' delimiter in it
+     * Identifies if a label belongs to an exclusive group. Only one label
+     * from an exclusive group is allowed to be assigned to an issue
      * @param labelName
      * @return
      */
