@@ -6,7 +6,9 @@ import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
 
 import org.eclipse.egit.github.core.Label;
+import util.Utility;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -239,5 +241,104 @@ public class TurboLabel implements Comparable<TurboLabel> {
         return labels.stream()
                 .map(TurboLabel::getActualName)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Returns the list of labels which name contains labelName
+     * @param repoLabels
+     * @param labelName
+     * @return
+     */
+    public static List<String> filterByName(List<String> repoLabels, String labelName) {
+        return repoLabels
+                .stream()
+                .filter(name -> Utility.containsIgnoreCase(getName(name), labelName))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Returns the list of labels which group contains labelGroup
+     * @param repoLabels
+     * @param labelGroup
+     * @return
+     */
+    public static List<String> filterByGroup(List<String> repoLabels, String labelGroup) {
+        if (labelGroup.isEmpty()) return repoLabels;
+
+        return repoLabels
+                .stream()
+                .filter(name -> {
+                    if (hasGroup(name)) {
+                        return Utility.containsIgnoreCase(getGroup(name), labelGroup);
+                    }
+                    return false;
+                })
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Returns the first label that matches the keyword
+     * i.e. the label's group contains keyword's group and label's name contains keyword's name
+     * @param repoLabels
+     * @param keyword
+     * @return
+     */
+    public static String getMatchedLabelName(List<String> repoLabels, String keyword) {
+        List<String> newMatchedLabels = new ArrayList<>();
+        newMatchedLabels.addAll(repoLabels);
+        newMatchedLabels = filterByName(newMatchedLabels, getName(keyword));
+        newMatchedLabels = filterByGroup(newMatchedLabels, getGroup(keyword));
+        return newMatchedLabels.get(0);
+    }
+
+    /**
+     * Returns true if there is exactly 1 matching label for keyword
+     *
+     * A label is matching if:
+     * the label's group contains keyword's group and label's name contains keyword's name
+     * @param repoLabels
+     * @param keyword
+     * @return
+     */
+    public static boolean hasExactlyOneMatchedLabel(List<String> repoLabels, String keyword) {
+        List<String> newMatchedLabels = new ArrayList<>();
+        newMatchedLabels.addAll(repoLabels);
+        newMatchedLabels = filterByName(newMatchedLabels, getName(keyword));
+        newMatchedLabels = filterByGroup(newMatchedLabels, getGroup(keyword));
+        return newMatchedLabels.size() == 1;
+    }
+
+    /**
+     * The labelName is considered to be in an exclusive group if it has a '.' delimiter in it
+     * @param labelName
+     * @return
+     */
+    public static boolean hasExclusiveGroup(String labelName) {
+        return TurboLabel.getDelimiter(labelName).isPresent() && TurboLabel.getDelimiter(labelName).get().equals(".");
+    }
+
+    /**
+     * Determines the group that labelName belongs to
+     * A labelName is considered to be in a group if getDelimiter(labelName).isPresent() is true.
+     * @param labelName
+     * @return
+     */
+    public static String getGroup(String labelName) {
+        if (!hasGroup(labelName)) return "";
+        return labelName.substring(0, labelName.indexOf(TurboLabel.getDelimiter(labelName).get()));
+    }
+
+    /**
+     * Returns the name of labelName after removing its group
+     * @param labelName
+     * @return
+     */
+    public static String getName(String labelName) {
+        if (!hasGroup(labelName)) return labelName;
+        return labelName.substring(labelName.indexOf(TurboLabel.getDelimiter(labelName).get()) + 1);
+    }
+
+    public static boolean hasGroup(String name) {
+        return TurboLabel.getDelimiter(name).isPresent();
     }
 }

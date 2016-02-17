@@ -74,8 +74,8 @@ public class LabelPickerState {
      * @return
      */
     public LabelPickerState toggleLabel(String keyword) {
-        if (!hasExactlyOneMatchedLabel(repoLabels, keyword)) return this;
-        String labelName = getMatchedLabelName(repoLabels, keyword);
+        if (!TurboLabel.hasExactlyOneMatchedLabel(repoLabels, keyword)) return this;
+        String labelName = TurboLabel.getMatchedLabelName(repoLabels, keyword);
 
         if (isAnInitialLabel(labelName)) {
             if (isARemovedLabel(labelName)) {
@@ -110,8 +110,8 @@ public class LabelPickerState {
     private LabelPickerState updateMatchedLabels(String query) {
         List<String> newMatchedLabels = repoLabels;
 
-        newMatchedLabels = filterByName(newMatchedLabels, getName(query));
-        newMatchedLabels = filterByGroup(newMatchedLabels, getGroup(query));
+        newMatchedLabels = TurboLabel.filterByName(newMatchedLabels, TurboLabel.getName(query));
+        newMatchedLabels = TurboLabel.filterByGroup(newMatchedLabels, TurboLabel.getGroup(query));
 
         OptionalInt newSuggestionIndex;
         if (query.isEmpty() || newMatchedLabels.isEmpty()) {
@@ -189,17 +189,17 @@ public class LabelPickerState {
      */
 
     private void removeConflictingLabels(String name) {
-        if (!hasExclusiveGroup(name)) return;
+        if (!TurboLabel.hasExclusiveGroup(name)) return;
 
-        String group = getGroup(name);
+        String group = TurboLabel.getGroup(name);
         // Remove from addedLabels
         addedLabels = addedLabels.stream()
-                .filter(label -> !getGroup(label).equals(group))
+                .filter(label -> !TurboLabel.getGroup(label).equals(group))
                 .collect(Collectors.toList());
 
         // Add to removedLabels all initialLabels that have conflicting group
         removedLabels.addAll(initialLabels.stream()
-                .filter(label -> getGroup(label).equals(group) && !removedLabels.contains(name))
+                .filter(label -> TurboLabel.getGroup(label).equals(group) && !removedLabels.contains(name))
                 .collect(Collectors.toList()));
     }
 
@@ -260,64 +260,9 @@ public class LabelPickerState {
         return !(keywordIndex == userInput.split("\\s+").length - 1 && !userInput.endsWith(" "));
     }
 
-    private static String getMatchedLabelName(List<String> repoLabels, String keyword) {
-        List<String> newMatchedLabels = new ArrayList<>();
-        newMatchedLabels.addAll(repoLabels);
-        newMatchedLabels = filterByName(newMatchedLabels, getName(keyword));
-        newMatchedLabels = filterByGroup(newMatchedLabels, getGroup(keyword));
-        return newMatchedLabels.get(0);
-    }
-
-    private static boolean hasExactlyOneMatchedLabel(List<String> repoLabels, String keyword) {
-        List<String> newMatchedLabels = new ArrayList<>();
-        newMatchedLabels.addAll(repoLabels);
-        newMatchedLabels = filterByName(newMatchedLabels, getName(keyword));
-        newMatchedLabels = filterByGroup(newMatchedLabels, getGroup(keyword));
-        return newMatchedLabels.size() == 1;
-    }
-
-    private static boolean hasExclusiveGroup(String name) {
-        return TurboLabel.getDelimiter(name).isPresent() && TurboLabel.getDelimiter(name).get().equals(".");
-    }
-
-    private static String getGroup(String labelName) {
-        if (!hasGroup(labelName)) return "";
-
-        return labelName.substring(0, labelName.indexOf(TurboLabel.getDelimiter(labelName).get()));
-    }
-
-    private static String getName(String labelName) {
-        if (!hasGroup(labelName)) return labelName;
-
-        return labelName.substring(labelName.indexOf(TurboLabel.getDelimiter(labelName).get()) + 1);
-    }
-
-    private static boolean hasGroup(String name) {
-        return TurboLabel.getDelimiter(name).isPresent();
-    }
-
     private static List<String> convertToList(Set<String> labelSet){
         return new ArrayList<>(labelSet);
     }
 
-    private static List<String> filterByName(List<String> repoLabels, String labelName) {
-        return repoLabels
-                .stream()
-                .filter(name -> Utility.containsIgnoreCase(getName(name), labelName))
-                .collect(Collectors.toList());
-    }
 
-    private static List<String> filterByGroup(List<String> repoLabels, String labelGroup) {
-        if (labelGroup.isEmpty()) return repoLabels;
-
-        return repoLabels
-                .stream()
-                .filter(name -> {
-                    if (hasGroup(name)) {
-                        return Utility.containsIgnoreCase(getGroup(name), labelGroup);
-                    }
-                    return false;
-                })
-                .collect(Collectors.toList());
-    }
 }
