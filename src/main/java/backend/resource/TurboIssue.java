@@ -336,6 +336,10 @@ public class TurboIssue {
         return newIssue;
     }
 
+    public static boolean isNewIssue(TurboIssue issue) {
+        return issue.getId() == NEWISSUE_ID;
+    }
+
     /**
      * Finds the index of an issue with specified id in a list of issues
      * @param issues
@@ -560,4 +564,5 @@ public class TurboIssue {
         result = 31 * result + (milestone != null ? milestone.hashCode() : 0);
         return result;
     }
+
 }

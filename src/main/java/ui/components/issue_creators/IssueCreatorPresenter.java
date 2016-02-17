@@ -18,8 +18,6 @@ import backend.resource.TurboUser;
  */
 public class IssueCreatorPresenter {
 
-    public static final int NEWISSUE_ID = -1;
-
     private static final Logger logger = HTLog.get(IssueCreator.class);
     private final Model repo;
     private final TurboIssue issue;
@@ -29,7 +27,7 @@ public class IssueCreatorPresenter {
     public IssueCreatorPresenter(Model repo, Optional<TurboIssue> issue) {
         this.repo = repo;
         this.issue = issue.isPresent() 
-            ? new TurboIssue(issue.get()) : new TurboIssue(repo.getRepoId(), NEWISSUE_ID, "");
+            ? new TurboIssue(issue.get()) : new TurboIssue(repo.getRepoId(), TurboIssue.NEWISSUE_ID, "");
         currentLabels = this.issue.getLabels();
     }
     
@@ -102,11 +100,8 @@ public class IssueCreatorPresenter {
     // Utility methods
     // ===============
 
-    /**
-     * Checks if this is a new issue
-     */
     public boolean isNewIssue() {
-        return issue.getId() == NEWISSUE_ID;
+        return TurboIssue.isNewIssue(issue);
     }
 
     /**

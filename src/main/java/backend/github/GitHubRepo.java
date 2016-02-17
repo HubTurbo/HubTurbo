@@ -266,7 +266,7 @@ public class GitHubRepo implements Repo {
     public Issue createIssue(TurboIssue issue) throws IOException {
         Issue postIssue = issue.convertToGitHubIssue();
         RepositoryId id = RepositoryId.createFromId(issue.getRepoId());
-        if (issue.getId() == IssueCreatorPresenter.NEWISSUE_ID) {
+        if (TurboIssue.isNewIssue(issue)) {
             return issueService.createIssue(id, postIssue);
         }
         return issueService.editIssue(id, postIssue);
