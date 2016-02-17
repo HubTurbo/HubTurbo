@@ -22,6 +22,8 @@ public class LabelPickerState {
     public LabelPickerState(Set<String> initialLabels, List<String> repoLabels) {
         this(initialLabels, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), repoLabels,
                 OptionalInt.empty());
+
+        this.updateMatchedLabels("");
     }
 
     private LabelPickerState(Set<String> initialLabels, List<String> addedLabels, List<String> removedLabels,
@@ -40,15 +42,13 @@ public class LabelPickerState {
     }
 
     /**
-     * Determines resulting state based on given initial state and user input
+     * Determines resulting state based on given user input
      *
-     * @param initialState the state of the label picker before the user has typed anything
      * @param userInput 
      * @return new state that corresponds with the user input
      */
-    public static LabelPickerState determineState(LabelPickerState initialState,
-                                                  String userInput) {
-        LabelPickerState state = initialState;
+    public LabelPickerState determineState(String userInput) {
+        LabelPickerState state = this;
         List<String> confirmedKeywords = getConfirmedKeywords(userInput);
         for (String confirmedKeyword : confirmedKeywords) {
             state = state.toggleLabel(confirmedKeyword);
@@ -107,7 +107,7 @@ public class LabelPickerState {
      * @param query
      * @return
      */
-    public LabelPickerState updateMatchedLabels(String query) {
+    private LabelPickerState updateMatchedLabels(String query) {
         List<String> newMatchedLabels = repoLabels;
 
         newMatchedLabels = filterByName(newMatchedLabels, getName(query));

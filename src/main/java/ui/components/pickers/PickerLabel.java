@@ -11,7 +11,12 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 
-// for use with LabelPickerDialog
+/**
+ * This class is to represent a label in LabelPickerDialog
+ *
+ * It contains attributes such as selected, highlighted, removed and faded in order
+ * to produce the appropriate styled node through getNode()
+ */
 public class PickerLabel extends TurboLabel {
 
     private boolean isSelected;
@@ -59,20 +64,12 @@ public class PickerLabel extends TurboLabel {
         this.isSelected = isSelected;
     }
 
-    public boolean isHighlighted() {
-        return isHighlighted;
-    }
-
     public void setIsHighlighted(boolean isHighlighted) {
         this.isHighlighted = isHighlighted;
     }
 
     public void setIsRemoved(boolean isRemoved) {
         this.isRemoved = isRemoved;
-    }
-
-    public boolean isFaded() {
-        return isFaded;
     }
 
     public void setIsFaded(boolean isFaded) {

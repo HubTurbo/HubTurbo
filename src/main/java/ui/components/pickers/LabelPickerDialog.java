@@ -63,17 +63,11 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
     LabelPickerDialog(TurboIssue issue, List<TurboLabel> repoLabels, Stage stage) {
         this.repoLabels = repoLabels;
         this.issue = issue;
-        this.state = getCleanState(new HashSet(issue.getLabels()), TurboLabel.getLabelsNameList(repoLabels));
+        this.state = new LabelPickerState(new HashSet(issue.getLabels()), TurboLabel.getLabelsNameList(repoLabels));
 
         initUI(stage, issue);
         setupEvents(stage);
         Platform.runLater(queryField::requestFocus);
-    }
-
-    private LabelPickerState getCleanState(Set<String> initialLabels, List<String> repoLabels) {
-        LabelPickerState state = new LabelPickerState(initialLabels, repoLabels);
-        state = state.updateMatchedLabels("");
-        return state;
     }
 
     // Initialisation of UI
@@ -89,7 +83,7 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
         title.setTooltip(createTitleTooltip(issue));
         createButtons();
 
-        populatePanes(getCleanState(new HashSet(issue.getLabels()), TurboLabel.getLabelsNameList(repoLabels)));
+        populatePanes(new LabelPickerState(new HashSet(issue.getLabels()), TurboLabel.getLabelsNameList(repoLabels)));
     }
 
     private void initialiseDialog(Stage stage, TurboIssue issue) {
@@ -328,9 +322,9 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
 
     private void initialiseAndregisterQueryHandler() {
         listener = (observable, oldValue, newValue) -> {
-            state = LabelPickerState.determineState(
-                    getCleanState(new HashSet(issue.getLabels()), TurboLabel.getLabelsNameList(repoLabels)),
-                    queryField.getText().toLowerCase());
+            LabelPickerState initialState = new LabelPickerState(new HashSet(issue.getLabels()),
+                    TurboLabel.getLabelsNameList(repoLabels));
+            state = initialState.determineState(queryField.getText().toLowerCase());
             populatePanes(state);
         };
         queryField.textProperty().addListener(listener);
