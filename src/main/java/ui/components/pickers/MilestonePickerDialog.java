@@ -50,6 +50,8 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
         inputField.clear();
         inputField.setDisable(true);
         curState.toggleMilestone(milestoneName);
+        state = curState;
+        refreshUI(state);
     }
 
     private void setupKeyEvents() {
