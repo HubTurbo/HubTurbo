@@ -241,3 +241,7 @@
     -fx-font-size: 13px;
     -fx-wrap-text: true;
 }
+
+.text-red {
+    -fx-fill: red;
+}
