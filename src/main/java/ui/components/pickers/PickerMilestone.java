@@ -13,17 +13,16 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
     boolean isExisting = false;
     MilestonePickerDialog dialog;
 
-    PickerMilestone(TurboMilestone milestone, MilestonePickerDialog dialog) {
+    public PickerMilestone(TurboMilestone milestone) {
         super(milestone.getRepoId(), milestone.getId(), milestone.getTitle());
         setDueDate(milestone.getDueDate());
         setDescription(milestone.getDescription() == null ? "" : milestone.getDescription());
         setOpen(milestone.isOpen());
         setOpenIssues(milestone.getOpenIssues());
         setClosedIssues(milestone.getClosedIssues());
-        this.dialog = dialog;
     }
 
-    PickerMilestone(PickerMilestone milestone, MilestonePickerDialog dialog) {
+    public PickerMilestone(PickerMilestone milestone) {
         super(milestone.getRepoId(), milestone.getId(), milestone.getTitle());
         setDueDate(milestone.getDueDate());
         setDescription(milestone.getDescription() == null ? "" : milestone.getDescription());
@@ -34,7 +33,6 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
         setHighlighted(milestone.isHighlighted());
         setSelected(milestone.isSelected());
         setExisting(milestone.isExisting());
-        this.dialog = dialog;
     }
 
     public Node getNode() {
@@ -56,8 +54,6 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
         if (isFaded) {
             milestone.setStyle(milestone.getStyle() + "-fx-opacity: 40%;");
         }
-
-        milestone.setOnMouseClicked(e -> dialog.toggleMilestone(getTitle()));
 
         return milestone;
     }
@@ -81,8 +77,6 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
             milestone.setStyle(milestone.getStyle() + "-fx-border-color: black;");
         }
 
-        milestone.setOnMouseClicked(e -> dialog.toggleMilestone(getTitle()));
-
         return milestone;
     }
 
@@ -101,8 +95,6 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
         if (!isExisting || !isSelected || hasSuggestion || isHighlighted) {
             milestone.getStyleClass().add("labels-removed"); // add strikethrough
         }
-
-        milestone.setOnMouseClicked(e -> dialog.toggleMilestone(getTitle()));
 
         return milestone;
     }

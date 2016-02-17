@@ -438,13 +438,13 @@ public class TurboIssue {
     public Optional<Integer> getMilestone() {
         return milestone;
     }
-
-    public void setMilestone(Integer milestone) {
+    
+    public void setMilestoneById(Integer milestone) {
         this.milestone = (milestone == null) ? Optional.empty() : Optional.of(milestone);
     }
 
     public void setMilestone(TurboMilestone milestone) {
-        setMilestone(milestone.getId());
+        setMilestoneById(milestone.getId());
     }
 
     public IssueMetadata getMetadata() {
