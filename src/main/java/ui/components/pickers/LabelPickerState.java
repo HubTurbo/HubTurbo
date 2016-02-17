@@ -1,7 +1,6 @@
 package ui.components.pickers;
 
 import backend.resource.TurboLabel;
-import util.Utility;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -110,8 +109,8 @@ public class LabelPickerState {
     private LabelPickerState updateMatchedLabels(String query) {
         List<String> newMatchedLabels = repoLabels;
 
-        newMatchedLabels = TurboLabel.filterByName(newMatchedLabels, TurboLabel.getName(query));
-        newMatchedLabels = TurboLabel.filterByGroup(newMatchedLabels, TurboLabel.getGroup(query));
+        newMatchedLabels = TurboLabel.filterByPartialName(newMatchedLabels, TurboLabel.getName(query));
+        newMatchedLabels = TurboLabel.filterByPartialGroupName(newMatchedLabels, TurboLabel.getGroup(query));
 
         OptionalInt newSuggestionIndex;
         if (query.isEmpty() || newMatchedLabels.isEmpty()) {

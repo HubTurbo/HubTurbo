@@ -225,7 +225,7 @@ public class TurboLabel implements Comparable<TurboLabel> {
     }
 
     /**
-     * To return the TurboLabel in labels that matches labelName
+     * Returns the TurboLabel in labels that matches labelName
      * Assumption: the labelName matches exactly 1 TurboLabel
      *
      * @param labels
@@ -255,7 +255,7 @@ public class TurboLabel implements Comparable<TurboLabel> {
      * @param labelName
      * @return
      */
-    public static List<String> filterByName(List<String> repoLabels, String labelName) {
+    public static List<String> filterByPartialName(List<String> repoLabels, String labelName) {
         return repoLabels
                 .stream()
                 .filter(name -> Utility.containsIgnoreCase(getName(name), labelName))
@@ -263,12 +263,13 @@ public class TurboLabel implements Comparable<TurboLabel> {
     }
 
     /**
-     * Returns the list of labels which group contains labelGroup
+     * Returns the list of labels which group contains labelGroup.
+     * Uses partial keyword matching and keyword is case-insensitive
      * @param repoLabels
      * @param labelGroup
      * @return
      */
-    public static List<String> filterByGroup(List<String> repoLabels, String labelGroup) {
+    public static List<String> filterByPartialGroupName(List<String> repoLabels, String labelGroup) {
         if (labelGroup.isEmpty()) return repoLabels;
 
         return repoLabels
@@ -292,8 +293,8 @@ public class TurboLabel implements Comparable<TurboLabel> {
     public static String getMatchedLabelName(List<String> repoLabels, String keyword) {
         List<String> newMatchedLabels = new ArrayList<>();
         newMatchedLabels.addAll(repoLabels);
-        newMatchedLabels = filterByName(newMatchedLabels, getName(keyword));
-        newMatchedLabels = filterByGroup(newMatchedLabels, getGroup(keyword));
+        newMatchedLabels = filterByPartialName(newMatchedLabels, getName(keyword));
+        newMatchedLabels = filterByPartialGroupName(newMatchedLabels, getGroup(keyword));
         return newMatchedLabels.get(0);
     }
 
@@ -309,8 +310,8 @@ public class TurboLabel implements Comparable<TurboLabel> {
     public static boolean hasExactlyOneMatchedLabel(List<String> repoLabels, String keyword) {
         List<String> newMatchedLabels = new ArrayList<>();
         newMatchedLabels.addAll(repoLabels);
-        newMatchedLabels = filterByName(newMatchedLabels, getName(keyword));
-        newMatchedLabels = filterByGroup(newMatchedLabels, getGroup(keyword));
+        newMatchedLabels = filterByPartialName(newMatchedLabels, getName(keyword));
+        newMatchedLabels = filterByPartialGroupName(newMatchedLabels, getGroup(keyword));
         return newMatchedLabels.size() == 1;
     }
 
