@@ -108,7 +108,7 @@ public class TurboMilestone {
                 .collect(Collectors.toList());
     }
 
-    public static List<TurboMilestone> getOpenMilestones(List<TurboMilestone> milestones) {
+    public static List<TurboMilestone> filterOpenMilestones(List<TurboMilestone> milestones) {
         return milestones.stream()
                 .filter(TurboMilestone::isOpen)
                 .collect(Collectors.toList());
@@ -127,6 +127,11 @@ public class TurboMilestone {
         };
     }
 
+    /**
+     * Sort a List<TurboMilestone> by due date. Milestones without due date are considered to
+     * have an imaginary due date in the far future. The sorting algorithm used is stable
+     * (i.e. relative ordering of 2 milestones with the same due date will be retained)
+     */
     public static List<TurboMilestone> sortByDueDate(List<TurboMilestone> milestones) {
         List<TurboMilestone> milestonesWithDueDate = milestones.stream()
                 .filter(ms -> ms.getDueDate().isPresent())

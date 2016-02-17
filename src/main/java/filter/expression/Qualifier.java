@@ -94,7 +94,7 @@ public class Qualifier implements FilterExpression {
 
         List<TurboMilestone> milestonesOfReposInPanel = TurboMilestone.filterMilestonesOfRepos(
                                                                                     model.getMilestones(), repoIds);
-        List<TurboMilestone> milestonesWithinAliasRange = getMilestonesWithinAliasRange(milestonesOfReposInPanel);
+        List<TurboMilestone> milestonesWithinAliasRange = getAliasableMilestones(milestonesOfReposInPanel);
         Map<Integer, TurboMilestone> milestoneAliasIndex = getMilestoneAliasIndex(milestonesWithinAliasRange);
 
         if (milestoneAliasIndex.isEmpty()) {
@@ -135,12 +135,12 @@ public class Qualifier implements FilterExpression {
     }
 
     /**
-     * Get all milestones that can be aliased with current-[n] to current+[n]
+     * Get all milestones which milestone alias (current+-[n]) can resolve to. This will henceforth
+     * be called aliasable milestones.
      *
-     * A milestone can be aliased if and only if it is open and has due date or it does not have due date but it is
-     * the only open milestone.
+     * A milestone is aliasable if it has due date or it is the only open milestone in that repo.
      */
-    private static List<TurboMilestone> getMilestonesWithinAliasRange(List<TurboMilestone> milestonesOfReposInPanel) {
+    private static List<TurboMilestone> getAliasableMilestones(List<TurboMilestone> milestonesOfReposInPanel) {
         List<TurboMilestone> milestones = new ArrayList<>();
         // add milestones with due date first
         milestones.addAll(milestonesOfReposInPanel.stream()
@@ -151,7 +151,7 @@ public class Qualifier implements FilterExpression {
         // it has due date or not.
         // In this case, if it is not included already (the open milestone does not
         // have due date), add it to the milestone list.
-        List<TurboMilestone> openMilestones = TurboMilestone.getOpenMilestones(milestonesOfReposInPanel);
+        List<TurboMilestone> openMilestones = TurboMilestone.filterOpenMilestones(milestonesOfReposInPanel);
         if (openMilestones.size() == 1) {
             TurboMilestone openMilestone = openMilestones.get(0);
             boolean hasDueDate = openMilestone.getDueDate().isPresent();
@@ -186,6 +186,10 @@ public class Qualifier implements FilterExpression {
      * is only one open milestone, it will be considered as the "current" milestone, even if it
      * does not have due date.
      *
+     * If there is no ongoing or open milestone, set "current" as one after last milestone -
+     * this means that there is no "current" milestone, but it is possible that there is a
+     * milestone before the "current" one (i.e. current-[n] where n >= 1)
+     *
      * This method expects the milestone list to be sorted (by due date)
      */
     private static Optional<Integer> getCurrentMilestoneIndex(List<TurboMilestone> sortedMilestones) {
@@ -193,7 +197,7 @@ public class Qualifier implements FilterExpression {
             return Optional.empty();
         }
 
-        int openMilestonesCount = TurboMilestone.getOpenMilestones(sortedMilestones).size();
+        int openMilestonesCount = TurboMilestone.filterOpenMilestones(sortedMilestones).size();
         if (openMilestonesCount == 1) {
             return getFirstOpenMilestonePosition(sortedMilestones);
         }
@@ -202,9 +206,6 @@ public class Qualifier implements FilterExpression {
         Optional<Integer> firstOngoingMilestonePosition = getFirstOngoingMilestonePosition(sortedMilestones);
 
         // if no ongoing milestone, set current as one after last milestone
-        // - this means that there is no "current" milestone, but it is possible
-        // that there is a milestone before the "current" one (i.e. current-[n]
-        // where n >= 1)
         return firstOngoingMilestonePosition.isPresent()
                 ? firstOngoingMilestonePosition
                 : Optional.of(sortedMilestones.size());
