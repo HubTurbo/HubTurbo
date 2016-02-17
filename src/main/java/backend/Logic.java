@@ -336,7 +336,7 @@ public class Logic {
         return repoIO.replaceIssueMilestone(issue, milestone)
                 .thenApply(resultingIssue -> {
                     logger.info("Changing milestone for " + issue + " on UI");
-                    issue.setMilestone(milestone);
+                    issue.setMilestone(resultingIssue.getMilestone().getNumber());
                     refreshUI();
                     return true;
                 })
