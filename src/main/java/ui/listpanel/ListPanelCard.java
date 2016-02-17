@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.geometry.Insets;
@@ -236,47 +237,54 @@ public class ListPanelCard extends VBox {
         }
 
         if (issue.isPullRequest()) {
-            Label authorLabel = new Label("Author: ");
-            Label authorNameLabel = new Label(issue.getCreator());
-
-            HBox authorBox = new HBox();
-            authorBox.setAlignment(Pos.BASELINE_CENTER);
-
-            if (guiElement.getAuthor().isPresent()) {
-                TurboUser author = guiElement.getAuthor().get();
-                ImageView authorAvatar = new ImageView();
-                if (author.getAvatarURL().length() != 0) {
-                    Image image = author.getAvatar();
-                    assert image != null;
-                    authorAvatar.setImage(image);
-                }
-
-                authorBox.getChildren().addAll(authorLabel, authorAvatar, authorNameLabel);
-            } else {
-                authorBox.getChildren().addAll(authorLabel, authorNameLabel);
-            }
-            authorBox.setPrefWidth(CARD_WIDTH / 2);
+            HBox authorBox = createDisplayUserBox(guiElement.getAuthor(), issue.getCreator());
             authorAssigneeBox.getChildren().add(authorBox);
+            if (issue.getAssignee().isPresent()) {
+                authorAssigneeBox.getChildren().add(new Label("--->"));
+            }
         }
 
-        if (issue.getAssignee().isPresent() && guiElement.getAssignee().isPresent()) {
-            TurboUser assignee = guiElement.getAssignee().get();
-            Label assigneeLabel = new Label("Assignee: ");
-            Label assigneeNameLabel = new Label(issue.getAssignee().get());
-
-            ImageView assigneeAvatar = new ImageView();
-            if (assignee.getAvatarURL().length() != 0) {
-                Image image = assignee.getAvatar();
-                assert image != null;
-                assigneeAvatar.setImage(image);
-            }
-
-            HBox assigneeBox = new HBox();
-            assigneeBox.setAlignment(Pos.BASELINE_CENTER);
-            assigneeBox.getChildren().addAll(assigneeLabel, assigneeAvatar, assigneeNameLabel);
-            assigneeBox.setPrefWidth(CARD_WIDTH/2);
+        if (issue.getAssignee().isPresent()) {
+            HBox assigneeBox = createDisplayUserBox(guiElement.getAssignee(), issue.getAssignee().get());
             authorAssigneeBox.getChildren().add(assigneeBox);
         }
+    }
+
+    /**
+     * Creates a box that displays a label of userName
+     * The avatar that belongs to the user will be prepended if TurboUser has it
+     * @param user
+     * @param userName
+     * @return
+     */
+    private HBox createDisplayUserBox(Optional<TurboUser> user, String userName) {
+        HBox userBox = setupUserBox();
+        Label authorNameLabel = new Label(userName);
+        addAvatarIfPresent(userBox, user);
+        userBox.getChildren().addAll(authorNameLabel);
+        return userBox;
+    }
+
+    private void addAvatarIfPresent(HBox authorBox, Optional<TurboUser> user) {
+        if (!user.isPresent()) return;
+        ImageView authorAvatar = getAuthorAvatar(user.get());
+        authorBox.getChildren().add(authorAvatar);
+    }
+
+    private HBox setupUserBox() {
+        HBox authorBox = new HBox();
+        authorBox.setAlignment(Pos.BASELINE_CENTER);
+        return authorBox;
+    }
+
+    private ImageView getAuthorAvatar(TurboUser user) {
+        ImageView authorAvatar = new ImageView();
+        if (user.getAvatarURL().length() != 0) {
+            Image image = user.getAvatar();
+            assert image != null;
+            authorAvatar.setImage(image);
+        }
+        return authorAvatar;
     }
 
 }
