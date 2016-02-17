@@ -341,6 +341,15 @@ public class TurboIssue {
     }
 
     /**
+     * Generates new TurboIssue given a repoId
+     * @param repoId
+     * @return
+     */
+    public static TurboIssue createNewIssue(String repoId) {
+        return new TurboIssue(repoId, NEWISSUE_ID, "");
+    }
+
+    /**
      * Finds the index of an issue with specified id in a list of issues
      * @param issues
      * @param id

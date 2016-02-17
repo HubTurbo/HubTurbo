@@ -24,10 +24,9 @@ public class IssueCreatorPresenter {
     
     private final List<String> currentLabels;
 
-    public IssueCreatorPresenter(Model repo, Optional<TurboIssue> issue) {
+    public IssueCreatorPresenter(Model repo, TurboIssue issue) {
         this.repo = repo;
-        this.issue = issue.isPresent() 
-            ? new TurboIssue(issue.get()) : new TurboIssue(repo.getRepoId(), TurboIssue.NEWISSUE_ID, "");
+        this.issue = new TurboIssue(issue);
         currentLabels = this.issue.getLabels();
     }
     

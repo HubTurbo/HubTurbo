@@ -46,7 +46,7 @@ public class IssueCreatorDialog extends Dialog<TurboIssue> {
     
     private IssueContentPane body;
     
-    public IssueCreatorDialog(Model repo, Optional<TurboIssue> issue, Stage stage) {
+    public IssueCreatorDialog(Model repo, TurboIssue issue, Stage stage) {
         presenter = new IssueCreatorPresenter(repo, issue);
         initUI(stage);
     }
