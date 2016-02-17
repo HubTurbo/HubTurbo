@@ -10,8 +10,7 @@ To use HubTurbo, you'll need:
 
 ## Installation
 
-Once you have the above, grab the installer from [here](https://github.com/HubTurbo/AutoUpdater/releases/download/V0.9.0/HubTurbo.jar) and run it. 
-It will download the latest HubTurbo version and launch it. 
+Once you have the above, grab HubTurbo from [here](https://github.com/HubTurbo/HubTurbo/releases/latest) and run it.
 
 When HubTurbo runs for the first time, you'll be presented with a login dialog similar to the one shown below. 
 Provide the URL of one of the repositories you want to access and your GitHub account details.

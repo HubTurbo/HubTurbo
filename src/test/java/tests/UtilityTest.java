@@ -8,7 +8,6 @@ import static util.Utility.formatDateISO8601;
 import static util.Utility.localDateTimeToDate;
 import static util.Utility.localDateTimeToLong;
 import static util.Utility.parseHTTPLastModifiedDate;
-import static util.Utility.parseVersionNumber;
 import static util.Utility.replaceNull;
 import static util.Utility.safeLongToInt;
 import static util.Utility.snakeCaseToCamelCase;
@@ -24,13 +23,6 @@ import org.junit.Test;
 import util.Utility;
 
 public class UtilityTest {
-
-    @Test
-    public void parseVersionNumberTest() {
-        assertEquals(1, parseVersionNumber("1.2.3a").get()[0]);
-        assertEquals(2, parseVersionNumber("1.2.3a").get()[1]);
-        assertEquals(3, parseVersionNumber("1.2.3a").get()[2]);
-    }
 
     @Test
     public void safeLongToIntTest() {

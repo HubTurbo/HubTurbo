@@ -18,6 +18,7 @@ import ui.UI;
 import ui.issuepanel.PanelControl;
 import util.PlatformEx;
 import util.Utility;
+import util.Version;
 
 public class BoardTests extends UITest {
 
@@ -248,7 +249,7 @@ public class BoardTests extends UITest {
     }
 
     private static String getUiTitleWithOpenBoard(String boardName) {
-        String version = Utility.version(UI.VERSION_MAJOR, UI.VERSION_MINOR, UI.VERSION_PATCH);
+        String version = Version.getCurrentVersion().toString();
         return String.format(UI.WINDOW_TITLE, version, boardName);
     }
 

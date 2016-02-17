@@ -226,30 +226,6 @@ public final class Utility {
         return millisecToMinutes(targetTime - new Date().getTime());
     }
 
-    /**
-     * Parses a version number string in the format V1.2.3.
-     * @param version version number string
-     * @return an array of 3 elements, representing the major, minor, and patch versions respectively
-     */
-    public static Optional<int[]> parseVersionNumber(String version) {
-        // Strip non-digits
-        String numericVersion = version.replaceAll("[^0-9.]+", "");
-
-        String[] temp = numericVersion.split("\\.");
-        try {
-            int major = temp.length > 0 ? Integer.parseInt(temp[0]) : 0;
-            int minor = temp.length > 1 ? Integer.parseInt(temp[1]) : 0;
-            int patch = temp.length > 2 ? Integer.parseInt(temp[2]) : 0;
-            return Optional.of(new int[] {major, minor, patch});
-        } catch (NumberFormatException e) {
-            return Optional.empty();
-        }
-    }
-
-    public static String version(int major, int minor, int patch) {
-        return String.format("V%d.%d.%d", major, minor, patch);
-    }
-
     public static String snakeCaseToCamelCase(String str) {
         Pattern p = Pattern.compile("(^|_)([a-z])");
         Matcher m = p.matcher(str);
