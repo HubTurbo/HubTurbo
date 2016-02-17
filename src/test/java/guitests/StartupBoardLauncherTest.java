@@ -1,5 +1,6 @@
 package guitests;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
@@ -53,5 +54,10 @@ public class StartupBoardLauncherTest extends UITest{
         FutureTask<Integer> countPanels = new FutureTask<>(panelControl::getPanelCount);
         PlatformEx.runAndWait(countPanels);
         return countPanels.get();
+    }
+
+    @After
+    public void teardown(){
+        clearTestFolder();
     }
 }
