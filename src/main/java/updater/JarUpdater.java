@@ -11,20 +11,23 @@ import javafx.stage.Stage;
 import util.DialogMessage;
 
 import java.io.*;
-import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Note: This class will be compiled into a JAR on its own
  *
  * Replaces a JAR file and optionally start that JAR
+ * If you made any changes to this class, run gradle task compileJarUpdater
  *
  * Options:
  * --source string path of source JAR file to replace old JAR
  * --target string path of target JAR file to be replaced
  * --execute-jar "y" to execute target JAR after replacement
+ * --backup-suffix (optional) suffix added to backup file
  */
 public class JarUpdater extends Application {
     private final ExecutorService pool = Executors.newSingleThreadExecutor();
@@ -34,6 +37,8 @@ public class JarUpdater extends Application {
     private static final String BACKUP_FILENAME_SUFFIX = "_backup";
     private static final String ERROR_ON_UPDATING_MESSAGE =
             "Update cannot be applied. Update will be aborted. Please close this window.";
+
+    private String backupSuffix = BACKUP_FILENAME_SUFFIX;
 
 
     public static void main(String[] args) { // NOPMD
@@ -79,12 +84,17 @@ public class JarUpdater extends Application {
         String sourceJarPath = commandLineArgs.get("source");
         String targetJarPath = commandLineArgs.get("target");
         String executeJarOption = commandLineArgs.get("execute-jar");
+        String backupSuffixOption = commandLineArgs.get("backup-suffix");
 
         if (sourceJarPath == null || targetJarPath == null) {
             throw new IllegalArgumentException("Please specify source and target files.");
         } else {
             log("source: " + sourceJarPath);
             log("target: " + targetJarPath);
+        }
+
+        if (backupSuffixOption != null) {
+            backupSuffix = backupSuffixOption;
         }
 
         File sourceJarFile = new File(sourceJarPath);
@@ -114,8 +124,6 @@ public class JarUpdater extends Application {
             // if target can't be started, rollback backup
             restoreBackupOfFile(targetJarFile);
             executeJar(targetJarPath);
-        } else {
-            removeBackupOfFileIfExists(targetJarFile);
         }
 
         quit();
@@ -165,7 +173,7 @@ public class JarUpdater extends Application {
      */
     private void moveFileToBackup(File file) throws IOException {
         log("Moving file as backup");
-        String backupFilename = getBackupFilename(file.getName());
+        String backupFilename = getJarBackupFilename(file.getName());
         File backup = new File(file.getParent(), backupFilename);
         JarUpdaterFileHandler.moveFileWithReplaceExisting(file.toPath(), backup.toPath());
     }
@@ -177,27 +185,27 @@ public class JarUpdater extends Application {
      */
     private void restoreBackupOfFile(File file) throws IOException {
         log("Restoring backup");
-        String backupFilename = getBackupFilename(file.getName());
+        String backupFilename = getJarBackupFilename(file.getName());
         File backup = new File(file.getParent(), backupFilename);
         JarUpdaterFileHandler.moveFileWithReplaceExisting(backup.toPath(), file.toPath());
     }
 
     /**
-     * Removes the backup file of a given filename
-     * @param file the file which backup should be removed
-     * @throws IOException if failed to remove backup file
+     * Gets backup name of jar file.
+     * If backup suffix option is provided, it will be used instead of standard backup suffix.
+     * If filename does not end with ".jar", appends standard backup suffix to the filename
+     * @param filename filename which backup name should be generated
+     * @return backup filename
      */
-    private void removeBackupOfFileIfExists(File file) throws IOException {
-        log("Removing backup");
-        String backupFilename = getBackupFilename(file.getName());
-        File backup = new File(file.getParent(), backupFilename);
-        if (!Files.deleteIfExists(backup.toPath())) {
-            log(String.format("No backup file %s", file.getName()));
-        }
-    }
+    private String getJarBackupFilename(String filename) {
+        Pattern jarFilenamePattern = Pattern.compile("^(.*)\\.jar$", Pattern.CASE_INSENSITIVE);
+        Matcher jarFilenameMatcher = jarFilenamePattern.matcher(filename);
 
-    private String getBackupFilename(String filename) {
-        return filename + BACKUP_FILENAME_SUFFIX;
+        if (!jarFilenameMatcher.find()) {
+            return filename + BACKUP_FILENAME_SUFFIX;
+        }
+
+        return jarFilenameMatcher.group(1) + backupSuffix + ".jar";
     }
 
     private static boolean executeJar(String jarPath) {
