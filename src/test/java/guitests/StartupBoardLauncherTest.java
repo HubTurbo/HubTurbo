@@ -3,11 +3,17 @@ package guitests;
 import org.junit.Before;
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
+import org.loadui.testfx.utils.TestUtils;
 import prefs.Preferences;
 import ui.BoardAutoCreator;
 import ui.TestController;
 import ui.UI;
 import ui.issuepanel.PanelControl;
+import ui.listpanel.ListPanel;
+import util.PlatformEx;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 
 import static guitests.BoardAutoCreatorTest.verifyBoard;
 
@@ -34,8 +40,7 @@ public class StartupBoardLauncherTest extends UITest{
     @Test
     public void boardCreation_firstTimeUser_sampleBoardCreated(){
         login("dummy", "dummy", "test", "test");
-        // Workaround since we are unable to synchronize board creation on Travis post login through the dialog box.
-        logout();
+        TestUtils.awaitCondition(() -> BoardAutoCreator.getSamplePanelDetails().size() == countPanelsShown());
 
         //Ensures that only 1 board was created and it was the sample board
         assertEquals(testPref.getAllBoardNames().size(), 1);
@@ -43,5 +48,11 @@ public class StartupBoardLauncherTest extends UITest{
 
         //Verifies the panel details of the sample board created.
         verifyBoard(panelControl, BoardAutoCreator.getSamplePanelDetails());
+    }
+
+    private int countPanelsShown() throws InterruptedException, ExecutionException {
+        FutureTask<Integer> countPanels = new FutureTask<>(panelControl::getPanelCount);
+        PlatformEx.runAndWait(countPanels);
+        return countPanels.get();
     }
 }
