@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
  * it contains the logic that handles every state transitions
  */
 public class LabelPickerState {
+
     Set<String> initialLabels;
     List<String> addedLabels;
     List<String> removedLabels;

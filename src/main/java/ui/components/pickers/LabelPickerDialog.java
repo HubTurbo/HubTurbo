@@ -107,7 +107,7 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
     private void populatePanes(LabelPickerState state) {
         // Population of UI elements
         populateAssignedLabels(state.getInitialLabels(), state.getRemovedLabels(), state.getAddedLabels(),
-                state.getCurrentSuggestion());
+                               state.getCurrentSuggestion());
         populateFeedbackLabels(state.getAssignedLabels(), state.getMatchedLabels(), state.getCurrentSuggestion());
         // Ensures dialog pane resize according to content
         getDialogPane().getScene().getWindow().sizeToScene();
