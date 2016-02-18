@@ -7,8 +7,8 @@ env:
     - TERM=dumb
 
 script:
-    #   - "./gradlew clean -DunstableTests.single=KeyboardShortcutsConfigTest unstableTests -i"
-    - "./gradlew clean check -i"
+    - "./gradlew clean -DunstableTests.single=KeyboardShortcutsConfigTest unstableTests -i"
+    # - "./gradlew clean check -i"
 
 after_success:
     - "./gradlew jacocoRootReport coveralls"
