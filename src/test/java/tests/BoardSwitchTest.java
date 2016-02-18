@@ -90,7 +90,7 @@ public class BoardSwitchTest {
         testPrefs.addBoard(BOARDNAME3, board3);
 
         testPrefs.switchBoard();
-        assertEquals(false, testPrefs.getLastOpenBoard().isPresent());
+        assertEquals(true, testPrefs.getLastOpenBoard().isPresent());
     }
 
     @Test
