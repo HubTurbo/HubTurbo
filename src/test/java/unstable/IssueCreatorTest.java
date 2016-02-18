@@ -10,13 +10,16 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import guitests.UITest;
 
+import org.controlsfx.control.NotificationPane;
 import org.fxmisc.richtext.InlineCssTextArea;
 import org.junit.Test;
 
 import backend.resource.TurboIssue;
+import backend.resource.TurboLabel;
 import ui.UI;
 import ui.components.issue_creators.IssueContentPane;
 import ui.listpanel.ListPanelCell;
+import util.PlatformEx;
 import util.events.ShowIssueCreatorEvent;
 
 public class IssueCreatorTest extends UITest {
@@ -37,7 +40,7 @@ public class IssueCreatorTest extends UITest {
         
         TextField title = find(TITLE_FIELD);
         verifyTextFieldInput(title, "hello");
-        verifyCleanExit();
+        ensuresCleanExit(KeyCode.ESCAPE);
     }
 
     
@@ -64,7 +67,21 @@ public class IssueCreatorTest extends UITest {
         assertEquals(content, assigneeField.getText());
         assertEquals(content, contentBody.getText());
         assertEquals(milestone, Integer.parseInt(milestoneField.getText()));
-        verifyCleanExit();
+        ensuresCleanExit(KeyCode.ESCAPE);
+    }
+
+    @Test
+    public void undoEditIssue_ReturnOldIssue() {
+        TurboIssue oldIssue = new TurboIssue("dummy/dummy", 1, "old issue");
+
+        UI.events.triggerEvent(new ShowIssueCreatorEvent(Optional.of(oldIssue)));
+        waitUntilNodeAppears(TITLE_FIELD);
+        
+        // Ensures that text field populated with new value
+        TextField title = find(TITLE_FIELD);
+        title.clear();
+        click(TITLE_FIELD).type("new issue");
+        assertEquals("new issue", title.getText());
     }
 
     /**
@@ -77,8 +94,12 @@ public class IssueCreatorTest extends UITest {
         assertEquals(content, field.getText());
     }
     
-    private void verifyCleanExit() {
-        push(KeyCode.ESCAPE);
+    /**
+     * Pushes designated key code and wait for node to dissappear
+     * @param code
+     */
+    private void ensuresCleanExit(KeyCode code) {
+        push(code);
         waitUntilNodeDisappears(TITLE_FIELD);
     }
 }
