@@ -106,10 +106,11 @@ public class LabelPickerState {
      * @return
      */
     private LabelPickerState updateMatchedLabels(String query) {
+        TurboLabel queryLabel = new TurboLabel("", query);
         List<String> newMatchedLabels = repoLabels;
 
-        newMatchedLabels = TurboLabel.filterByPartialName(newMatchedLabels, TurboLabel.getName(query));
-        newMatchedLabels = TurboLabel.filterByPartialGroupName(newMatchedLabels, TurboLabel.getGroup(query));
+        newMatchedLabels = TurboLabel.filterByPartialName(newMatchedLabels, queryLabel.getSimpleName());
+        newMatchedLabels = TurboLabel.filterByPartialGroupName(newMatchedLabels, queryLabel.getGroupName());
 
         OptionalInt newSuggestionIndex;
         if (query.isEmpty() || newMatchedLabels.isEmpty()) {
@@ -187,17 +188,19 @@ public class LabelPickerState {
      */
 
     private void removeConflictingLabels(String name) {
-        if (!TurboLabel.isInExclusiveGroup(name)) return;
+        TurboLabel queryLabel = new TurboLabel("", name);
+        if (!queryLabel.isInExclusiveGroup()) return;
 
-        String group = TurboLabel.getGroup(name);
+        String group = queryLabel.getGroupName();
         // Remove from addedLabels
         addedLabels = addedLabels.stream()
-                .filter(label -> !TurboLabel.getGroup(label).equals(group))
+                .filter(label -> !new TurboLabel("", label).getGroupName().equals(group))
                 .collect(Collectors.toList());
 
         // Add to removedLabels all initialLabels that have conflicting group
         removedLabels.addAll(initialLabels.stream()
-                .filter(label -> TurboLabel.getGroup(label).equals(group) && !removedLabels.contains(name))
+                .filter(label -> new TurboLabel("", label).getGroupName().equals(group) 
+                    && !removedLabels.contains(name))
                 .collect(Collectors.toList()));
     }
 

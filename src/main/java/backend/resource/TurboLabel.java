@@ -260,7 +260,8 @@ public class TurboLabel implements Comparable<TurboLabel> {
     public static List<String> filterByPartialName(List<String> repoLabels, String queryLabelName) {
         return repoLabels
                 .stream()
-                .filter(name -> Utility.containsIgnoreCase(getName(name), queryLabelName))
+                .filter(name -> Utility.containsIgnoreCase(
+                    new TurboLabel("", name).getSimpleName(), queryLabelName))
                 .collect(Collectors.toList());
     }
 
@@ -277,8 +278,9 @@ public class TurboLabel implements Comparable<TurboLabel> {
         return repoLabels
                 .stream()
                 .filter(name -> {
-                    if (hasGroup(name)) {
-                        return Utility.containsIgnoreCase(getGroup(name), queryLabelGroup);
+                    TurboLabel newLabel = new TurboLabel("", name);
+                    if (newLabel.isInGroup()) {
+                        return Utility.containsIgnoreCase(newLabel.getGroupName(), queryLabelGroup);
                     }
                     return false;
                 })
@@ -293,10 +295,12 @@ public class TurboLabel implements Comparable<TurboLabel> {
      * @return
      */
     public static String getMatchedLabelName(List<String> repoLabels, String keyword) {
+        TurboLabel query = new TurboLabel("", keyword);
+
         List<String> newMatchedLabels = new ArrayList<>();
         newMatchedLabels.addAll(repoLabels);
-        newMatchedLabels = filterByPartialName(newMatchedLabels, getName(keyword));
-        newMatchedLabels = filterByPartialGroupName(newMatchedLabels, getGroup(keyword));
+        newMatchedLabels = filterByPartialName(newMatchedLabels, query.getSimpleName());
+        newMatchedLabels = filterByPartialGroupName(newMatchedLabels, query.getGroupName());
         return newMatchedLabels.get(0);
     }
 
@@ -310,10 +314,12 @@ public class TurboLabel implements Comparable<TurboLabel> {
      * @return
      */
     public static boolean hasExactlyOneMatchedLabel(List<String> repoLabels, String keyword) {
+        TurboLabel query = new TurboLabel("", keyword);
+
         List<String> newMatchedLabels = new ArrayList<>();
         newMatchedLabels.addAll(repoLabels);
-        newMatchedLabels = filterByPartialName(newMatchedLabels, getName(keyword));
-        newMatchedLabels = filterByPartialGroupName(newMatchedLabels, getGroup(keyword));
+        newMatchedLabels = filterByPartialName(newMatchedLabels, query.getSimpleName());
+        newMatchedLabels = filterByPartialGroupName(newMatchedLabels, query.getGroupName());
         return newMatchedLabels.size() == 1;
     }
 
@@ -323,8 +329,8 @@ public class TurboLabel implements Comparable<TurboLabel> {
      * @param labelName
      * @return
      */
-    public static boolean isInExclusiveGroup(String labelName) {
-        return TurboLabel.getDelimiter(labelName).isPresent() && TurboLabel.getDelimiter(labelName).get().equals(".");
+    public boolean isInExclusiveGroup() {
+        return isInGroup() && getDelimiter(actualName).get().equals(".");
     }
 
     /**
@@ -333,9 +339,9 @@ public class TurboLabel implements Comparable<TurboLabel> {
      * @param labelName
      * @return
      */
-    public static String getGroup(String labelName) {
-        if (!hasGroup(labelName)) return "";
-        return labelName.substring(0, labelName.indexOf(TurboLabel.getDelimiter(labelName).get()));
+    public String getGroupName() {
+        if (!isInGroup()) return "";
+        return actualName.substring(0, actualName.indexOf(getDelimiter(actualName).get()));
     }
 
     /**
@@ -344,12 +350,12 @@ public class TurboLabel implements Comparable<TurboLabel> {
      * @param labelName
      * @return
      */
-    public static String getName(String labelName) {
-        if (!hasGroup(labelName)) return labelName;
-        return labelName.substring(labelName.indexOf(TurboLabel.getDelimiter(labelName).get()) + 1);
+    public String getSimpleName() {
+        if (!isInGroup()) return actualName;
+        return actualName.substring(actualName.indexOf(getDelimiter(actualName).get()) + 1);
     }
 
-    public static boolean hasGroup(String labelName) {
-        return TurboLabel.getDelimiter(labelName).isPresent();
+    public boolean isInGroup() {
+        return getDelimiter(actualName).isPresent();
     }
 }

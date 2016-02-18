@@ -222,7 +222,7 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
                 .filter(label -> label.getGroup().isPresent())
                 .map(label -> new PickerLabel(label, false))
                 .forEach(label -> {
-                    String group = label.getGroupName().get();
+                    String group = label.getGroupName();
                     if (!groupContent.containsKey(group)) {
                         groupContent.put(group, createGroupPane(GROUP_PAD));
                     }

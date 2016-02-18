@@ -76,14 +76,6 @@ public class PickerLabel extends TurboLabel {
         this.isFaded = isFaded;
     }
 
-    public Optional<String> getGroupName() {
-        Optional<String> groupName = Optional.empty();
-        if (getGroup().isPresent()) {
-            groupName = Optional.of(getGroup().get() + (isExclusive() ? "." : "-"));
-        }
-        return groupName;
-    }
-
     /**
      * This isn't unnecessary as fields are added, but are not taken into account for equality.
      * @return
