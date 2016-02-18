@@ -16,9 +16,9 @@ public class LabelPickerStateTests {
     @Test
     public void toggleLabel_labelsWithGroup_labelsAdded() {
         LabelPickerState initialState = setupState();
-        LabelPickerState nextState = initialState.toggleLabel("priority.medium");
+        LabelPickerState nextState = initialState.findMatchingLabelAndToggle("priority.medium");
         assertEquals(1, nextState.getAddedLabels().size());
-        nextState = nextState.toggleLabel("f-aaa");
+        nextState = nextState.findMatchingLabelAndToggle("f-aaa");
         assertEquals(2, nextState.getAddedLabels().size());
     }
 
@@ -26,7 +26,7 @@ public class LabelPickerStateTests {
     public void getRemovedLabels_exclusiveLabels_removeConflictingLabels() {
         LabelPickerState initialState = setupState("priority.low", "priority.high");
         assertEquals(2, initialState.getInitialLabels().size());
-        LabelPickerState nextState = initialState.toggleLabel("priority.medium");
+        LabelPickerState nextState = initialState.findMatchingLabelAndToggle("priority.medium");
 
         assertEquals("priority.medium", nextState.getAddedLabels().get(0));
         assertEquals(1, nextState.getAddedLabels().size());
@@ -38,15 +38,15 @@ public class LabelPickerStateTests {
     @Test
     public void getAssignedLabels() {
         LabelPickerState initialState = setupState("priority.low", "priority.high");
-        LabelPickerState nextState = initialState.toggleLabel("priority.medium");
-        nextState = nextState.toggleLabel("priority.medium");
+        LabelPickerState nextState = initialState.findMatchingLabelAndToggle("priority.medium");
+        nextState = nextState.findMatchingLabelAndToggle("priority.medium");
         assertEquals(0, nextState.getAssignedLabels().size());
 
-        nextState = nextState.toggleLabel("priority.low");
-        nextState = nextState.toggleLabel("priority.low");
-        nextState = nextState.toggleLabel("priority.low");
-        nextState = nextState.toggleLabel("Problem.Heavy");
-        nextState = nextState.toggleLabel("priority.medium");
+        nextState = nextState.findMatchingLabelAndToggle("priority.low");
+        nextState = nextState.findMatchingLabelAndToggle("priority.low");
+        nextState = nextState.findMatchingLabelAndToggle("priority.low");
+        nextState = nextState.findMatchingLabelAndToggle("Problem.Heavy");
+        nextState = nextState.findMatchingLabelAndToggle("priority.medium");
         assertEquals(2, nextState.getAssignedLabels().size());
         assertTrue(nextState.getAssignedLabels().contains("priority.medium"));
         assertTrue(nextState.getAssignedLabels().contains("Problem.Heavy"));

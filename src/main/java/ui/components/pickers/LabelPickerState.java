@@ -49,7 +49,7 @@ public class LabelPickerState {
         LabelPickerState state = this;
         List<String> confirmedKeywords = getConfirmedKeywords(userInput);
         for (String confirmedKeyword : confirmedKeywords) {
-            state = state.toggleLabel(confirmedKeyword);
+            state = state.findAndToggleMatchingLabel(confirmedKeyword);
         }
 
         Optional<String> keywordInProgess = getKeywordInProgress(userInput);
@@ -61,20 +61,28 @@ public class LabelPickerState {
     }
 
     /**
-     * Gives a new state with the label that contains keyword toggled.
      *
      * This will simply return the same state if there are more than 1
-     * labels that contain the keyword
-     *
-     * keyword is case-insensitive
+     * label that contains the keyword
      *
      * @param keyword
      * @return
      */
-    public LabelPickerState toggleLabel(String keyword) {
+    private LabelPickerState findAndToggleMatchingLabel(String keyword) {
         if (!TurboLabel.hasExactlyOneMatchedLabel(repoLabels, keyword)) return this;
         String labelName = TurboLabel.getMatchedLabelName(repoLabels, keyword);
+        return toggleLabel(labelName);
+    }
 
+    /**
+     * Gives a new state with the label toggled
+     *
+     * labelName is case-sensitive
+     *
+     * @param labelName
+     * @return
+     */
+    public LabelPickerState toggleLabel(String labelName) {
         if (isAnInitialLabel(labelName)) {
             if (isARemovedLabel(labelName)) {
                 // add back initial label
@@ -92,7 +100,6 @@ public class LabelPickerState {
                 addedLabels.add(labelName);
             }
         }
-
         return new LabelPickerState(initialLabels, addedLabels, removedLabels, repoLabels, repoLabels);
     }
 
@@ -187,8 +194,8 @@ public class LabelPickerState {
      * Non-static Helper functions
      */
 
-    private void removeConflictingLabels(String name) {
-        TurboLabel queryLabel = new TurboLabel("", name);
+    private void removeConflictingLabels(String labelName) {
+        TurboLabel queryLabel = new TurboLabel("", labelName);
         if (!queryLabel.isInExclusiveGroup()) return;
 
         String group = queryLabel.getGroupName();
@@ -200,7 +207,7 @@ public class LabelPickerState {
         // Add to removedLabels all initialLabels that have conflicting group
         removedLabels.addAll(initialLabels.stream()
                 .filter(label -> new TurboLabel("", label).getGroupName().equals(group) 
-                    && !removedLabels.contains(name))
+                    && !removedLabels.contains(labelName))
                 .collect(Collectors.toList()));
     }
 
