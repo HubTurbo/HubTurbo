@@ -63,10 +63,8 @@ public class KeyboardShortcutsConfigTest extends UITest {
         testPref.setKeyboardShortcuts(keyboardShortcuts);
         reloadPrefs(testPref);
         Platform.runLater(() -> KeyboardShortcuts.loadKeyboardShortcuts(testPref));
-        /*
-        waitUntilNodeAppears(hasText("Invalid key specified for MARK_AS_READ" +
+        waitUntilNodeAppears(hasText("Invasslid key specified for MARK_AS_READ" +
             " or it has already been used for some other shortcut. "));
-            */
         click("Use default key");
         reloadPrefs(testPref);
         assertEquals(KeyboardShortcuts.getDefaultKeyboardShortcuts().get("MARK_AS_READ"),
