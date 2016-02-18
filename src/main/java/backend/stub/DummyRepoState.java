@@ -401,7 +401,7 @@ public class DummyRepoState {
         eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test"),
                 IssueEventType.Milestoned,
                 new Date()).setMilestoneTitle(milestones.get(milestone).getTitle()));
-        toSet.setMilestone(milestone);
+        toSet.setMilestoneById(milestone);
         toSet.setUpdatedAt(LocalDateTime.now());
 
         markUpdatedEvents(toSet, IssueMetadata.intermediate(eventsOfIssue, metadataOfIssue.getComments(), "", ""));

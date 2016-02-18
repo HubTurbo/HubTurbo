@@ -32,9 +32,9 @@ public class MilestonePicker {
 
         if (!assignedMilestone.isPresent()) return;
         if (assignedMilestone.get().getKey().equals(ButtonType.CANCEL)) return;
-        if (!issue.getMilestone().equals(assignedMilestone.get().getValue())) {
+        if (!issue.getMilestone().equals(Optional.ofNullable(assignedMilestone.get().getValue()))) {
             ui.undoController.addAction(issue, new ChangeMilestoneAction(ui.logic, issue.getMilestone(),
-                    Optional.of(assignedMilestone.get().getValue())));
+                    Optional.ofNullable(assignedMilestone.get().getValue())));
         }
     }
 

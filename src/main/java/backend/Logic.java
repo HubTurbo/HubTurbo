@@ -4,7 +4,6 @@ import backend.control.RepoOpControl;
 import backend.resource.Model;
 import backend.resource.MultiModel;
 import backend.resource.TurboIssue;
-import backend.resource.TurboMilestone;
 import filter.expression.FilterExpression;
 import javafx.application.Platform;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -221,7 +220,11 @@ public class Logic {
         return repoIO.replaceIssueMilestone(issue, milestone)
                 .thenApply(resultingIssue -> {
                     logger.info("Changing milestone for " + issue + " on UI");
-                    issue.setMilestone(resultingIssue.getMilestone().getNumber());
+                    if (resultingIssue.getMilestone() != null) {
+                        issue.setMilestoneById(resultingIssue.getMilestone().getNumber());
+                    } else {
+                        issue.setMilestoneById(null);
+                    }
                     refreshUI();
                     return true;
                 })

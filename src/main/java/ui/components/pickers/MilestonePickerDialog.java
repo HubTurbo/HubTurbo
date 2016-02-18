@@ -27,7 +27,7 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
     private TextField inputField;
     private MilestonePickerState state;
 
-    /**xxxx
+    /**
      * Constructor to create a MilestonePickerDialog
      *
      * The issue and the originalMilestones list provided should come from the same repository
@@ -113,6 +113,7 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
     private void setConfirmResultConverter(ButtonType confirmButtonType) {
         setResultConverter((dialogButton) -> {
             List<PickerMilestone> finalList = state.getCurrentMilestonesList();
+            //if (dialogButton != confirmButtonType) return null;
             if (hasSelectedMilestone(finalList)) {
                 return new Pair<>(dialogButton, getSelectedMilestone(finalList).getId());
             }
