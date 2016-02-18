@@ -34,7 +34,7 @@ public class TurboMilestoneTest {
     }
 
     @Test
-    public void turboMilestoneSortingTest() {
+    public void sortByDueDate_sameMilestoneDueDate_stableSorting() {
         // test for turbo milestone due date sorting behaviour
         TurboMilestone milestone1 = new TurboMilestone("1", 1, "milestone1");
         milestone1.setDueDate(Optional.of(LocalDate.now().minusDays(1)));
@@ -44,13 +44,14 @@ public class TurboMilestoneTest {
         milestone3.setDueDate(Optional.of(LocalDate.now().minusDays(1)));
         TurboMilestone milestone4 = new TurboMilestone("3", 4, "milestone4");
         TurboMilestone milestone5 = new TurboMilestone("3", 5, "milestone5");
+
+        // the sort should be stable
         List<TurboMilestone> milestones = Arrays.asList(milestone1,
                 milestone2,
                 milestone3,
                 milestone4,
                 milestone5);
         List<TurboMilestone> sortedMilestones = TurboMilestone.sortByDueDate(milestones);
-        // the sort should be stable
         assertEquals("milestone2", sortedMilestones.get(0).getTitle());
         assertEquals("milestone1", sortedMilestones.get(1).getTitle());
         assertEquals("milestone3", sortedMilestones.get(2).getTitle());

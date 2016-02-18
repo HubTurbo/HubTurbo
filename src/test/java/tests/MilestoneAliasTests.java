@@ -161,7 +161,7 @@ public class MilestoneAliasTests {
     }
 
     @Test
-    public void replaceMilestoneAliasesTestOngoingMilestoneWithNoDueDate() {
+    public void milestoneAlias_onlyOpenMilestoneWithoutDueDate_openMilestoneConsideredAsCurrent() {
         //ongoing milestone -> open && (!overdue || (overdue && openIssues > 0))
 
         TurboMilestone msFinished0 = new TurboMilestone(REPO, 0, "finished0");
@@ -255,7 +255,7 @@ public class MilestoneAliasTests {
     }
 
     @Test
-    public void replaceMilestoneAliasesTestNoMilestone() {
+    public void milestoneAlias_noAliasableMilestone_currentDoesNotResolveToOtherMilestone() {
         model = TestUtils.singletonModel(new Model(REPO,
                 new ArrayList<>(),
                 new ArrayList<>(),
@@ -264,6 +264,8 @@ public class MilestoneAliasTests {
         FilterExpression expr = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:current"));
         List<Qualifier> milestoneQualifiers = expr.find(Qualifier::isMilestoneQualifier);
         assertEquals(1, milestoneQualifiers.size());
+
+        // no aliasable milestone, current should not resolve to anything
         milestoneQualifiers.stream().forEach(msQ -> {
             assertEquals("current", msQ.getContent().get());
         });
