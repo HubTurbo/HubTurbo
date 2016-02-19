@@ -25,7 +25,8 @@ public class ModelUpdateUITest extends UITest {
     }
 
     @Test
-    public void addIssueTest() throws InterruptedException, ExecutionException {
+    public void modelUpdate_panel_addedIssuesShowUp()
+        throws InterruptedException, ExecutionException {
         resetRepo();
         addIssue();
         FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssueCount);
@@ -34,7 +35,8 @@ public class ModelUpdateUITest extends UITest {
     }
 
     @Test
-    public void addMultipleIssuesTest() throws InterruptedException, ExecutionException {
+    public void modelUpdate_panel_multipleAddedIssuesShowUp()
+        throws InterruptedException, ExecutionException {
         resetRepo();
         addIssue();
         addIssue();
@@ -45,7 +47,8 @@ public class ModelUpdateUITest extends UITest {
     }
 
     @Test
-    public void countIssuesTest() throws InterruptedException, ExecutionException {
+    public void modelUpdate_panel_correctNumberOfIssuesShown()
+        throws InterruptedException, ExecutionException {
         addIssue();
         resetRepo();
         FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssueCount);
@@ -54,7 +57,8 @@ public class ModelUpdateUITest extends UITest {
     }
 
     @Test
-    public void deleteIssueTest() throws InterruptedException, ExecutionException {
+    public void modelUpdate_panel_deletedIssuesNoLongerShowUp()
+        throws InterruptedException, ExecutionException {
         resetRepo();
         addIssue();
         addIssue();
@@ -65,7 +69,8 @@ public class ModelUpdateUITest extends UITest {
     }
 
     @Test
-    public void deleteMultipleIssuesTest() throws InterruptedException, ExecutionException {
+    public void modelUpdate_panel_multipleDeletedIssuesNoLongerShowUp()
+        throws InterruptedException, ExecutionException {
         resetRepo();
         addIssue();
         addIssue();
@@ -79,7 +84,7 @@ public class ModelUpdateUITest extends UITest {
 
     // TODO no way to check correctness of these events as of yet as they are not reflected on the UI
     @Test
-    public void otherTriggersTest() throws InterruptedException, ExecutionException {
+    public void modelUpdate_events_eventsTriggerChanges() throws InterruptedException, ExecutionException {
         UI.events.triggerEvent(UpdateDummyRepoEvent.newLabel("dummy/dummy"));
         UI.events.triggerEvent(new UILogicRefreshEvent());
         sleep(EVENT_DELAY);
@@ -108,18 +113,18 @@ public class ModelUpdateUITest extends UITest {
         sleep(EVENT_DELAY);
     }
 
-    public void resetRepo() {
+    private void resetRepo() {
         UI.events.triggerEvent(UpdateDummyRepoEvent.resetRepo("dummy/dummy"));
         sleep(EVENT_DELAY);
     }
 
-    public void addIssue() {
+    private void addIssue() {
         UI.events.triggerEvent(UpdateDummyRepoEvent.newIssue("dummy/dummy"));
         UI.events.triggerEvent(new UILogicRefreshEvent());
         sleep(EVENT_DELAY);
     }
 
-    public void deleteIssue(int itemId) {
+    private void deleteIssue(int itemId) {
         UI.events.triggerEvent(UpdateDummyRepoEvent.deleteIssue("dummy/dummy", itemId));
         UI.events.triggerEvent(new UILogicRefreshEvent());
         sleep(EVENT_DELAY);

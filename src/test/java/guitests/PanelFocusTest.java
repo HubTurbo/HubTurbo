@@ -17,6 +17,7 @@ import prefs.ConfigFileHandler;
 import prefs.GlobalConfig;
 import prefs.PanelInfo;
 import prefs.Preferences;
+import ui.TestController;
 import ui.issuepanel.PanelControl;
 
 public class PanelFocusTest extends UITest {
@@ -28,28 +29,21 @@ public class PanelFocusTest extends UITest {
 
     @Override
     public void beforeStageStarts() {
-        ConfigFileHandler configFileHandler =
-            new ConfigFileHandler(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
-        GlobalConfig globalConfig = new GlobalConfig();
-
-        PanelInfo test1 = new PanelInfo();
-        PanelInfo test2 = new PanelInfo();
-        PanelInfo test3 = new PanelInfo();
-        List<PanelInfo> panels = new ArrayList<>();
-        panels.add(test1);
-        panels.add(test2);
-        panels.add(test3);
-
-        globalConfig.setPanelInfo(panels);
-        configFileHandler.saveGlobalConfig(globalConfig);
+        createDefaultPanels();
     }
 
-    // All tests kept in one method to control execution flow
     @Test
     public void panelFocusOnActionsTest() throws IllegalAccessException {
 
-        PanelControl panelControl = (PanelControl) find("#dummy/dummy_col0").getParent();
+        PanelControl panelControl = TestController.getUI().getPanelControl();
 
+        panelFocus_focusedPanel_focusCorrectOnStartup(panelControl);
+        panelFocus_focusedPanel_focusCorrectOnCreatingPanels(panelControl);
+        panelFocus_firstPanel_firstPanelShown(panelControl);
+
+    }
+
+    private void panelFocus_focusedPanel_focusCorrectOnStartup(PanelControl panelControl) {
         /**
          * Testing Panel Focus on Startup
          * ==============================
@@ -83,8 +77,9 @@ public class PanelFocusTest extends UITest {
         pushKeys(KeyCode.F);
         awaitCondition(() ->
             2 == panelControl.getCurrentlySelectedPanel().get());
+    }
 
-
+    private void panelFocus_focusedPanel_focusCorrectOnCreatingPanels(PanelControl panelControl) {
         /**
          * Testing Panel Focus on Creating Panels
          * ======================================
@@ -106,7 +101,10 @@ public class PanelFocusTest extends UITest {
         awaitCondition(() -> 0 == panelControl.getCurrentlySelectedPanel().get());
         type("  ");
         awaitCondition(() -> 0 == panelControl.getCurrentlySelectedPanel().get());
+    }
 
+    private void panelFocus_firstPanel_firstPanelShown(PanelControl panelControl)
+        throws IllegalAccessException {
         /**
          * Testing First Panel is shown (i.e. scrollbar is set to left end)
          * and on focus upon Opening Board
@@ -134,5 +132,22 @@ public class PanelFocusTest extends UITest {
         ScrollPane panelsScrollPaneReflection =
             (ScrollPane) FieldUtils.readField(panelControl, "panelsScrollPane", true);
         assertEquals(0, panelsScrollPaneReflection.getHvalue(), 0.001);
+    }
+
+    private void createDefaultPanels() {
+        ConfigFileHandler configFileHandler =
+            new ConfigFileHandler(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
+        GlobalConfig globalConfig = new GlobalConfig();
+
+        PanelInfo test1 = new PanelInfo();
+        PanelInfo test2 = new PanelInfo();
+        PanelInfo test3 = new PanelInfo();
+        List<PanelInfo> panels = new ArrayList<>();
+        panels.add(test1);
+        panels.add(test2);
+        panels.add(test3);
+
+        globalConfig.setPanelInfo(panels);
+        configFileHandler.saveGlobalConfig(globalConfig);
     }
 }

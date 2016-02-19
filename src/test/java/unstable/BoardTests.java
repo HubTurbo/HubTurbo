@@ -38,7 +38,7 @@ public class BoardTests extends UITest {
     }
 
     @Test
-    public void creatingAndClosingPanels() {
+    public void boards_panelCount_creatingAndClosingPanels() {
         UI ui = TestController.getUI();
         PanelControl panelControl = ui.getPanelControl();
 
@@ -60,7 +60,7 @@ public class BoardTests extends UITest {
     }
 
     @Test
-    public void saveWhenNoBoardOpen() {
+    public void boards_saveDialog_willSaveWhenNoBoardOpen() {
         UI ui = TestController.getUI();
         PanelControl panelControl = ui.getPanelControl();
 
@@ -75,7 +75,7 @@ public class BoardTests extends UITest {
     }
 
     @Test
-    public void boardNotSavedOnCancellation() {
+    public void boards_saveDialog_willNotSaveOnCancellation() {
         PanelControl panelControl = TestController.getUI().getPanelControl();
 
         traverseMenu("Boards", "Save");
@@ -87,14 +87,14 @@ public class BoardTests extends UITest {
     }
 
     @Test
-    public void switchWhenNoBoardOpen() {
+    public void boards_lastOpenedBoard_switchingWhenNoBoardIsOpen() {
         // Switching when no board is open should do nothing
         pushKeys(SWITCH_BOARD);
         assertFalse(UI.prefs.getLastOpenBoard().isPresent());
     }
 
     @Test
-    public void boardSaveAs() {
+    public void boards_panelCount_boardsSaveSuccessfully() {
         UI ui = TestController.getUI();
         PanelControl panelControl = ui.getPanelControl();
 
@@ -113,7 +113,7 @@ public class BoardTests extends UITest {
     }
 
     @Test
-    public void switchingBoardWithOnlyOneSaved() {
+    public void baords_lastOpenedBoard_cannotSwitchBoardWithOnlyOneSaved() {
 
         Preferences prefs = UI.prefs;
 
@@ -126,7 +126,7 @@ public class BoardTests extends UITest {
     }
 
     @Test
-    public void switchingBoardWithManySaved() {
+    public void boards_lastOpenedBoard_canSwitchBoardWithOnlyOneSaved() {
 
         Preferences prefs = UI.prefs;
 
@@ -148,7 +148,7 @@ public class BoardTests extends UITest {
     }
 
     @Test
-    public void boardNameValidation() {
+    public void boards_validation_displaysFeedbackOnFailingValidation() {
         tryBoardName("");
         tryBoardName("   ");
         tryBoardName("   none  ");
@@ -164,7 +164,7 @@ public class BoardTests extends UITest {
     }
 
     @Test
-    public void openingBoard() {
+    public void boards_panelCount_boardsCanBeOpenedSuccessfully() {
 
         UI ui = TestController.getUI();
         PanelControl panelControl = ui.getPanelControl();
@@ -186,7 +186,7 @@ public class BoardTests extends UITest {
     }
 
     @Test
-    public void savingBoard() {
+    public void boards_panelCount_boardsCanBeSavedSuccessfully() {
 
         PanelControl panelControl = TestController.getUI().getPanelControl();
 
@@ -207,7 +207,7 @@ public class BoardTests extends UITest {
     }
 
     @Test
-    public void deleteBoard() {
+    public void boards_panelCount_boardsCanBeDeletedSuccessfully() {
 
         UI ui = TestController.getUI();
         PanelControl panelControl = ui.getPanelControl();
@@ -225,9 +225,9 @@ public class BoardTests extends UITest {
     }
 
     @Test
-    public void noBoardsOpen() {
+    public void boards_panelCount_nothingHappensWhenNoBoardIsOpen() {
 
-        deleteBoard();
+        boards_panelCount_boardsCanBeDeletedSuccessfully();
 
         UI ui = TestController.getUI();
         PanelControl panelControl = ui.getPanelControl();

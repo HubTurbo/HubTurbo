@@ -13,7 +13,7 @@ import util.events.ModelUpdatedEventHandler;
 
 public class MenuControlTest extends UITest {
     @Test
-    public void refresh() {
+    public void refresh_refreshCount_refreshTriggersCorrectEvent() {
         final AtomicInteger triggered = new AtomicInteger(0);
 
         PlatformEx.runAndWait(() ->
