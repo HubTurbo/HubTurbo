@@ -884,12 +884,12 @@ public class Qualifier implements FilterExpression {
         TurboLabel candidateLabel = new TurboLabel("", candidate.toLowerCase());
 
         String group = "";
-        if (inputLabel.hasGroup()) {
+        if (inputLabel.isInGroup()) {
             group = inputLabel.getGroup().get();
         }
         String labelName = inputLabel.getName();
 
-        if (candidateLabel.hasGroup()) {
+        if (candidateLabel.isInGroup()) {
             if (labelName.isEmpty()) {
                 // Check the group
                 if (candidateLabel.getGroup().get().contains(group)) {

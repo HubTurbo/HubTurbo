@@ -62,7 +62,7 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
     LabelPickerDialog(TurboIssue issue, List<TurboLabel> repoLabels, Stage stage) {
         this.repoLabels = repoLabels;
         this.issue = issue;
-        this.state = new LabelPickerState(new HashSet(issue.getLabels()), TurboLabel.getLabelsNameList(repoLabels));
+        this.state = new LabelPickerState(new HashSet(issue.getLabels()), repoLabels);
 
         initUI(stage, issue);
         setupEvents(stage);
@@ -82,7 +82,7 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
         title.setTooltip(createTitleTooltip(issue));
         createButtons();
 
-        populatePanes(new LabelPickerState(new HashSet(issue.getLabels()), TurboLabel.getLabelsNameList(repoLabels)));
+        populatePanes(new LabelPickerState(new HashSet(issue.getLabels()), repoLabels));
     }
 
     private void initialiseDialog(Stage stage, TurboIssue issue) {
@@ -321,8 +321,8 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
 
     private void initialiseAndregisterQueryHandler() {
         listener = (observable, oldValue, newValue) -> {
-            LabelPickerState initialState = new LabelPickerState(new HashSet(issue.getLabels()),
-                    TurboLabel.getLabelsNameList(repoLabels));
+            LabelPickerState initialState = new LabelPickerState(
+                new HashSet(issue.getLabels()), repoLabels);
             state = initialState.determineState(queryField.getText().toLowerCase());
             populatePanes(state);
         };

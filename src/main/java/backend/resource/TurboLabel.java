@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 
 public class TurboLabel implements Comparable<TurboLabel> {
 
-    // Group membership 
     public static enum Grouping { EXCLUSIVE, NON_EXCLUSIVE, NONE }
 
     public static final String DEFAULT_COLOR = "ffffff";
@@ -143,11 +142,10 @@ public class TurboLabel implements Comparable<TurboLabel> {
      * @param nameQuery
      * @return
      */
-    public static List<String> filterByPartialName(List<String> repoLabels, String nameQuery) {
+    public static List<TurboLabel> filterByPartialName(List<TurboLabel> repoLabels, String nameQuery) {
         return repoLabels
                 .stream()
-                .filter(name -> Utility.containsIgnoreCase(
-                    new TurboLabel("", name).getSimpleName(), nameQuery))
+                .filter(label -> Utility.containsIgnoreCase(label.getSimpleName(), nameQuery))
                 .collect(Collectors.toList());
     }
 
@@ -158,15 +156,14 @@ public class TurboLabel implements Comparable<TurboLabel> {
      * @param groupQuery
      * @return
      */
-    public static List<String> filterByPartialGroupName(List<String> repoLabels, String groupQuery) {
+    public static List<TurboLabel> filterByPartialGroupName(List<TurboLabel> repoLabels, String groupQuery) {
         if (groupQuery.isEmpty()) return repoLabels;
 
         return repoLabels
                 .stream()
-                .filter(name -> {
-                    TurboLabel newLabel = new TurboLabel("", name);
-                    if (newLabel.isInGroup()) {
-                        return Utility.containsIgnoreCase(newLabel.getGroupName(), groupQuery);
+                .filter(label -> {
+                    if (label.isInGroup()) {
+                        return Utility.containsIgnoreCase(label.getGroupName(), groupQuery);
                     }
                     return false;
                 })
@@ -180,14 +177,14 @@ public class TurboLabel implements Comparable<TurboLabel> {
      * @param keyword
      * @return
      */
-    public static String getMatchedLabelName(List<String> repoLabels, String keyword) {
+    public static List<TurboLabel> getMatchedLabelName(List<TurboLabel> repoLabels, String keyword) {
         TurboLabel query = new TurboLabel("", keyword);
 
-        List<String> newMatchedLabels = new ArrayList<>();
+        List<TurboLabel> newMatchedLabels = new ArrayList<>();
         newMatchedLabels.addAll(repoLabels);
         newMatchedLabels = filterByPartialName(newMatchedLabels, query.getSimpleName());
         newMatchedLabels = filterByPartialGroupName(newMatchedLabels, query.getGroupName());
-        return newMatchedLabels.get(0);
+        return newMatchedLabels;
     }
 
     /**
@@ -199,18 +196,8 @@ public class TurboLabel implements Comparable<TurboLabel> {
      * @param keyword
      * @return
      */
-    public static boolean hasExactlyOneMatchedLabel(List<String> repoLabels, String keyword) {
-        TurboLabel query = new TurboLabel("", keyword);
-
-        List<String> newMatchedLabels = new ArrayList<>();
-        newMatchedLabels.addAll(repoLabels);
-        newMatchedLabels = filterByPartialName(newMatchedLabels, query.getSimpleName());
-        newMatchedLabels = filterByPartialGroupName(newMatchedLabels, query.getGroupName());
-        return newMatchedLabels.size() == 1;
-    }
-
-    public boolean isInExclusiveGroup() {
-        return grouping.equals(Grouping.EXCLUSIVE);
+    public static boolean hasExactlyOneMatchedLabel(List<TurboLabel> repoLabels, String keyword) {
+        return getMatchedLabelName(repoLabels, keyword).size() == 1;
     }
 
     public String getGroupName() {
@@ -221,16 +208,12 @@ public class TurboLabel implements Comparable<TurboLabel> {
         return simpleName;
     }
 
-    public boolean isInGroup() {
+    public boolean isInExclusiveGroup() {
+        return grouping.equals(Grouping.EXCLUSIVE);
+    }
+
+    public final boolean isInGroup() {
         return !grouping.equals(Grouping.NONE);
-    }
-
-    public boolean isExclusive() {
-        return getDelimiter(actualName).isPresent() && getDelimiter(actualName).get().equals(EXCLUSIVE_DELIMITER);
-    }
-
-    public boolean hasGroup() {
-        return getGroup().isPresent();
     }
 
     public Optional<String> getGroup() {
@@ -281,38 +264,6 @@ public class TurboLabel implements Comparable<TurboLabel> {
             // name
             return actualName;
         }
-    }
-
-    private static String joinWith(String group, String name, boolean exclusive) {
-        return group + (exclusive ? EXCLUSIVE_DELIMITER : NONEXCLUSIVE_DELIMITER) + name;
-    }
-
-    private Grouping initGroupMembership() {
-        if (getDelimiter(actualName).isPresent()) {
-            return getDelimiter(actualName).get().equals(EXCLUSIVE_DELIMITER) 
-                ? Grouping.EXCLUSIVE : Grouping.NON_EXCLUSIVE;
-        }
-        return Grouping.NONE;
-    }
-
-    /**
-     * Determines the group that labelName belongs to
-     * A labelName is considered to be in a group if getDelimiter(labelName).isPresent() is true.
-     * @return
-     */
-    private String initGroupName() {
-        if (!isInGroup()) return "";
-        return actualName.substring(0, actualName.indexOf(getDelimiter(actualName).get()));
-    }
-
-    /**
-     * Returns the name of labelName after omitting its group name
-     * i.e "priority.high" will return "high"
-     * @return
-     */
-    private String initSimpleName() {
-        if (!isInGroup()) return actualName;
-        return actualName.substring(actualName.indexOf(getDelimiter(actualName).get()) + 1);
     }
 
     public String getStyle() {
@@ -370,4 +321,37 @@ public class TurboLabel implements Comparable<TurboLabel> {
     public int compareTo(TurboLabel o) {
         return actualName.compareTo(o.getActualName());
     }
+
+    private static String joinWith(String group, String name, boolean exclusive) {
+        return group + (exclusive ? EXCLUSIVE_DELIMITER : NONEXCLUSIVE_DELIMITER) + name;
+    }
+
+    private Grouping initGroupMembership() {
+        if (getDelimiter(actualName).isPresent()) {
+            return getDelimiter(actualName).get().equals(EXCLUSIVE_DELIMITER) 
+                ? Grouping.EXCLUSIVE : Grouping.NON_EXCLUSIVE;
+        }
+        return Grouping.NONE;
+    }
+
+    /**
+     * Determines the group that labelName belongs to
+     * A labelName is considered to be in a group if getDelimiter(labelName).isPresent() is true.
+     * @return
+     */
+    private String initGroupName() {
+        if (!isInGroup()) return "";
+        return actualName.substring(0, actualName.indexOf(getDelimiter(actualName).get()));
+    }
+
+    /**
+     * Returns the name of labelName after omitting its group name
+     * i.e "priority.high" will return "high"
+     * @return
+     */
+    private String initSimpleName() {
+        if (!isInGroup()) return actualName;
+        return actualName.substring(actualName.indexOf(getDelimiter(actualName).get()) + 1);
+    }
+
 }

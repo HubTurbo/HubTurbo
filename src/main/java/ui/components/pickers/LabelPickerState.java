@@ -15,10 +15,10 @@ public class LabelPickerState {
     List<String> addedLabels;
     List<String> removedLabels;
     List<String> matchedLabels;
-    List<String> repoLabels;
+    List<TurboLabel> repoLabels;
     OptionalInt currentSuggestionIndex;
 
-    public LabelPickerState(Set<String> initialLabels, List<String> repoLabels) {
+    public LabelPickerState(Set<String> initialLabels, List<TurboLabel> repoLabels) {
         this(initialLabels, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), repoLabels,
                 OptionalInt.empty());
 
@@ -26,12 +26,13 @@ public class LabelPickerState {
     }
 
     private LabelPickerState(Set<String> initialLabels, List<String> addedLabels, List<String> removedLabels,
-                             List<String> matchedLabels, List<String> repoLabels) {
+                             List<String> matchedLabels, List<TurboLabel> repoLabels) {
         this(initialLabels, addedLabels, removedLabels, matchedLabels, repoLabels, OptionalInt.empty());
     }
 
     private LabelPickerState(Set<String> initialLabels, List<String> addedLabels, List<String> removedLabels,
-                             List<String> matchedLabels, List<String> repoLabels, OptionalInt currentSuggestionIndex) {
+                             List<String> matchedLabels, List<TurboLabel> repoLabels, 
+                             OptionalInt currentSuggestionIndex) {
         this.initialLabels = initialLabels;
         this.addedLabels = addedLabels;
         this.removedLabels = removedLabels;
@@ -71,7 +72,8 @@ public class LabelPickerState {
      */
     private LabelPickerState findAndToggleMatchingLabel(String keyword) {
         if (!TurboLabel.hasExactlyOneMatchedLabel(repoLabels, keyword)) return this;
-        String labelName = TurboLabel.getMatchedLabelName(repoLabels, keyword);
+        String labelName = TurboLabel.getMatchedLabelName(repoLabels, keyword)
+            .get(0).getActualName();
         return toggleLabel(labelName);
     }
 
@@ -101,7 +103,8 @@ public class LabelPickerState {
                 addedLabels.add(labelName);
             }
         }
-        return new LabelPickerState(initialLabels, addedLabels, removedLabels, repoLabels, repoLabels);
+        return new LabelPickerState(initialLabels, addedLabels, removedLabels, 
+            TurboLabel.getLabelsNameList(repoLabels), repoLabels);
     }
 
     /**
@@ -115,7 +118,7 @@ public class LabelPickerState {
      */
     private LabelPickerState updateMatchedLabels(String query) {
         TurboLabel queryLabel = new TurboLabel("", query);
-        List<String> newMatchedLabels = repoLabels;
+        List<TurboLabel> newMatchedLabels = repoLabels;
 
         newMatchedLabels = TurboLabel.filterByPartialName(newMatchedLabels, queryLabel.getSimpleName());
         newMatchedLabels = TurboLabel.filterByPartialGroupName(newMatchedLabels, queryLabel.getGroupName());
@@ -127,8 +130,8 @@ public class LabelPickerState {
             newSuggestionIndex = OptionalInt.of(0);
         }
 
-        return new LabelPickerState(initialLabels, addedLabels, removedLabels, newMatchedLabels, repoLabels,
-                newSuggestionIndex);
+        return new LabelPickerState(initialLabels, addedLabels, removedLabels, 
+            TurboLabel.getLabelsNameList(newMatchedLabels), repoLabels, newSuggestionIndex);
     }
 
     /*
