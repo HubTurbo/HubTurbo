@@ -74,14 +74,14 @@ public class TurboLabelTest {
         assertEquals(Optional.of("group"), label.getGroup());
         assertEquals("name", label.getName());
         assertEquals("group" + delimiter + "name", label.getActualName());
-        assertEquals(shouldBeExclusive, label.isExclusive());
+        assertEquals(shouldBeExclusive, label.isInExclusiveGroup());
 
         // label format: group.
         label = new TurboLabel(REPO, "group" + delimiter);
         assertEquals(Optional.of("group"), label.getGroup());
         assertEquals("", label.getName());
         assertEquals("group" + delimiter, label.getActualName());
-        assertEquals(shouldBeExclusive, label.isExclusive());
+        assertEquals(shouldBeExclusive, label.isInExclusiveGroup());
 
         // The rest are unconditionally nonexlusive because there's no group.
         // The delimiter is taken to be part of the name instead.
@@ -91,13 +91,13 @@ public class TurboLabelTest {
         assertEquals(Optional.<String>empty(), label.getGroup());
         assertEquals(delimiter + "name", label.getName());
         assertEquals(delimiter + "name", label.getActualName());
-        assertEquals(false, label.isExclusive());
+        assertEquals(false, label.isInExclusiveGroup());
 
         // label format: .
         label = new TurboLabel(REPO, delimiter);
         assertEquals(Optional.<String>empty(), label.getGroup());
         assertEquals(delimiter, label.getName());
         assertEquals(delimiter, label.getActualName());
-        assertEquals(false, label.isExclusive());
+        assertEquals(false, label.isInExclusiveGroup());
     }
 }

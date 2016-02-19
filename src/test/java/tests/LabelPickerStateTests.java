@@ -1,12 +1,15 @@
 package tests;
 
 import org.junit.Test;
+
+import backend.resource.TurboLabel;
 import ui.components.pickers.LabelPickerState;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -14,19 +17,19 @@ import static org.junit.Assert.assertTrue;
 public class LabelPickerStateTests {
 
     @Test
-    public void toggleLabel_labelsWithGroup_labelsAdded() {
+    public void determineState_addedLabels() {
+        String query = "f-aa priority.high ";
         LabelPickerState initialState = setupState();
-        LabelPickerState nextState = initialState.findMatchingLabelAndToggle("priority.medium");
-        assertEquals(1, nextState.getAddedLabels().size());
-        nextState = nextState.findMatchingLabelAndToggle("f-aaa");
+        LabelPickerState nextState = initialState.determineState(query);
+
         assertEquals(2, nextState.getAddedLabels().size());
     }
 
     @Test
-    public void getRemovedLabels_exclusiveLabels_removeConflictingLabels() {
+    public void determineState_exclusiveLabels_removeConflictingLabels() {
         LabelPickerState initialState = setupState("priority.low", "priority.high");
         assertEquals(2, initialState.getInitialLabels().size());
-        LabelPickerState nextState = initialState.findMatchingLabelAndToggle("priority.medium");
+        LabelPickerState nextState = initialState.determineState("priority.medium ");
 
         assertEquals("priority.medium", nextState.getAddedLabels().get(0));
         assertEquals(1, nextState.getAddedLabels().size());
@@ -36,17 +39,14 @@ public class LabelPickerStateTests {
     }
 
     @Test
-    public void getAssignedLabels() {
+    public void determineState_assignedLabels() {
         LabelPickerState initialState = setupState("priority.low", "priority.high");
-        LabelPickerState nextState = initialState.findMatchingLabelAndToggle("priority.medium");
-        nextState = nextState.findMatchingLabelAndToggle("priority.medium");
-        assertEquals(0, nextState.getAssignedLabels().size());
+        LabelPickerState nextState = initialState.determineState("priority.medium ");
+        assertEquals(1, nextState.getAssignedLabels().size());
 
-        nextState = nextState.findMatchingLabelAndToggle("priority.low");
-        nextState = nextState.findMatchingLabelAndToggle("priority.low");
-        nextState = nextState.findMatchingLabelAndToggle("priority.low");
-        nextState = nextState.findMatchingLabelAndToggle("Problem.Heavy");
-        nextState = nextState.findMatchingLabelAndToggle("priority.medium");
+        nextState = nextState.determineState("priority.low ");
+        nextState = nextState.determineState("Problem.Heavy ");
+        nextState = nextState.determineState("priority.medium ");
         assertEquals(2, nextState.getAssignedLabels().size());
         assertTrue(nextState.getAssignedLabels().contains("priority.medium"));
         assertTrue(nextState.getAssignedLabels().contains("Problem.Heavy"));
@@ -56,12 +56,11 @@ public class LabelPickerStateTests {
         return new LabelPickerState(getHashSet(labelNames), getTestRepoLabels());
     }
 
-    public List<String> getTestRepoLabels() {
-        List<String> listOfLabelNames;
-        listOfLabelNames = getArrayList("priority.high", "priority.medium", "priority.low", "highest", "Problem.Heavy",
-                "f-aaa", "f-bbb");
+    public List<TurboLabel> getTestRepoLabels() {
+        List<String> labelNames = getArrayList("priority.high", "priority.medium", "priority.low", 
+                                               "highest", "Problem.Heavy", "f-aaa", "f-bbb");
 
-        return listOfLabelNames;
+        return labelNames.stream().map(name -> new TurboLabel("", name)).collect(Collectors.toList());
     }
 
     public Set<String> getHashSet(String... labelNames) {
