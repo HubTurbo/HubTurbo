@@ -113,12 +113,12 @@ public class Qualifier implements FilterExpression {
     }
 
     /**
-     * Expands user input to a matching keyword, returns original input otherwise
+     * Expands aliases for Qualifier keyword in user input.
      * Includes aliases for Qualifier that also functions as keyword 
      * @param input
      * @return 
      */
-    public static String replaceKeywordAliases(String input) {
+    public static String expandKeywordAliases(String input) {
         
         switch(input) {
             case "as":
@@ -610,7 +610,7 @@ public class Qualifier implements FilterExpression {
 
         boolean isLabelGroup = false;
 
-        switch (replaceKeywordAliases(key)) {
+        switch (expandKeywordAliases(key)) {
         case "comments":
             comparator = (a, b) -> a.getCommentCount() - b.getCommentCount();
             break;
@@ -780,6 +780,7 @@ public class Qualifier implements FilterExpression {
 
     private boolean satisfiesRepo(TurboIssue issue) {
         if (!content.isPresent()) throw new SemanticException(type);
+
         return issue.getRepoId().equalsIgnoreCase(content.get());
     }
 
@@ -796,7 +797,8 @@ public class Qualifier implements FilterExpression {
 
     private boolean satisfiesHasConditions(TurboIssue issue) {
         if (!content.isPresent()) throw new SemanticException(type);
-        switch (replaceKeywordAliases(content.get())) {
+
+        switch (expandKeywordAliases(content.get())) {
         case "label":
             return issue.getLabels().size() > 0;
         case "milestone":
@@ -816,7 +818,8 @@ public class Qualifier implements FilterExpression {
 
     private boolean satisfiesIsConditions(TurboIssue issue) {
         if (!content.isPresent()) throw new SemanticException(type);
-        switch (replaceKeywordAliases(content.get())) {
+
+        switch (expandKeywordAliases(content.get())) {
         case "open":
         case "closed":
             return stateSatisfies(issue);
@@ -838,7 +841,8 @@ public class Qualifier implements FilterExpression {
 
     private boolean stateSatisfies(TurboIssue issue) {
         if (!content.isPresent()) throw new SemanticException(type);
-        String content = replaceKeywordAliases(this.content.get().toLowerCase());
+
+        String content = expandKeywordAliases(this.content.get().toLowerCase());
         if (content.contains("open")) {
             return issue.isOpen();
         } else if (content.contains("closed")) {
@@ -937,7 +941,7 @@ public class Qualifier implements FilterExpression {
     private boolean keywordSatisfies(TurboIssue issue, MetaQualifierInfo info) {
 
         if (info.getIn().isPresent()) {
-            switch (replaceKeywordAliases(info.getIn().get())) {
+            switch (expandKeywordAliases(info.getIn().get())) {
             case "title":
                 return titleSatisfies(issue);
             case "description":
@@ -963,7 +967,7 @@ public class Qualifier implements FilterExpression {
     private boolean typeSatisfies(TurboIssue issue) {
         if (!content.isPresent()) throw new SemanticException(type);
         String content = this.content.get().toLowerCase();
-        switch (replaceKeywordAliases(content)) {
+        switch (expandKeywordAliases(content)) {
             case "issue":
                 return !issue.isPullRequest();
             case "pr":
