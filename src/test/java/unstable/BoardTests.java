@@ -251,4 +251,37 @@ public class BoardTests extends UITest {
         String version = Utility.version(UI.VERSION_MAJOR, UI.VERSION_MINOR, UI.VERSION_PATCH);
         return String.format(UI.WINDOW_TITLE, version, boardName);
     }
+
+    @Test
+    public void boards_panelCount_nothingHappensWhenNewBoardIsCancelled() {
+        UI ui = TestController.getUI();
+        PanelControl panelControl = ui.getPanelControl();
+
+        assertEquals(0, panelControl.getNumberOfSavedBoards());
+        assertEquals(1, panelControl.getPanelCount());
+
+        traverseMenu("Boards", "New");
+        press(KeyCode.ESCAPE);
+        assertEquals(0, panelControl.getNumberOfSavedBoards());
+        assertEquals(1, panelControl.getPanelCount());
+    }
+
+    @Test
+    public void boards_panelCount_newBoardCreated() {
+
+        UI ui = TestController.getUI();
+        PanelControl panelControl = ui.getPanelControl();
+
+        traverseMenu("Boards", "New");
+        waitUntilNodeAppears(hasText("OK"));
+        click("OK");
+
+        waitUntilNodeAppears("#boardnameinput");
+        ((TextField) find("#boardnameinput")).setText("empty");
+        waitUntilNodeAppears(hasText("OK"));
+        click("OK");
+
+        waitAndAssertEquals(0, panelControl::getPanelCount);
+        waitAndAssertEquals(ui.getTitle(), () -> getUiTitleWithOpenBoard("empty"));
+    }
 }
