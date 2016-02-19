@@ -143,6 +143,11 @@ public class UI extends Application implements EventDispatcher {
         getMainWindowHandle(mainStage.getTitle());
     }
 
+    private void createAndLoadSampleBoard(){
+        BoardAutoCreator boardCreator = new BoardAutoCreator(this, panels, prefs);
+        boardCreator.createSampleBoard(false);
+    }
+
     private void disableUI(boolean disable) {
         mainStage.setResizable(!disable);
         menuBar.setDisable(disable);
@@ -150,6 +155,9 @@ public class UI extends Application implements EventDispatcher {
     }
 
     private void showMainWindow(String repoId) {
+        //We infer this is the first time HT is being used if there are no repo data stored at the start up.
+        //This check needs to be done at the very beginning of the startup, before HT downloads any repo data.
+        boolean isAFirstTimeUser = logic.getStoredRepos().isEmpty();
         logic.openPrimaryRepository(repoId);
         logic.setDefaultRepo(repoId);
         repoSelector.setText(repoId);
@@ -174,6 +182,9 @@ public class UI extends Application implements EventDispatcher {
         // Should only be called after panels have been initialized
         ensureSelectedPanelHasFocus();
         initialisePickers();
+        if (isAFirstTimeUser && TestController.shouldOpenSampleBoard()){
+            createAndLoadSampleBoard();
+        }
     }
 
     private void initialisePickers() {
