@@ -121,6 +121,9 @@ public class PanelControl extends HBox {
     }
 
     public void selectPanel(int index) {
+        if (getPanelCount() == 0) {
+            return;
+        }
         assert index >= 0 && index < getPanelCount();
         setCurrentlySelectedPanel(Optional.of(index));
         scrollToPanel(index);
