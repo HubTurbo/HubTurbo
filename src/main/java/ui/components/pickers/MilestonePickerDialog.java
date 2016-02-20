@@ -45,7 +45,8 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
         setupKeyEvents();
     }
 
-    public void toggleMilestone(String milestoneName) {
+    public void handleMouseClick(String milestoneName) {
+        // required since clearing inputField will reference to state
         MilestonePickerState curState = state;
         inputField.clear();
         inputField.setDisable(true);
@@ -56,11 +57,11 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
 
     private void setupKeyEvents() {
         inputField.textProperty().addListener((observable, oldValue, newValue) -> {
-            updateUI(newValue);
+            handleUpdatedInput(newValue);
         });
     }
 
-    private void updateUI(String userInput) {
+    private void handleUpdatedInput(String userInput) {
         state = new MilestonePickerState(originalMilestones);
         state.processInput(userInput);
         refreshUI(state);
@@ -113,7 +114,6 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
     private void setConfirmResultConverter(ButtonType confirmButtonType) {
         setResultConverter((dialogButton) -> {
             List<PickerMilestone> finalList = state.getCurrentMilestonesList();
-            //if (dialogButton != confirmButtonType) return null;
             if (hasSelectedMilestone(finalList)) {
                 return new Pair<>(dialogButton, getSelectedMilestone(finalList).getId());
             }
@@ -123,23 +123,17 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
 
     private void initUI() {
         milestoneBox = new VBox();
-        inputField = new TextField();
-
         assignedMilestone = createMilestoneGroup();
+        openMilestones = createMilestoneGroup();
+        closedMilestones = createMilestoneGroup();
+        inputField = new TextField();
 
         milestoneBox.getChildren().add(new Label(ASSIGNED_MILESTONE));
         milestoneBox.getChildren().add(assignedMilestone);
-
-        openMilestones = createMilestoneGroup();
-
         milestoneBox.getChildren().add(new Label(OPEN_MILESTONES));
         milestoneBox.getChildren().add(openMilestones);
-
-        closedMilestones = createMilestoneGroup();
-
         milestoneBox.getChildren().add(new Label(CLOSED_MILESTONES));
         milestoneBox.getChildren().add(closedMilestones);
-
         milestoneBox.getChildren().add(inputField);
 
         getDialogPane().setContent(milestoneBox);
@@ -224,7 +218,7 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
     }
 
     private Node setMouseClickForNode(Node node, String milestoneName) {
-        node.setOnMouseClicked(e -> toggleMilestone(milestoneName));
+        node.setOnMouseClicked(e -> handleMouseClick(milestoneName));
         return node;
     }
 
