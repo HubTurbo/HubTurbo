@@ -27,6 +27,7 @@ import ui.TestController;
 import ui.UI;
 import ui.components.FilterTextField;
 import util.events.*;
+import util.events.testevents.PrimaryRepoChangedEvent;
 import util.events.testevents.UIComponentFocusEvent;
 import prefs.PanelInfo;
 
@@ -104,8 +105,9 @@ public abstract class FilterPanel extends AbstractPanel {
         });
 
         ui.registerEvent((RepoOpeningEventHandler) this::indicatePanelLoading);
-
         ui.registerEvent((RepoOpenedEventHandler) this::unindicatePanelLoading);
+        ui.registerEvent((PanelReloadingEventHandler) this::indicatePanelLoading);
+        ui.registerEvent((PanelReloadedEventHandler) this::unindicatePanelLoading);
     }
 
     private final ModelUpdatedEventHandler onModelUpdate = e -> {
@@ -125,7 +127,9 @@ public abstract class FilterPanel extends AbstractPanel {
     private Node createFilterBox() {
         filterTextField = new FilterTextField("")
                 .setOnConfirm((text) -> {
+                    ui.triggerEvent(new PanelReloadingEvent());
                     applyStringFilter(text);
+                    ui.triggerEvent(new PanelReloadedEvent());
                     return text;
                 })
                 .setOnCancel(this::requestFocus);
@@ -208,6 +212,14 @@ public abstract class FilterPanel extends AbstractPanel {
         if (isIndicatorApplicable(e.isPrimaryRepo)) {
             removePanelLoadingIndication();
         }
+    }
+
+    private void indicatePanelLoading(PanelReloadingEvent e) {
+        addPanelLoadingIndication();
+    }
+
+    private void unindicatePanelLoading(PanelReloadedEvent e) {
+        removePanelLoadingIndication();
     }
 
     private boolean isIndicatorApplicable(boolean isPrimaryRepo) {
