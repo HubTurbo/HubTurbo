@@ -21,7 +21,7 @@ import java.util.Optional;
  * Abstractions for the contents of the global config file.
  */
 @SuppressWarnings("unused")
-public class GlobalConfig {
+public class GlobalConfig implements Config {
 
     private static final Logger logger = LogManager.getLogger(GlobalConfig.class.getName());
 

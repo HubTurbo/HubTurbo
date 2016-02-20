@@ -7,7 +7,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCode;
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
-import prefs.ConfigFileHandler;
+import prefs.ConfigFile;
 import prefs.GlobalConfig;
 import prefs.Preferences;
 import ui.TestController;
@@ -33,12 +33,12 @@ public class RemovableRepoListAndModelsTest extends UITest {
     public void beforeStageStarts() {
         // setup test json with last viewed repo "dummy/dummy"
         // obviously the json for that repo doesn't exist
-        ConfigFileHandler configFileHandler =
-                new ConfigFileHandler(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
         GlobalConfig globalConfig = new GlobalConfig();
         globalConfig.setLastLoginCredentials("test", "test");
         globalConfig.setLastViewedRepository("dummy/dummy");
-        configFileHandler.saveGlobalConfig(globalConfig);
+        ConfigFile globalConfigFile =
+                new ConfigFile(Preferences.DIRECTORY, Preferences.TEST_SESSION_CONFIG_FILE);
+        globalConfigFile.saveConfig(globalConfig);
     }
 
     /**
@@ -76,7 +76,7 @@ public class RemovableRepoListAndModelsTest extends UITest {
 
 
         // check if test json is present
-        File testConfig = new File(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
+        File testConfig = new File(Preferences.DIRECTORY, Preferences.TEST_SESSION_CONFIG_FILE);
         if (!(testConfig.exists() && testConfig.isFile())) {
             fail();
         }

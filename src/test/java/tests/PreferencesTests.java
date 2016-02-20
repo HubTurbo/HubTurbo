@@ -18,7 +18,7 @@ public class PreferencesTests {
     @Test
     public void testClearLastOpenBoard() {
         GlobalConfig config = mock(GlobalConfig.class);
-        Preferences prefs = Preferences.load(Preferences.TEST_CONFIG_FILE);
+        Preferences prefs = Preferences.load(Preferences.TEST_SESSION_CONFIG_FILE);
 
         prefs.global = config;
         prefs.clearLastOpenBoard();
@@ -36,7 +36,7 @@ public class PreferencesTests {
         List<PanelInfo> expected = new ArrayList<>();
         when(config.getBoardPanels("board")).thenReturn(expected);
 
-        Preferences prefs = Preferences.load(Preferences.TEST_CONFIG_FILE);
+        Preferences prefs = Preferences.load(Preferences.TEST_SESSION_CONFIG_FILE);
         prefs.global = config;
         List<PanelInfo> actual = prefs.getBoardPanels("board");
 

@@ -115,7 +115,7 @@ public final class TestController {
             return loadTestPreferences();
         }
 
-        return Preferences.load(Preferences.GLOBAL_CONFIG_FILE);
+        return Preferences.load(Preferences.SESSION_CONFIG_FILE);
     }
 
     /**
@@ -125,7 +125,7 @@ public final class TestController {
      * @return
      */
     public static Preferences loadTestPreferences() {
-        return Preferences.load(Preferences.TEST_CONFIG_FILE);
+        return Preferences.load(Preferences.TEST_SESSION_CONFIG_FILE);
     }
 
     /**
@@ -135,7 +135,7 @@ public final class TestController {
      * @return
      */
     public static Preferences createTestPreferences() {
-        return Preferences.create(Preferences.TEST_CONFIG_FILE);
+        return Preferences.create(Preferences.TEST_SESSION_CONFIG_FILE);
     }
 
     /**

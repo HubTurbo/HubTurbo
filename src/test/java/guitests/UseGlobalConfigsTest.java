@@ -130,7 +130,7 @@ public class UseGlobalConfigsTest extends UITest {
         click("Quit");
 
         // ...and check if the test JSON is still there...
-        File testConfig = new File(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
+        File testConfig = new File(Preferences.DIRECTORY, Preferences.TEST_SESSION_CONFIG_FILE);
         if (!(testConfig.exists() && testConfig.isFile())) {
             fail();
         }

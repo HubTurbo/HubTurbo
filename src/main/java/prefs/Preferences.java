@@ -18,15 +18,15 @@ public class Preferences { // NOPMD
     public static final String DIRECTORY = "settings";
 
     // Standard config filenames used for application and testing
-    public static final String GLOBAL_CONFIG_FILE = "global.json";
-    public static final String TEST_CONFIG_FILE = "test.json";
+    public static final String SESSION_CONFIG_FILE = "global.json";
+    public static final String TEST_SESSION_CONFIG_FILE = "test.json";
 
-    private final ConfigFileHandler fileHandler;
+    private final ConfigFile globalConfigFile;
 
     public GlobalConfig global;
 
     private Preferences(String configFileName, boolean createUnconditionally) {
-        this.fileHandler = new ConfigFileHandler(DIRECTORY, configFileName);
+        this.globalConfigFile = new ConfigFile(DIRECTORY, configFileName);
 
         if (createUnconditionally) {
             initGlobalConfig();
@@ -52,15 +52,16 @@ public class Preferences { // NOPMD
     }
 
     public void saveGlobalConfig() {
-        fileHandler.saveGlobalConfig(global);
+        globalConfigFile.saveConfig(global);
     }
 
     private void initGlobalConfig() {
-        global = fileHandler.initGlobalConfig();
+        global = new GlobalConfig();
+        globalConfigFile.saveConfig(global);
     }
 
     private void loadGlobalConfig() {
-        global = fileHandler.loadGlobalConfig();
+        global = (GlobalConfig) globalConfigFile.loadConfig(new GlobalConfig());
     }
 
     // Last login credentials. While the main UI is running (i.e. logged in successfully), last login
