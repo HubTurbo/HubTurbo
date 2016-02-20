@@ -12,8 +12,8 @@ public class SemanticException extends FilterException {
     
     public static final String ERROR_MESSAGE = "\"%s\" expects %s";
 
-    public SemanticException(QualifierType type, String details) {
-        super(String.format(ERROR_MESSAGE, type, details));
+    public SemanticException(QualifierType type) {
+        super(String.format(ERROR_MESSAGE, type, type.getDescriptionOfValidInputs()));
     }
 
 }
