@@ -17,12 +17,29 @@ import static org.junit.Assert.assertTrue;
 public class LabelPickerStateTests {
 
     @Test
-    public void determineState_addedLabels() {
-        String query = "f-aa priority.high ";
+    public void determineState_addMatchedLabels() {
         LabelPickerState initialState = setupState();
-        LabelPickerState nextState = initialState.determineState(query);
+        LabelPickerState nextState = initialState.determineState("f-aa p.high ");
 
         assertEquals(2, nextState.getAddedLabels().size());
+    }
+
+    @Test
+    public void determineState_removeMatchedAddedLabel() {
+        LabelPickerState initialState = setupState();
+        LabelPickerState nextState = initialState.determineState("p.medium ");
+        assertEquals(1, nextState.getAddedLabels().size());
+
+        nextState = nextState.determineState("p.medium ");
+        assertEquals(0, nextState.getAddedLabels().size());
+    }
+
+    @Test
+    public void determineState_invalidQuery_noChangeToState() {
+        LabelPickerState initialState = setupState("test");
+        LabelPickerState nextState = initialState.determineState("        ");
+
+        assertEquals(initialState, nextState);
     }
 
     @Test
@@ -39,18 +56,13 @@ public class LabelPickerStateTests {
     }
 
     @Test
-    public void determineState_assignedLabels() {
+    public void determineState_labelsInSameGroup_oneLabelAssigned() {
         LabelPickerState initialState = setupState("priority.low", "priority.high");
         LabelPickerState nextState = initialState.determineState("priority.medium ");
-        assertEquals(1, nextState.getAssignedLabels().size());
 
-        nextState = nextState.determineState("priority.low ");
-        nextState = nextState.determineState("Problem.Heavy ");
-        nextState = nextState.determineState("priority.medium ");
-        assertEquals(2, nextState.getAssignedLabels().size());
-        assertTrue(nextState.getAssignedLabels().contains("priority.medium"));
-        assertTrue(nextState.getAssignedLabels().contains("Problem.Heavy"));
+        assertEquals(1, nextState.getAssignedLabels().size());
     }
+
 
     public LabelPickerState setupState(String... labelNames) {
         return new LabelPickerState(getHashSet(labelNames), getTestRepoLabels());
