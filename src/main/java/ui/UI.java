@@ -583,10 +583,24 @@ public class UI extends Application implements EventDispatcher {
     }
 
     public void updateTitle() {
+        mainStage.setTitle(this.generateTitle());
+    }
+
+    public void updateTitle(boolean hasUnsavedState){
+        String defaultTitle = this.generateTitle();
+        if (hasUnsavedState) {
+            mainStage.setTitle(defaultTitle.substring(0, defaultTitle.length() - 1) + "*)");
+        }
+    }
+
+    /**
+     * Generate title from application attributes and states.
+     */
+    public String generateTitle(){
         String openBoard = prefs.getLastOpenBoard().orElse("none");
         String title = String.format("HubTurbo " + Utility.version(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH)
                 + " (%s)", openBoard);
-        mainStage.setTitle(title);
+        return title;
     }
 
     public boolean isNotificationPaneShowing() {

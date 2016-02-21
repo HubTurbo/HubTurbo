@@ -100,6 +100,7 @@ public class PanelControl extends HBox {
         FilterPanel panelAdded = this.addPanelAt(this.getPanelCount());
         panelAdded.setPanelName(panelName);
         panelAdded.setFilterByString(filterName);
+        ui.updateTitle(this.hasUnsavedPanels());
         return panelAdded;
     }
 
@@ -173,7 +174,7 @@ public class PanelControl extends HBox {
         updatePanelIndices();
         ((AbstractPanel) child).close();
         updateFocus(index);
-
+        ui.updateTitle(this.hasUnsavedPanels());
         UI.events.triggerEvent(new UsedReposChangedEvent());
     }
 
@@ -186,10 +187,12 @@ public class PanelControl extends HBox {
 
     public void createNewPanelAtStart() {
         addPanelAt(0).filterTextField.requestFocus();
+        ui.updateTitle(this.hasUnsavedPanels());
     }
 
     public void createNewPanelAtEnd() {
         addPanel().filterTextField.requestFocus();
+        ui.updateTitle(this.hasUnsavedPanels());
     }
 
     public void swapPanels(int panelIndex, int panelIndex2) {
@@ -205,6 +208,7 @@ public class PanelControl extends HBox {
         getChildren().set(panelIndex2, new HBox());
         getChildren().set(panelIndex, two);
         getChildren().set(panelIndex2, one);
+        ui.updateTitle(this.hasUnsavedPanels());
     }
 
     public Optional<Integer> getCurrentlySelectedPanel() {
@@ -342,5 +346,32 @@ public class PanelControl extends HBox {
                 return Stream.of();
             }
         }).collect(Collectors.toList());
+    }
+
+    /**
+     *
+     * @return true if there is difference between panels from storage and current panels
+     */
+    public boolean hasUnsavedPanels(){
+        if (!prefs.getLastOpenBoard().isPresent()) {
+            return true;
+        }
+        List<PanelInfo> savedPanelInfos = prefs.getBoardPanels(prefs.getLastOpenBoard().get());
+        List<PanelInfo> currentPanelInfos = getCurrentPanelInfos();
+        if (savedPanelInfos.size() != currentPanelInfos.size()) {
+            return true;
+        }
+
+        //savedPanelInfo and currentPanelInfo has to be an exact match (positionally) for them
+        //to be considered equal
+        for (int i = 0; i < savedPanelInfos.size(); i++) {
+            PanelInfo savedPanel = savedPanelInfos.get(i);
+            PanelInfo currentPanel = currentPanelInfos.get(i);
+            if (!savedPanel.getPanelName().equals(currentPanel.getPanelName())
+                    || !savedPanel.getPanelFilter().equals(currentPanel.getPanelFilter())) {
+                return true;
+            }
+        }
+        return false;
     }
 }

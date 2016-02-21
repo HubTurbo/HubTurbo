@@ -142,6 +142,7 @@ public class MenuControl extends MenuBar {
         
         prefs.addBoard(prefs.getLastOpenBoard().get(), panelList);
         ui.triggerEvent(new BoardSavedEvent());
+        ui.updateTitle();
         logger.info("Board " + prefs.getLastOpenBoard().get() + " saved");
     }
 
