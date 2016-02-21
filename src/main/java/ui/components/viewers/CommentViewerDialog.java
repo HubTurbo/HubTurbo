@@ -12,7 +12,7 @@ import org.eclipse.egit.github.core.Comment;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CommentViewerDialog extends Dialog<List<Comment>> {
+public class CommentViewerDialog extends Dialog<Void> {
 
     private TextArea textArea;
 
@@ -28,8 +28,6 @@ public class CommentViewerDialog extends Dialog<List<Comment>> {
     private void setupButtons() {
         ButtonType confirmButtonType = new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE);
         getDialogPane().getButtonTypes().addAll(confirmButtonType);
-
-        setResultConverter((b) -> new ArrayList<Comment>());
     }
 
     private void initialiseDialog(Stage stage, TurboIssue turboIssue) {

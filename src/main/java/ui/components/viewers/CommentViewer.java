@@ -26,7 +26,7 @@ public class CommentViewer {
                         CommentViewerDialog dialog = new CommentViewerDialog(stage, issue);
                         dialog.setHeight(500);
                         dialog.setResizable(true);
-                        dialog.showAndWait();
+                        dialog.show();
                     });
                 });
     }
