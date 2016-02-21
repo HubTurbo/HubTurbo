@@ -216,4 +216,8 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
         return selectedIndex.map(getItems()::get);
     }
 
+    public int getSelectedIndex() {
+        return selectedIndex.get();
+    }
+
 }

@@ -49,8 +49,12 @@ public class ListPanel extends FilterPanel {
     private final ContextMenu contextMenu = new ContextMenu();
 
     private final MenuItem markAsReadUnreadMenuItem = new MenuItem();
+    private final MenuItem markAllBelowAsRead = new MenuItem();
+    private final MenuItem markAllBelowAsUnread = new MenuItem();
     private static final String markAsReadMenuItemText = "Mark as read (E)";
     private static final String markAsUnreadMenuItemText = "Mark as unread (U)";
+    private static final String markAllAsUnreadMenuItemText = "Mark all below as unread";
+    private static final String markAllAsReadMenuItemText = "Mark all below as read";
 
     private static final MenuItem changeLabelsMenuItem = new MenuItem();
     private static final String changeLabelsMenuItemText = "Change labels (L)";
@@ -295,7 +299,18 @@ public class ListPanel extends FilterPanel {
             changeLabels();
         });
 
-        contextMenu.getItems().addAll(markAsReadUnreadMenuItem, changeLabelsMenuItem);
+        markAllBelowAsRead.setText(markAllAsReadMenuItemText);
+        markAllBelowAsRead.setOnAction(e -> {
+            markAllBelowAsRead();
+        });
+
+        markAllBelowAsUnread.setText(markAllAsUnreadMenuItemText);
+        markAllBelowAsUnread.setOnAction(e -> {
+            markAllBelowAsUnread();
+        });
+
+        contextMenu.getItems().addAll(markAsReadUnreadMenuItem, markAllBelowAsRead,
+                markAllBelowAsUnread, changeLabelsMenuItem);
         contextMenu.setOnShowing(e -> updateContextMenu(contextMenu));
         listView.setContextMenu(contextMenu);
 
@@ -360,6 +375,28 @@ public class ListPanel extends FilterPanel {
 
             parentPanelControl.refresh();
             listView.selectNextItem();
+        }
+    }
+
+    private void markAllBelowAsUnread() {
+        Optional<GuiElement> item = listView.getSelectedItem();
+        if (item.isPresent()) {
+            for(int i = listView.getSelectedIndex(); i < listView.getItems().size(); i++){
+                TurboIssue issue = listView.getItems().get(i).getIssue();
+                issue.markAsUnread(UI.prefs);
+            }
+            parentPanelControl.refresh();
+        }
+    }
+
+    private void markAllBelowAsRead() {
+        Optional<GuiElement> item = listView.getSelectedItem();
+        if (item.isPresent()) {
+            for(int i = listView.getSelectedIndex(); i < listView.getItems().size(); i++){
+                TurboIssue issue = listView.getItems().get(i).getIssue();
+                issue.markAsRead(UI.prefs);
+            }
+            parentPanelControl.refresh();
         }
     }
 
