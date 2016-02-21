@@ -49,7 +49,7 @@ public class DummySource extends RepoSource {
     }
 
     @Override
-    public CompletableFuture<List<String>> replaceIssueLabels(TurboIssue issue, List<String> labels) {
+    public CompletableFuture<Boolean> replaceIssueLabels(TurboIssue issue, List<String> labels) {
         return addTask(new ReplaceIssueLabelsTask(this, dummy, issue.getRepoId(), issue.getId(), labels)).response;
     }
 

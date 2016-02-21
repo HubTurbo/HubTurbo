@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Supplier;
 
 public final class TestUtils {
 
@@ -128,5 +129,29 @@ public final class TestUtils {
                 .withQueryStringParameter("state", "all")
                 .withQueryStringParameter("per_page", "100")
                 .withQueryStringParameter("page", Integer.toString(page));
+    }
+
+    /**
+     * Delays for a specified time then calls a function and returns its result
+     * @param delay time to be delayed in milliseconds
+     * @param supplier
+     * @return
+     * @throws InterruptedException
+     */
+    public static <T> T delayThenGet(long delay, Supplier<T> supplier) throws InterruptedException {
+        Thread.sleep(delay);
+        return supplier.get();
+    }
+
+    /**
+     * Delays for a specified time then runs a function
+     * @param delay time to be delayed in milliseconds
+     * @param runnable
+     * @return
+     * @throws InterruptedException
+     */
+    public static void delayThenRun(long delay, Runnable runnable) throws InterruptedException {
+        Thread.sleep(delay);
+        runnable.run();
     }
 }
