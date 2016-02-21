@@ -19,10 +19,7 @@ import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -373,25 +370,44 @@ public class UI extends Application implements EventDispatcher {
      * @param stage The stage whose bounds are to be set.
      */
     private void setBoundsFromScreen(Stage stage) {
-        List<Rectangle2D> occupyingBounds = Screen.getScreensForRectangle(
+        List<Rectangle2D> intersectingScreenBounds = Screen.getScreensForRectangle(
                 stage.getX(),
                 stage.getY(),
                 stage.getWidth(),
                 stage.getHeight()
         ).stream().map(Screen::getVisualBounds).collect(Collectors.toList());
 
-        List<Double> occupyingHeights = occupyingBounds.stream()
+        if (!intersectingScreenBounds.isEmpty()) {
+            Region stageBounds = getStageBounds(intersectingScreenBounds);
+            stage.setMinHeight(stageBounds.getMinHeight());
+            stage.setMaxHeight(stageBounds.getMaxHeight());
+            stage.setMaxWidth(stageBounds.getMaxWidth());
+        }
+    }
+
+    /**
+     * Calculates a stage's boundaries based on the screen information given as argument. If the list of screens
+     * is empty, then the boundaries will have the default value of Region.USE_COMPUTED_SIZE (-1.0).
+     *
+     * @param intersectingScreenBounds A list of screens, which should be non-empty
+     * @return A Region object containing relevant information in the maxHeight, minHeight and maxWidth fields.
+     */
+    public static Region getStageBounds(List<Rectangle2D> intersectingScreenBounds) {
+        List<Double> occupyingHeights = intersectingScreenBounds.stream()
                 .map(Rectangle2D::getHeight).collect(Collectors.toList());
+
         Optional<Double> maxHeight = occupyingHeights.stream().max(Double::compare);
         Optional<Double> minHeight = occupyingHeights.stream().min(Double::compare);
+        double sumWidths = intersectingScreenBounds.stream().mapToDouble(Rectangle2D::getWidth).sum();
 
-        double sumWidths = occupyingBounds.stream().mapToDouble(Rectangle2D::getWidth).sum();
-
+        Region stageBounds = new Region();
         if (maxHeight.isPresent() && minHeight.isPresent()) {
-            stage.setMinHeight(minHeight.get());
-            stage.setMaxHeight(maxHeight.get());
-            stage.setMaxWidth(sumWidths);
+            stageBounds.setMaxHeight(maxHeight.get());
+            stageBounds.setMinHeight(minHeight.get());
+            stageBounds.setMaxWidth(sumWidths);
         }
+
+        return stageBounds;
     }
 
     private static void getMainWindowHandle(String windowTitle) {
@@ -409,7 +425,6 @@ public class UI extends Application implements EventDispatcher {
         panelsScrollPane.setFitToHeight(true);
         panelsScrollPane.setVbarPolicy(ScrollBarPolicy.NEVER);
         HBox.setHgrow(panelsScrollPane, Priority.ALWAYS);
-
         menuBar = new MenuControl(this, panels, panelsScrollPane, prefs, mainStage);
         menuBar.setUseSystemMenuBar(true);
 
