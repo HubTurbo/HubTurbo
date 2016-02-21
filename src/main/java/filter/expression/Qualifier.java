@@ -94,8 +94,8 @@ public class Qualifier implements FilterExpression {
 
         List<TurboMilestone> milestonesOfReposInPanel = TurboMilestone.filterMilestonesOfRepos(
                                                                                     model.getMilestones(), repoIds);
-        List<TurboMilestone> milestonesWithinAliasRange = getAliasableMilestones(milestonesOfReposInPanel);
-        Map<Integer, TurboMilestone> milestoneAliasIndex = getMilestoneAliasIndex(milestonesWithinAliasRange);
+        List<TurboMilestone> aliasableMilestones = getAliasableMilestones(milestonesOfReposInPanel);
+        Map<Integer, TurboMilestone> milestoneAliasIndex = getMilestoneAliasIndex(aliasableMilestones);
 
         if (milestoneAliasIndex.isEmpty()) {
             return expr;
