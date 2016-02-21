@@ -67,9 +67,6 @@ public class FilterEvalTests {
         assertTrue(matches("id:<=2", issue1));
         assertTrue(matches("id:>0", issue1));
         assertTrue(matches("id:>=0", issue1));
-
-        // Non-number
-        assertFalse(matches("id:a", issue1));
     }
 
     @Test
@@ -524,7 +521,6 @@ public class FilterEvalTests {
         assertFalse(matches("has:label", issue));
         assertFalse(matches("has:milestone", issue));
         assertFalse(matches("has:assignee", issue));
-        assertFalse(matches("has:something", issue));
 
         // test: qualifier alias
         assertFalse(matches("h:label", issue));
@@ -542,7 +538,6 @@ public class FilterEvalTests {
         assertTrue(Qualifier.process(model, Parser.parse("has:label"), issue));
         assertFalse(Qualifier.process(model, Parser.parse("has:milestone"), issue));
         assertFalse(Qualifier.process(model, Parser.parse("has:assignee"), issue));
-        assertFalse(matches("has:something", issue));
 
         issue.setMilestone(milestone);
         model = TestUtils.modelWith(issue, label, milestone);
@@ -550,7 +545,6 @@ public class FilterEvalTests {
         assertTrue(Qualifier.process(model, Parser.parse("has:label"), issue));
         assertTrue(Qualifier.process(model, Parser.parse("has:milestone"), issue));
         assertFalse(Qualifier.process(model, Parser.parse("has:assignee"), issue));
-        assertFalse(matches("has:something", issue));
 
         issue.setAssignee(user);
         model = TestUtils.modelWith(issue, label, milestone, user);
@@ -558,7 +552,6 @@ public class FilterEvalTests {
         assertTrue(Qualifier.process(model, Parser.parse("has:label"), issue));
         assertTrue(Qualifier.process(model, Parser.parse("has:milestone"), issue));
         assertTrue(Qualifier.process(model, Parser.parse("has:assignee"), issue));
-        assertFalse(matches("has:something", issue));
     }
 
     @Test
@@ -578,7 +571,6 @@ public class FilterEvalTests {
         assertTrue(matches("no:label", issue));
         assertTrue(matches("no:milestone", issue));
         assertTrue(matches("no:assignee", issue));
-        assertTrue(matches("no:something", issue));
 
         // test: keyword aliases  
         assertTrue(matches("no:m", issue));
@@ -590,7 +582,6 @@ public class FilterEvalTests {
         assertFalse(Qualifier.process(model, Parser.parse("no:label"), issue));
         assertTrue(Qualifier.process(model, Parser.parse("no:milestone"), issue));
         assertTrue(Qualifier.process(model, Parser.parse("no:assignee"), issue));
-        assertTrue(matches("no:something", issue));
 
         issue.setMilestone(milestone);
         model = TestUtils.modelWith(issue, label, milestone);
@@ -598,7 +589,6 @@ public class FilterEvalTests {
         assertFalse(Qualifier.process(model, Parser.parse("no:label"), issue));
         assertFalse(Qualifier.process(model, Parser.parse("no:milestone"), issue));
         assertTrue(Qualifier.process(model, Parser.parse("no:assignee"), issue));
-        assertTrue(matches("no:something", issue));
 
         issue.setAssignee(user);
         model = TestUtils.modelWith(issue, label, milestone, user);
@@ -606,7 +596,6 @@ public class FilterEvalTests {
         assertFalse(Qualifier.process(model, Parser.parse("no:label"), issue));
         assertFalse(Qualifier.process(model, Parser.parse("no:milestone"), issue));
         assertFalse(Qualifier.process(model, Parser.parse("no:assignee"), issue));
-        assertTrue(matches("no:something", issue));
     }
 
     @Test
@@ -620,7 +609,6 @@ public class FilterEvalTests {
 
         assertFalse(matches("type:issue", issue));
         assertTrue(matches("type:pr", issue));
-        assertFalse(matches("type:sldkj", issue));
 
         // test: qualifier alias
         assertFalse(matches("ty:issue", issue));
@@ -726,7 +714,6 @@ public class FilterEvalTests {
         assertFalse(matches("created:<=2014-12-1", issue));
         assertTrue(matches("created:>2014-12-1", issue));
         assertTrue(matches("created:2014-12-2", issue));
-        assertFalse(matches("created:nondate", issue));
         
         // test: qualifier alias
         assertFalse(matches("cr:<2014-12-1", issue));

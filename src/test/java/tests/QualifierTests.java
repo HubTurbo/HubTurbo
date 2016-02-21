@@ -169,6 +169,49 @@ public class QualifierTests {
         assertEquals(expected, actual);
     }
 
+    @Test
+    public void sortByAssignee_isNonSelfUpdate() {
+        List<TurboIssue> issues = testModel.getIssues();
+        Comparator<TurboIssue> comparator = getComparatorForSortQualifier("sort:nonSelfUpdate, assignee");
+
+        Collections.shuffle(issues);
+        Collections.sort(issues, comparator);
+        List<Integer> expected = Arrays.asList(4, 2, 1, 5, 3);
+        List<Integer> actual = issues.stream().map(TurboIssue::getId).collect(Collectors.toList());
+        assertEquals(expected, actual);
+        
+        // test: nonSelfUpdate alias
+        comparator = getComparatorForSortQualifier("sort:nonSelfUpdate, assignee");
+        Collections.shuffle(issues);
+        Collections.sort(issues, comparator);
+        actual = issues.stream().map(TurboIssue::getId).collect(Collectors.toList());
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void sortByDate() {
+        List<TurboIssue> issues = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            TurboIssue issue = new TurboIssue(FilterEvalTests.REPO, i, "");
+            issue.setUpdatedAt(LocalDateTime.of(2015, 6, 4 + i, 12, 0));
+            issues.add(issue);
+        }
+        Comparator<TurboIssue> comparator = getComparatorForSortQualifier("sort:date");
+        
+        Collections.shuffle(issues);
+        Collections.sort(issues, comparator);
+        List<Integer> expected = Arrays.asList(0, 1, 2, 3, 4);
+        List<Integer> actual = issues.stream().map(TurboIssue::getId).collect(Collectors.toList());
+        assertEquals(expected, actual);
+
+        // test: date alias
+        comparator = getComparatorForSortQualifier("sort:d");
+        Collections.shuffle(issues);
+        Collections.sort(issues, comparator);
+        actual = issues.stream().map(TurboIssue::getId).collect(Collectors.toList());
+        assertEquals(expected, actual);
+    }
+
     /**
      * Tests sort qualifier with only ~assignee key
      */
