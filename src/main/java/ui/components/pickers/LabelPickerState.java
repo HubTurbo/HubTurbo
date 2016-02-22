@@ -101,8 +101,8 @@ public class LabelPickerState {
         TurboLabel queryLabel = new TurboLabel("", query);
         List<TurboLabel> newMatchedLabels = repoLabels;
 
-        newMatchedLabels = TurboLabel.filterByPartialName(newMatchedLabels, queryLabel.getSimpleName());
-        newMatchedLabels = TurboLabel.filterByPartialGroupName(newMatchedLabels, queryLabel.getGroupName());
+        newMatchedLabels = TurboLabel.filterByNameQuery(newMatchedLabels, queryLabel.getSimpleName());
+        newMatchedLabels = TurboLabel.filterByGroupQuery(newMatchedLabels, queryLabel.getGroupName());
 
         if (query.isEmpty() || newMatchedLabels.isEmpty()) {
             currentSuggestionIndex = OptionalInt.empty();

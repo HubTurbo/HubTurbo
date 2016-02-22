@@ -101,10 +101,7 @@ public class TurboLabel implements Comparable<TurboLabel> {
     /**
      * Returns the TurboLabel in labels that matches labelName
      * Assumption: the labelName matches exactly 1 TurboLabel
-     *
-     * @param labels
-     * @param labelName
-     * @return
+     * @return TurboLabel that matches a labelName
      */
     public static TurboLabel getMatchingTurboLabel(List<TurboLabel> labels, String labelName) {
         Optional<TurboLabel> firstMatchingLabel = labels.stream()
@@ -127,7 +124,7 @@ public class TurboLabel implements Comparable<TurboLabel> {
      * @param nameQuery
      * @return
      */
-    public static List<TurboLabel> filterByPartialName(List<TurboLabel> repoLabels, String nameQuery) {
+    public static List<TurboLabel> filterByNameQuery(List<TurboLabel> repoLabels, String nameQuery) {
         return repoLabels
                 .stream()
                 .filter(label -> Utility.containsIgnoreCase(label.getSimpleName(), nameQuery))
@@ -141,7 +138,7 @@ public class TurboLabel implements Comparable<TurboLabel> {
      * @param groupQuery
      * @return
      */
-    public static List<TurboLabel> filterByPartialGroupName(List<TurboLabel> repoLabels, String groupQuery) {
+    public static List<TurboLabel> filterByGroupQuery(List<TurboLabel> repoLabels, String groupQuery) {
         if (groupQuery.isEmpty()) return repoLabels;
 
         return repoLabels
@@ -167,8 +164,8 @@ public class TurboLabel implements Comparable<TurboLabel> {
 
         List<TurboLabel> newMatchedLabels = new ArrayList<>();
         newMatchedLabels.addAll(repoLabels);
-        newMatchedLabels = filterByPartialName(newMatchedLabels, query.getSimpleName());
-        newMatchedLabels = filterByPartialGroupName(newMatchedLabels, query.getGroupName());
+        newMatchedLabels = filterByNameQuery(newMatchedLabels, query.getSimpleName());
+        newMatchedLabels = filterByGroupQuery(newMatchedLabels, query.getGroupName());
         return newMatchedLabels;
     }
 
@@ -194,11 +191,11 @@ public class TurboLabel implements Comparable<TurboLabel> {
     }
 
     public boolean isInExclusiveGroup() {
-        return grouping.equals(Grouping.EXCLUSIVE);
+        return grouping == Grouping.EXCLUSIVE;
     }
 
     public final boolean isInGroup() {
-        return !grouping.equals(Grouping.NONE);
+        return grouping != Grouping.NONE;
     }
 
     public Optional<String> getGroup() {
