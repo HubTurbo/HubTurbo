@@ -4,6 +4,7 @@ import backend.resource.TurboIssue;
 import backend.resource.TurboLabel;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -72,7 +73,7 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        initialiseAndregisterQueryHandler();
+        queryField.textProperty().addListener(this::handleUserInput);
     }
 
     private void initUI(Stage stage, TurboIssue issue) {
@@ -130,7 +131,7 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
 
     private Node processInitialLabel(String initialLabel, List<String> removedLabels, 
                                             Optional<String> suggestion) {
-        TurboLabel repoInitialLabel = TurboLabel.getMatchingTurboLabel(repoLabels, initialLabel);
+        TurboLabel repoInitialLabel = TurboLabel.getFirstMatchingTurboLabel(repoLabels, initialLabel);
         if (!removedLabels.contains(initialLabel)) {
             if (suggestion.isPresent() && initialLabel.equals(suggestion.get())) {
                 return getStyledPickerLabel(repoInitialLabel, true, false, true, false, true);
@@ -147,11 +148,8 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
 
     private Node getStyledPickerLabel(TurboLabel label, 
         boolean isFaded, boolean isHighlighted, boolean isRemoved, boolean isSelected, boolean isTop) {
-        PickerLabel styledLabel = new PickerLabel(label, isTop);
-        styledLabel.setIsFaded(isFaded);
-        styledLabel.setIsHighlighted(isHighlighted);
-        styledLabel.setIsRemoved(isRemoved);
-        styledLabel.setIsSelected(isSelected);
+        PickerLabel styledLabel = new PickerLabel(
+            label, isTop, isSelected, isHighlighted, isRemoved, isFaded);
 
         Node node = styledLabel.getNode();
         node.setOnMouseClicked(e -> handleLabelClick(styledLabel));
@@ -175,10 +173,10 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
 
     private Node processAddedLabel(String addedLabel, Optional<String> suggestion) {
         if (!suggestion.isPresent() || !addedLabel.equals(suggestion.get())) {
-            return getStyledPickerLabel(TurboLabel.getMatchingTurboLabel(repoLabels, addedLabel),
+            return getStyledPickerLabel(TurboLabel.getFirstMatchingTurboLabel(repoLabels, addedLabel),
                     false, false, false, false, true);
         }
-        return getStyledPickerLabel(TurboLabel.getMatchingTurboLabel(repoLabels, addedLabel),
+        return getStyledPickerLabel(TurboLabel.getFirstMatchingTurboLabel(repoLabels, addedLabel),
                 true, false, true, false, true);
     }
 
@@ -194,7 +192,7 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
     }
 
     private Node processSuggestedLabel(String suggestedLabel) {
-        return getStyledPickerLabel(TurboLabel.getMatchingTurboLabel(repoLabels, suggestedLabel),
+        return getStyledPickerLabel(TurboLabel.getFirstMatchingTurboLabel(repoLabels, suggestedLabel),
                 true, false, false, false, true);
     }
 
@@ -247,7 +245,7 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
     private Node processMatchedLabel(String repoLabel, List<String> matchedLabels, 
                                             List<String> assignedLabels, Optional<String> suggestion) {
         boolean shouldHighlight = suggestion.isPresent() && suggestion.get().equals(repoLabel);
-        return getStyledPickerLabel(TurboLabel.getMatchingTurboLabel(repoLabels, repoLabel),
+        return getStyledPickerLabel(TurboLabel.getFirstMatchingTurboLabel(repoLabels, repoLabel),
                 !matchedLabels.contains(repoLabel), shouldHighlight, false, assignedLabels.contains(repoLabel), false);
     }
 
@@ -319,17 +317,15 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
         });
     }
 
-    private void initialiseAndregisterQueryHandler() {
-        listener = (observable, oldValue, newValue) -> {
-            state = new LabelPickerState(
-                new HashSet(issue.getLabels()), repoLabels, queryField.getText().toLowerCase());
-            populatePanes(state);
-        };
-        queryField.textProperty().addListener(listener);
+    private void handleUserInput(ObservableValue<? extends String> observable, 
+                                 String oldText, String newText) {
+        state = new LabelPickerState(
+            new HashSet(issue.getLabels()), repoLabels, queryField.getText().toLowerCase());
+        populatePanes(state);
     }
 
     private void handleLabelClick(PickerLabel label) {
-        state.toggleLabel(label.getFullName());
+        state.updateLabel(label.getFullName());
         populatePanes(state);
 
         if (!queryField.isDisabled()) {

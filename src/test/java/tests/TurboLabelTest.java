@@ -52,7 +52,7 @@ public class TurboLabelTest {
         labels.add(new TurboLabel(REPO, "testing"));
         
         // Ensures return of first matching label
-        assertEquals("test", TurboLabel.getMatchingTurboLabel(labels, "test").getFullName());
+        assertEquals("test", TurboLabel.getFirstMatchingTurboLabel(labels, "test").getFullName());
     }
     
     @Test

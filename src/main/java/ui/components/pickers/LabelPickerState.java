@@ -43,7 +43,7 @@ public class LabelPickerState {
     private void update(String userInput) {
         List<String> confirmedKeywords = getConfirmedKeywords(userInput);
         for (String confirmedKeyword : confirmedKeywords) {
-            findAndToggleMatchingLabel(confirmedKeyword);
+            updateMatchingLabel(confirmedKeyword);
         }
 
         Optional<String> keywordInProgess = getKeywordInProgress(userInput);
@@ -57,11 +57,11 @@ public class LabelPickerState {
      * given keyword
      * @param keyword
      */
-    private void findAndToggleMatchingLabel(String keyword) {
+    private void updateMatchingLabel(String keyword) {
         if (TurboLabel.hasExactlyOneMatchedLabel(repoLabels, keyword)) {
             String labelName =
-                    TurboLabel.getMatchedLabelName(repoLabels, keyword).get(0).getFullName();
-            toggleLabel(labelName);
+                    TurboLabel.getFirstMatchingTurboLabel(repoLabels, keyword).getFullName();
+            updateLabel(labelName);
         }
     }
 
@@ -70,10 +70,9 @@ public class LabelPickerState {
      * labelName is case-sensitive
      * @param labelName
      */
-    public void toggleLabel(String labelName) {
+    public void updateLabel(String labelName) {
         if (isAnInitialLabel(labelName)) {
             if (isARemovedLabel(labelName)) {
-                // add back initial label
                 removeConflictingLabels(labelName);
                 removedLabels.remove(labelName);
             } else {
@@ -99,11 +98,8 @@ public class LabelPickerState {
      * @param query
      */
     private void updateMatchedLabels(String query) {
-        TurboLabel queryLabel = new TurboLabel("", query);
-        List<TurboLabel> newMatchedLabels = repoLabels;
+        List<TurboLabel> newMatchedLabels = TurboLabel.getMatchedLabels(repoLabels, query);
 
-        newMatchedLabels = TurboLabel.filterByNameQuery(newMatchedLabels, queryLabel.getShortName());
-        newMatchedLabels = TurboLabel.filterByGroupQuery(newMatchedLabels, queryLabel.getGroupName());
 
         if (query.isEmpty() || newMatchedLabels.isEmpty()) {
             currentSuggestionIndex = OptionalInt.empty();
