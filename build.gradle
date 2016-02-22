@@ -66,13 +66,14 @@ allprojects {
         compile "com.google.guava:guava:$guavaVersion"
         compile "net.java.dev.jna:jna:$jnaVersion"
         compile "org.commonjava.googlecode.markdown4j:markdown4j:$markdown4jVersion"
-        compile "org.controlsfx:openjfx-dialogs:$openjfxDialogsVersion"
         compile "org.eclipse.mylyn.github:org.eclipse.egit.github.core:$egitVersion"
         compile "org.ocpsoft.prettytime:prettytime:$prettytimeVersion"
-		compile "org.pegdown:pegdown:1.6.0"
-    	compile group: 'org.fxmisc.richtext', name: 'richtextfx', version: '0.6.10'
         compile "org.seleniumhq.selenium:selenium-java:$seleniumJavaVersion"
         compile "org.seleniumhq.selenium:selenium-server:$seleniumServerVersion"
+        compile "org.controlsfx:openjfx-dialogs:$openjfxDialogsVersion"
+		compile "org.pegdown:pegdown:1.6.0"
+    	compile group: 'org.fxmisc.richtext', name: 'richtextfx', version: '0.6.10'
+		compile group: 'org.json', name: 'json', version: '20160212'
 
         testCompile "junit:junit:$junitVersion"
         testCompile "org.loadui:testFx:$testFxVersion"
