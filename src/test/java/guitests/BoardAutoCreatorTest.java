@@ -85,15 +85,15 @@ public class BoardAutoCreatorTest extends UITest {
 
         assertEquals(panelInfos.get(0).getPanelFilter(), "assignee:User 1 sort:milestone,status");
         assertEquals(panelInfos.get(1).getPanelFilter(), "assignee:User 10 sort:milestone,status");
-        assertEquals(panelInfos.get(2).getPanelFilter(), "assignee:User 2 sort:milestone,status");
-        assertEquals(panelInfos.get(3).getPanelFilter(), "assignee:User 3 sort:milestone,status");
-        assertEquals(panelInfos.get(4).getPanelFilter(), "assignee:User 4 sort:milestone,status");
+        assertEquals(panelInfos.get(2).getPanelFilter(), "assignee:User 11 sort:milestone,status");
+        assertEquals(panelInfos.get(3).getPanelFilter(), "assignee:User 12 sort:milestone,status");
+        assertEquals(panelInfos.get(4).getPanelFilter(), "assignee:User 2 sort:milestone,status");
 
         assertEquals(panelInfos.get(0).getPanelName(), "Work allocated to User 1");
         assertEquals(panelInfos.get(1).getPanelName(), "Work allocated to User 10");
-        assertEquals(panelInfos.get(2).getPanelName(), "Work allocated to User 2");
-        assertEquals(panelInfos.get(3).getPanelName(), "Work allocated to User 3");
-        assertEquals(panelInfos.get(4).getPanelName(), "Work allocated to User 4");
+        assertEquals(panelInfos.get(2).getPanelName(), "Work allocated to User 11");
+        assertEquals(panelInfos.get(3).getPanelName(), "Work allocated to User 12");
+        assertEquals(panelInfos.get(4).getPanelName(), "Work allocated to User 2");
     }
 
     @Test
