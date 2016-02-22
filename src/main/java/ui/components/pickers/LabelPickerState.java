@@ -18,6 +18,7 @@ public class LabelPickerState {
     List<TurboLabel> repoLabels;
     OptionalInt currentSuggestionIndex;
 
+    @SuppressWarnings("PMD")
     public LabelPickerState(Set<String> initialLabels, List<TurboLabel> repoLabels, String userInput) {
         this(initialLabels, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), repoLabels,
                 OptionalInt.empty());
@@ -39,7 +40,7 @@ public class LabelPickerState {
      * Updates current state based on given user input
      * @param userInput 
      */
-    public void update(String userInput) {
+    private void update(String userInput) {
         List<String> confirmedKeywords = getConfirmedKeywords(userInput);
         for (String confirmedKeyword : confirmedKeywords) {
             findAndToggleMatchingLabel(confirmedKeyword);
@@ -59,7 +60,7 @@ public class LabelPickerState {
     private void findAndToggleMatchingLabel(String keyword) {
         if (TurboLabel.hasExactlyOneMatchedLabel(repoLabels, keyword)) {
             String labelName =
-                    TurboLabel.getMatchedLabelName(repoLabels, keyword).get(0).getActualName();
+                    TurboLabel.getMatchedLabelName(repoLabels, keyword).get(0).getFullName();
             toggleLabel(labelName);
         }
     }
@@ -101,7 +102,7 @@ public class LabelPickerState {
         TurboLabel queryLabel = new TurboLabel("", query);
         List<TurboLabel> newMatchedLabels = repoLabels;
 
-        newMatchedLabels = TurboLabel.filterByNameQuery(newMatchedLabels, queryLabel.getSimpleName());
+        newMatchedLabels = TurboLabel.filterByNameQuery(newMatchedLabels, queryLabel.getShortName());
         newMatchedLabels = TurboLabel.filterByGroupQuery(newMatchedLabels, queryLabel.getGroupName());
 
         if (query.isEmpty() || newMatchedLabels.isEmpty()) {

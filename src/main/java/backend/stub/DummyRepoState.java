@@ -70,7 +70,7 @@ public class DummyRepoState {
 
             // Populate state with defaults
             issues.put(dummyIssue.getId(), dummyIssue);
-            labels.put(dummyLabel.getActualName(), dummyLabel);
+            labels.put(dummyLabel.getFullName(), dummyLabel);
             milestones.put(dummyMilestone.getId(), dummyMilestone);
             users.put(dummyUser.getLoginName(), dummyUser);
         }
@@ -295,8 +295,8 @@ public class DummyRepoState {
 
     protected void makeNewLabel() {
         TurboLabel toAdd = makeDummyLabel();
-        labels.put(toAdd.getActualName(), toAdd);
-        updatedLabels.put(toAdd.getActualName(), toAdd);
+        labels.put(toAdd.getFullName(), toAdd);
+        updatedLabels.put(toAdd.getFullName(), toAdd);
     }
 
     protected void makeNewMilestone() {

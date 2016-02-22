@@ -23,19 +23,20 @@ public class TurboLabel implements Comparable<TurboLabel> {
     public static final String EXCLUSIVE_DELIMITER = ".";
     public static final String NONEXCLUSIVE_DELIMITER = "-";
 
-    private final String actualName;
-    private final String simpleName;
+    private final String fullName;
+    private final String shortName;
     private final String groupName;
     private final Grouping grouping;
 
     private final String repoId;
 
+    @SuppressWarnings("PMD")
     private String colour;
 
     public TurboLabel(String repoId, String name) {
-        this.actualName = name;
+        this.fullName = name;
         this.grouping = initGroupMembership();
-        this.simpleName = initSimpleName();
+        this.shortName = initShortName();
         this.groupName = initGroupName();
         this.colour = DEFAULT_COLOR;
         this.repoId = repoId;
@@ -58,7 +59,7 @@ public class TurboLabel implements Comparable<TurboLabel> {
      * Copy constructor
      */
     public TurboLabel(TurboLabel label) {
-        this(label.getRepoId(), label.getActualName());
+        this(label.getRepoId(), label.getFullName());
         this.colour = label.getColour();
     }
 
@@ -68,7 +69,7 @@ public class TurboLabel implements Comparable<TurboLabel> {
     }
 
     public TurboLabel(String repoId, SerializableLabel label) {
-        this(repoId, label.getActualName());
+        this(repoId, label.getFullName());
         this.colour = label.getColour();
     }
 
@@ -105,7 +106,7 @@ public class TurboLabel implements Comparable<TurboLabel> {
      */
     public static TurboLabel getMatchingTurboLabel(List<TurboLabel> labels, String labelName) {
         Optional<TurboLabel> firstMatchingLabel = labels.stream()
-                .filter(label -> label.getActualName().equals(labelName))
+                .filter(label -> label.getFullName().equals(labelName))
                 .findFirst();
         assert firstMatchingLabel.isPresent();
         return firstMatchingLabel.get();
@@ -113,7 +114,7 @@ public class TurboLabel implements Comparable<TurboLabel> {
 
     public static List<String> getLabelsNameList(List<TurboLabel> labels) {
         return labels.stream()
-                .map(TurboLabel::getActualName)
+                .map(TurboLabel::getFullName)
                 .collect(Collectors.toList());
     }
 
@@ -127,7 +128,7 @@ public class TurboLabel implements Comparable<TurboLabel> {
     public static List<TurboLabel> filterByNameQuery(List<TurboLabel> repoLabels, String nameQuery) {
         return repoLabels
                 .stream()
-                .filter(label -> Utility.containsIgnoreCase(label.getSimpleName(), nameQuery))
+                .filter(label -> Utility.containsIgnoreCase(label.getShortName(), nameQuery))
                 .collect(Collectors.toList());
     }
 
@@ -164,7 +165,7 @@ public class TurboLabel implements Comparable<TurboLabel> {
 
         List<TurboLabel> newMatchedLabels = new ArrayList<>();
         newMatchedLabels.addAll(repoLabels);
-        newMatchedLabels = filterByNameQuery(newMatchedLabels, query.getSimpleName());
+        newMatchedLabels = filterByNameQuery(newMatchedLabels, query.getShortName());
         newMatchedLabels = filterByGroupQuery(newMatchedLabels, query.getGroupName());
         return newMatchedLabels;
     }
@@ -186,8 +187,8 @@ public class TurboLabel implements Comparable<TurboLabel> {
         return groupName;
     }
 
-    public String getSimpleName() {
-        return simpleName;
+    public String getShortName() {
+        return shortName;
     }
 
     public boolean isInExclusiveGroup() {
@@ -199,13 +200,13 @@ public class TurboLabel implements Comparable<TurboLabel> {
     }
 
     public Optional<String> getGroup() {
-        if (getDelimiter(actualName).isPresent()) {
-            String delimiter = getDelimiter(actualName).get();
+        if (getDelimiter(fullName).isPresent()) {
+            String delimiter = getDelimiter(fullName).get();
             // Escaping due to constants not being valid regexes
-            String[] segments = actualName.split("\\" + delimiter);
+            String[] segments = fullName.split("\\" + delimiter);
             assert segments.length >= 1;
             if (segments.length == 1) {
-                if (actualName.endsWith(delimiter)) {
+                if (fullName.endsWith(delimiter)) {
                     // group.
                     return Optional.of(segments[0]);
                 } else {
@@ -224,13 +225,13 @@ public class TurboLabel implements Comparable<TurboLabel> {
     }
 
     public String getName() {
-        if (getDelimiter(actualName).isPresent()) {
-            String delimiter = getDelimiter(actualName).get();
+        if (getDelimiter(fullName).isPresent()) {
+            String delimiter = getDelimiter(fullName).get();
             // Escaping due to constants not being valid regexes
-            String[] segments = actualName.split("\\" + delimiter);
+            String[] segments = fullName.split("\\" + delimiter);
             assert segments.length >= 1;
             if (segments.length == 1) {
-                if (actualName.endsWith(delimiter)) {
+                if (fullName.endsWith(delimiter)) {
                     // group.
                     return "";
                 } else {
@@ -244,7 +245,7 @@ public class TurboLabel implements Comparable<TurboLabel> {
             }
         } else {
             // name
-            return actualName;
+            return fullName;
         }
     }
 
@@ -271,17 +272,19 @@ public class TurboLabel implements Comparable<TurboLabel> {
 
     @Override
     public String toString() {
-        return actualName;
+        return fullName;
     }
 
     public String getRepoId() {
         return repoId;
     }
+
     public String getColour() {
         return colour;
     }
-    public String getActualName() {
-        return actualName;
+
+    public String getFullName() {
+        return fullName;
     }
 
     @Override
@@ -289,19 +292,19 @@ public class TurboLabel implements Comparable<TurboLabel> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TurboLabel that = (TurboLabel) o;
-        return actualName.equals(that.actualName) && colour.equals(that.colour);
+        return fullName.equals(that.fullName) && colour.equals(that.colour);
     }
 
     @Override
     public int hashCode() {
-        int result = actualName.hashCode();
+        int result = fullName.hashCode();
         result = 31 * result + colour.hashCode();
         return result;
     }
 
     @Override
     public int compareTo(TurboLabel o) {
-        return actualName.compareTo(o.getActualName());
+        return fullName.compareTo(o.getFullName());
     }
 
     private static String joinWith(String group, String name, boolean exclusive) {
@@ -309,8 +312,8 @@ public class TurboLabel implements Comparable<TurboLabel> {
     }
 
     private Grouping initGroupMembership() {
-        if (getDelimiter(actualName).isPresent()) {
-            return getDelimiter(actualName).get().equals(EXCLUSIVE_DELIMITER) 
+        if (getDelimiter(fullName).isPresent()) {
+            return getDelimiter(fullName).get().equals(EXCLUSIVE_DELIMITER) 
                 ? Grouping.EXCLUSIVE : Grouping.NON_EXCLUSIVE;
         }
         return Grouping.NONE;
@@ -323,7 +326,7 @@ public class TurboLabel implements Comparable<TurboLabel> {
      */
     private String initGroupName() {
         if (!isInGroup()) return "";
-        return actualName.substring(0, actualName.indexOf(getDelimiter(actualName).get()));
+        return fullName.substring(0, fullName.indexOf(getDelimiter(fullName).get()));
     }
 
     /**
@@ -331,9 +334,9 @@ public class TurboLabel implements Comparable<TurboLabel> {
      * i.e "priority.high" will return "high"
      * @return
      */
-    private String initSimpleName() {
-        if (!isInGroup()) return actualName;
-        return actualName.substring(actualName.indexOf(getDelimiter(actualName).get()) + 1);
+    private String initShortName() {
+        if (!isInGroup()) return fullName;
+        return fullName.substring(fullName.indexOf(getDelimiter(fullName).get()) + 1);
     }
 
 }

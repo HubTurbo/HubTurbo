@@ -52,7 +52,7 @@ public class TurboLabelTest {
         labels.add(new TurboLabel(REPO, "testing"));
         
         // Ensures return of first matching label
-        assertEquals("test", TurboLabel.getMatchingTurboLabel(labels, "test").getActualName());
+        assertEquals("test", TurboLabel.getMatchingTurboLabel(labels, "test").getFullName());
     }
     
     @Test
@@ -73,14 +73,14 @@ public class TurboLabelTest {
         TurboLabel label = new TurboLabel(REPO, "group" + delimiter + "name");
         assertEquals(Optional.of("group"), label.getGroup());
         assertEquals("name", label.getName());
-        assertEquals("group" + delimiter + "name", label.getActualName());
+        assertEquals("group" + delimiter + "name", label.getFullName());
         assertEquals(shouldBeExclusive, label.isInExclusiveGroup());
 
         // label format: group.
         label = new TurboLabel(REPO, "group" + delimiter);
         assertEquals(Optional.of("group"), label.getGroup());
         assertEquals("", label.getName());
-        assertEquals("group" + delimiter, label.getActualName());
+        assertEquals("group" + delimiter, label.getFullName());
         assertEquals(shouldBeExclusive, label.isInExclusiveGroup());
 
         // The rest are unconditionally nonexlusive because there's no group.
@@ -90,14 +90,14 @@ public class TurboLabelTest {
         label = new TurboLabel(REPO, delimiter + "name");
         assertEquals(Optional.<String>empty(), label.getGroup());
         assertEquals(delimiter + "name", label.getName());
-        assertEquals(delimiter + "name", label.getActualName());
+        assertEquals(delimiter + "name", label.getFullName());
         assertEquals(false, label.isInExclusiveGroup());
 
         // label format: .
         label = new TurboLabel(REPO, delimiter);
         assertEquals(Optional.<String>empty(), label.getGroup());
         assertEquals(delimiter, label.getName());
-        assertEquals(delimiter, label.getActualName());
+        assertEquals(delimiter, label.getFullName());
         assertEquals(false, label.isInExclusiveGroup());
     }
 }

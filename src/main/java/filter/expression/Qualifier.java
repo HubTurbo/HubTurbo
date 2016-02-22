@@ -919,7 +919,7 @@ public class Qualifier implements FilterExpression {
         // it does not express.
 
         for (TurboLabel label : model.getLabelsOfIssue(issue)) {
-            if (labelMatches(content.get(), label.getActualName())) {
+            if (labelMatches(content.get(), label.getFullName())) {
                 return true;
             }
         }
@@ -1017,7 +1017,7 @@ public class Qualifier implements FilterExpression {
 
         // Find labels containing the label name
         List<TurboLabel> labels = model.getLabels().stream()
-                .filter(l -> l.getActualName().toLowerCase().contains(content.get().toLowerCase()))
+                .filter(l -> l.getFullName().toLowerCase().contains(content.get().toLowerCase()))
             .collect(Collectors.toList());
 
         if (labels.isEmpty()) {
@@ -1029,7 +1029,7 @@ public class Qualifier implements FilterExpression {
 
         // Find labels with the exact label name
         labels = model.getLabels().stream()
-            .filter(l -> l.getActualName().toLowerCase().equals(content.get().toLowerCase()))
+            .filter(l -> l.getFullName().toLowerCase().equals(content.get().toLowerCase()))
             .collect(Collectors.toList());
 
         if (labels.isEmpty()) {

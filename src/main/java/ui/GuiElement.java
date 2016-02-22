@@ -56,6 +56,6 @@ public class GuiElement {
     }
 
     public Optional<TurboLabel> getLabelByActualName(String actualName) {
-        return labels.stream().filter(label -> label.getActualName().equals(actualName)).findFirst();
+        return labels.stream().filter(label -> label.getFullName().equals(actualName)).findFirst();
     }
 }

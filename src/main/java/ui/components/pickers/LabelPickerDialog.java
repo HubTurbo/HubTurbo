@@ -227,7 +227,7 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
                         groupContent.put(group, createGroupPane(GROUP_PAD));
                     }
                     groupContent.get(group).getChildren().add(processMatchedLabel(
-                        label.getActualName(), matchedLabels, finalLabels, suggestion));
+                        label.getFullName(), matchedLabels, finalLabels, suggestion));
                 });
         return groupContent;
     }
@@ -239,7 +239,7 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
                 .filter(label -> !label.getGroup().isPresent())
                 .map(label -> new PickerLabel(label, false))
                 .forEach(label -> groupless.getChildren().add(processMatchedLabel(
-                    label.getActualName(), matchedLabels, finalLabels, suggestion)));
+                    label.getFullName(), matchedLabels, finalLabels, suggestion)));
 
         if (!groupless.getChildren().isEmpty()) feedbackLabels.getChildren().add(groupless);
     }
@@ -329,7 +329,7 @@ public class LabelPickerDialog extends Dialog<List<String>> implements Initializ
     }
 
     private void handleLabelClick(PickerLabel label) {
-        state.toggleLabel(label.getActualName());
+        state.toggleLabel(label.getFullName());
         populatePanes(state);
 
         if (!queryField.isDisabled()) {
