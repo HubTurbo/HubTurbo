@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static ui.components.KeyboardShortcuts.JUMP_TO_FIRST_ISSUE;
 
-import backend.resource.TurboUser;
 import github.IssueEventType;
 import github.TurboIssueEvent;
 
@@ -22,7 +21,6 @@ import javafx.scene.layout.VBox;
 
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.User;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.loadui.testfx.GuiTest;
@@ -173,6 +171,7 @@ public class IssuePanelTests extends UITest {
         type("id:11");
         push(KeyCode.ENTER);
         assertEquals(true, GuiTest.exists("User 11"));
+        // arrow to indicate assignment i.e. author -> assignee
         assertEquals(true, GuiTest.exists("\uf03e"));
         assertEquals(true, GuiTest.exists("User 1"));
     }

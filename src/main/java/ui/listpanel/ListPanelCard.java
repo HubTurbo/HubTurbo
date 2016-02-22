@@ -201,7 +201,6 @@ public class ListPanelCard extends VBox {
     private void setupAuthorAssigneeBox() {
         authorAssigneeBox.setPrefWidth(CARD_WIDTH);
         authorAssigneeBox.setPadding(new Insets(0, 0, 1, 0));
-        //authorAssigneeBox.setSpacing(1);
     }
 
     private void updateDetails() {

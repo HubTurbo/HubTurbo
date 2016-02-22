@@ -62,55 +62,19 @@ public class KeyboardShortcutsTest extends UITest {
         assertEquals(DummyRepoState.noOfDummyIssues, selectedIssueId);
         clearSelectedIssueId();
 
-        // jump to first issue using number key(1) or ENTER
-        push(KeyCode.ESCAPE);
-        press(JUMP_TO_NTH_ISSUE_KEYS.get(1));
-        PlatformEx.waitOnFxThread();
-        assertEquals(DummyRepoState.noOfDummyIssues, selectedIssueId);
-        clearSelectedIssueId();
-        press(JUMP_TO_FILTER_BOX);
-        assertEquals(UIComponentFocusEvent.EventType.FILTER_BOX, uiComponentFocusEventType);
-        clearUiComponentFocusEventType();
-        push(KeyCode.ESCAPE);
-        press(JUMP_TO_NTH_ISSUE_KEYS.get(2));
-        PlatformEx.waitOnFxThread();
-        assertEquals(DummyRepoState.noOfDummyIssues - 1, selectedIssueId);
-        clearSelectedIssueId();
-        push(KeyCode.ESCAPE);
-        press(JUMP_TO_NTH_ISSUE_KEYS.get(3));
-        PlatformEx.waitOnFxThread();
-        assertEquals(DummyRepoState.noOfDummyIssues - 2, selectedIssueId);
-        clearSelectedIssueId();
-        push(KeyCode.ESCAPE);
-        press(JUMP_TO_NTH_ISSUE_KEYS.get(4));
-        PlatformEx.waitOnFxThread();
-        assertEquals(DummyRepoState.noOfDummyIssues - 3, selectedIssueId);
-        clearSelectedIssueId();
-        push(KeyCode.ESCAPE);
-        press(JUMP_TO_NTH_ISSUE_KEYS.get(5));
-        PlatformEx.waitOnFxThread();
-        assertEquals(DummyRepoState.noOfDummyIssues - 4, selectedIssueId);
-        clearSelectedIssueId();
-        push(KeyCode.ESCAPE);
-        press(JUMP_TO_NTH_ISSUE_KEYS.get(6));
-        PlatformEx.waitOnFxThread();
-        assertEquals(DummyRepoState.noOfDummyIssues - 5, selectedIssueId);
-        clearSelectedIssueId();
-        push(KeyCode.ESCAPE);
-        press(JUMP_TO_NTH_ISSUE_KEYS.get(7));
-        PlatformEx.waitOnFxThread();
-        assertEquals(DummyRepoState.noOfDummyIssues - 6, selectedIssueId);
-        clearSelectedIssueId();
-        push(KeyCode.ESCAPE);
-        press(JUMP_TO_NTH_ISSUE_KEYS.get(8));
-        PlatformEx.waitOnFxThread();
-        assertEquals(DummyRepoState.noOfDummyIssues - 7, selectedIssueId);
-        clearSelectedIssueId();
-        push(KeyCode.ESCAPE);
-        press(JUMP_TO_NTH_ISSUE_KEYS.get(9));
-        PlatformEx.waitOnFxThread();
-        assertEquals(DummyRepoState.noOfDummyIssues - 8, selectedIssueId);
-        clearSelectedIssueId();
+        // jump to nth issue using number keys 1-9
+        for (int i = 1; i <= 9; i++) {
+            push(KeyCode.ESCAPE);
+            press(JUMP_TO_NTH_ISSUE_KEYS.get(i));
+            PlatformEx.waitOnFxThread();
+            assertEquals(DummyRepoState.noOfDummyIssues - (i - 1), selectedIssueId);
+            clearSelectedIssueId();
+            if (i == 1) {
+                press(JUMP_TO_FILTER_BOX);
+                assertEquals(UIComponentFocusEvent.EventType.FILTER_BOX, uiComponentFocusEventType);
+                clearUiComponentFocusEventType();
+            }
+        }
 
         // jump to last issue
         push(KeyCode.END);
