@@ -1,7 +1,6 @@
 package tests;
 
 import backend.resource.Model;
-import backend.resource.TurboLabel;
 import backend.resource.TurboMilestone;
 import filter.Parser;
 import filter.expression.FilterExpression;
@@ -59,12 +58,8 @@ public class MilestoneAliasTests {
         TurboMilestone msCurrPlus3 = new TurboMilestone(REPO, 4, "V0.7");
         msCurrPlus3.setDueDate(Optional.empty());
 
-        model = TestUtils.singletonModel(new Model(REPO,
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new ArrayList<>(Arrays.asList(msCurrMin3, msCurrMin2, msCurrMin1,
-                        msCurr, msCurrPlus1, msCurrPlus2, msCurrPlus3)),
-                new ArrayList<>()));
+        model = createIModelFromTurboMilestones(msCurrMin3, msCurrMin2, msCurrMin1,
+                                        msCurr, msCurrPlus1, msCurrPlus2, msCurrPlus3);
 
         FilterExpression noMilestoneAlias;
         List<Qualifier> milestoneQualifiers;
@@ -189,12 +184,7 @@ public class MilestoneAliasTests {
         msOngoing2.setOpen(true);
 
         // only one milestone, open and no due date
-        model = TestUtils.singletonModel(new Model(REPO,
-               new ArrayList<>(),
-                new ArrayList<>(),
-                new ArrayList<>(Arrays.asList(msOngoing0)),
-                new ArrayList<>()
-        ));
+        model = createIModelFromTurboMilestones(msOngoing0);
 
         FilterExpression expr = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:current"));
         List<Qualifier> milestoneQualifiers = expr.find(Qualifier::isMilestoneQualifier);
@@ -204,12 +194,7 @@ public class MilestoneAliasTests {
 
         // 2 finished milestones with due dates, and 1 open milestone with no due date
         // the finished milestone should be able to be referred with current-1 and current-2
-        model = TestUtils.singletonModel(new Model(REPO,
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new ArrayList<>(Arrays.asList(msFinished1, msFinished2, msOngoing1)),
-                new ArrayList<>()
-        ));
+        model = createIModelFromTurboMilestones(msFinished1, msFinished2, msOngoing1);
 
         expr = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:current"));
         milestoneQualifiers = expr.find(Qualifier::isMilestoneQualifier);
@@ -235,12 +220,7 @@ public class MilestoneAliasTests {
 
         // 2 open milestones without due date and 2 finished milestone, there should be no
         // "current" milestone, and current-1 and current-2 should refer to the finished milestones
-        model = TestUtils.singletonModel(new Model(REPO,
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new ArrayList<>(Arrays.asList(msFinished1, msFinished2, msOngoing1, msOngoing2)),
-                new ArrayList<>()
-        ));
+        model = createIModelFromTurboMilestones(msFinished1, msFinished2, msOngoing1, msOngoing2);
 
         expr = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:current"));
         milestoneQualifiers = expr.find(Qualifier::isMilestoneQualifier);
@@ -256,11 +236,7 @@ public class MilestoneAliasTests {
 
     @Test
     public void milestoneAlias_noAliasableMilestone_currentDoesNotResolveToOtherMilestone() {
-        model = TestUtils.singletonModel(new Model(REPO,
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new ArrayList<>()));
+        model = createIModelFromTurboMilestones();
         FilterExpression expr = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:current"));
         List<Qualifier> milestoneQualifiers = expr.find(Qualifier::isMilestoneQualifier);
         assertEquals(1, milestoneQualifiers.size());
@@ -288,11 +264,7 @@ public class MilestoneAliasTests {
         msClose3.setOpen(false);
         msClose3.setDueDate(Optional.of(LocalDate.now().plusMonths(4)));
 
-        model = TestUtils.singletonModel(new Model(REPO,
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new ArrayList<>(Arrays.asList(msClose1, msClose2, msClose3)),
-                new ArrayList<>()));
+        model = createIModelFromTurboMilestones(msClose1, msClose2, msClose3);
 
         assertMilestoneAliasFalseQualifierSize1("milestone:current");
         assertMilestoneAliasFalseQualifierSize1("milestone:current+1");
@@ -316,5 +288,13 @@ public class MilestoneAliasTests {
         assertEquals(noMilestoneAlias.getQualifierTypes().get(0), QualifierType.FALSE);
         milestoneQualifiers = noMilestoneAlias.find(Qualifier::isMilestoneQualifier);
         assertEquals(milestoneQualifiers.size(), 0);
+    }
+
+    private IModel createIModelFromTurboMilestones(TurboMilestone... milestones) {
+        return TestUtils.singletonModel(new Model(REPO,
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>(Arrays.asList(milestones)),
+                new ArrayList<>()));
     }
 }
