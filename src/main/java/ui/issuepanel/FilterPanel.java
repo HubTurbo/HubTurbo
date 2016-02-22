@@ -109,8 +109,8 @@ public abstract class FilterPanel extends AbstractPanel {
 
         ui.registerEvent((RepoOpeningEventHandler) this::indicatePanelLoading);
         ui.registerEvent((RepoOpenedEventHandler) this::unindicatePanelLoading);
-        ui.registerEvent((PanelReloadingEventHandler) this::indicatePanelLoading);
-        ui.registerEvent((PanelReloadedEventHandler) this::unindicatePanelLoading);
+        ui.registerEvent((PanelReloadingEventHandler) e -> indicatePanelLoading());
+        ui.registerEvent((PanelReloadedEventHandler) e -> unindicatePanelLoading());
     }
 
     private final ModelUpdatedEventHandler onModelUpdate = e -> {
@@ -217,11 +217,11 @@ public abstract class FilterPanel extends AbstractPanel {
         }
     }
 
-    private void indicatePanelLoading(PanelReloadingEvent e) {
+    private void indicatePanelLoading() {
         addPanelLoadingIndication();
     }
 
-    private void unindicatePanelLoading(PanelReloadedEvent e) {
+    private void unindicatePanelLoading() {
         removePanelLoadingIndication();
     }
 
