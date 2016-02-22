@@ -147,6 +147,10 @@ public class Preferences { // NOPMD
         return global.getBoardPanels(board);
     }
 
+    public void clearAllBoards() {
+        global.clearAllBoards();
+    }
+
     /**
      * Session configuration
      */
