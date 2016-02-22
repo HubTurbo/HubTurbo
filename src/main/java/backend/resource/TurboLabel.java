@@ -26,10 +26,11 @@ public class TurboLabel implements Comparable<TurboLabel> {
     private final String actualName;
     private final String simpleName;
     private final String groupName;
-    private final String colour;
     private final Grouping grouping;
 
     private final String repoId;
+
+    private String colour;
 
     public TurboLabel(String repoId, String name) {
         this.actualName = name;
@@ -41,12 +42,8 @@ public class TurboLabel implements Comparable<TurboLabel> {
     }
 
     public TurboLabel(String repoId, String colour, String name) {
-        this.actualName = name;
-        this.grouping = initGroupMembership();
-        this.simpleName = initSimpleName();
-        this.groupName = initGroupName();
+        this(repoId, name);
         this.colour = colour;
-        this.repoId = repoId;
     }
 
     public static TurboLabel nonexclusive(String repoId, String group, String name) {
@@ -61,30 +58,18 @@ public class TurboLabel implements Comparable<TurboLabel> {
      * Copy constructor
      */
     public TurboLabel(TurboLabel label) {
-        this.actualName = label.getActualName();
-        this.grouping = initGroupMembership();
-        this.simpleName = initSimpleName();
-        this.groupName = initGroupName();
+        this(label.getRepoId(), label.getActualName());
         this.colour = label.getColour();
-        this.repoId = label.getRepoId();
     }
 
     public TurboLabel(String repoId, Label label) {
-        this.actualName = label.getName();
-        this.grouping = initGroupMembership();
-        this.simpleName = initSimpleName();
-        this.groupName = initGroupName();
+        this(repoId, label.getName());
         this.colour = label.getColor();
-        this.repoId = repoId;
     }
 
     public TurboLabel(String repoId, SerializableLabel label) {
-        this.actualName = label.getActualName();
-        this.grouping = initGroupMembership();
-        this.simpleName = initSimpleName();
-        this.groupName = initGroupName();
+        this(repoId, label.getActualName());
         this.colour = label.getColour();
-        this.repoId = repoId;
     }
 
 
