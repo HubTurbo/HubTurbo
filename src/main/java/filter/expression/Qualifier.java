@@ -9,6 +9,7 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import backend.resource.*;
 import filter.ParseException;
@@ -91,21 +92,18 @@ public class Qualifier implements FilterExpression {
             repoIds.add(model.getDefaultRepo().toLowerCase());
         }
 
-        List<TurboMilestone> allMilestones = model.getMilestones().stream()
-                .filter(ms -> ms.getDueDate().isPresent())
-                .filter(ms -> repoIds.contains(ms.getRepoId().toLowerCase()))
-                .sorted((a, b) -> getMilestoneDueDateComparator().compare(a, b))
-                .collect(Collectors.toList());
+        List<TurboMilestone> milestonesOfReposInPanel = TurboMilestone.filterMilestonesOfRepos(
+                                                                                    model.getMilestones(), repoIds);
+        List<TurboMilestone> aliasableMilestones = getAliasableMilestones(milestonesOfReposInPanel);
+        Map<Integer, TurboMilestone> milestoneAliasIndex = getMilestoneAliasIndex(aliasableMilestones);
 
-        Optional<Integer> currentMilestoneIndex = getCurrentMilestoneIndex(allMilestones);
-
-        if (!currentMilestoneIndex.isPresent()) {
+        if (milestoneAliasIndex.isEmpty()) {
             return expr;
         }
 
         return expr.map(q -> {
             if (Qualifier.isMilestoneQualifier(q)) {
-                return q.convertMilestoneAliasQualifier(allMilestones, currentMilestoneIndex.get());
+                return q.convertMilestoneAliasQualifier(milestoneAliasIndex);
             } else {
                 return q;
             }
@@ -136,28 +134,103 @@ public class Qualifier implements FilterExpression {
         return exprWithNormalQualifiers.isSatisfiedBy(model, issue, new MetaQualifierInfo(metaQualifiers));
     }
 
-    private static Optional<Integer> getCurrentMilestoneIndex(List<TurboMilestone> allMilestones) {
-        if (allMilestones.isEmpty()) {
+    /**
+     * Get all milestones which milestone alias (current+-[n]) can resolve to. This will henceforth
+     * be called aliasable milestones.
+     *
+     * A milestone is aliasable if it has due date or it is the only open milestone in that repo.
+     */
+    private static List<TurboMilestone> getAliasableMilestones(List<TurboMilestone> milestonesOfReposInPanel) {
+        List<TurboMilestone> milestones = new ArrayList<>();
+        // add milestones with due date first
+        milestones.addAll(milestonesOfReposInPanel.stream()
+                .filter(ms -> ms.getDueDate().isPresent())
+                .collect(Collectors.toList()));
+
+        // Special case: if there is only one open milestone, it should be included regardless of whether
+        // it has due date or not.
+        // In this case, if it is not included already (the open milestone does not
+        // have due date), add it to the milestone list.
+        List<TurboMilestone> openMilestones = TurboMilestone.filterOpenMilestones(milestonesOfReposInPanel);
+        if (openMilestones.size() == 1) {
+            TurboMilestone openMilestone = openMilestones.get(0);
+            boolean hasDueDate = openMilestone.getDueDate().isPresent();
+            if (!hasDueDate) {
+                milestones.add(openMilestone);
+            }
+        }
+
+        return milestones;
+    }
+
+    /**
+     * Returns a map where the key denotes offset from "current" milestone.
+     * i.e. 0 for "current" milestone, -1 for "current-1" milestone, etc.
+     */
+    private static Map<Integer, TurboMilestone> getMilestoneAliasIndex(List<TurboMilestone> milestones) {
+        List<TurboMilestone> sortedMilestones = TurboMilestone.sortByDueDate(milestones);
+        Optional<Integer> currentMilestoneIndex = getCurrentMilestoneIndex(sortedMilestones);
+
+        assert currentMilestoneIndex.isPresent() || !currentMilestoneIndex.isPresent() && sortedMilestones.isEmpty();
+
+        return IntStream
+                .range(0, sortedMilestones.size())
+                .boxed()
+                .collect(Collectors.toMap(
+                        i -> i - currentMilestoneIndex.get(),
+                        i -> sortedMilestones.get(i)));
+    }
+
+    /**
+     * "Current" milestone is an ongoing milestone with the earliest due date. However, if there
+     * is only one open milestone, it will be considered as the "current" milestone, even if it
+     * does not have a due date.
+     *
+     * If there is no ongoing or open milestone, sets "current" as one after last milestone -
+     * this means that there is no "current" milestone, but it is possible that there is a
+     * milestone before the "current" one (i.e. current-[n] where n >= 1)
+     *
+     * This method expects the milestone list to be sorted (by due date)
+     */
+    private static Optional<Integer> getCurrentMilestoneIndex(List<TurboMilestone> sortedMilestones) {
+        if (sortedMilestones.isEmpty()) {
             return Optional.empty();
         }
 
-        int currentIndex = 0;
-
-        for (TurboMilestone checker : allMilestones) {
-            boolean overdue = checker.getDueDate().isPresent() &&
-                    checker.getDueDate().get().isBefore(LocalDate.now());
-            boolean relevant = !(overdue && checker.getOpenIssues() == 0);
-
-            if (checker.isOpen() && relevant) {
-                return Optional.of(currentIndex);
-            }
-
-            currentIndex++;
+        int openMilestonesCount = TurboMilestone.filterOpenMilestones(sortedMilestones).size();
+        if (openMilestonesCount == 1) {
+            return getFirstOpenMilestonePosition(sortedMilestones);
         }
 
-        // if no open milestone, set current as one after last milestone
-        // - this means that no such milestone, which will return no issue
-        return Optional.of(allMilestones.size());
+        // Look for the first milestone in the (sorted) list that is ongoing.
+        Optional<Integer> firstOngoingMilestonePosition = getFirstOngoingMilestonePosition(sortedMilestones);
+
+        // if no ongoing milestone, set current as one after last milestone
+        return firstOngoingMilestonePosition.isPresent()
+                ? firstOngoingMilestonePosition
+                : Optional.of(sortedMilestones.size());
+    }
+
+    /**
+     * Expects milestone to be sorted (by due date).
+     */
+    private static Optional<Integer> getFirstOpenMilestonePosition(List<TurboMilestone> milestones) {
+        return IntStream
+                .range(0, milestones.size())
+                .boxed()
+                .filter(i -> milestones.get(i).isOpen())
+                .findFirst();
+    }
+
+    /**
+     * Expects milestone to be sorted (by due date).
+     */
+    private static Optional<Integer> getFirstOngoingMilestonePosition(List<TurboMilestone> milestones) {
+        return IntStream
+                .range(0, milestones.size())
+                .boxed()
+                .filter(i -> milestones.get(i).isOngoing())
+                .findFirst();
     }
 
     public static HashSet<String> getMetaQualifierContent(FilterExpression expr, QualifierType qualifierType) {
@@ -532,7 +605,7 @@ public class Qualifier implements FilterExpression {
                         } else if (!bDueDate.isPresent()) {
                             return -1;
                         } else {
-                            return -(getMilestoneDueDateComparator()
+                            return -(TurboMilestone.getDueDateComparator()
                                     .compare(aMilestone.get(), bMilestone.get()));
                         }
                     }
@@ -981,7 +1054,7 @@ public class Qualifier implements FilterExpression {
         return type;
     }
 
-    private Qualifier convertMilestoneAliasQualifier(List<TurboMilestone> allMilestones, int currentIndex) {
+    private Qualifier convertMilestoneAliasQualifier(Map<Integer, TurboMilestone> milestoneAliasIndex) {
         if (!content.isPresent()) {
             return Qualifier.EMPTY;
         }
@@ -996,39 +1069,23 @@ public class Qualifier implements FilterExpression {
             return this;
         }
 
-        int offset;
-        int newIndex = currentIndex;
+        int offset = 0;
         if (aliasMatcher.group(2) != null && aliasMatcher.group(3) != null) {
-            offset = Integer.parseInt(aliasMatcher.group(3));
             if (aliasMatcher.group(2).equals("+")) {
-                newIndex += offset;
+                offset = Integer.parseInt(aliasMatcher.group(3));
             } else {
-                newIndex -= offset;
+                offset = -Integer.parseInt(aliasMatcher.group(3));
             }
         }
 
-        // if out of milestone range, don't convert alias
-        if (newIndex >= allMilestones.size() || newIndex < 0) {
+        // if the offset is not within alias range, no issue will be shown
+        if (!milestoneAliasIndex.containsKey(offset)) {
             return Qualifier.FALSE;
         }
 
-        contents = allMilestones.get(newIndex).getTitle().toLowerCase();
+        contents = milestoneAliasIndex.get(offset).getTitle().toLowerCase();
 
         return new Qualifier(type, contents);
-    }
-
-    /**
-     * Condition: milestone must have due dates
-     */
-    public static Comparator<TurboMilestone> getMilestoneDueDateComparator() {
-        return (a, b) -> {
-            assert a.getDueDate().isPresent();
-            assert b.getDueDate().isPresent();
-            LocalDate aDueDate = a.getDueDate().get();
-            LocalDate bDueDate = b.getDueDate().get();
-
-            return aDueDate.compareTo(bDueDate);
-        };
     }
 
     /**
