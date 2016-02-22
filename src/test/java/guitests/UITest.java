@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -37,6 +36,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.ComboBoxBase;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -396,6 +396,17 @@ public class UITest extends GuiTest {
         for (String menuName : menuNames) {
             click(menuName);
         }
+    }
+
+    /**
+     * Sets a text field with given text. Does not simulate clicking and typing 
+     * in the text field.
+     * @param fieldId
+     * @param text
+     */
+    public void setTextField(String fieldId, String text) {
+        waitUntilNodeAppears(fieldId);
+        ((TextField) find(fieldId)).setText(text);
     }
 
     public <T> void waitForValue(ComboBoxBase<T> comboBoxBase) {
