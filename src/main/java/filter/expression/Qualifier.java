@@ -184,9 +184,9 @@ public class Qualifier implements FilterExpression {
     /**
      * "Current" milestone is an ongoing milestone with the earliest due date. However, if there
      * is only one open milestone, it will be considered as the "current" milestone, even if it
-     * does not have due date.
+     * does not have a due date.
      *
-     * If there is no ongoing or open milestone, set "current" as one after last milestone -
+     * If there is no ongoing or open milestone, sets "current" as one after last milestone -
      * this means that there is no "current" milestone, but it is possible that there is a
      * milestone before the "current" one (i.e. current-[n] where n >= 1)
      *
@@ -211,6 +211,9 @@ public class Qualifier implements FilterExpression {
                 : Optional.of(sortedMilestones.size());
     }
 
+    /**
+     * Expects milestone to be sorted (by due date).
+     */
     private static Optional<Integer> getFirstOpenMilestonePosition(List<TurboMilestone> milestones) {
         return IntStream
                 .range(0, milestones.size())
@@ -219,6 +222,9 @@ public class Qualifier implements FilterExpression {
                 .findFirst();
     }
 
+    /**
+     * Expects milestone to be sorted (by due date).
+     */
     private static Optional<Integer> getFirstOngoingMilestonePosition(List<TurboMilestone> milestones) {
         return IntStream
                 .range(0, milestones.size())
