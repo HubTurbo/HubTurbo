@@ -7,6 +7,7 @@ import static ui.components.KeyboardShortcuts.MINIMIZE_WINDOW;
 import static ui.components.KeyboardShortcuts.SWITCH_BOARD;
 
 import filter.expression.QualifierType;
+import javafx.application.Platform;
 import ui.GUIController;
 import ui.GuiElement;
 import ui.components.PanelMenuBar;
@@ -31,9 +32,11 @@ import util.events.testevents.PrimaryRepoChangedEvent;
 import util.events.testevents.UIComponentFocusEvent;
 import prefs.PanelInfo;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -127,9 +130,9 @@ public abstract class FilterPanel extends AbstractPanel {
     private Node createFilterBox() {
         filterTextField = new FilterTextField("")
                 .setOnConfirm((text) -> {
-                    ui.triggerEvent(new PanelReloadingEvent());
+                    Platform.runLater(() -> ui.triggerEvent(new PanelReloadingEvent()));
                     applyStringFilter(text);
-                    ui.triggerEvent(new PanelReloadedEvent());
+                    Platform.runLater(() -> ui.triggerEvent(new PanelReloadedEvent()));
                     return text;
                 })
                 .setOnCancel(this::requestFocus);
