@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 /**
  * This class is used to represent the state of the label picker. In addition to representing a state,
- * it contains the logic that handles every state transitions
+ * it contains the logic that handles every state transition
  */
 public class LabelPickerState {
 
@@ -18,16 +18,10 @@ public class LabelPickerState {
     List<TurboLabel> repoLabels;
     OptionalInt currentSuggestionIndex;
 
-    public LabelPickerState(Set<String> initialLabels, List<TurboLabel> repoLabels) {
+    public LabelPickerState(Set<String> initialLabels, List<TurboLabel> repoLabels, String userInput) {
         this(initialLabels, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), repoLabels,
                 OptionalInt.empty());
-
-        this.updateMatchedLabels("");
-    }
-
-    private LabelPickerState(Set<String> initialLabels, List<String> addedLabels, List<String> removedLabels,
-                             List<String> matchedLabels, List<TurboLabel> repoLabels) {
-        this(initialLabels, addedLabels, removedLabels, matchedLabels, repoLabels, OptionalInt.empty());
+        update(userInput);
     }
 
     private LabelPickerState(Set<String> initialLabels, List<String> addedLabels, List<String> removedLabels,
@@ -42,50 +36,40 @@ public class LabelPickerState {
     }
 
     /**
-     * Determines resulting state based on given user input
-     *
+     * Updates current state based on given user input
      * @param userInput 
-     * @return new state that corresponds with the user input
      */
-    public LabelPickerState determineState(String userInput) {
-        LabelPickerState state = this;
+    public void update(String userInput) {
         List<String> confirmedKeywords = getConfirmedKeywords(userInput);
         for (String confirmedKeyword : confirmedKeywords) {
-            state = state.findAndToggleMatchingLabel(confirmedKeyword);
+            findAndToggleMatchingLabel(confirmedKeyword);
         }
 
         Optional<String> keywordInProgess = getKeywordInProgress(userInput);
         if (keywordInProgess.isPresent()) {
-            state = state.updateMatchedLabels(keywordInProgess.get());
+            updateMatchedLabels(keywordInProgess.get());
         }
-
-        return state;
     }
 
     /**
-     *
-     * This will simply return the same state if there are more than 1
-     * label that contains the keyword
-     *
+     * Update current state if there is exactly one matching label based on the 
+     * given keyword
      * @param keyword
-     * @return
      */
-    private LabelPickerState findAndToggleMatchingLabel(String keyword) {
-        if (!TurboLabel.hasExactlyOneMatchedLabel(repoLabels, keyword)) return this;
-        String labelName = TurboLabel.getMatchedLabelName(repoLabels, keyword)
-            .get(0).getActualName();
-        return toggleLabel(labelName);
+    private void findAndToggleMatchingLabel(String keyword) {
+        if (TurboLabel.hasExactlyOneMatchedLabel(repoLabels, keyword)) {
+            String labelName =
+                    TurboLabel.getMatchedLabelName(repoLabels, keyword).get(0).getActualName();
+            toggleLabel(labelName);
+        }
     }
 
     /**
-     * Gives a new state with the label toggled
-     *
+     * Updates current state based on properties of selected label
      * labelName is case-sensitive
-     *
      * @param labelName
-     * @return
      */
-    public LabelPickerState toggleLabel(String labelName) {
+    public void toggleLabel(String labelName) {
         if (isAnInitialLabel(labelName)) {
             if (isARemovedLabel(labelName)) {
                 // add back initial label
@@ -103,8 +87,6 @@ public class LabelPickerState {
                 addedLabels.add(labelName);
             }
         }
-        return new LabelPickerState(initialLabels, addedLabels, removedLabels, 
-            TurboLabel.getLabelsNameList(repoLabels), repoLabels);
     }
 
     /**
@@ -114,24 +96,21 @@ public class LabelPickerState {
      * The suggestion index will be pointed to the first label that fits the query, if there is.
      *
      * @param query
-     * @return
      */
-    private LabelPickerState updateMatchedLabels(String query) {
+    private void updateMatchedLabels(String query) {
         TurboLabel queryLabel = new TurboLabel("", query);
         List<TurboLabel> newMatchedLabels = repoLabels;
 
         newMatchedLabels = TurboLabel.filterByPartialName(newMatchedLabels, queryLabel.getSimpleName());
         newMatchedLabels = TurboLabel.filterByPartialGroupName(newMatchedLabels, queryLabel.getGroupName());
 
-        OptionalInt newSuggestionIndex;
         if (query.isEmpty() || newMatchedLabels.isEmpty()) {
-            newSuggestionIndex = OptionalInt.empty();
+            currentSuggestionIndex = OptionalInt.empty();
         } else {
-            newSuggestionIndex = OptionalInt.of(0);
+            currentSuggestionIndex = OptionalInt.of(0);
         }
 
-        return new LabelPickerState(initialLabels, addedLabels, removedLabels, 
-            TurboLabel.getLabelsNameList(newMatchedLabels), repoLabels, newSuggestionIndex);
+        matchedLabels = TurboLabel.getLabelsNameList(newMatchedLabels);
     }
 
     /*

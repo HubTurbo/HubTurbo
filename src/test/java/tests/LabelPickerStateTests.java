@@ -18,54 +18,45 @@ public class LabelPickerStateTests {
 
     @Test
     public void determineState_addMatchedLabels() {
-        LabelPickerState initialState = setupState();
-        LabelPickerState nextState = initialState.determineState("f-aa p.high ");
+        LabelPickerState state = setupState("f-aa p.high ", "");
 
-        assertEquals(2, nextState.getAddedLabels().size());
+        assertEquals(2, state.getAddedLabels().size());
     }
 
     @Test
     public void determineState_removeMatchedAddedLabel() {
-        LabelPickerState initialState = setupState();
-        LabelPickerState nextState = initialState.determineState("p.medium ");
-        assertEquals(1, nextState.getAddedLabels().size());
+        LabelPickerState state = setupState("p.medium ", "priority.medium");
 
-        nextState = nextState.determineState("p.medium ");
-        assertEquals(0, nextState.getAddedLabels().size());
+        assertEquals(0, state.getAddedLabels().size());
     }
 
     @Test
     public void determineState_invalidQuery_noChangeToState() {
-        LabelPickerState initialState = setupState("test");
-        LabelPickerState nextState = initialState.determineState("        ");
+        LabelPickerState state = setupState("       ", "test");
 
-        assertEquals(initialState, nextState);
+        assertEquals(0, state.getAddedLabels().size());
     }
 
     @Test
     public void determineState_exclusiveLabels_removeConflictingLabels() {
-        LabelPickerState initialState = setupState("priority.low", "priority.high");
-        assertEquals(2, initialState.getInitialLabels().size());
-        LabelPickerState nextState = initialState.determineState("priority.medium ");
-
-        assertEquals("priority.medium", nextState.getAddedLabels().get(0));
-        assertEquals(1, nextState.getAddedLabels().size());
-        assertEquals(2, nextState.getRemovedLabels().size());
-        assertTrue(nextState.getRemovedLabels().contains("priority.low"));
-        assertTrue(nextState.getRemovedLabels().contains("priority.high"));
+        LabelPickerState state = setupState("p.medium ", "priority.low");
+        assertEquals(1, state.getInitialLabels().size());
+        assertEquals("priority.medium", state.getAddedLabels().get(0));
+        assertEquals(1, state.getAddedLabels().size());
+        assertEquals(1, state.getRemovedLabels().size());
+        assertTrue(state.getRemovedLabels().contains("priority.low"));
     }
 
     @Test
     public void determineState_labelsInSameGroup_oneLabelAssigned() {
-        LabelPickerState initialState = setupState("priority.low", "priority.high");
-        LabelPickerState nextState = initialState.determineState("priority.medium ");
+        LabelPickerState state = setupState("p.medium ", "priority.low", "priority.high");
 
-        assertEquals(1, nextState.getAssignedLabels().size());
+        assertEquals(1, state.getAssignedLabels().size());
     }
 
 
-    public LabelPickerState setupState(String... labelNames) {
-        return new LabelPickerState(getHashSet(labelNames), getTestRepoLabels());
+    public LabelPickerState setupState(String userInput, String... labelNames) {
+        return new LabelPickerState(getHashSet(labelNames), getTestRepoLabels(), userInput);
     }
 
     public List<TurboLabel> getTestRepoLabels() {
