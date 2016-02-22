@@ -1,4 +1,4 @@
-package ui.components.issue_creators;
+package ui.components.issuecreator;
 
 
 import java.io.IOException;

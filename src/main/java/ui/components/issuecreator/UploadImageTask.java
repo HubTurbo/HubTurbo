@@ -1,4 +1,4 @@
-package ui.components.issue_creators;
+package ui.components.issuecreator;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -58,17 +58,17 @@ public class UploadImageTask {
             conn.connect();
             
             // Writing to connection
-            OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+            OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream(), "UTF-8");
             wr.write(data);
             wr.flush();
             
             // Reading response
             StringBuilder stb = new StringBuilder();
             BufferedReader rd = new BufferedReader(
-                    new InputStreamReader(conn.getInputStream()));
+                    new InputStreamReader(conn.getInputStream(), "UTF-8"));
             String line;
             while ((line = rd.readLine()) != null) {
-                stb.append(line).append("\n");
+                stb.append(line).append('\n');
             }
             wr.close();
             rd.close();

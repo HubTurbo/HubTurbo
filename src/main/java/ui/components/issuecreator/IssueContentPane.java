@@ -1,4 +1,4 @@
-package ui.components.issue_creators;
+package ui.components.issuecreator;
 
 import java.util.Comparator;
 import java.util.List;
@@ -117,7 +117,8 @@ public class IssueContentPane extends StackPane {
             if (paste.isPresent()) {
                 new UploadImageTask(paste.get()).response.ifPresent(json -> {
                     try {
-                        body.appendText(" " + String.format(IMAGE_LINK, ((JSONObject) json.get("data")).getString("link")));
+                        body.appendText(" " + String.format(
+                            IMAGE_LINK, ((JSONObject) json.get("data")).getString("link")));
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }

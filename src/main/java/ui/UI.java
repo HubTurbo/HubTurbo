@@ -35,7 +35,7 @@ import prefs.Preferences;
 import ui.components.HTStatusBar;
 import ui.components.KeyboardShortcuts;
 import ui.components.StatusUI;
-import ui.components.issue_creators.IssueCreator;
+import ui.components.issuecreator.IssueCreator;
 import ui.components.pickers.LabelPicker;
 import ui.issuepanel.PanelControl;
 import undo.UndoController;

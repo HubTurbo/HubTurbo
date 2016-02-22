@@ -5,21 +5,16 @@ import static org.junit.Assert.*;
 import java.util.Optional;
 
 import javafx.application.Platform;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import guitests.UITest;
 
-import org.controlsfx.control.NotificationPane;
 import org.fxmisc.richtext.InlineCssTextArea;
 import org.junit.Test;
 
 import backend.resource.TurboIssue;
-import backend.resource.TurboLabel;
 import ui.UI;
-import ui.components.issue_creators.IssueContentPane;
 import ui.listpanel.ListPanelCell;
-import util.PlatformEx;
 import util.events.ShowIssueCreatorEvent;
 
 public class IssueCreatorTest extends UITest {

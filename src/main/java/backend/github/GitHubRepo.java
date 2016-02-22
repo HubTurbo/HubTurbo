@@ -19,7 +19,7 @@ import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.MilestoneService;
 
 import ui.UI;
-import ui.components.issue_creators.IssueCreatorPresenter;
+import ui.components.issuecreator.IssueCreatorPresenter;
 import util.HTLog;
 import util.events.UpdateProgressEvent;
 

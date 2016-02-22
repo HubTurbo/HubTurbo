@@ -7,7 +7,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import backend.resource.Model;
 import backend.resource.TurboIssue;
-import ui.components.issue_creators.IssueCreatorPresenter;
+import ui.components.issuecreator.IssueCreatorPresenter;
 
 public class IssueCreatorLogicTest {
 

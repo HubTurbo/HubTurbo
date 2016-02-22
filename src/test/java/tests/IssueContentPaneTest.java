@@ -1,14 +1,11 @@
 package tests;
 
-import static org.junit.Assert.*;
-
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import ui.components.issue_creators.IssueContentPane;
-import ui.components.issue_creators.IssueCreatorPresenter;
+import ui.components.issuecreator.IssueContentPane;
+import ui.components.issuecreator.IssueCreatorPresenter;
 
 public class IssueContentPaneTest {
 
