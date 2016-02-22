@@ -2,6 +2,7 @@ package prefs;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import util.RepoConfig;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -15,7 +16,6 @@ import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.Optional;
 
 /**
  * Abstractions for the contents of the global config file.
@@ -33,6 +33,15 @@ public class GlobalConfig {
     private final Map<String, List<PanelInfo>> savedBoards = new LinkedHashMap<>();
     private final Map<String, Map<Integer, LocalDateTime>> markedReadTimes = new HashMap<>();
     private Map<String, String> keyboardShortcuts = new HashMap<>();
+    private final RepoConfig repoConfig = new RepoConfig();
+
+    /**
+     * Returns the repo configuration as a RepoConfig object.
+     */
+    public RepoConfig getRepoConfig() {
+        logger.info("Number of alias mappings: " + repoConfig.getAliasCount());
+        return repoConfig;
+    }
 
     public Map<String, String> getKeyboardShortcuts() {
         return new HashMap<>(keyboardShortcuts);

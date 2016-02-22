@@ -1,8 +1,6 @@
 package tests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static util.Utility.dateToLocalDateTime;
 import static util.Utility.formatDateISO8601;
 import static util.Utility.localDateTimeToDate;
@@ -24,6 +22,22 @@ import org.junit.Test;
 import util.Utility;
 
 public class UtilityTest {
+
+    @Test
+    public void wellFormedRepoAliasTest() {
+
+        // "OK" repo aliases are alphanumeric only, i.e. they match the regex ^[a-zA-Z0-9]*$
+        final String REPO_ALIAS_OK_1 = "ht";
+        final String REPO_ALIAS_OK_2 = "dhas7h2k8uhaksd81hda";
+
+        // "NOK" is not ok, they are not only alphanumeric, so they should contain at least one banned character.
+        final String REPO_ALIAS_NOK_1 = "hubturbo/hubturbo";
+
+        assertTrue(Utility.isWellFormedRepoAlias(REPO_ALIAS_OK_1));
+        assertTrue(Utility.isWellFormedRepoAlias(REPO_ALIAS_OK_2));
+
+        assertFalse(Utility.isWellFormedRepoAlias(REPO_ALIAS_NOK_1));
+    }
 
     @Test
     public void parseVersionNumberTest() {

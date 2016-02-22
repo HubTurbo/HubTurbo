@@ -1,6 +1,7 @@
 package prefs;
 
 import org.eclipse.egit.github.core.RepositoryId;
+import util.RepoConfig;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -190,5 +191,12 @@ public class Preferences { // NOPMD
 
     public void setKeyboardShortcuts(Map<String, String> keyboardShortcuts) {
         global.setKeyboardShortcuts(keyboardShortcuts);
+    }
+
+    /**
+     * Returns the repo configuration as a RepoConfig object.
+     */
+    public RepoConfig getRepoConfig() {
+        return global.getRepoConfig();
     }
 }

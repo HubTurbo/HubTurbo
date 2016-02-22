@@ -5,6 +5,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
+import util.RepoConfig;
 import util.Utility;
 
 import static ui.components.KeyboardShortcuts.REMOVE_FOCUS;
@@ -42,11 +43,14 @@ public class RepositorySelector extends HBox {
                 return;
             }
 
-            String repoId = Utility.removeAllWhitespace(newVal);
-            if (!repoId.equals(newVal)) {
-                comboBox.setValue(repoId);
+            String repoIdOrAlias = Utility.removeAllWhitespace(newVal);
+            if (!repoIdOrAlias.equals(newVal)) {
+                comboBox.setValue(repoIdOrAlias);
                 return;
             }
+
+            RepoConfig repoConfig = UI.prefs.getRepoConfig();
+            String repoId = repoConfig.resolveRepoId(repoIdOrAlias);
 
             if (Utility.isWellFormedRepoId(repoId) && !changesDisabled) {
                 onValueChangeCallback.accept(repoId);
@@ -70,7 +74,7 @@ public class RepositorySelector extends HBox {
     }
 
     private void loadContents() {
-        comboBox.getItems().addAll(ui.logic.getStoredRepos());
+        comboBox.getItems().addAll(ui.logic.getStoredReposWithAlias());
         comboBox.getItems().sort(String.CASE_INSENSITIVE_ORDER);
     }
 

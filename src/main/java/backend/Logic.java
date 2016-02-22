@@ -14,7 +14,7 @@ import ui.TestController;
 import ui.UI;
 import util.Futures;
 import util.HTLog;
-import util.Utility;
+import util.RepoConfig;
 import util.events.RepoOpenedEvent;
 import util.events.RepoOpeningEvent;
 import util.events.testevents.ClearLogicModelEvent;
@@ -101,8 +101,16 @@ public class Logic {
         return openRepository(repoId, false);
     }
 
-    private CompletableFuture<Boolean> openRepository(String repoId, boolean isPrimaryRepository) {
-        assert Utility.isWellFormedRepoId(repoId);
+    /**
+     * Opens the repository represented by a repo id or alias.
+     * @param repoIdOrAlias A string that is either a repo id or a repo alias
+     * @param isPrimaryRepository True if the repo in repoIdOrAlias is the primary repository
+     * @return A CompletableFuture (Boolean) indicating if the opening succeeded
+     */
+    private CompletableFuture<Boolean> openRepository(String repoIdOrAlias, boolean isPrimaryRepository) {
+        // First resolves the given string to a repo id.
+        final String repoId = prefs.getRepoConfig().resolveRepoId(repoIdOrAlias);
+
         if (isPrimaryRepository) prefs.setLastViewedRepository(repoId);
         if (isAlreadyOpen(repoId) || models.isRepositoryPending(repoId)) {
             // The content of panels with an empty filter text should change when the primary repo is changed.
@@ -143,6 +151,16 @@ public class Logic {
 
     public Set<String> getStoredRepos() {
         return repoIO.getStoredRepos().stream().collect(Collectors.toSet());
+    }
+
+    /**
+     * Gets the repo ids of the stored repos, but replaces the repo id with its alias if it has one
+     */
+    public Set<String> getStoredReposWithAlias() {
+        return repoIO.getStoredRepos().stream().map(repoId -> {
+            RepoConfig repoConfig = prefs.getRepoConfig();
+            return repoConfig.hasRepoAlias(repoId) ? repoConfig.getRepoAlias(repoId) : repoId;
+        }).collect(Collectors.toSet());
     }
 
     public boolean isAlreadyOpen(String repoId) {
