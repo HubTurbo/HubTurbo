@@ -120,7 +120,7 @@ public final class BoardNameDialog extends Dialog<String> {
             String newName = nameField.getText().trim();
             if (nameField.getText().length() > BOARD_MAX_NAME_LENGTH) {
                 nameField.setText(previousText);
-                errorText.setText(ERROR_LONG_NAME);
+                errorText.setText(String.format(ERROR_LONG_NAME, BOARD_MAX_NAME_LENGTH));
                 submitButton.setDisable(false);
             } else if (isBoardNameInvalid(newName)) {
                 errorText.setText(ERROR_INVALID_NAME);
