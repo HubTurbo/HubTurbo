@@ -1,6 +1,15 @@
 
 # Changelog
 
+# V3.20.0
+
+- Added menu item for creating a new board
+- A board is opened on startup for new users
+- Issue cards will now update more accurately if a label update failed to go through
+- Improved filter error-handling
+- If there is only one open milestone, it will be considered as the current milestone in filters
+- Fixed a bug with long board names
+
 # V3.19.0
 
 - Fixed HT not refreshing when the undo notification was visible

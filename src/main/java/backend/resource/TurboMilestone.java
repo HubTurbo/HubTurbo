@@ -5,7 +5,10 @@ import org.eclipse.egit.github.core.Milestone;
 import util.Utility;
 
 import java.time.LocalDate;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("unused")
 public class TurboMilestone {
@@ -81,6 +84,65 @@ public class TurboMilestone {
     }
 
     private void ______METHODS______() {
+    }
+
+    public boolean isOverdue() {
+        return dueDate.isPresent() && dueDate.get().isBefore(LocalDate.now());
+    }
+
+    public boolean hasOpenIssues() {
+        return openIssues > 0;
+    }
+
+    /**
+     * A milestone is ongoing if it is open and not due yet or if it is overdue but still open and has open issues.
+     */
+    public boolean isOngoing() {
+        return isOpen() && (!isOverdue() || hasOpenIssues());
+    }
+
+    public static List<TurboMilestone> filterMilestonesOfRepos(List<TurboMilestone> milestones,
+                                                               List<String> repoIds) {
+        return milestones.stream()
+                .filter(ms -> repoIds.contains(ms.getRepoId().toLowerCase()))
+                .collect(Collectors.toList());
+    }
+
+    public static List<TurboMilestone> filterOpenMilestones(List<TurboMilestone> milestones) {
+        return milestones.stream()
+                .filter(TurboMilestone::isOpen)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Condition: milestone must have due dates
+     */
+    public static Comparator<TurboMilestone> getDueDateComparator() {
+        return (a, b) -> {
+            assert a.getDueDate().isPresent();
+            assert b.getDueDate().isPresent();
+            LocalDate aDueDate = a.getDueDate().get();
+            LocalDate bDueDate = b.getDueDate().get();
+            return aDueDate.compareTo(bDueDate);
+        };
+    }
+
+    /**
+     * Sort a List<TurboMilestone> by due date. Milestones without due date are considered to
+     * have an imaginary due date in the far future. The sorting algorithm used is stable
+     * (i.e. relative ordering of 2 milestones with the same due date will be retained)
+     */
+    public static List<TurboMilestone> sortByDueDate(List<TurboMilestone> milestones) {
+        List<TurboMilestone> milestonesWithDueDate = milestones.stream()
+                .filter(ms -> ms.getDueDate().isPresent())
+                .sorted(getDueDateComparator())
+                .collect(Collectors.toList());
+        List<TurboMilestone> milestonesWithoutDueDate = milestones.stream()
+                .filter(ms -> !ms.getDueDate().isPresent())
+                .collect(Collectors.toList());
+        List<TurboMilestone> result = milestonesWithDueDate;
+        result.addAll(milestonesWithoutDueDate);
+        return result;
     }
 
     @Override

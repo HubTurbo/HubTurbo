@@ -1,13 +1,11 @@
-package unstable;
+package guitests;
 
-import guitests.UITest;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
 
-import static org.junit.Assert.assertEquals;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 
 public class ValidLoginTest extends UITest {
 
@@ -19,14 +17,14 @@ public class ValidLoginTest extends UITest {
     @Test
     public void validLoginTest() throws InterruptedException {
         TextField repoOwnerField = find("#repoOwnerField");
-        doubleClick(repoOwnerField);
-        doubleClick(repoOwnerField);
+        click(repoOwnerField);
+        selectAll();
         type("test").push(KeyCode.TAB);
         type("test").push(KeyCode.TAB);
         type("test").push(KeyCode.TAB);
         type("test");
         click("Sign in");
         ComboBox<String> repositorySelector = findOrWaitFor("#repositorySelector");
-        assertEquals("test/test", repositorySelector.getValue());
+        awaitCondition(() -> "test/test".equals(repositorySelector.getValue()));
     }
 }

@@ -11,14 +11,14 @@ import static util.Futures.chain;
 /**
  * This class represents a repository operation that replaces a list of labels assigned to an issue
  */
-public class ReplaceIssueLabelsOp implements RepoOp<List<String>> {
+public class ReplaceIssueLabelsOp implements RepoOp<Boolean> {
 
     private final RepoIO repoIO;
     private final TurboIssue issue;
     private final List<String> labels;
-    private final CompletableFuture<List<String>> result;
+    private final CompletableFuture<Boolean> result;
 
-    public ReplaceIssueLabelsOp(RepoIO repoIO, CompletableFuture<List<String>> result,
+    public ReplaceIssueLabelsOp(RepoIO repoIO, CompletableFuture<Boolean> result,
                                 TurboIssue issue, List<String> labels) {
         this.repoIO = repoIO;
         this.result = result;
@@ -33,7 +33,7 @@ public class ReplaceIssueLabelsOp implements RepoOp<List<String>> {
     }
 
     @Override
-    public CompletableFuture<List<String>> perform() {
+    public CompletableFuture<Boolean> perform() {
         return repoIO.replaceIssueLabels(issue, labels)
                 .thenApply(chain(result));
     }

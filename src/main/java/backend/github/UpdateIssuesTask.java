@@ -40,7 +40,7 @@ public class UpdateIssuesTask extends GitHubRepoTask<GitHubRepoTask.Result<Turbo
 
         List<TurboIssue> updated = updatedIssues.isEmpty()
             ? existing
-            : TurboIssue.reconcile(model.getRepoId(), existing, updatedIssues);
+            : TurboIssue.reconcile(existing, updatedIssues);
         updated = TurboIssue.combineWithPullRequests(updated, updatedPullRequests);
 
         response.complete(new Result<>(updated, changes.middle, changes.right));

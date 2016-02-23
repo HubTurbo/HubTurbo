@@ -153,7 +153,7 @@ Aliases: `desc`, `description`
 
 Matches all issues associated with any milestones whose names contain the given string.
 
-`current` or `curr` can be used to refer to an open milestone with earliest due date, or an overdue open milestone with open issues if any. `curr-2`, `curr-1`, `curr+1`, `curr+2`, etc. (no space before or after `-`/`+`) can then be used to refer to milestones before or after `current`, sorted by due date. Milestones with no due date will not be considered in resolving `curr`/`current`. If there is no open milestone, `current` will refer to no milestone, while `current-1` will refer to the last closed milestone.
+`current` or `curr` can be used to refer to an open milestone with earliest due date, or an overdue open milestone with open issues if any. However, if there is only one open milestone, it will be considered as the `current` milestone even if it does not have due date. `curr-2`, `curr-1`, `curr+1`, `curr+2`, etc. (no space before or after `-`/`+`) can then be used to refer to milestones before or after `current`, sorted by due date. If there is no open milestone, `current` will refer to no milestone, while `current-1` will refer to the last closed milestone.
 
 Aliases: `m`
 

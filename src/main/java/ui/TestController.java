@@ -58,12 +58,21 @@ public final class TestController {
                         isTestJSONEnabled() ||
                         isTestChromeDriver() ||
                         isTestGlobalConfig() ||
+                        shouldTestStartupBoard() ||
                         isCloseOnQuit());
     }
 
     public static boolean isTestGlobalConfig() {
         return hasUI() && commandLineArgs.getOrDefault("testconfig", "false").equalsIgnoreCase("true");
     }
+
+    /**
+     * Determines whether the startup board should be tested using command line arguments.
+     */
+    public static boolean shouldTestStartupBoard() {
+        return hasUI() && commandLineArgs.getOrDefault("startupboard", "false").equalsIgnoreCase("true");
+    }
+
 
     // When --bypasslogin=true is passed as an argument, the username and password
     // are empty strings.
@@ -83,6 +92,15 @@ public final class TestController {
     // tests to fail).
     public static boolean isCloseOnQuit() {
         return hasUI() && commandLineArgs.getOrDefault("closeonquit", "false").equalsIgnoreCase("true");
+    }
+
+    /**
+     * Returns true if HubTurbo is not being run on Test mode or if startup board creation is being tested.
+     * As for the other tests, they start on a clean state with dummy repos established
+     * so don't need boards created on startup.
+     */
+    public static boolean shouldOpenSampleBoard() {
+        return !isTestMode() || shouldTestStartupBoard();
     }
 
     /**
