@@ -1,19 +1,19 @@
 package unstable;
 
+import static org.junit.Assert.assertEquals;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
+
 import org.junit.Test;
+import org.loadui.testfx.utils.FXTestUtils;
 
 import guitests.UITest;
-import org.loadui.testfx.utils.FXTestUtils;
 import ui.UI;
 import ui.listpanel.ListPanel;
 import util.PlatformEx;
 import util.events.testevents.UILogicRefreshEvent;
 import util.events.testevents.UpdateDummyRepoEvent;
-
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
-
-import static org.junit.Assert.assertEquals;
 
 public class ModelUpdateUITest extends UITest {
 
@@ -25,66 +25,66 @@ public class ModelUpdateUITest extends UITest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    public void addIssueTest() throws InterruptedException, ExecutionException {
+    public void modelUpdate_panel_addedIssuesShowUp()
+        throws InterruptedException, ExecutionException {
         resetRepo();
         addIssue();
-        FutureTask countIssues = new FutureTask(((ListPanel) find("#dummy/dummy_col0"))::getIssueCount);
+        FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssueCount);
         PlatformEx.runAndWait(countIssues);
-        assertEquals(11, countIssues.get());
+        assertEquals(11, countIssues.get().intValue());
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    public void addMultipleIssuesTest() throws InterruptedException, ExecutionException {
+    public void modelUpdate_panel_multipleAddedIssuesShowUp()
+        throws InterruptedException, ExecutionException {
         resetRepo();
         addIssue();
         addIssue();
         addIssue();
-        FutureTask countIssues = new FutureTask(((ListPanel) find("#dummy/dummy_col0"))::getIssueCount);
+        FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssueCount);
         PlatformEx.runAndWait(countIssues);
-        assertEquals(13, countIssues.get());
+        assertEquals(13, countIssues.get().intValue());
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    public void countIssuesTest() throws InterruptedException, ExecutionException {
+    public void modelUpdate_panel_correctNumberOfIssuesShown()
+        throws InterruptedException, ExecutionException {
         addIssue();
         resetRepo();
-        FutureTask countIssues = new FutureTask(((ListPanel) find("#dummy/dummy_col0"))::getIssueCount);
+        FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssueCount);
         PlatformEx.runAndWait(countIssues);
-        assertEquals(10, countIssues.get());
+        assertEquals(10, countIssues.get().intValue());
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    public void deleteIssueTest() throws InterruptedException, ExecutionException {
+    public void modelUpdate_panel_deletedIssuesNoLongerShowUp()
+        throws InterruptedException, ExecutionException {
         resetRepo();
         addIssue();
         addIssue();
         deleteIssue(1);
-        FutureTask countIssues = new FutureTask(((ListPanel) find("#dummy/dummy_col0"))::getIssueCount);
+        FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssueCount);
         PlatformEx.runAndWait(countIssues);
-        assertEquals(11, countIssues.get());
+        assertEquals(11, countIssues.get().intValue());
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    public void deleteMultipleIssuesTest() throws InterruptedException, ExecutionException {
+    public void modelUpdate_panel_multipleDeletedIssuesNoLongerShowUp()
+        throws InterruptedException, ExecutionException {
         resetRepo();
         addIssue();
         addIssue();
         addIssue();
         deleteIssue(1);
         deleteIssue(2);
-        FutureTask countIssues = new FutureTask(((ListPanel) find("#dummy/dummy_col0"))::getIssueCount);
+        FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssueCount);
         PlatformEx.runAndWait(countIssues);
-        assertEquals(11, countIssues.get());
+        assertEquals(11, countIssues.get().intValue());
     }
 
     // TODO no way to check correctness of these events as of yet as they are not reflected on the UI
     @Test
-    public void otherTriggersTest() throws InterruptedException, ExecutionException {
+    public void modelUpdate_events_eventsTriggerChanges() throws InterruptedException, ExecutionException {
         UI.events.triggerEvent(UpdateDummyRepoEvent.newLabel("dummy/dummy"));
         UI.events.triggerEvent(new UILogicRefreshEvent());
         sleep(EVENT_DELAY);
@@ -113,18 +113,18 @@ public class ModelUpdateUITest extends UITest {
         sleep(EVENT_DELAY);
     }
 
-    public void resetRepo() {
+    private void resetRepo() {
         UI.events.triggerEvent(UpdateDummyRepoEvent.resetRepo("dummy/dummy"));
         sleep(EVENT_DELAY);
     }
 
-    public void addIssue() {
+    private void addIssue() {
         UI.events.triggerEvent(UpdateDummyRepoEvent.newIssue("dummy/dummy"));
         UI.events.triggerEvent(new UILogicRefreshEvent());
         sleep(EVENT_DELAY);
     }
 
-    public void deleteIssue(int itemId) {
+    private void deleteIssue(int itemId) {
         UI.events.triggerEvent(UpdateDummyRepoEvent.deleteIssue("dummy/dummy", itemId));
         UI.events.triggerEvent(new UILogicRefreshEvent());
         sleep(EVENT_DELAY);
