@@ -1,9 +1,5 @@
 package util;
 
-import java.awt.Dimension;
-import java.awt.GraphicsEnvironment;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,8 +15,6 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import javax.swing.UIManager;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -265,29 +259,6 @@ public final class Utility {
         }
         m.appendTail(sb);
         return sb.toString();
-    }
-
-    public static Rectangle getScreenDimensions() {
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        return new Rectangle((int) screenSize.getWidth(), (int) screenSize.getHeight());
-    }
-
-    public static Optional<Rectangle> getUsableScreenDimensions() {
-        try {
-            if (PlatformSpecific.isOnLinux()) {
-                UIManager.setLookAndFeel(
-                    UIManager.getCrossPlatformLookAndFeelClassName());
-            } else {
-                UIManager.setLookAndFeel(
-                    UIManager.getSystemLookAndFeelClassName());
-            }
-
-            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-            return Optional.of(ge.getMaximumWindowBounds());
-        } catch (Exception e) {
-            logger.error(e.getLocalizedMessage(), e);
-        }
-        return Optional.empty();
     }
 
     public static boolean containsIgnoreCase(String source, String query) {

@@ -2,11 +2,11 @@ package tests;
 
 import browserview.BrowserComponent;
 import javafx.scene.layout.Region;
-import javafx.stage.Screen;
 import org.junit.Test;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
+import ui.ScreenManager;
 import ui.UI;
 
 import java.awt.Rectangle;
@@ -16,20 +16,22 @@ import java.util.List;
 
 import static org.mockito.Mockito.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-public class ResizeTests {
+
+public class ScreenManagerTests {
 
     /**
      * Tests whether the bView is placed next to the pView when it is at default size.
      */
     @Test
     public void resizeBview_MinimumPViewSize_AdjacentBView() {
-        UI mockedUI = getMockedUI(200.0, 1600, 1400, 2400);
+        ScreenManager mockedScreenManager = getMockedScreenManager(200.0, 1600, 1400, 2400);
         WebDriver.Window mockedWindow = mock(WebDriver.Window.class);
         WebDriver.Options mockedManage = getMockedOptions(mockedWindow);
 
-        BrowserComponent testBrowserComponent = new BrowserComponent(mockedUI, false);
-        testBrowserComponent.setWindowSize(mockedManage);
+        BrowserComponent testBrowserComponent = new BrowserComponent(null, mockedScreenManager, false);
+        testBrowserComponent.setWindowBounds(mockedManage);
 
         verify(mockedWindow).setPosition(new Point(200, 0));
         verify(mockedWindow).setSize(new Dimension(1400, 2400));
@@ -41,12 +43,12 @@ public class ResizeTests {
      */
     @Test
     public void resizeBview_MediumPViewSize_AdjacentBView() {
-        UI mockedUI = getMockedUI(1439.0, 1600, 161, 2400);
+        ScreenManager mockedScreenManager = getMockedScreenManager(1439.0, 1600, 161, 2400);
         WebDriver.Window mockedWindow = mock(WebDriver.Window.class);
         WebDriver.Options mockedManage = getMockedOptions(mockedWindow);
 
-        BrowserComponent testBrowserComponent = new BrowserComponent(mockedUI, false);
-        testBrowserComponent.setWindowSize(mockedManage);
+        BrowserComponent testBrowserComponent = new BrowserComponent(null, mockedScreenManager, false);
+        testBrowserComponent.setWindowBounds(mockedManage);
 
         verify(mockedWindow).setPosition(new Point(1439, 0));
         verify(mockedWindow).setSize(new Dimension(161, 2400));
@@ -57,12 +59,12 @@ public class ResizeTests {
      */
     @Test
     public void resizeBview_OversizedPView_MaximiseBView() {
-        UI mockedUI = getMockedUI(1440.0, 1600, 160, 2400);
+        ScreenManager mockedScreenManager = getMockedScreenManager(1440.0, 1600, 160, 2400);
         WebDriver.Window mockedWindow = mock(WebDriver.Window.class);
         WebDriver.Options mockedManage = getMockedOptions(mockedWindow);
 
-        BrowserComponent testBrowserComponent = new BrowserComponent(mockedUI, false);
-        testBrowserComponent.setWindowSize(mockedManage);
+        BrowserComponent testBrowserComponent = new BrowserComponent(null, mockedScreenManager, false);
+        testBrowserComponent.setWindowBounds(mockedManage);
 
         verify(mockedWindow).setPosition(new Point(0, 0));
         verify(mockedWindow).setSize(new Dimension(1600, 2400));
@@ -73,15 +75,31 @@ public class ResizeTests {
      */
     @Test
     public void resizeBview_FullscreenPView_MaximisedBView() {
-        UI mockedUI = getMockedUI(1600.0, 1600, 0, 2400);
+        ScreenManager mockedScreenManager = getMockedScreenManager(1600.0, 1600, 0, 2400);
         WebDriver.Window mockedWindow = mock(WebDriver.Window.class);
         WebDriver.Options mockedManage = getMockedOptions(mockedWindow);
 
-        BrowserComponent testBrowserComponent = new BrowserComponent(mockedUI, false);
-        testBrowserComponent.setWindowSize(mockedManage);
+        BrowserComponent testBrowserComponent = new BrowserComponent(null, mockedScreenManager, false);
+        testBrowserComponent.setWindowBounds(mockedManage);
 
         verify(mockedWindow).setPosition(new Point(0, 0));
         verify(mockedWindow).setSize(new Dimension(1600, 2400));
+    }
+
+    /**
+     * Tests whether the bView snaps to the correct position when pView is out of position.
+     */
+    @Test
+    public void resizeBview_OutOfPositionPView_SnappedBView() {
+        ScreenManager mockedScreenManager = getMockedScreenManager(800.0, 1600, 400, 2400);
+        WebDriver.Window mockedWindow = mock(WebDriver.Window.class);
+        WebDriver.Options mockedManage = getMockedOptions(mockedWindow);
+
+        BrowserComponent testBrowserComponent = new BrowserComponent(null, mockedScreenManager, false);
+        testBrowserComponent.setWindowBounds(mockedManage);
+
+        verify(mockedWindow).setPosition(new Point(800, 0));
+        verify(mockedWindow).setSize(new Dimension(400, 2400));
     }
 
     /**
@@ -91,7 +109,7 @@ public class ResizeTests {
     @Test
     public void getPviewBounds_NoIntersectingScreens_EmptyBounds() {
         List<Rectangle2D> emptyScreenBoundsList = new ArrayList<>();
-        Region emptyBounds = UI.getStageBounds(emptyScreenBoundsList);
+        Region emptyBounds = ScreenManager.getStageBounds(emptyScreenBoundsList);
 
         assertEquals(Region.USE_COMPUTED_SIZE, emptyBounds.getMaxWidth(), 0.0);
         assertEquals(Region.USE_COMPUTED_SIZE, emptyBounds.getMaxHeight(), 0.0);
@@ -108,7 +126,7 @@ public class ResizeTests {
         List<Rectangle2D> screenBoundsList = new ArrayList<>();
         screenBoundsList.add(screenBound);
 
-        Region stageBounds = UI.getStageBounds(screenBoundsList);
+        Region stageBounds = ScreenManager.getStageBounds(screenBoundsList);
 
         assertEquals(screenBound.getWidth(), stageBounds.getMaxWidth(), 0.0);
         assertEquals(screenBound.getHeight(), stageBounds.getMaxHeight(), 0.0);
@@ -132,7 +150,7 @@ public class ResizeTests {
         screenBoundsList.add(mediumScreenBound);
         screenBoundsList.add(smallScreenBound);
 
-        Region stageBounds = UI.getStageBounds(screenBoundsList);
+        Region stageBounds = ScreenManager.getStageBounds(screenBoundsList);
 
         assertEquals(bigScreenBound.getWidth() + mediumScreenBound.getWidth() + smallScreenBound.getWidth(),
                 stageBounds.getMaxWidth(), 0.0);
@@ -140,22 +158,29 @@ public class ResizeTests {
         assertEquals(smallScreenBound.getHeight(), stageBounds.getMinHeight(), 0.0);
     }
 
+    @Test(timeout = 5000)
+    public void testGettingLookAndFeelOnLinux() {
+        assertTrue(ScreenManager.getUsableScreenDimensions().isPresent());
+        assertTrue(ScreenManager.getScreenDimensions() != null);
+    }
+
     /**
-     * Produces a mocked UI object that responds to getDimensions and getAvailableDimensions based
+     * Produces a mocked ScreenManager object that responds to getDimensions and getAvailableDimensions based
      * on information provided as parameters.
      *
      * @param pViewX The x-coordinate of the top right corner of the pView window.
      * @param maxWidth The width of the screen.
      * @param availableWidth The width of the space on the right of the pView window.
      * @param height The height of the screen.
-     * @return The mocked UI object.
+     * @return The mocked ScreenManager object.
      */
-    private static UI getMockedUI(double pViewX, int maxWidth, int availableWidth, int height) {
-        UI mockedUI = mock(UI.class);
-        when(mockedUI.getAvailableDimensions()).thenReturn(new Rectangle(availableWidth, height));
-        when(mockedUI.getCollapsedX()).thenReturn(pViewX);
-        when(mockedUI.getDimensions()).thenReturn(new Rectangle(0, 0, maxWidth, height));
-        return mockedUI;
+    private static ScreenManager getMockedScreenManager(double pViewX, int maxWidth, int availableWidth, int height) {
+        ScreenManager mockedScreenManager = mock(ScreenManager.class);
+        when(mockedScreenManager.getAvailableDimensions()).thenReturn(new Rectangle(availableWidth, height));
+        when(mockedScreenManager.getCollapsedX()).thenReturn(pViewX);
+        when(mockedScreenManager.getDimensions()).thenReturn(new Rectangle(0, 0, maxWidth, height));
+        when(mockedScreenManager.getBrowserComponentBounds()).thenCallRealMethod();
+        return mockedScreenManager;
     }
 
     /**

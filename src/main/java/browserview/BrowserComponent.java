@@ -3,6 +3,7 @@ package browserview;
 import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef.HWND;
 import com.sun.jna.platform.win32.WinUser;
+import javafx.geometry.Rectangle2D;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
@@ -12,6 +13,7 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.os.Kernel32;
+import ui.ScreenManager;
 import ui.UI;
 import util.GitHubURL;
 import util.GithubPageElements;
@@ -53,11 +55,8 @@ public class BrowserComponent {
     private static HWND browserWindowHandle;
     private static User32 user32;
 
-    // The minimum fraction of available width to total screen width for the browser to be
-    // resized to available width.
-    private static final double maximiseThreshold = 0.1;
-
     private final UI ui;
+    private final ScreenManager screenManager;
     private ChromeDriverEx driver = null;
 
     // We want browser commands to be run on a separate thread, but not to
@@ -72,8 +71,10 @@ public class BrowserComponent {
     // at the moment.
     private final Executor executor;
 
-    public BrowserComponent(UI ui, boolean isTestChromeDriver) {
+    public BrowserComponent(UI ui, ScreenManager screenManager, boolean isTestChromeDriver) {
         this.ui = ui;
+        this.screenManager = screenManager;
+
         executor = Executors.newSingleThreadExecutor();
         this.isTestChromeDriver = isTestChromeDriver;
         setupJNA();
@@ -128,27 +129,26 @@ public class BrowserComponent {
             options.addArguments(String.format("user-agent=\"%s\"", MOBILE_USER_AGENT));
         }
         ChromeDriverEx driver = new ChromeDriverEx(options, isTestChromeDriver);
-        WebDriver.Options manage = driver.manage();
+        WebDriver.Options driverOptions = driver.manage();
         if (!isTestChromeDriver) {
-            setWindowSize(manage);
+            setWindowBounds(driverOptions);
             initialiseJNA();
         }
         return driver;
     }
 
-    public void setWindowSize(WebDriver.Options manage) {
-        Rectangle availableDimensions = ui.getAvailableDimensions();
-        Rectangle screenDimensions = ui.getDimensions();
+    /**
+     * Positions the browser component according to the main window's position and size.
+     *
+     * @param driverOptions The options object belonging to the WebDriver managing the current Chrome window.
+     */
+    public void setWindowBounds(WebDriver.Options driverOptions) {
+        Rectangle windowBounds = screenManager.getBrowserComponentBounds();
 
-        if (availableDimensions.getWidth() > maximiseThreshold * screenDimensions.getWidth()) {
-            manage.window().setPosition(new Point((int) ui.getCollapsedX(), 0));
-            manage.window().setSize(new Dimension((int) ui.getAvailableDimensions().getWidth(),
-                    (int) ui.getAvailableDimensions().getHeight()));
-        } else {
-            manage.window().setPosition(new Point(0, 0));
-            manage.window().setSize(new Dimension((int) ui.getDimensions().getWidth(),
-                    (int) ui.getAvailableDimensions().getHeight()));
-        }
+        driverOptions.window().setPosition(new Point((int) windowBounds.getX(),
+                                                     (int) windowBounds.getY()));
+        driverOptions.window().setSize(new Dimension((int) windowBounds.getWidth(),
+                                                     (int) windowBounds.getHeight()));
     }
 
     private void removeChromeDriverIfNecessary() {
