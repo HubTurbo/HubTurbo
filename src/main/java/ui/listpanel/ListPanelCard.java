@@ -267,26 +267,33 @@ public class ListPanelCard extends VBox {
         return userBox;
     }
 
-    private void addAvatarIfPresent(HBox authorBox, Optional<TurboUser> user) {
+    private void addAvatarIfPresent(HBox userBox, Optional<TurboUser> user) {
         if (!user.isPresent()) return;
-        ImageView authorAvatar = getAuthorAvatar(user.get());
-        authorBox.getChildren().add(authorAvatar);
+        ImageView userAvatar = getAvatar(user.get());
+        userBox.getChildren().add(userAvatar);
     }
 
     private HBox setupUserBox() {
-        HBox authorBox = new HBox();
-        authorBox.setAlignment(Pos.BASELINE_CENTER);
-        return authorBox;
+        HBox userBox = new HBox();
+        userBox.setAlignment(Pos.BASELINE_CENTER);
+        return userBox;
     }
 
-    private ImageView getAuthorAvatar(TurboUser user) {
-        ImageView authorAvatar = new ImageView();
-        if (user.getAvatarURL().length() != 0) {
-            Image image = user.getAvatar();
-            assert image != null;
-            authorAvatar.setImage(image);
+    /**
+     * Attempts to get the TurboUser's avatar
+     *
+     * Returns an empty ImageView if avatar image obtained from TurboUser is null
+     *
+     * @param user
+     * @return ImageView that contains the avatar image if it exists
+     */
+    private ImageView getAvatar(TurboUser user) {
+        ImageView userAvatar = new ImageView();
+        Image userAvatarImage = user.getAvatarImage();
+        if (userAvatarImage != null) {
+            userAvatar.setImage(userAvatarImage);
         }
-        return authorAvatar;
+        return userAvatar;
     }
 
 }

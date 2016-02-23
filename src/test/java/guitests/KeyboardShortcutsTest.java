@@ -134,10 +134,10 @@ public class KeyboardShortcutsTest extends UITest {
         // test shortcut on repo dropdown
         doubleClick(repoSelectorComboBox);
         pushKeys(SWITCH_DEFAULT_REPO);
-        waitUntilNodeAppears("#dummy/dummy_col1_8");
+        waitUntilNodeAppears("#dummy/dummy_col1_1");
         assertEquals(repoSelectorComboBox.getValue(), "dummy/dummy");
         // test shortcut when focus is on panel
-        click("#dummy/dummy_col1_8");
+        click("#dummy/dummy_col1_1");
         press(SWITCH_DEFAULT_REPO);
         PlatformEx.waitOnFxThread();
         assertEquals(repoSelectorComboBox.getValue(), "dummy1/dummy1");

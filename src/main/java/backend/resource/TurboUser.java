@@ -43,6 +43,7 @@ public class TurboUser {
         this.loginName = user.getLoginName();
         this.realName = user.getRealName();
         this.avatarURL = user.getAvatarURL();
+        this.avatar = getAvatarImageFromAvatarUrl();
         this.repoId = user.getRepoId();
     }
 
@@ -50,6 +51,7 @@ public class TurboUser {
         this.loginName = replaceNull(loginName, "");
         this.realName = replaceNull(realName, "");
         this.avatarURL = "";
+        this.avatar = getAvatarImageFromAvatarUrl();
         this.repoId = replaceNull(repoId, "");
     }
 
@@ -57,6 +59,7 @@ public class TurboUser {
         this.loginName = replaceNull(user.getLogin(), "");
         this.realName = replaceNull(user.getName(), "");
         this.avatarURL = replaceNull(user.getAvatarUrl(), "");
+        this.avatar = getAvatarImageFromAvatarUrl();
         this.repoId = replaceNull(repoId, "");
     }
 
@@ -64,6 +67,7 @@ public class TurboUser {
         this.loginName = replaceNull(user.getLoginName(), "");
         this.realName = replaceNull(user.getRealName(), "");
         this.avatarURL = replaceNull(user.getAvatarURL(), "");
+        this.avatar = getAvatarImageFromAvatarUrl();
         this.repoId = replaceNull(repoId, "");
     }
 
@@ -75,11 +79,8 @@ public class TurboUser {
         return loginName;
     }
 
-    public Image getAvatar() {
-        if (avatar == null) {
-            avatar = new Image(avatarURL, 12, 12, true, true, true);
-        }
-        return avatar;
+    public Image getAvatarImage() {
+        return this.avatar;
     }
 
     private void ______BOILERPLATE______() {
@@ -119,5 +120,10 @@ public class TurboUser {
         result = 31 * result + realName.hashCode();
         result = 31 * result + avatarURL.hashCode();
         return result;
+    }
+
+    private Image getAvatarImageFromAvatarUrl() {
+        if (avatarURL.isEmpty()) return null;
+        return new Image(avatarURL, 12, 12, true, true, true);
     }
 }
