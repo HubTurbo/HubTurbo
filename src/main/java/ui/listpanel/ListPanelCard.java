@@ -281,11 +281,8 @@ public class ListPanelCard extends VBox {
 
     /**
      * Attempts to get the TurboUser's avatar
-     *
-     * Returns an empty ImageView if avatar image obtained from TurboUser is null
-     *
      * @param user
-     * @return ImageView that contains the avatar image if it exists
+     * @return ImageView that contains the avatar image if it exists or an empty ImageView if it doesn't exist
      */
     private ImageView getAvatar(TurboUser user) {
         ImageView userAvatar = new ImageView();
