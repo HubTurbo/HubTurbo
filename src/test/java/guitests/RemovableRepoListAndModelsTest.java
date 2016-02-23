@@ -37,7 +37,7 @@ public class RemovableRepoListAndModelsTest extends UITest {
         globalConfig.setLastLoginCredentials("test", "test");
         globalConfig.setLastViewedRepository("dummy/dummy");
         ConfigFile globalConfigFile =
-                new ConfigFile(Preferences.DIRECTORY, Preferences.TEST_SESSION_CONFIG_FILE);
+                new ConfigFile(Preferences.DIRECTORY, Preferences.TEST_SESSION_CONFIG_FILENAME);
         globalConfigFile.saveConfig(globalConfig);
     }
 
@@ -76,7 +76,7 @@ public class RemovableRepoListAndModelsTest extends UITest {
 
 
         // check if test json is present
-        File testConfig = new File(Preferences.DIRECTORY, Preferences.TEST_SESSION_CONFIG_FILE);
+        File testConfig = new File(Preferences.DIRECTORY, Preferences.TEST_SESSION_CONFIG_FILENAME);
         if (!(testConfig.exists() && testConfig.isFile())) {
             fail();
         }

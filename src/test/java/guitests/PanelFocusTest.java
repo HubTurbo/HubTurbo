@@ -147,7 +147,7 @@ public class PanelFocusTest extends UITest {
 
         globalConfig.setPanelInfo(panels);
         ConfigFile globalConfigFile =
-                new ConfigFile(Preferences.DIRECTORY, Preferences.TEST_SESSION_CONFIG_FILE);
+                new ConfigFile(Preferences.DIRECTORY, Preferences.TEST_SESSION_CONFIG_FILENAME);
         globalConfigFile.saveConfig(globalConfig);
     }
 }

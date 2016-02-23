@@ -123,7 +123,7 @@ public class UITest extends GuiTest {
     @Override
     public void setupStage() throws Throwable {
         // delete test.json if it exists
-        File testConfig = new File(Preferences.DIRECTORY, Preferences.TEST_SESSION_CONFIG_FILE);
+        File testConfig = new File(Preferences.DIRECTORY, Preferences.TEST_SESSION_CONFIG_FILENAME);
         if (testConfig.exists() && testConfig.isFile()) {
             assert testConfig.delete();
         }

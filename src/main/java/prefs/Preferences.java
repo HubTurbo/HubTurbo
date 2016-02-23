@@ -1,7 +1,11 @@
 package prefs;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.RepositoryId;
+import util.HTLog;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,28 +14,35 @@ import java.util.Optional;
 
 /**
  * Represents persistent user configuration. Maps to a file on disk.
- * <p>
+ *
  * Overrides PMD's recommendation that this class should be final.
  * It cannot be as we need to mock it.
  */
 public class Preferences { // NOPMD
+
     public static final String DIRECTORY = "settings";
 
     // Standard config filenames used for application and testing
-    public static final String SESSION_CONFIG_FILE = "global.json";
-    public static final String TEST_SESSION_CONFIG_FILE = "test.json";
+    public static final String SESSION_CONFIG_FILENAME = "global.json";
+    public static final String TEST_SESSION_CONFIG_FILENAME = "test.json";
 
-    private final ConfigFile globalConfigFile;
+    private final ConfigFile sessionConfigFile;
 
-    public GlobalConfig global;
+    private GlobalConfig sessionConfig;
 
+    /**
+     * Private constructor that prevents external instantiation
+     * @param configFileName The name of the preferences file
+     * @param createUnconditionally True if the Preferences are to be initialised regardless of previous
+     *                              saved preferences
+     */
     private Preferences(String configFileName, boolean createUnconditionally) {
-        this.globalConfigFile = new ConfigFile(DIRECTORY, configFileName);
+        this.sessionConfigFile = new ConfigFile(DIRECTORY, configFileName);
 
         if (createUnconditionally) {
-            initGlobalConfig();
+            initSessionConfig();
         } else {
-            loadGlobalConfig();
+            loadSessionConfig();
         }
     }
 
@@ -51,48 +62,78 @@ public class Preferences { // NOPMD
         return new Preferences(configFileName, true);
     }
 
-    public void saveGlobalConfig() {
-        globalConfigFile.saveConfig(global);
+    /**
+     * Saves the session config
+     */
+    public void saveSessionConfig() {
+        sessionConfigFile.saveConfig(sessionConfig);
     }
 
-    private void initGlobalConfig() {
-        global = new GlobalConfig();
-        globalConfigFile.saveConfig(global);
+    /**
+     * Intiialises the session config
+     */
+    private void initSessionConfig() {
+        sessionConfig = new GlobalConfig();
+        sessionConfigFile.saveConfig(sessionConfig);
     }
 
-    private void loadGlobalConfig() {
-        global = (GlobalConfig) globalConfigFile.loadConfig(new GlobalConfig());
+    /**
+     * Loads the session config.
+     */
+    private void loadSessionConfig() {
+        sessionConfig = (GlobalConfig) sessionConfigFile.loadConfig(GlobalConfig.class).orElse(new GlobalConfig());
     }
 
     // Last login credentials. While the main UI is running (i.e. logged in successfully), last login
     // credentials are guaranteed to be the current user's credentials thanks to setLastLoginCredentials
     // being called immediately after a successful login in LoginDialog.
     public String getLastLoginPassword() {
-        return global.getLastLoginPassword();
+        return sessionConfig.getLastLoginPassword();
     }
 
+    /**
+     * Retrieves the last login username
+     */
     public String getLastLoginUsername() {
-        return global.getLastLoginUsername();
+        return sessionConfig.getLastLoginUsername();
     }
 
+    /**
+     * Sets the last login credentials
+     * @param username The username used during the last login
+     * @param password The password used during the last login
+     */
     public void setLastLoginCredentials(String username, String password) {
-        global.setLastLoginCredentials(username, password);
+        sessionConfig.setLastLoginCredentials(username, password);
     }
 
+    /**
+     * Retrieves a list of the last open filters
+     */
     public List<String> getLastOpenFilters() {
-        return global.getLastOpenFilters();
+        return sessionConfig.getLastOpenFilters();
     }
 
+    /**
+     * Retrieves a list of panel names
+     */
     public List<String> getPanelNames() {
-        return global.getPanelNames();
+        return sessionConfig.getPanelNames();
     }
 
+    /**
+     * Retrieves a list of panel infos
+     */
     public List<PanelInfo> getPanelInfo() {
-        return global.getPanelInfo();
+        return sessionConfig.getPanelInfo();
     }
 
+    /**
+     * Sets the panel infos
+     * @param panelInfo The list of panel infos to set to
+     */
     public void setPanelInfo(List<PanelInfo> panelInfo) {
-        global.setPanelInfo(panelInfo);
+        sessionConfig.setPanelInfo(panelInfo);
     }
 
     /**
@@ -105,66 +146,107 @@ public class Preferences { // NOPMD
 
     public void addBoard(String name, List<PanelInfo> panels) {
         assert name != null && panels != null;
-        global.addBoard(name, panels);
+        sessionConfig.addBoard(name, panels);
     }
 
+    /**
+     * Retrieves a map of all the boards
+     */
     public Map<String, List<PanelInfo>> getAllBoards() {
-        return global.getAllBoards();
+        return sessionConfig.getAllBoards();
     }
 
+    /**
+     * Retrieves a list of all the board names
+     */
     public List<String> getAllBoardNames() {
         return new ArrayList<>(getAllBoards().keySet());
     }
 
+    /**
+     * Removes the board specified
+     * @param name The name of the board to remove
+     */
     public void removeBoard(String name) {
-        global.removeBoard(name);
+        sessionConfig.removeBoard(name);
     }
 
+    /**
+     * Sets the last open board
+     * @param board The name of the last open board.
+     */
     public void setLastOpenBoard(String board) {
-        global.setLastOpenBoard(board);
+        sessionConfig.setLastOpenBoard(board);
     }
 
+    /**
+     * Retrieves the name of the last open board. May be null
+     * @return An Optional of a nullable board name
+     */
     public Optional<String> getLastOpenBoard() {
-        return global.getLastOpenBoard();
+        return sessionConfig.getLastOpenBoard();
     }
 
+    /**
+     * Switches the board to the next one. Cycles through the boards one at a time.
+     * @return The new board selected
+     */
     public Optional<String> switchBoard() {
         if (getLastOpenBoard().isPresent() && getAllBoards().size() > 1) {
             List<String> boardNames = getAllBoardNames();
             int lastBoard = boardNames.indexOf(getLastOpenBoard().get());
             int index = (lastBoard + 1) % boardNames.size();
-
+            
             setLastOpenBoard(boardNames.get(index));
         }
-
+        
         return getLastOpenBoard();
     }
 
+    /**
+     * Clears the last open board
+     */
     public void clearLastOpenBoard() {
-        global.clearLastOpenBoard();
+        sessionConfig.clearLastOpenBoard();
     }
 
-    public List<PanelInfo> getBoardPanels(String board) {
-        return global.getBoardPanels(board);
+    /**
+     * Retrieves the panels of the board.
+     * @param boardName The name of the board to retrieve the panels from
+     * @return A list of panel infos from that board
+     */
+    public List<PanelInfo> getBoardPanels(String boardName) {
+        return sessionConfig.getBoardPanels(boardName);
     }
 
+    /**
+     * Clears all boards.
+     */
     public void clearAllBoards() {
-        global.clearAllBoards();
+        sessionConfig.clearAllBoards();
     }
 
     /**
      * Session configuration
      */
 
+    /**
+     * Sets the last viewed repo to the specified repo
+     * @param repository The last viewed repo
+     */
     public void setLastViewedRepository(String repository) {
-        global.setLastViewedRepository(repository);
+        sessionConfig.setLastViewedRepository(repository);
     }
 
+    /**
+     * Retrieves the last viewed repo.
+     * @return An Optional of the last viewed repo.
+     */
     public Optional<RepositoryId> getLastViewedRepository() {
-        if (global.getLastViewedRepository().isEmpty()) {
+        if (sessionConfig.getLastViewedRepository().isEmpty()) {
             return Optional.empty();
         } else {
-            RepositoryId repositoryId = RepositoryId.createFromId(global.getLastViewedRepository());
+            RepositoryId repositoryId = RepositoryId.createFromId(sessionConfig.getLastViewedRepository());
             if (repositoryId == null) {
                 return Optional.empty();
             } else {
@@ -173,23 +255,47 @@ public class Preferences { // NOPMD
         }
     }
 
+    /**
+     * Clears marked read at of an issue at the specified repo
+     * @param repoId The repo that this issue resides in
+     * @param issue The issue to clear
+     */
     public void clearMarkedReadAt(String repoId, int issue) {
-        global.clearMarkedReadAt(repoId, issue);
+        sessionConfig.clearMarkedReadAt(repoId, issue);
     }
 
+    /**
+     * Sets the marked read at for an issue in a repo, to a certain time
+     * @param repoId The repo of the issue
+     * @param issue The issue to set
+     * @param time The time it was marked read
+     */
     public void setMarkedReadAt(String repoId, int issue, LocalDateTime time) {
-        global.setMarkedReadAt(repoId, issue, time);
+        sessionConfig.setMarkedReadAt(repoId, issue, time);
     }
 
+    /**
+     * Retrieves the marked read at for a specified issue in a repo
+     * @param repoId The repo of the issue
+     * @param issue The issue to retrieve the marked read at
+     * @return An Optional of the marked read at
+     */
     public Optional<LocalDateTime> getMarkedReadAt(String repoId, int issue) {
-        return global.getMarkedReadAt(repoId, issue);
+        return sessionConfig.getMarkedReadAt(repoId, issue);
     }
 
+    /**
+     * Retrieves the map of keyboard shortcuts
+     */
     public Map<String, String> getKeyboardShortcuts() {
-        return global.getKeyboardShortcuts();
+        return sessionConfig.getKeyboardShortcuts();
     }
 
+    /**
+     * Sets the keyboard shortcuts to the specified mapping
+     * @param keyboardShortcuts The mapping of keyboard shortcuts to set to.
+     */
     public void setKeyboardShortcuts(Map<String, String> keyboardShortcuts) {
-        global.setKeyboardShortcuts(keyboardShortcuts);
+        sessionConfig.setKeyboardShortcuts(keyboardShortcuts);
     }
 }

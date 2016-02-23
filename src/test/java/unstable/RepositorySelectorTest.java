@@ -56,14 +56,14 @@ public class RepositorySelectorTest extends UITest {
         globalConfig.setLastLoginCredentials("test", "test");
         globalConfig.setLastViewedRepository("dummy/dummy");
         ConfigFile globalConfigFile =
-                new ConfigFile(Preferences.DIRECTORY, Preferences.TEST_SESSION_CONFIG_FILE);
+                new ConfigFile(Preferences.DIRECTORY, Preferences.TEST_SESSION_CONFIG_FILENAME);
         globalConfigFile.saveConfig(globalConfig);
     }
 
     @Test
     public void repositorySelectorTest() {
         // check if test json is present
-        File testConfig = new File(Preferences.DIRECTORY, Preferences.TEST_SESSION_CONFIG_FILE);
+        File testConfig = new File(Preferences.DIRECTORY, Preferences.TEST_SESSION_CONFIG_FILENAME);
         boolean testConfigExists = testConfig.exists() && testConfig.isFile();
         if (!testConfigExists) {
             fail();

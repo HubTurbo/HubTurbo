@@ -5,10 +5,11 @@ import prefs.GlobalConfig;
 import prefs.PanelInfo;
 import prefs.Preferences;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 public class PreferencesTests {
@@ -18,10 +19,18 @@ public class PreferencesTests {
     @Test
     public void testClearLastOpenBoard() {
         GlobalConfig config = mock(GlobalConfig.class);
-        Preferences prefs = Preferences.load(Preferences.TEST_SESSION_CONFIG_FILE);
+        Preferences prefs = Preferences.load(Preferences.TEST_SESSION_CONFIG_FILENAME);
 
-        prefs.global = config;
-        prefs.clearLastOpenBoard();
+        try {
+            Field sessionConfigField = Preferences.class.getDeclaredField("sessionConfig");
+            sessionConfigField.setAccessible(true);
+            sessionConfigField.set(prefs, config);
+            prefs.clearLastOpenBoard();
+
+        } catch (IllegalAccessException | NoSuchFieldException e) {
+            e.printStackTrace();
+            fail();
+        }
 
         verify(config, times(1)).clearLastOpenBoard();
     }
@@ -36,8 +45,17 @@ public class PreferencesTests {
         List<PanelInfo> expected = new ArrayList<>();
         when(config.getBoardPanels("board")).thenReturn(expected);
 
-        Preferences prefs = Preferences.load(Preferences.TEST_SESSION_CONFIG_FILE);
-        prefs.global = config;
+        Preferences prefs = Preferences.load(Preferences.TEST_SESSION_CONFIG_FILENAME);
+        try {
+            Field sessionConfigField = Preferences.class.getDeclaredField("sessionConfig");
+            sessionConfigField.setAccessible(true);
+            sessionConfigField.set(prefs, config);
+            prefs.clearLastOpenBoard();
+
+        } catch (IllegalAccessException | NoSuchFieldException e) {
+            e.printStackTrace();
+            fail();
+        }
         List<PanelInfo> actual = prefs.getBoardPanels("board");
 
         verify(config, times(1)).getBoardPanels("board");

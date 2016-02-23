@@ -36,7 +36,7 @@ public class WrongLastViewedTest extends UITest {
         globalConfig.setLastLoginCredentials("test", "test");
         globalConfig.setLastViewedRepository("test/test");
         ConfigFile globalConfigFile =
-                new ConfigFile(Preferences.DIRECTORY, Preferences.TEST_SESSION_CONFIG_FILE);
+                new ConfigFile(Preferences.DIRECTORY, Preferences.TEST_SESSION_CONFIG_FILENAME);
         globalConfigFile.saveConfig(globalConfig);
         RepoIO testIO = TestController.createTestingRepoIO(Optional.empty());
         testIO.setRepoOpControl(TestUtils.createRepoOpControlWithEmptyModels(testIO));

@@ -105,14 +105,14 @@ public class KeyboardShortcutsConfigTest extends UITest {
     }
 
     private static void reloadPrefs(Preferences prefs) {
-        prefs.saveGlobalConfig();
-        String loadGlobalConfig = "loadGlobalConfig";
+        prefs.saveSessionConfig();
+        String loadSessionConfig = "loadSessionConfig";
         try {
-            Method method = Preferences.class.getDeclaredMethod(loadGlobalConfig);
+            Method method = Preferences.class.getDeclaredMethod(loadSessionConfig);
             method.setAccessible(true);
             method.invoke(prefs);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            fail(String.format("Problem invoking private method; does %s still exist?", loadGlobalConfig));
+            fail(String.format("Problem invoking private method; does %s still exist?", loadSessionConfig));
         }
     }
 }
