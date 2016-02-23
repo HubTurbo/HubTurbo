@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 
+import filter.expression.QualifierType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCodeCombination;
@@ -29,6 +30,8 @@ import util.GithubPageElements;
 import util.HTLog;
 import util.KeyPress;
 import util.events.IssueSelectedEvent;
+import util.events.RepoOpenedEvent;
+import util.events.RepoOpeningEvent;
 import util.events.ShowLabelPickerEvent;
 import backend.resource.TurboIssue;
 import filter.expression.Qualifier;
@@ -383,22 +386,62 @@ public class ListPanel extends FilterPanel {
      * Adds a style class to the listview which changes its background to contain a loading spinning gif
      */
     @Override
-    protected void addPanelLoadingIndication() {
+    protected void setLoadingIndicator() {
         logger.info("Preparing to add panel loading indication");
         listView.getStyleClass().add("listview-loading");
-
-        // Remove the items in the issue list because they are not relevant to the filter anymore.
-        // This also makes the listview background visible, since we intend to show a loading indicator on the
-        // background.
-        listView.setItems(null);
     }
 
     /**
-     * Removes the style class that was added in addPanelLoadingIndicator() from the listview.
+     * Removes the style class that was added in setLoadingIndicator() from the listview.
      */
     @Override
-    protected void removePanelLoadingIndication() {
+    protected void removeLoadingIndicator() {
         logger.info("Preparing to remove panel loading indication");
         listView.getStyleClass().removeIf(cssClass -> cssClass.equals("listview-loading"));
+    }
+
+    @Override
+    protected void showRepoOpeningIndicator(RepoOpeningEvent e) {
+        if (isIndicatorApplicable(e.isPrimaryRepo)) {
+            setTranslucentCellFactory();
+            setLoadingIndicator();
+        }
+    }
+
+    @Override
+    protected void hideRepoOpeningIndicator(RepoOpenedEvent e) {
+        if (isIndicatorApplicable(e.isPrimaryRepo)) {
+            removeLoadingIndicator();
+        }
+    }
+
+    @Override
+    protected void showPanelReloadingIndicator() {
+        setTranslucentCellFactory();
+        setLoadingIndicator();
+    }
+
+    @Override
+    protected void hidePanelReloadingIndicator() {
+        removeLoadingIndicator();
+    }
+
+    private void setTranslucentCellFactory() {
+        final HashSet<Integer> issuesWithNewComments
+                = updateIssueCommentCounts(Qualifier.hasUpdatedQualifier(getCurrentFilterExpression()));
+        listView.setCellFactory(list -> {
+            ListPanelCell cell = new ListPanelCell(this, panelIndex, issuesWithNewComments);
+            cell.setStyle(cell.getStyle() + "-fx-opacity: 40%;");
+            return cell;
+        });
+    }
+
+    private boolean isIndicatorApplicable(boolean isPrimaryRepo) {
+        HashSet<String> allReposInFilterExpr =
+                Qualifier.getMetaQualifierContent(getCurrentFilterExpression(), QualifierType.REPO);
+
+        boolean isPrimaryRepoChanged = isPrimaryRepo && allReposInFilterExpr.isEmpty();
+
+        return isPrimaryRepoChanged;
     }
 }

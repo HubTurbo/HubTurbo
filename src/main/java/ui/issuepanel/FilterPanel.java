@@ -28,14 +28,9 @@ import ui.TestController;
 import ui.UI;
 import ui.components.FilterTextField;
 import util.events.*;
-import util.events.testevents.PrimaryRepoChangedEvent;
 import util.events.testevents.UIComponentFocusEvent;
 import prefs.PanelInfo;
 
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -107,10 +102,10 @@ public abstract class FilterPanel extends AbstractPanel {
             requestFocus();
         });
 
-        ui.registerEvent((RepoOpeningEventHandler) this::indicatePanelLoading);
-        ui.registerEvent((RepoOpenedEventHandler) this::unindicatePanelLoading);
-        ui.registerEvent((PanelReloadingEventHandler) e -> indicatePanelLoading());
-        ui.registerEvent((PanelReloadedEventHandler) e -> unindicatePanelLoading());
+        ui.registerEvent((RepoOpeningEventHandler) this::showRepoOpeningIndicator);
+        ui.registerEvent((RepoOpenedEventHandler) this::hideRepoOpeningIndicator);
+        ui.registerEvent((PanelReloadingEventHandler) e -> showPanelReloadingIndicator());
+        ui.registerEvent((PanelReloadedEventHandler) e -> hidePanelReloadingIndicator());
     }
 
     private final ModelUpdatedEventHandler onModelUpdate = e -> {
@@ -205,45 +200,24 @@ public abstract class FilterPanel extends AbstractPanel {
         parentPanelControl.getGUIController().panelFilterExpressionChanged(this);
     }
 
-    private void indicatePanelLoading(RepoOpeningEvent e) {
-        if (isIndicatorApplicable(e.isPrimaryRepo)) {
-            addPanelLoadingIndication();
-        }
-    }
+    protected abstract void showRepoOpeningIndicator(RepoOpeningEvent e);
 
-    private void unindicatePanelLoading(RepoOpenedEvent e) {
-        if (isIndicatorApplicable(e.isPrimaryRepo)) {
-            removePanelLoadingIndication();
-        }
-    }
+    protected abstract void hideRepoOpeningIndicator(RepoOpenedEvent e);
 
-    private void indicatePanelLoading() {
-        addPanelLoadingIndication();
-    }
+    protected abstract void showPanelReloadingIndicator();
 
-    private void unindicatePanelLoading() {
-        removePanelLoadingIndication();
-    }
-
-    private boolean isIndicatorApplicable(boolean isPrimaryRepo) {
-        HashSet<String> allReposInFilterExpr =
-                Qualifier.getMetaQualifierContent(getCurrentFilterExpression(), QualifierType.REPO);
-
-        boolean isPrimaryRepoChanged = isPrimaryRepo && allReposInFilterExpr.isEmpty();
-
-        return isPrimaryRepoChanged;
-    }
+    protected abstract void hidePanelReloadingIndicator();
 
     /**
-     * Implements a user-visible indication that the current panel is loading a repo.
+     * Implements the addition of the panel-loading indication
      */
-    protected abstract void addPanelLoadingIndication();
+    protected abstract void setLoadingIndicator();
 
     /**
      * Implements the removal of the panel-loading indication that was applied by the method
-     * addPanelLoadingIndication().
+     * setLoadingIndicator().
      */
-    protected abstract void removePanelLoadingIndication();
+    protected abstract void removeLoadingIndicator();
 
     public void setFilterByString(String filterString) {
         filterTextField.setFilterText(filterString);
