@@ -14,8 +14,7 @@ public class MilestonePickerTests {
         List<PickerMilestone> labelList = new ArrayList<>();
         PickerMilestone label = new PickerMilestone(new TurboMilestone("testrepo", 1, "milestone1"));
         labelList.add(label);
-        MilestonePickerState state = new MilestonePickerState(labelList);
-        return state;
+        return new MilestonePickerState(labelList);
     }
 
     public MilestonePickerState prepareAssignedState() {
@@ -25,8 +24,7 @@ public class MilestonePickerTests {
         label2.setSelected(true);
         labelList.add(label);
         labelList.add(label2);
-        MilestonePickerState state = new MilestonePickerState(labelList);
-        return state;
+        return new MilestonePickerState(labelList);
     }
 
     @Test
