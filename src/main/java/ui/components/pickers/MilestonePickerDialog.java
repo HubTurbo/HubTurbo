@@ -45,8 +45,8 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
         setupKeyEvents();
     }
 
-    public void handleMouseClick(String milestoneName) {
-        // required since clearing inputField will reference to state
+    private void handleMouseClick(String milestoneName) {
+        // required since clearing inputField will change the reference to the state
         MilestonePickerState curState = state;
         inputField.clear();
         inputField.setDisable(true);

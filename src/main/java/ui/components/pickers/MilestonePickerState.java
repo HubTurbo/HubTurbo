@@ -17,15 +17,11 @@ public class MilestonePickerState {
 
     private void cloneList(List<PickerMilestone> sourceList, List<PickerMilestone> destList) {
         sourceList.stream()
-                .forEach(milestone -> {
-                    destList.add(new PickerMilestone(milestone));
-                });
+                .forEach(milestone -> destList.add(new PickerMilestone(milestone)));
     }
 
     public void processInput(String userInput) {
-        if (userInput.isEmpty()) {
-            return;
-        }
+        if (userInput.isEmpty()) return;
 
         String[] userInputWords = userInput.split(" ");
         for (int i = 0; i < userInputWords.length; i++) {
@@ -44,13 +40,11 @@ public class MilestonePickerState {
      * @param milestoneQuery
      */
     public void toggleMilestone(String milestoneQuery) {
-        String milestoneName = getMilestoneName(milestoneQuery);
+        String milestoneName = getMatchingMilestoneName(milestoneQuery);
         if (milestoneName == null) return;
         this.currentMilestonesList.stream()
-                .forEach(milestone -> {
-                    milestone.setSelected(milestone.getTitle().equals(milestoneName)
-                            && !milestone.isSelected());
-                });
+                .forEach(milestone -> milestone.setSelected(milestone.getTitle().equals(milestoneName)
+                        && !milestone.isSelected()));
     }
 
     public void filterMilestone(String query) {
@@ -84,7 +78,7 @@ public class MilestonePickerState {
                 .isPresent();
     }
 
-    private String getMilestoneName(String query) {
+    private String getMatchingMilestoneName(String query) {
         if (hasExactlyOneMatchingMilestone(currentMilestonesList, query)) {
             return getMatchingMilestoneName(currentMilestonesList, query);
         }
