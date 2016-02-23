@@ -23,7 +23,7 @@ public class ScreenManager {
     // resized to available width.
     private static final double maximiseThreshold = 0.1;
 
-    private Window mainStage;
+    private final Window mainStage;
 
     public ScreenManager(Window mainStage) {
         this.mainStage = mainStage;
