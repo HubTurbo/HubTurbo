@@ -54,7 +54,7 @@ import static ui.components.KeyboardShortcuts.SWITCH_DEFAULT_REPO;
 public class UI extends Application implements EventDispatcher {
 
     public static final int VERSION_MAJOR = 3;
-    public static final int VERSION_MINOR = 19;
+    public static final int VERSION_MINOR = 20;
     public static final int VERSION_PATCH = 0;
 
     public static final String WINDOW_TITLE = "HubTurbo %s (%s)";
