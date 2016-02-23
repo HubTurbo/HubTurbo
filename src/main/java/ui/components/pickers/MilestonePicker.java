@@ -19,6 +19,7 @@ import java.util.Optional;
 public class MilestonePicker {
     UI ui;
     Stage stage;
+
     public MilestonePicker(UI ui, Stage mainStage) {
         this.ui = ui;
         this.stage = mainStage;
@@ -28,13 +29,16 @@ public class MilestonePicker {
     private void showMilestonePicker(TurboIssue issue) {
         List<TurboMilestone> milestoneList = ui.logic.getRepo(issue.getRepoId()).getMilestones();
         MilestonePickerDialog dialog = new MilestonePickerDialog(stage, issue, milestoneList);
-        Optional<Pair<ButtonType, Integer>> assignedMilestone = dialog.showAndWait();
+        Optional<Pair<ButtonType, Integer>> milestoneDialogResponse = dialog.showAndWait();
 
-        if (!assignedMilestone.isPresent()) return;
-        if (assignedMilestone.get().getKey().equals(ButtonType.CANCEL)) return;
-        if (!issue.getMilestone().equals(Optional.ofNullable(assignedMilestone.get().getValue()))) {
+        if (!milestoneDialogResponse.isPresent() ||
+                milestoneDialogResponse.get().getKey().equals(ButtonType.CANCEL)) return;
+
+        Optional<Integer> newlyAssignedMilestone = Optional.ofNullable(milestoneDialogResponse.get().getValue());
+
+        if (!issue.getMilestone().equals(newlyAssignedMilestone)) {
             ui.undoController.addAction(issue, new ChangeMilestoneAction(ui.logic, issue.getMilestone(),
-                    Optional.ofNullable(assignedMilestone.get().getValue())));
+                    newlyAssignedMilestone));
         }
     }
 

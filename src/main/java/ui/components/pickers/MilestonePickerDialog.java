@@ -62,8 +62,7 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
     }
 
     private void handleUpdatedInput(String userInput) {
-        state = new MilestonePickerState(originalMilestones);
-        state.processInput(userInput);
+        state = new MilestonePickerState(originalMilestones, userInput);
         refreshUI(state);
     }
 
