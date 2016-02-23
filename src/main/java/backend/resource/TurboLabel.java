@@ -6,6 +6,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
 
 import org.eclipse.egit.github.core.Label;
+
 import util.Utility;
 
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ import java.util.stream.Collectors;
 
 public class TurboLabel implements Comparable<TurboLabel> {
 
-    public static enum Grouping { EXCLUSIVE, NON_EXCLUSIVE, NONE }
+    public enum Grouping { EXCLUSIVE, NON_EXCLUSIVE, NONE }
 
     public static final String DEFAULT_COLOR = "ffffff";
     public static final String EXCLUSIVE_DELIMITER = ".";
@@ -35,7 +36,7 @@ public class TurboLabel implements Comparable<TurboLabel> {
 
     public TurboLabel(String repoId, String name) {
         this.fullName = name;
-        this.grouping = initGroupMembership();
+        this.grouping = determineGrouping();
         this.shortName = extractShortName(name);
         this.groupName = extractGroupName(name);
         this.colour = DEFAULT_COLOR;
@@ -45,14 +46,6 @@ public class TurboLabel implements Comparable<TurboLabel> {
     public TurboLabel(String repoId, String colour, String name) {
         this(repoId, name);
         this.colour = colour;
-    }
-
-    public static TurboLabel nonexclusive(String repoId, String group, String name) {
-        return new TurboLabel(repoId, buildFullName(group, name, false));
-    }
-
-    public static TurboLabel exclusive(String repoId, String group, String name) {
-        return new TurboLabel(repoId, buildFullName(group, name, true));
     }
 
     /**
@@ -99,9 +92,8 @@ public class TurboLabel implements Comparable<TurboLabel> {
 
 
     /**
-     * Returns the first TurboLabel in labels that matches labelName
      * Assumption: the labelName matches at least 1 TurboLabel
-     * @return TurboLabel that matches labelName
+     * @return the first TurboLabel in labels that matches labelName
      */
     public static TurboLabel getFirstMatchingTurboLabel(List<TurboLabel> labels, String labelName) {
         Optional<TurboLabel> firstMatchingLabel = getMatchedLabels(labels, labelName).stream().findFirst();
@@ -116,12 +108,11 @@ public class TurboLabel implements Comparable<TurboLabel> {
     }
 
     /**
-     * Returns the list of label names that matches a query
-     * Matches label name that contains sequence of chars in nameQuery and the matching is
+     * Matches label name that contains nameQuery and the matching is
      * case-insensitive
      * @param repoLabels
      * @param nameQuery
-     * @return
+     * @return the list of label names that matches a query
      */
     public static List<TurboLabel> filterByNameQuery(List<TurboLabel> repoLabels, String nameQuery) {
         return repoLabels
@@ -131,11 +122,11 @@ public class TurboLabel implements Comparable<TurboLabel> {
     }
 
     /**
-     * Returns the list of label names that belongs to a group and matches a query
-     * Uses partial matching and matching is case-insensitive
+     * Matches label name that contains groupQuery and the matching is
+     * case-insensitive
      * @param repoLabels
      * @param groupQuery
-     * @return
+     * @return the list of label names that belongs to a group and matches a query
      */
     public static List<TurboLabel> filterByGroupQuery(List<TurboLabel> repoLabels, String groupQuery) {
         if (groupQuery.isEmpty()) return repoLabels;
@@ -152,33 +143,30 @@ public class TurboLabel implements Comparable<TurboLabel> {
     }
 
     /**
-     * Returns the list of labels that matches the keyword
-     * i.e. the label's group contains keyword's group and label's name contains keyword's name
      * @param repoLabels
      * @param keyword
-     * @return
+     * @return the list of labels that matches the keyword i.e. the label's group 
+     * contains keyword's group and label's name contains keyword's name
      */
     public static List<TurboLabel> getMatchedLabels(List<TurboLabel> repoLabels, String keyword) {
-        TurboLabel query = new TurboLabel("", keyword);
+        String[] extractedNames = extractNames(keyword);
 
         List<TurboLabel> newMatchedLabels = new ArrayList<>();
         newMatchedLabels.addAll(repoLabels);
-        newMatchedLabels = filterByNameQuery(newMatchedLabels, query.getShortName());
-        newMatchedLabels = filterByGroupQuery(newMatchedLabels, query.getGroupName());
+        newMatchedLabels = filterByNameQuery(newMatchedLabels, extractedNames[1]);
+        newMatchedLabels = filterByGroupQuery(newMatchedLabels, extractedNames[0]);
         return newMatchedLabels;
     }
 
     /**
-     * Returns true if there is exactly 1 matching label for keyword
-     *
      * A label is matching if:
      * the label's group contains keyword's group and label's name contains keyword's name
      * @param repoLabels
      * @param keyword
-     * @return
+     * @return true if there is there is at least 1 matching label for the keyword
      */
-    public static boolean hasExactlyOneMatchedLabel(List<TurboLabel> repoLabels, String keyword) {
-        return getMatchedLabels(repoLabels, keyword).size() == 1;
+    public static boolean hasMatchedLabel(List<TurboLabel> repoLabels, String keyword) {
+        return !getMatchedLabels(repoLabels, keyword).isEmpty();
     }
 
     public String getGroupName() {
@@ -197,56 +185,6 @@ public class TurboLabel implements Comparable<TurboLabel> {
         return grouping != Grouping.NONE;
     }
 
-    public Optional<String> getGroup() {
-        if (getDelimiter(fullName).isPresent()) {
-            String delimiter = getDelimiter(fullName).get();
-            // Escaping due to constants not being valid regexes
-            String[] segments = fullName.split("\\" + delimiter);
-            assert segments.length >= 1;
-            if (segments.length == 1) {
-                if (fullName.endsWith(delimiter)) {
-                    // group.
-                    return Optional.of(segments[0]);
-                } else {
-                    // .name
-                    return Optional.empty();
-                }
-            } else {
-                // group.name
-                assert segments.length == 2;
-                return Optional.of(segments[0]);
-            }
-        } else {
-            // name
-            return Optional.empty();
-        }
-    }
-
-    public String getName() {
-        if (getDelimiter(fullName).isPresent()) {
-            String delimiter = getDelimiter(fullName).get();
-            // Escaping due to constants not being valid regexes
-            String[] segments = fullName.split("\\" + delimiter);
-            assert segments.length >= 1;
-            if (segments.length == 1) {
-                if (fullName.endsWith(delimiter)) {
-                    // group.
-                    return "";
-                } else {
-                    // .name
-                    return segments[0];
-                }
-            } else {
-                // group.name
-                assert segments.length == 2;
-                return segments[1];
-            }
-        } else {
-            // name
-            return fullName;
-        }
-    }
-
     public String getStyle() {
         String colour = getColour();
         int r = Integer.parseInt(colour.substring(0, 2), 16);
@@ -258,11 +196,11 @@ public class TurboLabel implements Comparable<TurboLabel> {
     }
 
     public Node getNode() {
-        javafx.scene.control.Label node = new javafx.scene.control.Label(getName());
+        javafx.scene.control.Label node = new javafx.scene.control.Label(shortName);
         node.getStyleClass().add("labels");
         node.setStyle(getStyle());
-        if (getGroup().isPresent()) {
-            Tooltip groupTooltip = new Tooltip(getGroup().get());
+        if (isInGroup()) {
+            Tooltip groupTooltip = new Tooltip(groupName);
             node.setTooltip(groupTooltip);
         }
         return node;
@@ -305,11 +243,7 @@ public class TurboLabel implements Comparable<TurboLabel> {
         return fullName.compareTo(o.getFullName());
     }
 
-    private static String buildFullName(String group, String name, boolean exclusive) {
-        return group + (exclusive ? EXCLUSIVE_DELIMITER : NONEXCLUSIVE_DELIMITER) + name;
-    }
-
-    private Grouping initGroupMembership() {
+    private Grouping determineGrouping() {
         if (!getDelimiter(fullName).isPresent()) return Grouping.NONE;
 
         return getDelimiter(fullName).get().equals(EXCLUSIVE_DELIMITER) 
@@ -317,23 +251,38 @@ public class TurboLabel implements Comparable<TurboLabel> {
     }
 
     /**
-     * Determines and returns the group that labelName belongs to
-     * A labelName is considered to be in a group if getDelimiter(labelName).isPresent() is true.
-     * @return
+     * Extracts shortName and groupName from a keyword
+     * groupName is name of the group associated with a keyword
+     * shortName is name of the keyword after omitting its group name 
+     * Example: "priority.high" -> groupName = "priority", shortName = "high"
+     * @param keyword
+     * @return shortName and groupName of a given keyword
      */
-    private String extractGroupName(String fullName) {
-        if (!isInGroup()) return "";
-        return fullName.substring(0, fullName.indexOf(getDelimiter(fullName).get()));
+    public static String[] extractNames(String keyword) {
+        if (!getDelimiter(keyword).isPresent()) return new String[] {"", keyword};
+
+        int delimiterIndex = keyword.indexOf(getDelimiter(keyword).get());
+        String shortName = keyword.substring(delimiterIndex + 1);
+        String groupName = keyword.substring(0, delimiterIndex);
+        return new String[] {groupName, shortName};
     }
 
     /**
-     * Returns the name of labelName after omitting its group name
-     * i.e "priority.high" will return "high"
-     * @return
+     * Extracts the group name from the fullName
+     * Returns empty string if no group name is extracted
+     * @param fullName
+     * @return 
      */
-    private String extractShortName(String fullName) {
-        if (!isInGroup()) return fullName;
-        return fullName.substring(fullName.indexOf(getDelimiter(fullName).get()) + 1);
+    private String extractGroupName(String fullName) {
+        return extractNames(fullName)[0];
     }
 
+    /**
+     * @param fullName
+     * @return the name of fullName after omitting its group name
+     * i.e "priority.high" will return "high"
+     */
+    private String extractShortName(String fullName) {
+        return extractNames(fullName)[1];
+    }
 }

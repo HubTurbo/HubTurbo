@@ -11,28 +11,28 @@ import java.util.stream.Collectors;
  */
 public class LabelPickerState {
 
-    Set<String> initialLabels;
-    List<String> addedLabels;
-    List<String> removedLabels;
-    List<String> matchedLabels;
-    List<TurboLabel> repoLabels;
-    OptionalInt currentSuggestionIndex;
+    private Set<String> initialLabels;
+    private List<String> addedLabels;
+    private List<String> removedLabels;
+    private List<String> matchedLabels;
+    private List<TurboLabel> allLabels;
+    private OptionalInt currentSuggestionIndex;
 
     @SuppressWarnings("PMD")
-    public LabelPickerState(Set<String> initialLabels, List<TurboLabel> repoLabels, String userInput) {
-        this(initialLabels, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), repoLabels,
+    public LabelPickerState(Set<String> initialLabels, List<TurboLabel> allLabels, String userInput) {
+        this(initialLabels, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), allLabels,
                 OptionalInt.empty());
         update(userInput);
     }
 
     private LabelPickerState(Set<String> initialLabels, List<String> addedLabels, List<String> removedLabels,
-                             List<String> matchedLabels, List<TurboLabel> repoLabels, 
+                             List<String> matchedLabels, List<TurboLabel> allLabels, 
                              OptionalInt currentSuggestionIndex) {
         this.initialLabels = initialLabels;
         this.addedLabels = addedLabels;
         this.removedLabels = removedLabels;
         this.matchedLabels = matchedLabels;
-        this.repoLabels = repoLabels;
+        this.allLabels = allLabels;
         this.currentSuggestionIndex = currentSuggestionIndex;
     }
 
@@ -43,7 +43,7 @@ public class LabelPickerState {
     private void update(String userInput) {
         List<String> confirmedKeywords = getConfirmedKeywords(userInput);
         for (String confirmedKeyword : confirmedKeywords) {
-            updateMatchingLabel(confirmedKeyword);
+            updateIfMatchesLabel(confirmedKeyword);
         }
 
         Optional<String> keywordInProgess = getKeywordInProgress(userInput);
@@ -53,27 +53,26 @@ public class LabelPickerState {
     }
 
     /**
-     * Update current state if there is exactly one matching label based on the 
+     * Updates current state if there is at least one matching label based on the 
      * given keyword
      * @param keyword
      */
-    private void updateMatchingLabel(String keyword) {
-        if (TurboLabel.hasExactlyOneMatchedLabel(repoLabels, keyword)) {
-            String labelName =
-                    TurboLabel.getFirstMatchingTurboLabel(repoLabels, keyword).getFullName();
-            updateLabel(labelName);
+    private void updateIfMatchesLabel(String keyword) {
+        if (TurboLabel.hasMatchedLabel(allLabels, keyword)) {
+            updateAssignedLabels(TurboLabel.getFirstMatchingTurboLabel(allLabels, keyword));
         }
     }
 
     /**
-     * Updates current state based on properties of selected label
-     * labelName is case-sensitive
-     * @param labelName
+     * Updates assignedLabels based on properties of a label 
+     * @param label
      */
-    public void updateLabel(String labelName) {
+    public void updateAssignedLabels(TurboLabel label) {
+        String labelName = label.getFullName();
+
         if (isAnInitialLabel(labelName)) {
             if (isARemovedLabel(labelName)) {
-                removeConflictingLabels(labelName);
+                removeConflictingLabels(label);
                 removedLabels.remove(labelName);
             } else {
                 removedLabels.add(labelName);
@@ -83,25 +82,25 @@ public class LabelPickerState {
                 addedLabels.remove(labelName);
             } else {
                 // add new label
-                removeConflictingLabels(labelName);
+                removeConflictingLabels(label);
                 addedLabels.add(labelName);
             }
         }
     }
 
     /**
-     * Updates the list of labels which labels' names contain the current query.
+     * Updates the list of labels which labels' names contain the current keyword.
      * This list of labels can then be retrieved later via getMatchedLabels()
      *
-     * The suggestion index will be pointed to the first label that fits the query, if there is.
+     * The suggestion index will be pointed to the first label that matches the keyword, if there is.
      *
-     * @param query
+     * @param keyword
      */
-    private void updateMatchedLabels(String query) {
-        List<TurboLabel> newMatchedLabels = TurboLabel.getMatchedLabels(repoLabels, query);
+    private void updateMatchedLabels(String keyword) {
+        List<TurboLabel> newMatchedLabels = TurboLabel.getMatchedLabels(allLabels, keyword);
 
 
-        if (query.isEmpty() || newMatchedLabels.isEmpty()) {
+        if (keyword.isEmpty() || newMatchedLabels.isEmpty()) {
             currentSuggestionIndex = OptionalInt.empty();
         } else {
             currentSuggestionIndex = OptionalInt.of(0);
@@ -115,8 +114,7 @@ public class LabelPickerState {
      */
 
     /**
-     * Returns the final list of labels to be assigned
-     * @return
+     * @returns final list of labels to be assigned
      */
     public List<String> getAssignedLabels() {
         List<String> assignedLabels = new ArrayList<>();
@@ -127,32 +125,28 @@ public class LabelPickerState {
     }
 
     /**
-     * Returns the initial list of labels
-     * @return
+     * @return the initial list of labels
      */
     public List<String> getInitialLabels() {
         return convertToList(initialLabels);
     }
 
     /**
-     * Returns the list of initial labels that have been removed
-     * @return
+     * @return the list of initial labels that have been removed
      */
     public List<String> getRemovedLabels() {
         return removedLabels;
     }
 
     /**
-     * Returns the list of labels that are newly added
-     * @return
+     * @return the list of labels that are newly added
      */
     public List<String> getAddedLabels() {
         return addedLabels;
     }
 
     /**
-     * Returns the name of the suggested label, if it exists
-     * @return
+     * @return the name of the suggested label, if it exists
      */
     public Optional<String> getCurrentSuggestion() {
         if (currentSuggestionIndex.isPresent()) {
@@ -163,31 +157,29 @@ public class LabelPickerState {
     }
 
     /**
-     * Returns the names of the labels that match the current query
-     * @return
+     * @return the names of the labels that match the current query
      */
     public List<String> getMatchedLabels() {
         return matchedLabels;
     }
 
-    /*
-     * Non-static Helper functions
+    /**
+     * Removes labels that belong to the same group as the given label
+     * @param label
      */
+    private void removeConflictingLabels(TurboLabel label) {
+        if (!label.isInExclusiveGroup()) return;
 
-    private void removeConflictingLabels(String labelName) {
-        TurboLabel queryLabel = new TurboLabel("", labelName);
-        if (!queryLabel.isInExclusiveGroup()) return;
-
-        String group = queryLabel.getGroupName();
+        String group = label.getGroupName();
         // Remove from addedLabels
         addedLabels = addedLabels.stream()
-                .filter(label -> !new TurboLabel("", label).getGroupName().equals(group))
+                .filter(name -> !new TurboLabel("", name).getGroupName().equals(group))
                 .collect(Collectors.toList());
 
         // Add to removedLabels all initialLabels that have conflicting group
         removedLabels.addAll(initialLabels.stream()
-                .filter(label -> new TurboLabel("", label).getGroupName().equals(group) 
-                    && !removedLabels.contains(labelName))
+                .filter(name -> new TurboLabel("", name).getGroupName().equals(group) 
+                    && !removedLabels.contains(label.getFullName()))
                 .collect(Collectors.toList()));
     }
 
@@ -203,18 +195,25 @@ public class LabelPickerState {
         return this.removedLabels.contains(name);
     }
 
+    /**
+     * @return suggested label 
+     */
     private String getSuggestedLabel() {
         return matchedLabels.get(currentSuggestionIndex.getAsInt());
     }
 
+    /**
+     * @return true if a suggestion index is positive and within the list of matched labels
+     */
     private boolean isValidSuggestionIndex() {
         return currentSuggestionIndex.getAsInt() >= 0 && currentSuggestionIndex.getAsInt() < matchedLabels.size();
     }
 
-    /*
-     * Static Helper functions
-     */
 
+    /**
+     * @param userInput
+     * @return list of confirmed keywords based on given userInput
+     */
     private static List<String> getConfirmedKeywords(String userInput) {
         ArrayList<String> confirmedKeywords = new ArrayList<>();
 
@@ -228,6 +227,12 @@ public class LabelPickerState {
         return confirmedKeywords;
     }
 
+    /**
+     * A keyword is considered in progress if there is no space after it i.e  given
+     * an input "test dummy world", "world" is the keyword in progress.
+     * @param userInput
+     * @return the keyword in progress based on the userInput
+     */
     private static Optional<String> getKeywordInProgress(String userInput) {
         String[] keywords = userInput.split("\\s+");
         if (keywords.length == 0) return Optional.empty();

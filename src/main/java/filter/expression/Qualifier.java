@@ -710,9 +710,9 @@ public class Qualifier implements FilterExpression {
 
             // Matches labels belong to the given group
             Predicate<TurboLabel> sameGroup = l ->
-                l.getGroup().isPresent() && l.getGroup().get().equals(group);
+                l.isInGroup() && l.getGroupName().equals(group);
 
-            Comparator<TurboLabel> labelComparator = (x, y) -> x.getName().compareTo(y.getName());
+            Comparator<TurboLabel> labelComparator = (x, y) -> x.compareTo(y);
 
             List<TurboLabel> aLabels = model.getLabelsOfIssue(a, sameGroup);
             List<TurboLabel> bLabels = model.getLabelsOfIssue(b, sameGroup);
@@ -885,25 +885,25 @@ public class Qualifier implements FilterExpression {
 
         String group = "";
         if (inputLabel.isInGroup()) {
-            group = inputLabel.getGroup().get();
+            group = inputLabel.getGroupName();
         }
-        String labelName = inputLabel.getName();
+        String labelName = inputLabel.getShortName();
 
         if (candidateLabel.isInGroup()) {
             if (labelName.isEmpty()) {
                 // Check the group
-                if (candidateLabel.getGroup().get().contains(group)) {
+                if (candidateLabel.getGroupName().contains(group)) {
                     return true;
                 }
             } else {
-                if (candidateLabel.getGroup().get().contains(group)
-                    && candidateLabel.getName().contains(labelName)) {
+                if (candidateLabel.getGroupName().contains(group)
+                    && candidateLabel.getShortName().contains(labelName)) {
                     return true;
                 }
             }
         } else {
             // Check only the label name
-            if (group.isEmpty() && !labelName.isEmpty() && candidateLabel.getName().contains(labelName)) {
+            if (group.isEmpty() && !labelName.isEmpty() && candidateLabel.getShortName().contains(labelName)) {
                 return true;
             }
         }
