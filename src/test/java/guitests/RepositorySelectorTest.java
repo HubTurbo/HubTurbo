@@ -6,6 +6,7 @@ import static org.loadui.testfx.Assertions.assertNodeExists;
 
 import java.io.File;
 
+import javafx.application.Platform;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
@@ -79,7 +80,8 @@ public class RepositorySelectorTest extends UITest {
 
         // we check if the "dummy2/dummy2" is added to the repository selector
         // but the primary repo isn't changed
-        click("#dummy/dummy_col0_filterTextField");
+        Platform.runLater(find("#dummy/dummy_col0_filterTextField")::requestFocus);
+        PlatformEx.waitOnFxThread();
         type("repo:dummy2/dummy2");
         push(KeyCode.ENTER);
         assertEquals(2, comboBox.getItems().size());
