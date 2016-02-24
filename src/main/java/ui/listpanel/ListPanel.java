@@ -431,13 +431,4 @@ public class ListPanel extends FilterPanel {
             return cell;
         });
     }
-
-    private boolean isIndicatorApplicable(boolean isPrimaryRepo) {
-        HashSet<String> allReposInFilterExpr =
-                Qualifier.getMetaQualifierContent(getCurrentFilterExpression(), QualifierType.REPO);
-
-        boolean isPrimaryRepoChanged = isPrimaryRepo && allReposInFilterExpr.isEmpty();
-
-        return isPrimaryRepoChanged;
-    }
 }
