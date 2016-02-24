@@ -402,17 +402,13 @@ public class ListPanel extends FilterPanel {
 
     @Override
     protected void showRepoOpeningIndicator(RepoOpeningEvent e) {
-        if (isIndicatorApplicable(e.isPrimaryRepo)) {
-            setTranslucentCellFactory();
-            setLoadingIndicator();
-        }
+        setTranslucentCellFactory();
+        setLoadingIndicator();
     }
 
     @Override
     protected void hideRepoOpeningIndicator(RepoOpenedEvent e) {
-        if (isIndicatorApplicable(e.isPrimaryRepo)) {
-            removeLoadingIndicator();
-        }
+        removeLoadingIndicator();
     }
 
     @Override
