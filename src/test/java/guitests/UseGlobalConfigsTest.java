@@ -73,7 +73,7 @@ public class UseGlobalConfigsTest extends UITest {
         FilterTextField filterTextField0 = filterPanel0.getFilterTextField();
         waitUntilNodeAppears(filterTextField0);
         Platform.runLater(filterTextField0::requestFocus);
-        PlatformEx.waitOnFxThread();;
+        PlatformEx.waitOnFxThread();
         type("is");
         pushKeys(KeyCode.SHIFT, KeyCode.SEMICOLON);
         type("issue");
@@ -86,7 +86,7 @@ public class UseGlobalConfigsTest extends UITest {
         FilterTextField filterTextField1 = filterPanel1.getFilterTextField();
         waitUntilNodeAppears(filterTextField1);
         Platform.runLater(filterTextField1::requestFocus);
-        PlatformEx.waitOnFxThread();;
+        PlatformEx.waitOnFxThread();
         type("repo");
         pushKeys(KeyCode.SHIFT, KeyCode.SEMICOLON);
         type("dummy2/dummy2");
@@ -104,7 +104,7 @@ public class UseGlobalConfigsTest extends UITest {
         FilterPanel filterPanel2 = (FilterPanel) panels.getPanel(0);
         FilterTextField filterTextField2 = filterPanel2.getFilterTextField();
         Platform.runLater(filterTextField2::requestFocus);
-        PlatformEx.waitOnFxThread();;
+        PlatformEx.waitOnFxThread();
         type("is");
         pushKeys(KeyCode.SHIFT, KeyCode.SEMICOLON);
         type("open");
