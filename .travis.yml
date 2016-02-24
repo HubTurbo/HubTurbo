@@ -7,7 +7,7 @@ env:
     - TERM=dumb
 
 script:
-    - "./gradlew clean check -i"
+    - "./gradlew clean test -i"
 
 after_success:
     - "./gradlew jacocoRootReport coveralls"
@@ -16,6 +16,7 @@ branches:
   only:
     - master
     - release
+    - 1218-test-ci
 
 before_install:
     - "export DISPLAY=:99.0"
