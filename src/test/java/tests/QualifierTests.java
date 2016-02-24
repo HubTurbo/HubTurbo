@@ -169,6 +169,49 @@ public class QualifierTests {
         assertEquals(expected, actual);
     }
 
+    @Test
+    public void sortByAssignee_isNonSelfUpdate() {
+        List<TurboIssue> issues = testModel.getIssues();
+        Comparator<TurboIssue> comparator = getComparatorForSortQualifier("sort:nonSelfUpdate, assignee");
+
+        Collections.shuffle(issues);
+        Collections.sort(issues, comparator);
+        List<Integer> expected = Arrays.asList(4, 2, 1, 5, 3);
+        List<Integer> actual = issues.stream().map(TurboIssue::getId).collect(Collectors.toList());
+        assertEquals(expected, actual);
+        
+        // test: nonSelfUpdate alias
+        comparator = getComparatorForSortQualifier("sort:nonSelfUpdate, assignee");
+        Collections.shuffle(issues);
+        Collections.sort(issues, comparator);
+        actual = issues.stream().map(TurboIssue::getId).collect(Collectors.toList());
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void sortByDate() {
+        List<TurboIssue> issues = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            TurboIssue issue = new TurboIssue(FilterEvalTests.REPO, i, "");
+            issue.setUpdatedAt(LocalDateTime.of(2015, 6, 4 + i, 12, 0));
+            issues.add(issue);
+        }
+        Comparator<TurboIssue> comparator = getComparatorForSortQualifier("sort:date");
+        
+        Collections.shuffle(issues);
+        Collections.sort(issues, comparator);
+        List<Integer> expected = Arrays.asList(0, 1, 2, 3, 4);
+        List<Integer> actual = issues.stream().map(TurboIssue::getId).collect(Collectors.toList());
+        assertEquals(expected, actual);
+
+        // test: date alias
+        comparator = getComparatorForSortQualifier("sort:d");
+        Collections.shuffle(issues);
+        Collections.sort(issues, comparator);
+        actual = issues.stream().map(TurboIssue::getId).collect(Collectors.toList());
+        assertEquals(expected, actual);
+    }
+
     /**
      * Tests sort qualifier with only ~assignee key
      */
@@ -311,19 +354,18 @@ public class QualifierTests {
 
         List<TurboIssue> renderedIssues = new ArrayList<>(issues);
 
-        Collections.sort(renderedIssues,
-            Qualifier.getSortComparator(model, "repo", false, false));
 
-        assertEquals(Arrays.asList(5, 6, 7, 8, 9, 0, 1, 2, 3, 4), renderedIssues.stream()
-            .map(TurboIssue::getId)
-            .collect(Collectors.toList()));
+        // test: sorting by repo
+        assertSorted(renderedIssues, Arrays.asList(5, 6, 7, 8, 9, 0, 1, 2, 3, 4), 
+                     model, "repo", false, false);
 
-        Collections.sort(renderedIssues,
-            Qualifier.getSortComparator(model, "repo", true, false));
+        // repo alias
+        assertSorted(renderedIssues, Arrays.asList(5, 6, 7, 8, 9, 0, 1, 2, 3, 4), 
+                     model, "r", false, false);
 
-        assertEquals(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9), renderedIssues.stream()
-            .map(TurboIssue::getId)
-            .collect(Collectors.toList()));
+        // inverted sort order
+        assertSorted(renderedIssues, Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9), 
+                     model, "repo", true, false);
     }
 
     @Test
@@ -341,19 +383,16 @@ public class QualifierTests {
 
         List<TurboIssue> renderedIssues = new ArrayList<>(issues);
 
-        Collections.sort(renderedIssues,
-            Qualifier.getSortComparator(model, "updated", false, false));
-
-        assertEquals(Arrays.asList(0, 1, 2, 3, 4), renderedIssues.stream()
-            .map(TurboIssue::getId)
-            .collect(Collectors.toList()));
-
-        Collections.sort(renderedIssues,
-            Qualifier.getSortComparator(model, "updated", true, false));
-
-        assertEquals(Arrays.asList(4, 3, 2, 1, 0), renderedIssues.stream()
-            .map(TurboIssue::getId)
-            .collect(Collectors.toList()));
+        // test: sorting by updated 
+        assertSorted(renderedIssues, Arrays.asList(0, 1, 2, 3, 4), 
+                     model, "updated", false, false);
+        // updated alias
+        assertSorted(renderedIssues, Arrays.asList(0, 1, 2, 3, 4), 
+                     model, "u", false, false);
+        
+        // inverted sort order
+        assertSorted(renderedIssues, Arrays.asList(4, 3, 2, 1, 0), 
+                     model, "updated", true, false);
     }
 
     @Test
@@ -369,19 +408,15 @@ public class QualifierTests {
 
         List<TurboIssue> renderedIssues = new ArrayList<>(issues);
 
-        Collections.sort(renderedIssues,
-            Qualifier.getSortComparator(model, "id", false, false));
 
-        assertEquals(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7), renderedIssues.stream()
-            .map(TurboIssue::getId)
-            .collect(Collectors.toList()));
+        // test: sorting by id
+        assertSorted(renderedIssues, Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7), 
+                     model, "id", false, false);
 
-        Collections.sort(renderedIssues,
-            Qualifier.getSortComparator(model, "id", true, false));
+        // inverted sort order
+        assertSorted(renderedIssues, Arrays.asList(7, 6, 5, 4, 3, 2, 1, 0), 
+                     model, "id", true, false);
 
-        assertEquals(Arrays.asList(7, 6, 5, 4, 3, 2, 1, 0), renderedIssues.stream()
-            .map(TurboIssue::getId)
-            .collect(Collectors.toList()));
     }
 
     @Test
@@ -399,19 +434,18 @@ public class QualifierTests {
 
         List<TurboIssue> renderedIssues = new ArrayList<>(issues);
 
-        Collections.sort(renderedIssues,
-            Qualifier.getSortComparator(model, "comments", false, false));
+        // test: sorting by comments
+        assertSorted(renderedIssues, Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7), 
+                     model, "comments", false, false);
 
-        assertEquals(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7), renderedIssues.stream()
-            .map(TurboIssue::getId)
-            .collect(Collectors.toList()));
+        // comments alias
+        assertSorted(renderedIssues, Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7), 
+                     model, "cm", false, false);
 
-        Collections.sort(renderedIssues,
-            Qualifier.getSortComparator(model, "comments", true, false));
+        // inverted sort order
+        assertSorted(renderedIssues, Arrays.asList(7, 6, 5, 4, 3, 2, 1, 0), 
+                     model, "comments", true, false);
 
-        assertEquals(Arrays.asList(7, 6, 5, 4, 3, 2, 1, 0), renderedIssues.stream()
-            .map(TurboIssue::getId)
-            .collect(Collectors.toList()));
     }
 
     @Test
@@ -457,19 +491,11 @@ public class QualifierTests {
         // lexicographical within groups, with those outside the group arranged last, by size
         // (being last can mean either larger or smaller depending on inversion)
 
-        Collections.sort(renderedIssues,
-            Qualifier.getLabelGroupComparator(model, "test", false));
+        assertSorted(renderedIssues, Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7), 
+                     model, "test", false, false);
 
-        assertEquals(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7), renderedIssues.stream()
-            .map(TurboIssue::getId)
-            .collect(Collectors.toList()));
-
-        Collections.sort(renderedIssues,
-            Qualifier.getLabelGroupComparator(model, "test", true));
-
-        assertEquals(Arrays.asList(5, 4, 3, 2, 1, 0, 6, 7), renderedIssues.stream()
-            .map(TurboIssue::getId)
-            .collect(Collectors.toList()));
+        assertSorted(renderedIssues, Arrays.asList(5, 4, 3, 2, 1, 0, 6, 7), 
+                     model, "test", true, false);
     }
     
     @Test
@@ -490,18 +516,38 @@ public class QualifierTests {
 
         List<TurboIssue> renderedIssues = new ArrayList<>(issues);
 
-        Collections.sort(renderedIssues,
-                Qualifier.getSortComparator(model, "status", false, false));
+        // test: sorting by status 
+        assertSorted(renderedIssues, Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7), 
+                     model, "status", false, false);
+
+        // status alias
+        assertSorted(renderedIssues, Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7), 
+                     model, "st", false, false);
+
+        // inverted sort order
+        assertSorted(renderedIssues, Arrays.asList(4, 5, 6, 7, 0, 1, 2, 3), 
+                     model, "status", true, false);
+
+    }
+    
+    /**
+     * Ensures that TurboIssues are ordered in a particular way given some sorting criteria
+     */
+    private void assertSorted(List<TurboIssue> issues, List<Integer> expectedIds,
+                                  IModel model, String sortCriteria, 
+                                  boolean isInverted, boolean isNonSelfUpdate) {
+        Collections.sort(issues, 
+            Qualifier.getSortComparator(model, sortCriteria, isInverted, isNonSelfUpdate));
         
-        assertEquals(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7), renderedIssues.stream()
+        assertEquals(expectedIds, getIds(issues));
+    }
+
+    /**
+     * Get list of ids from TurboIssues 
+     */
+    private List<Integer> getIds(List<TurboIssue> issues) {
+        return issues.stream()
                 .map(TurboIssue::getId)
-                .collect(Collectors.toList()));
-        
-        Collections.sort(renderedIssues,
-                Qualifier.getSortComparator(model, "status", true, false));
-        
-        assertEquals(Arrays.asList(4, 5, 6, 7, 0, 1, 2, 3), renderedIssues.stream()
-                .map(TurboIssue::getId)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
     }
 }

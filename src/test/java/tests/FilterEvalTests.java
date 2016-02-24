@@ -9,17 +9,24 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import backend.interfaces.IModel;
 import backend.resource.*;
 import filter.ParseException;
 import filter.Parser;
+import filter.SemanticException;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
+import filter.expression.QualifierType;
 import prefs.Preferences;
 
 public class FilterEvalTests {
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     private final IModel empty;
     public static final String REPO = "test/test";
@@ -29,73 +36,67 @@ public class FilterEvalTests {
         empty.setDefaultRepo(REPO);
     }
 
-    /**
-     * Helper method for testing an issue against a filter string in the context
-     * of an empty model.
-     */
-    public boolean matches(String filterExpr, TurboIssue issue) {
-        return Qualifier.process(empty, Parser.parse(filterExpr), issue);
-    }
-
     @Test
-    public void invalid() {
+    public void checksInvalidQualifier() {
         TurboIssue issue = new TurboIssue(REPO, 1, "title");
-        assertEquals(false, matches("something:a", issue));
+        assertFalse(matches("something:a", issue));
     }
 
     @Test
-    public void falseQualifier() {
+    public void satisfiesFalseQualifier() {
         TurboIssue issue = new TurboIssue(REPO, 1, "1");
         TurboMilestone milestone = new TurboMilestone(REPO, 1, "v1.0");
 
         IModel model = TestUtils.modelWith(issue, milestone);
 
-        assertEquals(false, Qualifier.process(model, Qualifier.FALSE, issue));
+        assertFalse(Qualifier.process(model, Qualifier.FALSE, issue));
     }
 
     @Test
-    public void id() {
+    public void satisfiesId_validInputs() {
         TurboIssue issue1 = new TurboIssue(REPO, 1, "1");
 
-        assertEquals(true, matches("id:1", issue1));
-        assertEquals(true, matches("id:>=1", issue1));
-        assertEquals(true, matches("id:<=1", issue1));
-        assertEquals(false, matches("id:<1", issue1));
-        assertEquals(false, matches("id:>1", issue1));
-        assertEquals(false, matches("id:2", issue1));
+        assertTrue(matches("id:1", issue1));
+        assertTrue(matches("id:>=1", issue1));
+        assertTrue(matches("id:<=1", issue1));
+        assertFalse(matches("id:<1", issue1));
+        assertFalse(matches("id:>1", issue1));
+        assertFalse(matches("id:2", issue1));
 
-        assertEquals(true, matches("id:<2", issue1));
-        assertEquals(true, matches("id:<=2", issue1));
-        assertEquals(true, matches("id:>0", issue1));
-        assertEquals(true, matches("id:>=0", issue1));
+        assertTrue(matches("id:<2", issue1));
+        assertTrue(matches("id:<=2", issue1));
+        assertTrue(matches("id:>0", issue1));
+        assertTrue(matches("id:>=0", issue1));
+    }
 
-        // Non-number
-        assertEquals(false, matches("id:a", issue1));
+    @Test
+    public void satisfiesId_invalidInputs_throwSemanticException() {
+        verifySemanticException(QualifierType.ID, "id:something");
     }
 
     private void testForPresenceOfKeywords(String prefix, TurboIssue issue) {
 
         // Exact match
-        assertEquals(true, matches(prefix + "test", issue));
+        assertTrue(matches(prefix + "test", issue));
 
         // Substring
-        assertEquals(true, matches(prefix + "te", issue));
+        assertTrue(matches(prefix + "te", issue));
 
         // Implicit conjunction
-        assertEquals(true, matches(prefix + "is a", issue));
+        assertTrue(matches(prefix + "is a", issue));
 
         // Like above but out of order
-        assertEquals(true, matches(prefix + "a is", issue));
+        assertTrue(matches(prefix + "a is", issue));
     }
 
     @Test
-    public void title() {
+    public void satisfiesTitle_validInputs() {
         TurboIssue issue = new TurboIssue(REPO, 1, "this is a test");
         testForPresenceOfKeywords("title:", issue);
     }
 
     @Test
-    public void body() {
+    public void satisfiesBody_validInputs() {
         TurboIssue issue = new TurboIssue(REPO, 1, "");
         issue.setDescription("this is a test");
         testForPresenceOfKeywords("body:", issue);
@@ -104,36 +105,37 @@ public class FilterEvalTests {
     }
 
     @Test
-    public void in() {
+    public void satisfiesIn_validInputs() {
         TurboIssue issue = new TurboIssue(REPO, 1, "");
         issue.setDescription("this is a test");
         testForPresenceOfKeywords("in:body ", issue);
 
         issue = new TurboIssue(REPO, 1, "this is a test");
         testForPresenceOfKeywords("in:title ", issue);
-
-        assertEquals(false, matches("in:something test", issue));
-        assertEquals(false, matches("in:something te", issue));
-        assertEquals(false, matches("in:something is a", issue));
-        assertEquals(false, matches("in:something a is", issue));
-    }
-
-    private void testMilestoneParsing(String milestoneQualifier, TurboIssue issue, IModel model) {
-        assertEquals(true, Qualifier.process(model, Parser.parse(milestoneQualifier + ":" + "v1.0"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse(milestoneQualifier + ":" + "v1"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse(milestoneQualifier + ":" + "v"), issue));
-        assertEquals(false, Qualifier.process(model, Parser.parse(milestoneQualifier + ":" + "1"), issue));
-
-        try {
-            assertEquals(true, Qualifier.process(model, Parser.parse(milestoneQualifier + ":."), issue));
-            fail(". is not a valid token on its own");
-        } catch (ParseException ignored) {
-        }
-        assertEquals(false, matches(milestoneQualifier + ":what", issue));
+        testForPresenceOfKeywords("in:t ", issue);
     }
 
     @Test
-    public void milestone() {
+    public void satisfiesIn_invalidInputs_throwSemanticException() {
+        verifySemanticException(QualifierType.IN, "in:something test");
+    }
+
+    private void testMilestoneParsing(String milestoneQualifier, TurboIssue issue, IModel model) {
+        assertTrue(Qualifier.process(model, Parser.parse(milestoneQualifier + ":" + "v1.0"), issue));
+        assertTrue(Qualifier.process(model, Parser.parse(milestoneQualifier + ":" + "v1"), issue));
+        assertTrue(Qualifier.process(model, Parser.parse(milestoneQualifier + ":" + "v"), issue));
+        assertFalse(Qualifier.process(model, Parser.parse(milestoneQualifier + ":" + "1"), issue));
+
+        try {
+            assertTrue(Qualifier.process(model, Parser.parse(milestoneQualifier + ":."), issue));
+            fail(". is not a valid token on its own");
+        } catch (ParseException ignored) {
+        }
+        assertFalse(matches(milestoneQualifier + ":what", issue));
+    }
+
+    @Test
+    public void satisfiesMilestone_validInputs() {
         TurboMilestone milestone = new TurboMilestone(REPO, 1, "v1.0");
 
         TurboIssue issue = new TurboIssue(REPO, 1, "");
@@ -142,6 +144,8 @@ public class FilterEvalTests {
         IModel model = TestUtils.modelWith(issue, milestone);
 
         testMilestoneParsing("milestone", issue, model);
+        // test: qualifier alias
+        testMilestoneParsing("m", issue, model);
 
         // milestone aliases
         // - sorting of milestone is by due date
@@ -212,77 +216,77 @@ public class FilterEvalTests {
         FilterExpression noMilestoneAlias;
 
         noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr-3"));
-        assertEquals(true, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+        assertTrue(Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
 
         noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr-2"));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
-        assertEquals(true, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertTrue(Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
 
         noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr-1"));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
-        assertEquals(true, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertTrue(Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
 
         noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr"));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
-        assertEquals(true, Qualifier.process(model, noMilestoneAlias, iCurr));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertTrue(Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
 
         noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr+1"));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
-        assertEquals(true, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertTrue(Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
 
         noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr+2"));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
-        assertEquals(true, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertTrue(Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
 
         noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr+3"));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
 
         // test: negation alias
         noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("-milestone:curr"));
-        assertEquals(true, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
-        assertEquals(true, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
-        assertEquals(true, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
-        assertEquals(true, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
-        assertEquals(true, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
-        assertEquals(true, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+        assertTrue(Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertTrue(Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertTrue(Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertTrue(Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertTrue(Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertTrue(Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
 
         // test: no milestone in model should return qualifier false
         model = TestUtils.singletonModel(new Model(REPO,
@@ -293,71 +297,71 @@ public class FilterEvalTests {
                 new ArrayList<>()));
 
         noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr-3"));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
 
         noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr-2"));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
 
         noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr-1"));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
 
         noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr"));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
 
         noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr+1"));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
 
         noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr+2"));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
 
         noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr+3"));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin3));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin2));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrMin1));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurr));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
-        assertEquals(false, Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin3));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin2));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin1));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurr));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
+        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
     }
 
     @Test
-    public void label() {
+    public void satisfiesLabel_validInputs() {
         TurboLabel label = TurboLabel.exclusive(REPO, "type", "bug");
 
         TurboIssue issue = new TurboIssue(REPO, 1, "");
@@ -365,17 +369,17 @@ public class FilterEvalTests {
 
         IModel model = TestUtils.modelWith(issue, label);
 
-        assertEquals(false, Qualifier.process(model, Parser.parse("label:type"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("label:type."), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("label:type.bug"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("label:bug"), issue));
+        assertFalse(Qualifier.process(model, Parser.parse("label:type"), issue));
+        assertTrue(Qualifier.process(model, Parser.parse("label:type."), issue));
+        assertTrue(Qualifier.process(model, Parser.parse("label:type.bug"), issue));
+        assertTrue(Qualifier.process(model, Parser.parse("label:bug"), issue));
         try {
-            assertEquals(true, Qualifier.process(model, Parser.parse("label:.bug"), issue));
+            assertTrue(Qualifier.process(model, Parser.parse("label:.bug"), issue));
             fail(". cannot begin symbols");
         } catch (ParseException ignored) {
         }
         try {
-            assertEquals(false, Qualifier.process(model, Parser.parse("label:."), issue));
+            assertFalse(Qualifier.process(model, Parser.parse("label:."), issue));
             fail(". is not a valid token on its own");
         } catch (ParseException ignored) {
         }
@@ -396,7 +400,7 @@ public class FilterEvalTests {
             new ArrayList<>(),
             new ArrayList<>())));
 
-        assertEquals(true, Qualifier.process(model, Parser.parse("label:t."), issue));
+        assertTrue(Qualifier.process(model, Parser.parse("label:t."), issue));
 
         // Label without a group
 
@@ -407,24 +411,24 @@ public class FilterEvalTests {
 
         model = TestUtils.modelWith(issue, label);
 
-        assertEquals(false, Qualifier.process(model, Parser.parse("label:bug."), issue));
-        assertEquals(false, Qualifier.process(model, Parser.parse("label:type.bug"), issue));
-        assertEquals(false, Qualifier.process(model, Parser.parse("label:type"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("label:bug"), issue));
+        assertFalse(Qualifier.process(model, Parser.parse("label:bug."), issue));
+        assertFalse(Qualifier.process(model, Parser.parse("label:type.bug"), issue));
+        assertFalse(Qualifier.process(model, Parser.parse("label:type"), issue));
+        assertTrue(Qualifier.process(model, Parser.parse("label:bug"), issue));
         try {
-            assertEquals(true, Qualifier.process(model, Parser.parse("label:.bug"), issue));
+            assertTrue(Qualifier.process(model, Parser.parse("label:.bug"), issue));
             fail(". cannot begin symbols");
         } catch (ParseException ignored) {
         }
         try {
-            assertEquals(false, Qualifier.process(model, Parser.parse("label:."), issue));
+            assertFalse(Qualifier.process(model, Parser.parse("label:."), issue));
             fail(". is not a valid token on its own");
         } catch (ParseException ignored) {
         }
     }
 
     @Test
-    public void assignee() {
+    public void satisfiesAssignee_validInputs() {
         TurboUser user = new TurboUser(REPO, "bob", "alice");
 
         TurboIssue issue = new TurboIssue(REPO, 1, "");
@@ -432,26 +436,32 @@ public class FilterEvalTests {
 
         IModel model = TestUtils.modelWith(issue, user);
 
-        assertEquals(true, Qualifier.process(model, Parser.parse("assignee:BOB"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("assignee:bob"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("assignee:alice"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("assignee:o"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("assignee:lic"), issue));
+        assertTrue(Qualifier.process(model, Parser.parse("assignee:BOB"), issue));
+        assertTrue(Qualifier.process(model, Parser.parse("assignee:bob"), issue));
+        assertTrue(Qualifier.process(model, Parser.parse("assignee:alice"), issue));
+        assertTrue(Qualifier.process(model, Parser.parse("assignee:o"), issue));
+        assertTrue(Qualifier.process(model, Parser.parse("assignee:lic"), issue));
+
+        // test: qualifier alias
+        assertTrue(Qualifier.process(model, Parser.parse("as:BOB"), issue));
     }
 
     @Test
-    public void author() {
+    public void satisfiesAuthor_validInputs() {
         TurboIssue issue = new TurboIssue(REPO, 1, "", "bob", null, false);
 
-        assertEquals(true, matches("author:BOB", issue));
-        assertEquals(true, matches("author:bob", issue));
-        assertEquals(false, matches("author:alice", issue));
-        assertEquals(true, matches("author:o", issue));
-        assertEquals(false, matches("author:lic", issue));
+        assertTrue(matches("author:BOB", issue));
+        assertTrue(matches("author:bob", issue));
+        assertFalse(matches("author:alice", issue));
+        assertTrue(matches("author:o", issue));
+        assertFalse(matches("author:lic", issue));
+
+        // test: qualifier alias
+        assertTrue(matches("au:bob", issue));
     }
 
     @Test
-    public void involves() {
+    public void satisfiesInvolves_validInput() {
         // involves = assignee || author
 
         // assignee
@@ -462,242 +472,302 @@ public class FilterEvalTests {
 
         IModel model = TestUtils.modelWith(issue, user);
 
-        assertEquals(true, Qualifier.process(model, Parser.parse("involves:BOB"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("involves:bob"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("involves:alice"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("involves:o"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("involves:lic"), issue));
+        assertTrue(Qualifier.process(model, Parser.parse("involves:BOB"), issue));
+        assertTrue(Qualifier.process(model, Parser.parse("involves:bob"), issue));
+        assertTrue(Qualifier.process(model, Parser.parse("involves:alice"), issue));
+        assertTrue(Qualifier.process(model, Parser.parse("involves:o"), issue));
+        assertTrue(Qualifier.process(model, Parser.parse("involves:lic"), issue));
+
+        // test: qualifier alias
+        assertTrue(Qualifier.process(model, Parser.parse("user:BOB"), issue));
 
         // author
         issue = new TurboIssue(REPO, 1, "", "bob", null, false);
 
-        assertEquals(true, Qualifier.process(model, Parser.parse("involves:BOB"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("involves:bob"), issue));
-        assertEquals(false, Qualifier.process(model, Parser.parse("involves:alice"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("involves:o"), issue));
-        assertEquals(false, Qualifier.process(model, Parser.parse("involves:lic"), issue));
+        assertTrue(Qualifier.process(model, Parser.parse("involves:BOB"), issue));
+        assertTrue(Qualifier.process(model, Parser.parse("involves:bob"), issue));
+        assertFalse(Qualifier.process(model, Parser.parse("involves:alice"), issue));
+        assertTrue(Qualifier.process(model, Parser.parse("involves:o"), issue));
+        assertFalse(Qualifier.process(model, Parser.parse("involves:lic"), issue));
     }
 
     @Test
-    public void state() {
+    public void satisfiesState_validInputs() {
         TurboIssue issue = new TurboIssue(REPO, 1, "");
         issue.setOpen(false);
-        assertEquals(false, matches("state:open", issue));
-        assertEquals(false, matches("state:o", issue));
-        assertEquals(true, matches("state:closed", issue));
+        assertFalse(matches("state:open", issue));
+        assertFalse(matches("state:o", issue));
+        assertTrue(matches("state:closed", issue));
+        assertTrue(matches("state:c", issue));
+
+        // test: qualifier alias
+        assertFalse(matches("st:open", issue));
     }
 
     @Test
-    public void has() {
+    public void satisfiesState_invalidInputs_throwSemanticException() {
+        verifySemanticException(QualifierType.STATE, "state:something");
+        verifySemanticException(QualifierType.STATE, "state:1");
+    }
+
+    @Test
+    public void satisfiesHasConditions_validInputs() {
         TurboLabel label = TurboLabel.exclusive(REPO, "type", "bug");
         TurboUser user = new TurboUser(REPO, "bob", "alice");
         TurboMilestone milestone = new TurboMilestone(REPO, 1, "v1.0");
 
         TurboIssue issue = new TurboIssue(REPO, 1, "");
 
-        assertEquals(false, matches("has:label", issue));
-        assertEquals(false, matches("has:milestone", issue));
-        assertEquals(false, matches("has:m", issue));
-        assertEquals(false, matches("has:assignee", issue));
-        assertEquals(false, matches("has:as", issue));
-        assertEquals(false, matches("has:something", issue));
+        assertFalse(matches("has:label", issue));
+        assertFalse(matches("has:milestone", issue));
+        assertFalse(matches("has:assignee", issue));
+
+        // test: qualifier alias
+        assertFalse(matches("h:label", issue));
+
+        // test: keyword aliases  
+        assertFalse(matches("has:l", issue));
+        assertFalse(matches("has:labels", issue));
+        assertFalse(matches("has:milestones", issue));
+        assertFalse(matches("has:m", issue));
+        assertFalse(matches("has:as", issue));
 
         issue.addLabel(label);
         IModel model = TestUtils.modelWith(issue, label);
 
-        assertEquals(true, Qualifier.process(model, Parser.parse("has:label"), issue));
-        assertEquals(false, Qualifier.process(model, Parser.parse("has:milestone"), issue));
-        assertEquals(false, Qualifier.process(model, Parser.parse("has:m"), issue));
-        assertEquals(false, Qualifier.process(model, Parser.parse("has:assignee"), issue));
-        assertEquals(false, Qualifier.process(model, Parser.parse("has:as"), issue));
-        assertEquals(false, matches("has:something", issue));
+        assertTrue(Qualifier.process(model, Parser.parse("has:label"), issue));
+        assertFalse(Qualifier.process(model, Parser.parse("has:milestone"), issue));
+        assertFalse(Qualifier.process(model, Parser.parse("has:assignee"), issue));
 
         issue.setMilestone(milestone);
         model = TestUtils.modelWith(issue, label, milestone);
 
-        assertEquals(true, Qualifier.process(model, Parser.parse("has:label"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("has:milestone"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("has:m"), issue));
-        assertEquals(false, Qualifier.process(model, Parser.parse("has:assignee"), issue));
-        assertEquals(false, Qualifier.process(model, Parser.parse("has:as"), issue));
-        assertEquals(false, matches("has:something", issue));
+        assertTrue(Qualifier.process(model, Parser.parse("has:label"), issue));
+        assertTrue(Qualifier.process(model, Parser.parse("has:milestone"), issue));
+        assertFalse(Qualifier.process(model, Parser.parse("has:assignee"), issue));
 
         issue.setAssignee(user);
         model = TestUtils.modelWith(issue, label, milestone, user);
 
-        assertEquals(true, Qualifier.process(model, Parser.parse("has:label"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("has:milestone"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("has:m"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("has:assignee"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("has:as"), issue));
-        assertEquals(false, matches("has:something", issue));
+        assertTrue(Qualifier.process(model, Parser.parse("has:label"), issue));
+        assertTrue(Qualifier.process(model, Parser.parse("has:milestone"), issue));
+        assertTrue(Qualifier.process(model, Parser.parse("has:assignee"), issue));
     }
 
     @Test
-    public void no() {
+    public void satisfiesHasConditions_invalidInputs_throwSemanticException() {
+        verifySemanticException(QualifierType.HAS, "has:something");
+        verifySemanticException(QualifierType.HAS, "has:2011-1-1");
+    }
+
+    @Test
+    public void satisfiesNoConditions_validInputs() {
         TurboLabel label = TurboLabel.exclusive(REPO, "type", "bug");
         TurboUser user = new TurboUser(REPO, "bob", "alice");
         TurboMilestone milestone = new TurboMilestone(REPO, 1, "v1.0");
 
         TurboIssue issue = new TurboIssue(REPO, 1, "");
 
-        assertEquals(true, matches("no:label", issue));
-        assertEquals(true, matches("no:milestone", issue));
-        assertEquals(true, matches("no:m", issue));
-        assertEquals(true, matches("no:assignee", issue));
-        assertEquals(true, matches("no:as", issue));
-        assertEquals(true, matches("no:something", issue));
+        assertTrue(matches("no:label", issue));
+        assertTrue(matches("no:milestone", issue));
+        assertTrue(matches("no:assignee", issue));
+
+        // test: keyword aliases  
+        assertTrue(matches("no:m", issue));
+        assertTrue(matches("no:as", issue));
 
         issue.addLabel(label);
         IModel model = TestUtils.modelWith(issue, label);
 
-        assertEquals(false, Qualifier.process(model, Parser.parse("no:label"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("no:milestone"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("no:m"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("no:assignee"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("no:as"), issue));
-        assertEquals(true, matches("no:something", issue));
+        assertFalse(Qualifier.process(model, Parser.parse("no:label"), issue));
+        assertTrue(Qualifier.process(model, Parser.parse("no:milestone"), issue));
+        assertTrue(Qualifier.process(model, Parser.parse("no:assignee"), issue));
 
         issue.setMilestone(milestone);
         model = TestUtils.modelWith(issue, label, milestone);
 
-        assertEquals(false, Qualifier.process(model, Parser.parse("no:label"), issue));
-        assertEquals(false, Qualifier.process(model, Parser.parse("no:milestone"), issue));
-        assertEquals(false, Qualifier.process(model, Parser.parse("no:m"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("no:assignee"), issue));
-        assertEquals(true, Qualifier.process(model, Parser.parse("no:as"), issue));
-        assertEquals(true, matches("no:something", issue));
+        assertFalse(Qualifier.process(model, Parser.parse("no:label"), issue));
+        assertFalse(Qualifier.process(model, Parser.parse("no:milestone"), issue));
+        assertTrue(Qualifier.process(model, Parser.parse("no:assignee"), issue));
 
         issue.setAssignee(user);
         model = TestUtils.modelWith(issue, label, milestone, user);
 
-        assertEquals(false, Qualifier.process(model, Parser.parse("no:label"), issue));
-        assertEquals(false, Qualifier.process(model, Parser.parse("no:milestone"), issue));
-        assertEquals(false, Qualifier.process(model, Parser.parse("no:m"), issue));
-        assertEquals(false, Qualifier.process(model, Parser.parse("no:assignee"), issue));
-        assertEquals(false, Qualifier.process(model, Parser.parse("no:as"), issue));
-        assertEquals(true, matches("no:something", issue));
+        assertFalse(Qualifier.process(model, Parser.parse("no:label"), issue));
+        assertFalse(Qualifier.process(model, Parser.parse("no:milestone"), issue));
+        assertFalse(Qualifier.process(model, Parser.parse("no:assignee"), issue));
     }
 
     @Test
-    public void type() {
-        TurboIssue issue = new TurboIssue(REPO, 1, "", "", null, true);
-
-        assertEquals(false, matches("type:issue", issue));
-        assertEquals(true, matches("type:pr", issue));
-        assertEquals(false, matches("type:sldkj", issue));
-
-        issue = new TurboIssue(REPO, 1, "", "", null, false);
-
-        assertEquals(true, matches("type:issue", issue));
-        assertEquals(false, matches("type:pr", issue));
-        assertEquals(false, matches("type:lkjs", issue));
+    public void satisfiesNoConditions_invalidInputs_throwSemanticException() {
+        verifySemanticException(QualifierType.NO, "no:something");
     }
 
     @Test
-    public void is() {
-
+    public void satisfiesType_validInputs() {
         TurboIssue issue = new TurboIssue(REPO, 1, "", "", null, true);
 
-        assertEquals(false, matches("is:sldkj", issue));
+        assertFalse(matches("type:issue", issue));
+        assertTrue(matches("type:pr", issue));
 
-        assertEquals(false, matches("is:issue", issue));
-        assertEquals(true, matches("is:pr", issue));
+        // test: qualifier alias
+        assertFalse(matches("ty:issue", issue));
 
-        assertEquals(true, matches("is:open", issue));
-        assertEquals(true, matches("is:unmerged", issue));
-        assertEquals(false, matches("is:closed", issue));
-        assertEquals(false, matches("is:merged", issue));
-
-        issue.setOpen(false);
-
-        assertEquals(false, matches("is:open", issue));
-        assertEquals(false, matches("is:unmerged", issue));
-        assertEquals(true, matches("is:closed", issue));
-        assertEquals(true, matches("is:merged", issue));
+        // test: keyword aliases
+        assertFalse(matches("type:i", issue));
+        assertTrue(matches("type:p", issue));
 
         issue = new TurboIssue(REPO, 1, "", "", null, false);
 
-        assertEquals(true, matches("is:issue", issue));
-        assertEquals(false, matches("is:pr", issue));
+        assertTrue(matches("type:issue", issue));
+        assertFalse(matches("type:pr", issue));
+    }
 
-        assertEquals(true, matches("is:open", issue));
-        assertEquals(false, matches("is:closed", issue));
+    @Test
+    public void satisfiesType_invalidInputs_throwSemanticException() {
+        verifySemanticException(QualifierType.TYPE, "type:something");
+        verifySemanticException(QualifierType.TYPE, "type:2011-1-1");
+    }
 
-        // Not a PR
-        assertEquals(false, matches("is:unmerged", issue));
-        assertEquals(false, matches("is:merged", issue));
+    @Test
+    public void satisfiesIsConditions_validInputs() {
+
+        TurboIssue issue = new TurboIssue(REPO, 1, "", "", null, true);
+
+        assertFalse(matches("is:issue", issue));
+        assertTrue(matches("is:pr", issue));
+
+        assertTrue(matches("is:open", issue));
+        assertTrue(matches("is:unmerged", issue));
+        assertFalse(matches("is:closed", issue));
+        assertFalse(matches("is:merged", issue));
+
+        // test: keyword aliases
+        assertFalse(matches("is:i", issue));
+        assertTrue(matches("is:p", issue));
+        assertTrue(matches("is:o", issue));
+        assertTrue(matches("is:um", issue));
+        assertFalse(matches("is:c", issue));
+        assertFalse(matches("is:mg", issue));
 
         issue.setOpen(false);
 
-        assertEquals(false, matches("is:open", issue));
-        assertEquals(true, matches("is:closed", issue));
+        assertFalse(matches("is:open", issue));
+        assertFalse(matches("is:unmerged", issue));
+        assertTrue(matches("is:closed", issue));
+        assertTrue(matches("is:merged", issue));
+
+        issue = new TurboIssue(REPO, 1, "", "", null, false);
+
+        assertTrue(matches("is:issue", issue));
+        assertFalse(matches("is:pr", issue));
+
+        assertTrue(matches("is:open", issue));
+        assertFalse(matches("is:closed", issue));
 
         // Not a PR
-        assertEquals(false, matches("is:unmerged", issue));
-        assertEquals(false, matches("is:merged", issue));
+        assertFalse(matches("is:unmerged", issue));
+        assertFalse(matches("is:merged", issue));
+
+        issue.setOpen(false);
+
+        assertFalse(matches("is:open", issue));
+        assertTrue(matches("is:closed", issue));
+
+        // Not a PR
+        assertFalse(matches("is:unmerged", issue));
+        assertFalse(matches("is:merged", issue));
 
         // Read status
 
-        assertEquals(false, issue.isCurrentlyRead());
+        assertFalse(issue.isCurrentlyRead());
 
-        assertEquals(true, matches("is:unread", issue));
-        assertEquals(false, matches("is:read", issue));
+        assertTrue(matches("is:unread", issue));
+        assertTrue(matches("is:ur", issue));
+        assertFalse(matches("is:read", issue));
+        assertFalse(matches("is:rd", issue));
 
         issue.setUpdatedAt(LocalDateTime.of(2015, 2, 17, 2, 10));
         issue.setMarkedReadAt(Optional.of(LocalDateTime.of(2015, 1, 6, 12, 15)));
 
-        assertEquals(true, matches("is:unread", issue));
-        assertEquals(false, matches("is:read", issue));
+        assertTrue(matches("is:unread", issue));
+        assertFalse(matches("is:read", issue));
 
         issue.setUpdatedAt(LocalDateTime.of(2015, 1, 1, 1, 1));
         issue.setMarkedReadAt(Optional.of(LocalDateTime.of(2015, 1, 6, 12, 15)));
 
-        assertEquals(false, matches("is:unread", issue));
-        assertEquals(true, matches("is:read", issue));
+        assertFalse(matches("is:unread", issue));
+        assertTrue(matches("is:read", issue));
     }
 
     @Test
-    public void created() {
+    public void satisfiesIs_invalidInputs_throwSemanticException() {
+        verifySemanticException(QualifierType.IS, "is:something");
+        verifySemanticException(QualifierType.IS, "is:2011-1-1");
+    }
+
+    @Test
+    public void satisfiesCreatedDate_validInputs() {
         TurboIssue issue = new TurboIssue(REPO, 1, "", "", LocalDateTime.of(2014, 12, 2, 12, 0), false);
 
-        assertEquals(false, matches("created:<2014-12-1", issue));
-        assertEquals(false, matches("created:<=2014-12-1", issue));
-        assertEquals(true, matches("created:>2014-12-1", issue));
-        assertEquals(true, matches("created:2014-12-2", issue));
-        assertEquals(false, matches("created:nondate", issue));
+        assertFalse(matches("created:<2014-12-1", issue));
+        assertFalse(matches("created:<=2014-12-1", issue));
+        assertTrue(matches("created:>2014-12-1", issue));
+        assertTrue(matches("created:2014-12-2", issue));
+        
+        // test: qualifier alias
+        assertFalse(matches("cr:<2014-12-1", issue));
     }
 
     @Test
-    public void updated() {
+    public void satisfiesCreationDate_invalidInputs_throwSemanticException() {
+        verifySemanticException(QualifierType.CREATED, "created:nondate");
+    }
+
+    @Test
+    public void satisfiesUpdatedHours_validInputs() {
         LocalDateTime now = LocalDateTime.now();
         Qualifier.setCurrentTime(now);
 
         TurboIssue issue = new TurboIssue(REPO, 1, "");
         issue.setUpdatedAt(now.minusDays(2));
 
-        assertEquals(false, matches("updated:<24", issue));
+        assertFalse(matches("updated:<24", issue));
         assertEquals(matches("updated:<24", issue),
             matches("updated:24", issue));
-        assertEquals(true, matches("updated:>24", issue));
-        assertEquals(false, matches("updated:nondate", issue));
+        assertTrue(matches("updated:>24", issue));
+
+        // test: qualifier alias
+        assertFalse(matches("u:<24", issue));
 
         issue = new TurboIssue(REPO, 1, "");
         issue.setUpdatedAt(now.minusDays(1));
 
-        assertEquals(true, matches("updated:<26", issue));
+        assertTrue(matches("updated:<26", issue));
         assertEquals(matches("updated:<26", issue),
             matches("updated:26", issue));
-        assertEquals(false, matches("updated:>26", issue));
-        assertEquals(false, matches("updated:nondate", issue));
+        assertFalse(matches("updated:>26", issue));
     }
 
     @Test
-    public void repo() {
+    public void satisfiesUpdatedHours_invalidInputs_throwSemanticException() {
+        verifySemanticException(QualifierType.UPDATED, "updated:nondate");
+    }
+
+    @Test
+    public void satisfiesRepo_validInputs() {
         TurboIssue issue = new TurboIssue(REPO, 1, "");
 
-        assertEquals(true, matches("repo:" + REPO, issue));
-        assertEquals(false, matches("repo:something/else", issue));
+        assertTrue(matches("repo:" + REPO, issue));
+        assertFalse(matches("repo:something/else", issue));
+        
+        // test: qualifier alias
+        assertTrue(matches("r:" + REPO, issue));
+    }
+
+    @Test
+    public void satisfiesRepo_invalidInputs_throwSemanticException() {
+        verifySemanticException(QualifierType.REPO, "repo:2011-1-1");
     }
 
     @Test
@@ -725,5 +795,24 @@ public class FilterEvalTests {
         assertFalse(Qualifier.labelMatches("pri.hi", "p.high"));
         assertFalse(Qualifier.labelMatches("pi.hi", "p.high"));
         assertFalse(Qualifier.labelMatches(".", "p.high"));
+    }
+
+    /**
+     * Tests the filter string in the context of an empty model
+     */
+    public boolean matches(String filterExpr, TurboIssue issue) {
+        return Qualifier.process(empty, Parser.parse(filterExpr), issue);
+    }
+
+    /**
+     * Confirms that the input causes a Semantic Exception to be thrown
+     * with correct error message. Test fails if it doesn't.
+     */
+    public void verifySemanticException(QualifierType type, String invalidInput) {
+        TurboIssue issue = new TurboIssue(REPO, 1, "");
+        thrown.expect(SemanticException.class);
+        thrown.expectMessage(
+            String.format(SemanticException.ERROR_MESSAGE, type, type.getDescriptionOfValidInputs()));
+        matches(invalidInput, issue);
     }
 }

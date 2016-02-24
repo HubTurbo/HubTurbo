@@ -17,11 +17,13 @@ import util.Utility;
 import backend.interfaces.IModel;
 import filter.MetaQualifierInfo;
 import filter.QualifierApplicationException;
+import filter.SemanticException;
 
 public class Qualifier implements FilterExpression {
 
     public static final Qualifier EMPTY = new Qualifier(QualifierType.EMPTY, "");
     public static final Qualifier FALSE = new Qualifier(QualifierType.FALSE, "");
+
 
     private final QualifierType type;
 
@@ -108,6 +110,64 @@ public class Qualifier implements FilterExpression {
                 return q;
             }
         });
+    }
+
+    /**
+     * Expands aliases for Qualifier keyword in user input.
+     * Includes aliases for Qualifier that also functions as keyword 
+     * @param input
+     * @return 
+     */
+    public static String expandKeywordAliases(String input) {
+        
+        switch(input) {
+            case "as":
+                return "assignee";
+            case "body":
+            case "desc":
+            case "de":
+                return "description";
+            case "d":
+                return "date";
+            case "l":
+            case "labels":
+                return "label";
+            case "m":
+            case "milestones":
+                return "milestone";
+            case "r":
+                return "repo";
+            case "st":
+            case "status":
+                return "state";
+            case "t":
+                return "title";
+            case "u":
+                return "updated";
+            case "o":
+                return "open";
+            case "c":
+                return "closed";
+            case "i":
+                return "issue";
+            case "p":
+            case "pullrequest":
+                return "pr";
+            case "mg":
+                return "merged";
+            case "um":
+                return "unmerged";
+            case "rd":
+                return "read";
+            case "ur":
+                return "unread";
+            case "cm":
+                return "comments";
+            case "ns":
+                return "nonSelfUpdate";
+            default:
+                return input;
+        }
     }
 
     /**
@@ -337,11 +397,13 @@ public class Qualifier implements FilterExpression {
         case TITLE:
         case DESCRIPTION:
         case KEYWORD:
-            throw new QualifierApplicationException("Unnecessary filter: issue text cannot be changed by dragging");
+            throw new QualifierApplicationException(
+                "Unnecessary filter: issue text cannot be changed by dragging");
         case ID:
             throw new QualifierApplicationException("Unnecessary filter: id is immutable");
         case CREATED:
-            throw new QualifierApplicationException("Unnecessary filter: cannot change issue creation date");
+            throw new QualifierApplicationException(
+                "Unnecessary filter: cannot change issue creation date");
         case HAS:
         case NO:
         case IS:
@@ -356,9 +418,11 @@ public class Qualifier implements FilterExpression {
             applyAssignee(issue, model);
             break;
         case AUTHOR:
-            throw new QualifierApplicationException("Unnecessary filter: cannot change author of issue");
+            throw new QualifierApplicationException(
+                "Unnecessary filter: cannot change author of issue");
         case INVOLVES:
-            throw new QualifierApplicationException("Ambiguous filter: cannot change users involved with issue");
+            throw new QualifierApplicationException(
+                "Ambiguous filter: cannot change users involved with issue");
         case STATE:
             applyState(issue);
             break;
@@ -478,12 +542,12 @@ public class Qualifier implements FilterExpression {
 
     private static boolean shouldBeStripped(Qualifier q) {
         switch (q.getType()) {
-            case IN:
-            case SORT:
-            case COUNT:
-                return true;
-            default:
-                return false;
+        case IN:
+        case SORT:
+        case COUNT:
+            return true;
+        default:
+            return false;
         }
     }
 
@@ -501,19 +565,19 @@ public class Qualifier implements FilterExpression {
 
     public static boolean isMilestoneQualifier(Qualifier q) {
         switch (q.getType()) {
-            case MILESTONE:
-                return true;
-            default:
-                return false;
+        case MILESTONE:
+            return true;
+        default:
+            return false;
         }
     }
 
     public static boolean isUpdatedQualifier(Qualifier q) {
         switch (q.getType()) {
-            case UPDATED:
-                return true;
-            default:
-                return false;
+        case UPDATED:
+            return true;
+        default:
+            return false;
         }
     }
 
@@ -546,83 +610,83 @@ public class Qualifier implements FilterExpression {
 
         boolean isLabelGroup = false;
 
-        switch (key) {
-            case "comments":
-                comparator = (a, b) -> a.getCommentCount() - b.getCommentCount();
-                break;
-            case "repo":
-                comparator = (a, b) -> a.getRepoId().compareTo(b.getRepoId());
-                break;
-            case "updated":
-            case "date":
+        switch (expandKeywordAliases(key)) {
+        case "comments":
+            comparator = (a, b) -> a.getCommentCount() - b.getCommentCount();
+            break;
+        case "repo":
+            comparator = (a, b) -> a.getRepoId().compareTo(b.getRepoId());
+            break;
+        case "updated":
+        case "date":
+            comparator = (a, b) -> a.getUpdatedAt().compareTo(b.getUpdatedAt());
+            break;
+        case "nonSelfUpdate":
+            if (isSortableByNonSelfUpdates) {
+                comparator = (a, b) ->
+                    a.getMetadata().getNonSelfUpdatedAt().compareTo(b.getMetadata().getNonSelfUpdatedAt());
+            } else {
                 comparator = (a, b) -> a.getUpdatedAt().compareTo(b.getUpdatedAt());
-                break;
-            case "nonSelfUpdate":
-                if (isSortableByNonSelfUpdates) {
-                    comparator = (a, b) ->
-                        a.getMetadata().getNonSelfUpdatedAt().compareTo(b.getMetadata().getNonSelfUpdatedAt());
+            }
+            break;
+        case "assignee":
+        case "as":
+            comparator = (a, b) -> {
+                Optional<String> aAssignee = a.getAssignee();
+                Optional<String> bAssignee = b.getAssignee();
+
+                if (!aAssignee.isPresent() && !bAssignee.isPresent()) {
+                    return 0;
+                } else if (!aAssignee.isPresent()) {
+                    return 1;
+                } else if (!bAssignee.isPresent()) {
+                    return -1;
                 } else {
-                    comparator = (a, b) -> a.getUpdatedAt().compareTo(b.getUpdatedAt());
+                    return aAssignee.get().compareTo(bAssignee.get());
                 }
-                break;
-            case "assignee":
-            case "as":
-                comparator = (a, b) -> {
-                    Optional<String> aAssignee = a.getAssignee();
-                    Optional<String> bAssignee = b.getAssignee();
+            };
+            break;
+        case "milestone":
+        case "m":
+            comparator = (a, b) -> {
+                Optional<TurboMilestone> aMilestone = model.getMilestoneOfIssue(a);
+                Optional<TurboMilestone> bMilestone = model.getMilestoneOfIssue(b);
 
-                    if (!aAssignee.isPresent() && !bAssignee.isPresent()) {
+                if (!aMilestone.isPresent() && !bMilestone.isPresent()) {
+                    return 0;
+                } else if (!aMilestone.isPresent()) {
+                    return 1;
+                } else if (!bMilestone.isPresent()) {
+                    return -1;
+                } else {
+                    Optional<LocalDate> aDueDate = aMilestone.get().getDueDate();
+                    Optional<LocalDate> bDueDate = bMilestone.get().getDueDate();
+
+                    if (!aDueDate.isPresent() && !bDueDate.isPresent()) {
                         return 0;
-                    } else if (!aAssignee.isPresent()) {
+                    } else if (!aDueDate.isPresent()) {
                         return 1;
-                    } else if (!bAssignee.isPresent()) {
+                    } else if (!bDueDate.isPresent()) {
                         return -1;
                     } else {
-                        return aAssignee.get().compareTo(bAssignee.get());
+                        return -(TurboMilestone.getDueDateComparator()
+                            .compare(aMilestone.get(), bMilestone.get()));
                     }
-                };
-                break;
-            case "milestone":
-            case "m":
-                comparator = (a, b) -> {
-                    Optional<TurboMilestone> aMilestone = model.getMilestoneOfIssue(a);
-                    Optional<TurboMilestone> bMilestone = model.getMilestoneOfIssue(b);
-
-                    if (!aMilestone.isPresent() && !bMilestone.isPresent()) {
-                        return 0;
-                    } else if (!aMilestone.isPresent()) {
-                        return 1;
-                    } else if (!bMilestone.isPresent()) {
-                        return -1;
-                    } else {
-                        Optional<LocalDate> aDueDate = aMilestone.get().getDueDate();
-                        Optional<LocalDate> bDueDate = bMilestone.get().getDueDate();
-
-                        if (!aDueDate.isPresent() && !bDueDate.isPresent()) {
-                            return 0;
-                        } else if (!aDueDate.isPresent()) {
-                            return 1;
-                        } else if (!bDueDate.isPresent()) {
-                            return -1;
-                        } else {
-                            return -(TurboMilestone.getDueDateComparator()
-                                    .compare(aMilestone.get(), bMilestone.get()));
-                        }
-                    }
-                };
-                break;
-            case "id":
-                comparator = (a, b) -> a.getId() - b.getId();
-                break;
-            case "state":
-            case "status":
-            case "s":
-                comparator = (a, b) -> Boolean.compare(b.isOpen(), a.isOpen());
-                break;
-            default:
-                // Doesn't match anything; assume it's a label group
-                isLabelGroup = true;
-                break;
+                }
+            };
+            break;
+        case "id":
+            comparator = (a, b) -> a.getId() - b.getId();
+            break;
+        case "state":
+        case "status":
+        case "s":
+            comparator = (a, b) -> Boolean.compare(b.isOpen(), a.isOpen());
+            break;
+        default:
+            // Doesn't match anything; assume it's a label group
+            isLabelGroup = true;
+            break;
         }
 
         if (isLabelGroup) {
@@ -695,7 +759,7 @@ public class Qualifier implements FilterExpression {
         } else if (numberRange.isPresent()) {
             return numberRange.get().encloses(issue.getId());
         }
-        return false;
+        throw new SemanticException(type);
     }
 
     private boolean satisfiesUpdatedHours(TurboIssue issue) {
@@ -706,7 +770,7 @@ public class Qualifier implements FilterExpression {
         } else if (number.isPresent()) {
             updatedRange = new NumberRange(null, number.get(), true);
         } else {
-            return false;
+            throw new SemanticException(type);
         }
 
         LocalDateTime dateOfUpdate = issue.getUpdatedAt();
@@ -715,7 +779,8 @@ public class Qualifier implements FilterExpression {
     }
 
     private boolean satisfiesRepo(TurboIssue issue) {
-        if (!content.isPresent()) return false;
+        if (!content.isPresent()) throw new SemanticException(type);
+
         return issue.getRepoId().equalsIgnoreCase(content.get());
     }
 
@@ -726,28 +791,24 @@ public class Qualifier implements FilterExpression {
         } else if (dateRange.isPresent()) {
             return dateRange.get().encloses(creationDate);
         } else {
-            return false;
+            throw new SemanticException(type);
         }
     }
 
     private boolean satisfiesHasConditions(TurboIssue issue) {
-        if (!content.isPresent()) return false;
-        switch (content.get()) {
+        if (!content.isPresent()) throw new SemanticException(type);
+
+        switch (expandKeywordAliases(content.get())) {
         case "label":
-        case "labels":
             return issue.getLabels().size() > 0;
         case "milestone":
-        case "milestones":
-        case "m":
             assert issue.getMilestone() != null;
             return issue.getMilestone().isPresent();
         case "assignee":
-        case "assignees":
-        case "as":
             assert issue.getAssignee() != null;
             return issue.getAssignee().isPresent();
         default:
-            return false;
+            throw new SemanticException(type);
         }
     }
 
@@ -756,8 +817,9 @@ public class Qualifier implements FilterExpression {
     }
 
     private boolean satisfiesIsConditions(TurboIssue issue) {
-        if (!content.isPresent()) return false;
-        switch (content.get()) {
+        if (!content.isPresent()) throw new SemanticException(type);
+
+        switch (expandKeywordAliases(content.get())) {
         case "open":
         case "closed":
             return stateSatisfies(issue);
@@ -773,19 +835,20 @@ public class Qualifier implements FilterExpression {
         case "unread":
             return !issue.isCurrentlyRead();
         default:
-            return false;
+            throw new SemanticException(type);
         }
     }
 
     private boolean stateSatisfies(TurboIssue issue) {
-        if (!content.isPresent()) return false;
-        String content = this.content.get().toLowerCase();
+        if (!content.isPresent()) throw new SemanticException(type);
+
+        String content = expandKeywordAliases(this.content.get().toLowerCase());
         if (content.contains("open")) {
             return issue.isOpen();
         } else if (content.contains("closed")) {
             return !issue.isOpen();
         } else {
-            return false;
+            throw new SemanticException(type);
         }
     }
 
@@ -878,15 +941,13 @@ public class Qualifier implements FilterExpression {
     private boolean keywordSatisfies(TurboIssue issue, MetaQualifierInfo info) {
 
         if (info.getIn().isPresent()) {
-            switch (info.getIn().get()) {
+            switch (expandKeywordAliases(info.getIn().get())) {
             case "title":
                 return titleSatisfies(issue);
-            case "body":
-            case "desc":
             case "description":
                 return bodySatisfies(issue);
             default:
-                return false;
+                throw new SemanticException(QualifierType.IN);
             }
         } else {
             return titleSatisfies(issue) || bodySatisfies(issue);
@@ -904,16 +965,15 @@ public class Qualifier implements FilterExpression {
     }
 
     private boolean typeSatisfies(TurboIssue issue) {
-        if (!content.isPresent()) return false;
+        if (!content.isPresent()) throw new SemanticException(type);
         String content = this.content.get().toLowerCase();
-        switch (content) {
+        switch (expandKeywordAliases(content)) {
             case "issue":
                 return !issue.isPullRequest();
             case "pr":
-            case "pullrequest":
                 return issue.isPullRequest();
             default:
-                return false;
+                throw new SemanticException(type);
         }
     }
 
