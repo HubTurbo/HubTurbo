@@ -20,10 +20,8 @@ import util.events.RepoOpeningEvent;
 import util.events.testevents.ClearLogicModelEvent;
 import util.events.testevents.ClearLogicModelEventHandler;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -42,10 +40,10 @@ public class Logic {
     public LoginController loginController;
     public UpdateController updateController;
 
-    public Logic(UIManager uiManager, Preferences prefs) {
+    public Logic(UIManager uiManager, Preferences prefs, Optional<MultiModel> models) {
         this.uiManager = uiManager;
         this.prefs = prefs;
-        models = new MultiModel(prefs);
+        this.models = models.orElse(new MultiModel(prefs));
 
         loginController = new LoginController(this);
         updateController = new UpdateController(this);
@@ -200,18 +198,77 @@ public class Logic {
      * @return true if label replacement on GitHub was a success, false otherwise.
      */
     public CompletableFuture<Boolean> replaceIssueLabels(TurboIssue issue, List<String> newLabels) {
+        List<String> originalLabels = issue.getLabels();
+
         logger.info("Changing labels for " + issue + " on UI");
-        issue.setLabels(newLabels);
+        /* Calls models to replace the issue's labels locally since the the reference to the issue here
+           could be invalidated by changes to the models elsewhere */
+        Optional<TurboIssue> localReplaceResult =
+                models.replaceIssueLabels(issue.getRepoId(), issue.getId(), newLabels);
+        if (!localReplaceResult.isPresent()) {
+            return CompletableFuture.completedFuture(false);
+        }
         refreshUI();
 
-        return updateIssueLabelsOnRepo(issue, newLabels);
+        return updateIssueLabelsOnServer(issue, newLabels)
+                .thenApply((isUpdateSuccessful) -> handleIssueLabelsUpdateOnServerResult(
+                            isUpdateSuccessful, localReplaceResult.get(), originalLabels));
     }
 
-    private CompletableFuture<Boolean> updateIssueLabelsOnRepo(TurboIssue issue, List<String> newLabels) {
+    /**
+     * Gets the issue identified by {@code repoId} and {@code issueId} in {@link Logic#models}
+     * @param repoId
+     * @param issueId
+     * @return
+     */
+    private Optional<TurboIssue> getIssue(String repoId, int issueId) {
+        Optional<Model> modelLookUpResult = models.getModelById(repoId);
+        return Utility.safeFlatMapOptional(modelLookUpResult,
+                (model) -> model.getIssueById(issueId),
+                () -> logger.error("Model " + repoId + " not found in models"));
+    }
+
+    private CompletableFuture<Boolean> updateIssueLabelsOnServer(TurboIssue issue, List<String> newLabels) {
         logger.info("Changing labels for " + issue + " on GitHub");
-        return repoOpControl.replaceIssueLabels(issue, newLabels)
-                .thenApply(labels -> labels.containsAll(newLabels))
-                .exceptionally(Futures.withResult(false));
+        return repoOpControl.replaceIssueLabels(issue, newLabels);
+    }
+
+    /**
+     * Handles the result of updating an issue's labels on server. Current implementation includes
+     * reverting back to the original labels locally if the server update failed.
+     * @param isUpdateSuccessful
+     * @param localModifiedIssue
+     * @param originalLabels
+     * @return true if the server update is successful
+     */
+    private boolean handleIssueLabelsUpdateOnServerResult(boolean isUpdateSuccessful,
+                                                          TurboIssue localModifiedIssue,
+                                                          List<String> originalLabels) {
+        if (isUpdateSuccessful) {
+            return true;
+        }
+        logger.error("Unable to update model on server");
+        revertLocalLabelsReplace(localModifiedIssue, originalLabels);
+        return false;
+    }
+
+    /**
+     * Replaces labels of the issue in the {@link Logic#models} corresponding to {@code modifiedIssue} with
+     * {@code originalLabels} if the current labels on the issue is assigned at the same time as {@code modifiedIssue}
+     * @param modifiedIssue
+     * @param originalLabels
+     */
+    private void revertLocalLabelsReplace(TurboIssue modifiedIssue, List<String> originalLabels) {
+        TurboIssue currentIssue = getIssue(modifiedIssue.getRepoId(), modifiedIssue.getId()).orElse(modifiedIssue);
+        LocalDateTime originalLabelsModifiedAt = modifiedIssue.getLabelsLastModifiedAt();
+        LocalDateTime currentLabelsAssignedAt = currentIssue.getLabelsLastModifiedAt();
+        boolean isCurrentLabelsModifiedFromOriginalLabels = originalLabelsModifiedAt.isEqual(currentLabelsAssignedAt);
+
+        if (isCurrentLabelsModifiedFromOriginalLabels) {
+            logger.info("Reverting labels for issue " + currentIssue);
+            models.replaceIssueLabels(currentIssue.getRepoId(), currentIssue.getId(), originalLabels);
+            refreshUI();
+        }
     }
 
     /**

@@ -2,6 +2,7 @@ package tests;
 
 import backend.RepoIO;
 import backend.json.JSONStoreStub;
+import backend.resource.Model;
 import backend.resource.MultiModel;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -11,12 +12,16 @@ import ui.UI;
 import ui.components.StatusUIStub;
 import util.events.EventDispatcherStub;
 
-import java.util.Locale;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class MultiModelTest {
 
@@ -62,4 +67,35 @@ public class MultiModelTest {
         assertEquals(false, models.getModelById(repoId2).isPresent());
     }
 
+    /**
+     * Tests that replaceIssueLabels returns Optional.empty() if the model for the
+     * issue given in the argument can't be found
+     */
+    @Test
+    public void replaceIssueLabels_modelNotFound() {
+        MultiModel models = new MultiModel(mock(Preferences.class));
+        assertEquals(Optional.empty(), models.replaceIssueLabels("nonexistentrepo", 1, new ArrayList<>()));
+    }
+
+    /**
+     * Tests that replaceIssueLabels called the Model with the same id as the argument
+     * repoId and invoke replaceIssueLabels on that Model
+     */
+    @Test
+    public void replaceIssueLabels_successful() {
+        String repoId = "testowner/testrepo";
+        int issueId = 1;
+        List<String> labels = Arrays.asList("label1", "label2");
+
+        Model mockedModel = mock(Model.class);
+        when(mockedModel.getRepoId()).thenReturn(repoId);
+        when(mockedModel.getIssues()).thenReturn(new ArrayList<>());
+
+        MultiModel models = new MultiModel(mock(Preferences.class));
+        models.queuePendingRepository(repoId);
+        models.addPending(mockedModel);
+
+        models.replaceIssueLabels(repoId, issueId, labels);
+        verify(mockedModel).replaceIssueLabels(issueId, labels);
+    }
 }

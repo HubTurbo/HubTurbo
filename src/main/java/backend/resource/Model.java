@@ -3,6 +3,9 @@ package backend.resource;
 import backend.UpdateSignature;
 import backend.interfaces.IBaseModel;
 import backend.resource.serialization.SerializableModel;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import util.Utility;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +21,8 @@ public class Model implements IBaseModel {
     private final List<TurboLabel> labels;
     private final List<TurboMilestone> milestones;
     private final List<TurboUser> users;
+
+    private static final Logger logger = LogManager.getLogger(Model.class);
 
     /**
      * Standard constructor.
@@ -99,7 +104,7 @@ public class Model implements IBaseModel {
     }
 
     @Override
-    public List<TurboIssue> getIssues() {
+    public synchronized List<TurboIssue> getIssues() {
         return new ArrayList<>(issues);
     }
 
@@ -184,6 +189,22 @@ public class Model implements IBaseModel {
             .map(this::getLabelByActualName)
             .filter(Optional::isPresent).map(Optional::get)
             .collect(Collectors.toList());
+    }
+
+    /**
+     * Replaces labels of an issue specified by {@code issueId} with {@code labels}
+     * @param issueId
+     * @param labels
+     * @return the modified TurboIssue if successful
+     */
+    public synchronized Optional<TurboIssue> replaceIssueLabels(int issueId, List<String> labels) {
+        Optional<TurboIssue> issueLookUpResult = getIssueById(issueId);
+        return Utility.safeFlatMapOptional(issueLookUpResult,
+                (issue) -> {
+                    issue.setLabels(labels);
+                    return Optional.of(new TurboIssue(issue));
+                },
+                () -> logger.error("Issue " + issueId + " not found in model for " + repoId));
     }
 
     @SuppressWarnings("unused")

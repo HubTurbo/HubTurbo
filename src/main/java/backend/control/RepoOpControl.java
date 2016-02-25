@@ -56,9 +56,9 @@ public class RepoOpControl {
         return result;
     }
 
-    public CompletableFuture<List<String>> replaceIssueLabels(TurboIssue issue, List<String> labels) {
+    public CompletableFuture<Boolean> replaceIssueLabels(TurboIssue issue, List<String> labels) {
         init(issue.getRepoId());
-        CompletableFuture<List<String>> result = new CompletableFuture<>();
+        CompletableFuture<Boolean> result = new CompletableFuture<>();
         enqueue(new ReplaceIssueLabelsOp(repoIO, result, issue, labels));
         return result;
     }
