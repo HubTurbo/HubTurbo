@@ -10,10 +10,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 
+import javafx.event.Event;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Priority;
 
 import org.apache.logging.log4j.Logger;
@@ -40,6 +43,7 @@ public class ListPanel extends FilterPanel {
     private final UI ui;
     private final GUIController guiController;
     private int issueCount;
+    private boolean shouldTriggerIssueSelectedEvent = true;
 
     private final IssueListView listView;
     private final HashMap<Integer, Integer> issueCommentCounts = new HashMap<>();
@@ -138,14 +142,18 @@ public class ListPanel extends FilterPanel {
         setVgrow(listView, Priority.ALWAYS);
         setupKeyboardShortcuts();
         setupContextMenu();
+        setupIssueSelectedTrigger();
 
         listView.setOnItemSelected(i -> {
             updateContextMenu(contextMenu);
 
             TurboIssue issue = listView.getItems().get(i).getIssue();
-            ui.triggerEvent(
-                    new IssueSelectedEvent(issue.getRepoId(), issue.getId(), panelIndex, issue.isPullRequest())
-            );
+
+            if(shouldTriggerIssueSelectedEvent) {
+                ui.triggerEvent(
+                        new IssueSelectedEvent(issue.getRepoId(), issue.getId(), panelIndex, issue.isPullRequest())
+                );
+            }
 
             // Save the stored comment count as its own comment count.
             // The refreshItems(false) call that follows will remove the highlighted effect of the comment bubble.
@@ -154,6 +162,23 @@ public class ListPanel extends FilterPanel {
             issueNonSelfCommentCounts.put(issue.getId(), issue.getMetadata().getNonSelfCommentCount());
 
             refreshItems();
+        });
+    }
+
+    private void setupIssueSelectedTrigger(){
+        // filter right mouse button out. Choose only the left mouse button for triggering IssueSelectedEvent
+        listView.addEventFilter(MouseEvent.MOUSE_PRESSED, e -> {
+            if(e.isSecondaryButtonDown()) {
+                shouldTriggerIssueSelectedEvent = false;
+            }
+            else {
+                shouldTriggerIssueSelectedEvent = true;
+            }
+        });
+
+        //Also choose any key presses for triggering IssueSelectedEvent
+        listView.addEventFilter(KeyEvent.KEY_PRESSED, e -> {
+            shouldTriggerIssueSelectedEvent = true;
         });
     }
 
@@ -374,13 +399,13 @@ public class ListPanel extends FilterPanel {
             issue.markAsRead(UI.prefs);
 
             parentPanelControl.refresh();
+            shouldTriggerIssueSelectedEvent = true;
             listView.selectNextItem();
         }
     }
 
     private void markAllBelowAsUnread() {
-        Optional<GuiElement> item = listView.getSelectedItem();
-        if (item.isPresent()) {
+        if (listView.getSelectedIndex() >= 0) {
             for(int i = listView.getSelectedIndex(); i < listView.getItems().size(); i++){
                 TurboIssue issue = listView.getItems().get(i).getIssue();
                 issue.markAsUnread(UI.prefs);
@@ -390,8 +415,7 @@ public class ListPanel extends FilterPanel {
     }
 
     private void markAllBelowAsRead() {
-        Optional<GuiElement> item = listView.getSelectedItem();
-        if (item.isPresent()) {
+        if (listView.getSelectedIndex() >= 0) {
             for(int i = listView.getSelectedIndex(); i < listView.getItems().size(); i++){
                 TurboIssue issue = listView.getItems().get(i).getIssue();
                 issue.markAsRead(UI.prefs);
