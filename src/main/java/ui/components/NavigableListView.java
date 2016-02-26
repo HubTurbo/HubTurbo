@@ -216,6 +216,9 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
         return selectedIndex.map(getItems()::get);
     }
 
+    /**
+     * @return The integer value of the selected index in the list panel
+     */
     public int getSelectedIndex() {
         return selectedIndex.get();
     }
