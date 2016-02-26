@@ -53,8 +53,8 @@ public class ListPanel extends FilterPanel {
     private final ContextMenu contextMenu = new ContextMenu();
 
     private final MenuItem markAsReadUnreadMenuItem = new MenuItem();
-    private final MenuItem markAllBelowAsRead = new MenuItem();
-    private final MenuItem markAllBelowAsUnread = new MenuItem();
+    private final MenuItem markAllBelowAsReadMenuItem = new MenuItem();
+    private final MenuItem markAllBelowAsUnreadMenuItem = new MenuItem();
     private static final String markAsReadMenuItemText = "Mark as read (E)";
     private static final String markAsUnreadMenuItemText = "Mark as unread (U)";
     private static final String markAllAsUnreadMenuItemText = "Mark all below as unread";
@@ -324,18 +324,18 @@ public class ListPanel extends FilterPanel {
             changeLabels();
         });
 
-        markAllBelowAsRead.setText(markAllAsReadMenuItemText);
-        markAllBelowAsRead.setOnAction(e -> {
+        markAllBelowAsReadMenuItem.setText(markAllAsReadMenuItemText);
+        markAllBelowAsReadMenuItem.setOnAction(e -> {
             markAllBelowAsRead();
         });
 
-        markAllBelowAsUnread.setText(markAllAsUnreadMenuItemText);
-        markAllBelowAsUnread.setOnAction(e -> {
+        markAllBelowAsUnreadMenuItem.setText(markAllAsUnreadMenuItemText);
+        markAllBelowAsUnreadMenuItem.setOnAction(e -> {
             markAllBelowAsUnread();
         });
 
-        contextMenu.getItems().addAll(markAsReadUnreadMenuItem, markAllBelowAsRead,
-                markAllBelowAsUnread, changeLabelsMenuItem);
+        contextMenu.getItems().addAll(markAsReadUnreadMenuItem, markAllBelowAsReadMenuItem,
+                markAllBelowAsUnreadMenuItem, changeLabelsMenuItem);
         contextMenu.setOnShowing(e -> updateContextMenu(contextMenu));
         listView.setContextMenu(contextMenu);
 
@@ -368,6 +368,8 @@ public class ListPanel extends FilterPanel {
         Optional<GuiElement> item = listView.getSelectedItem();
         if (item.isPresent()) {
             markAsReadUnreadMenuItem.setDisable(false);
+            markAllBelowAsReadMenuItem.setDisable(false);
+            markAllBelowAsUnreadMenuItem.setDisable(false);
             TurboIssue selectedIssue = item.get().getIssue();
 
             if (selectedIssue.isCurrentlyRead()) {
@@ -377,6 +379,8 @@ public class ListPanel extends FilterPanel {
             }
         } else {
             markAsReadUnreadMenuItem.setDisable(true);
+            markAllBelowAsReadMenuItem.setDisable(true);
+            markAllBelowAsUnreadMenuItem.setDisable(true);
         }
 
         return markAsReadUnreadMenuItem;
