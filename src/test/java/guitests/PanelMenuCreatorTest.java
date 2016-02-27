@@ -45,30 +45,30 @@ public class PanelMenuCreatorTest extends UITest{
 
     @Test
     public void createPanelTest(){
-        clickMenu("Panels", "Create");
+        traverseMenu("Panels", "Create");
 
-        assertEquals(panelControl.getPanelCount(), 2);
-        assertEquals(panelControl.getCurrentlySelectedPanel(), Optional.of(1));
+        waitAndAssertEquals(2, panelControl::getPanelCount);
+        assertEquals(Optional.of(1), panelControl.getCurrentlySelectedPanel());
 
-        clickMenu("Panels", "Create (Left)");
-        assertEquals(panelControl.getPanelCount(), 3);
-        assertEquals(panelControl.getCurrentlySelectedPanel(), Optional.of(0));
+        traverseMenu("Panels", "Create (Left)");
+        waitAndAssertEquals(3, panelControl::getPanelCount);
+        assertEquals(Optional.of(0), panelControl.getCurrentlySelectedPanel());
 
-        clickMenu("Panels", "Close");
-        clickMenu("Panels", "Close");
+        traverseMenu("Panels", "Close");
+        traverseMenu("Panels", "Close");
     }
 
     private void customizedPanelMenuItemTest(String panelName, String panelFilter){
         PlatformEx.waitOnFxThread();
-        clickMenu("Panels", "Auto-create", panelName);
+        traverseMenu("Panels", "Auto-create", panelName);
 
-        assertEquals(panelControl.getPanelCount(), 2);
-        assertEquals(panelControl.getCurrentlySelectedPanel(), Optional.of(1));
+        waitAndAssertEquals(2, panelControl::getPanelCount);
+        assertEquals(Optional.of(1), panelControl.getCurrentlySelectedPanel());
 
         PanelInfo panelInfo = panelControl.getCurrentPanelInfos().get(1);
-        assertEquals(panelInfo.getPanelFilter(), panelFilter);
-        assertEquals(panelInfo.getPanelName(), panelName);
-        clickMenu("Panels", "Close");
+        waitAndAssertEquals(panelFilter, panelInfo::getPanelFilter);
+        assertEquals(panelName, panelInfo.getPanelName());
+        traverseMenu("Panels", "Close");
     }
 
 }
