@@ -37,36 +37,39 @@ public class BoardTests extends UITest {
     @Test
     public void duplicateNameTest() {
         // Save the current board
-        clickMenu("Boards", "Save as");
+        traverseMenu("Boards", "Save as");
+        waitUntilNodeAppears(hasText("OK"));
         // Use the default 'New Board' as board name
         // Workaround since we are unable to get text field into focus on Travis
         click("OK");
-        assertEquals(1, panelControl.getPanelCount());
+        waitAndAssertEquals(1, panelControl::getPanelCount);
 
         // Create a new panel, then save with the same name
         // Expected: Dialog shown to confirm duplicate name
-        clickMenu("Panels", "Create");
-        clickMenu("Boards", "Save as");
+        traverseMenu("Panels", "Create");
+        traverseMenu("Boards", "Save as");
+        waitUntilNodeAppears(hasText("OK"));
         click("OK");
         waitUntilNodeAppears(hasText("A board by the name 'New Board' already exists."));
 
         // Overwrite previous board, then open the board again
         // Expected: the board should contain 2 panels
         click("Yes");
-        clickMenu("Boards", "Open", "New Board");
-        assertEquals(2, panelControl.getPanelCount());
+        traverseMenu("Boards", "Open", "New Board");
+        waitAndAssertEquals(2, panelControl::getPanelCount);
 
 
         // Create a new panel, then save with the same name to show warning dialog,
         // don't save and try to reopen board
         // Expected: Board is not overwritten, should contain 2 panels
-        clickMenu("Panels", "Create");
-        assertEquals(3, panelControl.getPanelCount());
-        clickMenu("Boards", "Save as");
+        traverseMenu("Panels", "Create");
+        waitAndAssertEquals(3, panelControl::getPanelCount);
+        traverseMenu("Boards", "Save as");
+        waitUntilNodeAppears(hasText("OK"));
         click("OK");
         click("No");
         click("Cancel");
-        clickMenu("Boards", "Open", "New Board");
-        assertEquals(2, panelControl.getPanelCount());
+        traverseMenu("Boards", "Open", "New Board");
+        waitAndAssertEquals(2, panelControl::getPanelCount);
     }
 }

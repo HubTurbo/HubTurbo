@@ -40,7 +40,7 @@ public class BoardAutoCreatorTest extends UITest {
 
         assertEquals(panelControl.getNumberOfSavedBoards(), 0);
 
-        clickMenu("Boards", "Auto-create", "Milestones");
+        traverseMenu("Boards", "Auto-create", "Milestones");
 
         PlatformEx.waitOnFxThread();
         assertNodeExists(hasText("Milestones board has been created and loaded.\n\n" +
@@ -70,7 +70,7 @@ public class BoardAutoCreatorTest extends UITest {
     public void workAllocationBoardAutoCreationTest() {
         assertEquals(panelControl.getNumberOfSavedBoards(), 0);
 
-        clickMenu("Boards", "Auto-create", "Work Allocation");
+        traverseMenu("Boards", "Auto-create", "Work Allocation");
 
         PlatformEx.waitOnFxThread();
         assertNodeExists(hasText("Work Allocation board has been created and loaded.\n\n" +
@@ -100,7 +100,7 @@ public class BoardAutoCreatorTest extends UITest {
     public void sampleBoardAutoCreationTest() {
         assertEquals(panelControl.getNumberOfSavedBoards(), 0);
 
-        clickMenu("Boards", "Auto-create", SAMPLE_BOARD);
+        traverseMenu("Boards", "Auto-create", SAMPLE_BOARD);
 
         waitUntilNodeAppears(SAMPLE_BOARD_DIALOG);
         click("OK");
