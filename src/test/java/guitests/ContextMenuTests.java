@@ -14,6 +14,7 @@ import org.junit.Test;
 import ui.components.FilterTextField;
 import ui.listpanel.ListPanel;
 import ui.listpanel.ListPanelCell;
+import util.PlatformEx;
 
 public class ContextMenuTests extends UITest {
 
@@ -39,7 +40,7 @@ public class ContextMenuTests extends UITest {
      * All menu items should be disabled
      */
     @Test
-    public void test1() {
+    public void contextMenuDisabling_noIssueInListView_contextMenuItemsDisabled() {
         ListPanel issuePanel = find("#dummy/dummy_col0");
 
         click("#dummy/dummy_col0_filterTextField");
@@ -50,7 +51,7 @@ public class ContextMenuTests extends UITest {
         sleep(EVENT_DELAY);
 
         ContextMenu contextMenu = issuePanel.getContextMenu();
-        for(MenuItem menuItem : contextMenu.getItems()){
+        for (MenuItem menuItem : contextMenu.getItems()){
             assertTrue(menuItem.isDisable());
         }
     }
@@ -82,22 +83,9 @@ public class ContextMenuTests extends UITest {
      * Tests selecting "Mark all below as read" and "Mark all below as unread" context menu items
      */
     @Test
-    public void markAllBelowAsReadUnread() {
-        click("#dummy/dummy_col0_9");
-        rightClick("#dummy/dummy_col0_9");
-        click("Mark all below as read");
-        for(int i=9; i >= 1; i--){
-            ListPanelCell listPanelCell = find("#dummy/dummy_col0_" + String.valueOf(i));
-            assertTrue(listPanelCell.getIssue().isCurrentlyRead());
-        }
-
-        click("#dummy/dummy_col0_9");
-        rightClick("#dummy/dummy_col0_9");
-        click("Mark all below as unread");
-        for(int i=9; i >= 1; i--){
-            ListPanelCell listPanelCell = find("#dummy/dummy_col0_" + String.valueOf(i));
-            assertFalse(listPanelCell.getIssue().isCurrentlyRead());
-        }
+    public void markAllBelowAsReadUnread_tenIssuesInListView_markIssue9andBelowReadUnread() {
+        markAllReadUnreadHelper(true);
+        markAllReadUnreadHelper(false);
     }
 
     /**
@@ -115,6 +103,25 @@ public class ContextMenuTests extends UITest {
 
         push(KeyCode.ESCAPE);
         sleep(EVENT_DELAY);
+    }
+
+    private void markAllReadUnreadHelper(boolean isTestingRead){
+        click("#dummy/dummy_col0_9");
+        rightClick("#dummy/dummy_col0_9");
+        if (isTestingRead){
+            click("Mark all below as read");
+        } else {
+            click("Mark all below as unread");
+        }
+        PlatformEx.waitOnFxThread();
+        for (int i = 9; i >= 1; i--){
+            ListPanelCell listPanelCell = find("#dummy/dummy_col0_" + i);
+            if (isTestingRead){
+                assertTrue(listPanelCell.getIssue().isCurrentlyRead());
+            } else {
+                assertFalse(listPanelCell.getIssue().isCurrentlyRead());
+            }
+        }
     }
 
 }

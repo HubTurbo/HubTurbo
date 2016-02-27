@@ -10,10 +10,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 
-import javafx.event.Event;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
-import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -149,7 +147,7 @@ public class ListPanel extends FilterPanel {
 
             TurboIssue issue = listView.getItems().get(i).getIssue();
 
-            if(shouldTriggerIssueSelectedEvent) {
+            if (shouldTriggerIssueSelectedEvent) {
                 ui.triggerEvent(
                         new IssueSelectedEvent(issue.getRepoId(), issue.getId(), panelIndex, issue.isPullRequest())
                 );
@@ -168,10 +166,9 @@ public class ListPanel extends FilterPanel {
     private void setupIssueSelectedTrigger(){
         // filter right mouse button out. Choose only the left mouse button for triggering IssueSelectedEvent
         listView.addEventFilter(MouseEvent.MOUSE_PRESSED, e -> {
-            if(e.isSecondaryButtonDown()) {
+            if (e.isSecondaryButtonDown()) {
                 shouldTriggerIssueSelectedEvent = false;
-            }
-            else {
+            } else {
                 shouldTriggerIssueSelectedEvent = true;
             }
         });
@@ -408,9 +405,10 @@ public class ListPanel extends FilterPanel {
         }
     }
 
+    //Mark all issues below and including the selected issue as unread.
     private void markAllBelowAsUnread() {
         if (listView.getSelectedIndex() >= 0) {
-            for(int i = listView.getSelectedIndex(); i < listView.getItems().size(); i++){
+            for (int i = listView.getSelectedIndex(); i < listView.getItems().size(); i++){
                 TurboIssue issue = listView.getItems().get(i).getIssue();
                 issue.markAsUnread(UI.prefs);
             }
@@ -418,9 +416,10 @@ public class ListPanel extends FilterPanel {
         }
     }
 
+    //Mark all issues below and including the selected issue as read.
     private void markAllBelowAsRead() {
         if (listView.getSelectedIndex() >= 0) {
-            for(int i = listView.getSelectedIndex(); i < listView.getItems().size(); i++){
+            for (int i = listView.getSelectedIndex(); i < listView.getItems().size(); i++){
                 TurboIssue issue = listView.getItems().get(i).getIssue();
                 issue.markAsRead(UI.prefs);
             }
