@@ -114,9 +114,17 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
                 selectedIndex = Optional.of(nextIndex);
 
                 // The next item will be considered selected
-                onItemSelected.accept(nextIndex, SHOULD_LOAD_BVIEW_ISSUE);
+                setItemSelectedParams(nextIndex, SHOULD_LOAD_BVIEW_ISSUE);
             }
         }
+    }
+
+    /**
+     * Passes the relevant index and boolean value for whether the bview should be loaded
+     * to the callback variable onItemSelected
+     */
+    private void setItemSelectedParams(int index, boolean shouldLoadBViewIssue){
+        onItemSelected.accept(index, shouldLoadBViewIssue);
     }
 
     public abstract boolean areItemsEqual(T item1, T item2);
@@ -132,9 +140,9 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
                 logger.info("Mouse click on item index " + selectedIndex.get());
                 // whenever the right mouse button is clicked, do not load issue on bView.
                 if (e.getButton().equals(MouseButton.SECONDARY)){
-                    onItemSelected.accept(selectedIndex.get(), !SHOULD_LOAD_BVIEW_ISSUE);
+                    setItemSelectedParams(selectedIndex.get(), !SHOULD_LOAD_BVIEW_ISSUE);
                 } else {
-                    onItemSelected.accept(selectedIndex.get(), SHOULD_LOAD_BVIEW_ISSUE);
+                    setItemSelectedParams(selectedIndex.get(), SHOULD_LOAD_BVIEW_ISSUE);
                 }
             }
         });
@@ -149,7 +157,7 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
                 e.consume();
                 if (selectedIndex.isPresent()) {
                     logger.info("Enter key selection on item " + selectedIndex.get());
-                    onItemSelected.accept(selectedIndex.get(), SHOULD_LOAD_BVIEW_ISSUE);
+                    setItemSelectedParams(selectedIndex.get(), SHOULD_LOAD_BVIEW_ISSUE);
                 }
             }
             if (e.getCode() == KeyCode.UP || e.getCode() == KeyCode.DOWN ||
@@ -159,7 +167,7 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
                 assert selectedIndex.isPresent() : "handleUpDownKeys doesn't set selectedIndex!";
                 if (!e.isShiftDown()) {
                     logger.info("Enter key selection on item index " + selectedIndex.get());
-                    onItemSelected.accept(selectedIndex.get(), SHOULD_LOAD_BVIEW_ISSUE);
+                    setItemSelectedParams(selectedIndex.get(), SHOULD_LOAD_BVIEW_ISSUE);
                 }
             }
             if (FIRST_ISSUE.match(e)) {
@@ -205,7 +213,7 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
         getSelectionModel().clearAndSelect(n - 1);
         scrollAndShow(n - 1);
         selectedIndex = Optional.of(n - 1);
-        onItemSelected.accept(selectedIndex.get(), SHOULD_LOAD_BVIEW_ISSUE);
+        setItemSelectedParams(selectedIndex.get(), SHOULD_LOAD_BVIEW_ISSUE);
     }
     
    public void selectNextItem() {
@@ -214,7 +222,7 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
            getSelectionModel().clearAndSelect(selectedIndex.get() + 1);
            scrollAndShow(selectedIndex.get() + 1);
            selectedIndex = Optional.of(selectedIndex.get() + 1);
-           onItemSelected.accept(selectedIndex.get(), SHOULD_LOAD_BVIEW_ISSUE);
+           setItemSelectedParams(selectedIndex.get(), SHOULD_LOAD_BVIEW_ISSUE);
        }
    }
 
@@ -223,10 +231,10 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
     }
 
     /**
-     * @return The integer value of the selected index in the list panel or -1 if it is null.
+     * @return The selected index in the list panel
      */
-    public int getSelectedIndex() {
-        return selectedIndex.isPresent() ? selectedIndex.get() : -1;
+    public Optional<Integer> getSelectedIndex() {
+        return selectedIndex;
     }
 
 }

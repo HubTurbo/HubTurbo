@@ -55,7 +55,7 @@ public class ListPanel extends FilterPanel {
     private static final String markAsUnreadMenuItemText = "Mark as unread (U)";
     private static final String markAllAsUnreadMenuItemText = "Mark all below as unread";
     private static final String markAllAsReadMenuItemText = "Mark all below as read";
-
+    private static final Boolean IS_READ = true;
     private static final MenuItem changeLabelsMenuItem = new MenuItem();
     private static final String changeLabelsMenuItemText = "Change labels (L)";
 
@@ -302,12 +302,12 @@ public class ListPanel extends FilterPanel {
 
         markAllBelowAsReadMenuItem.setText(markAllAsReadMenuItemText);
         markAllBelowAsReadMenuItem.setOnAction(e -> {
-            markAllBelowAsRead();
+            markAllItemsBelow(IS_READ);
         });
 
         markAllBelowAsUnreadMenuItem.setText(markAllAsUnreadMenuItemText);
         markAllBelowAsUnreadMenuItem.setOnAction(e -> {
-            markAllBelowAsUnread();
+            markAllItemsBelow(!IS_READ);
         });
 
         contextMenu.getItems().addAll(markAsReadUnreadMenuItem, markAllBelowAsReadMenuItem,
@@ -384,31 +384,24 @@ public class ListPanel extends FilterPanel {
     }
 
     /**
-     * Mark all issues below and including the selected issue as unread.
+     * Mark all items on and below the selected item in the list view as read/unread
+     * @param isRead isRead set to true mark all items on and below the selected issue as read.
+     *               Setting it to false marks all items on and below the selected issue as unread.
      */
-    private void markAllBelowAsUnread() {
-        if (listView.getSelectedIndex() >= 0) {
-            for (int i = listView.getSelectedIndex(); i < listView.getItems().size(); i++) {
-                TurboIssue issue = listView.getItems().get(i).getIssue();
+    private void markAllItemsBelow(boolean isRead){
+        if (!listView.getSelectedIndex().isPresent()) {
+            return;
+        }
+        for (int i = listView.getSelectedIndex().get(); i < listView.getItems().size(); i++) {
+            TurboIssue issue = listView.getItems().get(i).getIssue();
+            if (isRead){
+                issue.markAsRead(UI.prefs);
+            } else {
                 issue.markAsUnread(UI.prefs);
             }
-
-            parentPanelControl.refresh();
         }
-    }
 
-    /**
-     * Mark all issues below and including the selected issue as read.
-     */
-    private void markAllBelowAsRead() {
-        if (listView.getSelectedIndex() >= 0) {
-            for (int i = listView.getSelectedIndex(); i < listView.getItems().size(); i++) {
-                TurboIssue issue = listView.getItems().get(i).getIssue();
-                issue.markAsRead(UI.prefs);
-            }
-
-            parentPanelControl.refresh();
-        }
+        parentPanelControl.refresh();
     }
 
     private void markAsUnread() {

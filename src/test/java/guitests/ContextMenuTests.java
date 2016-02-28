@@ -84,8 +84,8 @@ public class ContextMenuTests extends UITest {
      */
     @Test
     public void markAllBelowAsReadUnread_tenIssuesInListView_markIssue9andBelowReadUnread() {
-        markAllReadUnreadHelper(true);
-        markAllReadUnreadHelper(false);
+        markAllReadOrUnread(true);
+        markAllReadOrUnread(false);
     }
 
     /**
@@ -105,7 +105,12 @@ public class ContextMenuTests extends UITest {
         sleep(EVENT_DELAY);
     }
 
-    private void markAllReadUnreadHelper(boolean isTestingRead){
+    /**
+     * Tests marked issues from Issue #9 in the UI right to the end of the list as read/unread
+     * @param isTestingRead If true, tests whether issues on/below the selected issue are being correctly marked read
+     *                      If false, tests whether issues on/below the selected are being correctly marked unread
+     */
+    private void markAllReadOrUnread(boolean isTestingRead){
         click("#dummy/dummy_col0_9");
         rightClick("#dummy/dummy_col0_9");
         if (isTestingRead){
