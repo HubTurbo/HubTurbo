@@ -126,8 +126,8 @@ public class PanelRenameTest extends UITest {
         assertEquals("Panel", panelNameText5.getText());
         
         // Quitting to update json
-        click("File");
-        push(KeyCode.DOWN).push(KeyCode.DOWN).push(KeyCode.ENTER);
+        traverseMenu("File", "Quit");
+        push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
     }
 }
