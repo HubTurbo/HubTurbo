@@ -113,7 +113,6 @@ public class ContextMenuTests extends UITest {
         } else {
             click("Mark all below as unread");
         }
-        PlatformEx.waitOnFxThread();
         for (int i = 9; i >= 1; i--){
             ListPanelCell listPanelCell = find("#dummy/dummy_col0_" + i);
             if (isTestingRead){
