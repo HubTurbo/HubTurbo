@@ -70,8 +70,19 @@ public class FilterEvalTests {
     }
 
     @Test
+    public void satisfiesId_validCompoundId() {
+        TurboIssue issue1 = new TurboIssue("dummy/dummy", 1, "1");
+       
+        assertFalse(matches("id:test/test#1", issue1));
+        assertTrue(matches("id:dummy/dummy#1", issue1));
+    }
+
+    @Test
     public void satisfiesId_invalidInputs_throwSemanticException() {
         verifySemanticException(QualifierType.ID, "id:something");
+
+        // test: compound id lookup
+        verifySemanticException(QualifierType.ID, "id:dummy/dummy#hello");
     }
 
     private void testForPresenceOfKeywords(String prefix, TurboIssue issue) {
@@ -768,6 +779,9 @@ public class FilterEvalTests {
     @Test
     public void satisfiesRepo_invalidInputs_throwSemanticException() {
         verifySemanticException(QualifierType.REPO, "repo:2011-1-1");
+        
+        // test: compound id lookup
+        verifySemanticException(QualifierType.REPO, "id:2011#1");
     }
 
     @Test

@@ -181,6 +181,8 @@ public final class Parser {
     private FilterExpression parseQualifierContent(QualifierType type) {
         if (type == QualifierType.SORT) {
             return parseSortKeys();
+        } else if (isCompoundId(type, lookAhead())) {
+            return parseCompoundId();
         } else if (isRangeOperatorToken(lookAhead())) {
             // < > <= >= [number range | date range]
             return parseRangeOperator(type, lookAhead());
@@ -200,6 +202,15 @@ public final class Parser {
             throw new ParseException(String.format("Invalid content for qualifier %s: %s",
                 type, lookAhead()));
         }
+    }
+
+    /**
+     * Checks if this is an enhanced id lookup i.e id:test/test#111
+     * @param type
+     * @return
+     */
+    private boolean isCompoundId(QualifierType type, Token token) {
+        return type == QualifierType.ID && token.getType() == TokenType.COMPOUND_ID;
     }
 
     private boolean isKeywordToken(Token token) {
@@ -280,6 +291,18 @@ public final class Parser {
         }
         assert false : "Should never reach here";
         return null;
+    }
+
+    /**
+     * Parses filter for conjunction lookup of repo and id i.e id:test/test#id
+     * @return 
+     */
+    private FilterExpression parseCompoundId() {
+        String repoId = consume().getValue();
+        FilterExpression left = new Qualifier(
+            QualifierType.REPO, repoId.substring(0, repoId.length() - 1));
+
+        return new Conjunction(left, parseQualifierContent(QualifierType.ID));
     }
 
     private FilterExpression parseDateOrDateRange(QualifierType type) {
