@@ -72,7 +72,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         title.setTooltip(createTitleTooltip(issue));
         createButtons();
 
-        state = new LabelPickerState(new HashSet(issue.getLabels()), allLabels, "");
+        state = new LabelPickerState(new HashSet<>(issue.getLabels()), allLabels, "");
         populatePanes(state);
     }
 
@@ -92,10 +92,10 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     // Population of UI elements
 
     /**
-     * Populate respective panes with labels that matches current user input
+     * Populates respective panes with labels that matches current user input
      * @param state
      */
-    private void populatePanes(LabelPickerState state) {
+    private final void populatePanes(LabelPickerState state) {
         // Population of UI elements
         populateAssignedLabels(state.getInitialLabels(), state.getRemovedLabels(), state.getAddedLabels(),
                                state.getCurrentSuggestion());
@@ -104,7 +104,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         getDialogPane().getScene().getWindow().sizeToScene();
     }
 
-    private void populateAssignedLabels(List<String> initialLabels, List<String> removedLabels,
+    private final void populateAssignedLabels(List<String> initialLabels, List<String> removedLabels,
                                         List<String> addedLabels, Optional<String> suggestion) {
         assignedLabels.getChildren().clear();
         populateInitialLabels(initialLabels, removedLabels, suggestion);
@@ -112,14 +112,14 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         if (initialLabels.isEmpty()) createTextLabel("No currently selected labels. ");
     }
 
-    private void populateInitialLabels(List<String> initialLabels, List<String> removedLabels,
+    private final void populateInitialLabels(List<String> initialLabels, List<String> removedLabels,
                                        Optional<String> suggestion) {
         initialLabels.stream()
             .forEach(label -> assignedLabels.getChildren()
             .add(processInitialLabel(label, removedLabels, suggestion)));
     }
 
-    private Node processInitialLabel(String initialLabel, List<String> removedLabels, 
+    private final Node processInitialLabel(String initialLabel, List<String> removedLabels, 
                                             Optional<String> suggestion) {
         TurboLabel repoInitialLabel = TurboLabel.getFirstMatchingTurboLabel(allLabels, initialLabel);
         if (!removedLabels.contains(initialLabel)) {
@@ -141,13 +141,13 @@ public class LabelPickerDialog extends Dialog<List<String>> {
      * @param label
      * @return Node from label after registering mouse handler
      */
-    private Node getStyledPickerLabel(PickerLabel label) {
+    private final Node getStyledPickerLabel(PickerLabel label) {
         Node node = label.getNode();
         node.setOnMouseClicked(e -> handleLabelClick(label));
         return node;
     }
 
-    private void populateToBeAddedLabels(List<String> addedLabels, Optional<String> suggestion) {
+    private final void populateToBeAddedLabels(List<String> addedLabels, Optional<String> suggestion) {
         if (!addedLabels.isEmpty() || hasNewSuggestion(addedLabels, suggestion)) {
             assignedLabels.getChildren().add(new Label("|"));
         }
@@ -155,14 +155,14 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         populateSuggestedLabel(addedLabels, suggestion);
     }
 
-    private void populateAddedLabels(List<String> addedLabels, Optional<String> suggestion) {
+    private final void populateAddedLabels(List<String> addedLabels, Optional<String> suggestion) {
         addedLabels.stream()
                 .forEach(label -> {
                     assignedLabels.getChildren().add(processAddedLabel(label, suggestion));
                 });
     }
 
-    private Node processAddedLabel(String addedLabel, Optional<String> suggestion) {
+    private final Node processAddedLabel(String addedLabel, Optional<String> suggestion) {
         if (!suggestion.isPresent() || !addedLabel.equals(suggestion.get())) {
             return getStyledPickerLabel(
                 new PickerLabel(TurboLabel.getFirstMatchingTurboLabel(allLabels, addedLabel), true));
@@ -172,31 +172,31 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                 .faded(true).removed(true));
     }
 
-    private void populateSuggestedLabel(List<String> addedLabels, Optional<String> suggestion) {
+    private final void populateSuggestedLabel(List<String> addedLabels, Optional<String> suggestion) {
         if (hasNewSuggestion(addedLabels, suggestion)) {
             assignedLabels.getChildren().add(processSuggestedLabel(suggestion.get()));
         }
     }
 
-    private boolean hasNewSuggestion(List<String> addedLabels, Optional<String> suggestion) {
+    private final boolean hasNewSuggestion(List<String> addedLabels, Optional<String> suggestion) {
         return suggestion.isPresent() 
             && !(issue.getLabels()).contains(suggestion.get()) && !addedLabels.contains(suggestion.get());
     }
 
-    private Node processSuggestedLabel(String suggestedLabel) {
+    private final Node processSuggestedLabel(String suggestedLabel) {
         return getStyledPickerLabel(
              new PickerLabel(TurboLabel.getFirstMatchingTurboLabel(allLabels, suggestedLabel), true)
              .faded(true));
     }
 
-    private void populateFeedbackLabels(List<String> assignedLabels, List<String> matchedLabels,
+    private final void populateFeedbackLabels(List<String> assignedLabels, List<String> matchedLabels,
                                         Optional<String> suggestion) {
         feedbackLabels.getChildren().clear();
         populateGroupLabels(assignedLabels, matchedLabels, suggestion);
         populateGrouplessLabels(assignedLabels, matchedLabels, suggestion);
     }
 
-    private void populateGroupLabels(List<String> finalLabels, List<String> matchedLabels,
+    private final void populateGroupLabels(List<String> finalLabels, List<String> matchedLabels,
                                      Optional<String> suggestion) {
 
         Map<String, FlowPane> groupContent = getGroupContent(finalLabels, matchedLabels, suggestion);
@@ -206,7 +206,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         });
     }
 
-    private Map<String, FlowPane> getGroupContent(List<String> finalLabels, List<String> matchedLabels,
+    private final Map<String, FlowPane> getGroupContent(List<String> finalLabels, List<String> matchedLabels,
                                                   Optional<String> suggestion) {
         Map<String, FlowPane> groupContent = new HashMap<>();
         allLabels.stream().sorted()
@@ -223,7 +223,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         return groupContent;
     }
 
-    private void populateGrouplessLabels(List<String> finalLabels, List<String> matchedLabels,
+    private final void populateGrouplessLabels(List<String> finalLabels, List<String> matchedLabels,
                                          Optional<String> suggestion) {
         FlowPane groupless = createGroupPane(GROUPLESS_PAD);
         allLabels.stream()
@@ -235,7 +235,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         if (!groupless.getChildren().isEmpty()) feedbackLabels.getChildren().add(groupless);
     }
 
-    private Node processMatchedLabel(String repoLabel, List<String> matchedLabels, 
+    private final Node processMatchedLabel(String repoLabel, List<String> matchedLabels, 
                                             List<String> assignedLabels, Optional<String> suggestion) {
 
         return getStyledPickerLabel(
@@ -307,11 +307,15 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
     // Event handling 
 
-    @SuppressWarnings("PMD")
-    private void handleUserInput(ObservableValue<? extends String> observable, 
-                                 String oldText, String newText) {
+    /**
+     * Updates state of the label picker based on the entire query
+     * NOPMD : Parameters are unused because the entire query is taken into consideration when 
+     * updating the state
+     */
+    private final void handleUserInput(ObservableValue<? extends String> observable, // NOPMD
+                                       String oldText, String newText) {             // NOPMD
         state = new LabelPickerState(
-            new HashSet(issue.getLabels()), allLabels, queryField.getText().toLowerCase());
+            new HashSet<>(issue.getLabels()), allLabels, queryField.getText().toLowerCase());
         populatePanes(state);
     }
 

@@ -18,7 +18,6 @@ public class LabelPickerState {
     private List<TurboLabel> allLabels;
     private OptionalInt currentSuggestionIndex;
 
-    @SuppressWarnings("PMD")
     public LabelPickerState(Set<String> initialLabels, List<TurboLabel> allLabels, String userInput) {
         this(initialLabels, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), allLabels,
                 OptionalInt.empty());
@@ -40,7 +39,7 @@ public class LabelPickerState {
      * Updates current state based on given user input
      * @param userInput 
      */
-    private void update(String userInput) {
+    private final void update(String userInput) {
         List<String> confirmedKeywords = getConfirmedKeywords(userInput);
         for (String confirmedKeyword : confirmedKeywords) {
             updateIfMatchesLabel(confirmedKeyword);
@@ -57,7 +56,7 @@ public class LabelPickerState {
      * given keyword
      * @param keyword
      */
-    private void updateIfMatchesLabel(String keyword) {
+    private final void updateIfMatchesLabel(String keyword) {
         if (TurboLabel.hasMatchedLabel(allLabels, keyword)) {
             updateAssignedLabels(TurboLabel.getFirstMatchingTurboLabel(allLabels, keyword));
         }
@@ -67,7 +66,7 @@ public class LabelPickerState {
      * Updates assignedLabels based on properties of a label 
      * @param label
      */
-    public void updateAssignedLabels(TurboLabel label) {
+    public final void updateAssignedLabels(TurboLabel label) {
         String labelName = label.getFullName();
 
         if (isAnInitialLabel(labelName)) {
@@ -96,7 +95,7 @@ public class LabelPickerState {
      *
      * @param keyword
      */
-    private void updateMatchedLabels(String keyword) {
+    private final void updateMatchedLabels(String keyword) {
         List<TurboLabel> newMatchedLabels = TurboLabel.getMatchedLabels(allLabels, keyword);
 
 
@@ -114,7 +113,7 @@ public class LabelPickerState {
      */
 
     /**
-     * @returns final list of labels to be assigned
+     * @return final list of labels to be assigned
      */
     public List<String> getAssignedLabels() {
         List<String> assignedLabels = new ArrayList<>();

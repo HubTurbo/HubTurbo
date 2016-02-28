@@ -11,6 +11,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 public class TurboLabelTest {
 
@@ -25,7 +26,6 @@ public class TurboLabelTest {
     public void isExclusive_nonExclusiveLabels_false() {
         testWithDelimiter(TurboLabel.NONEXCLUSIVE_DELIMITER, false);
     }
-
 
     @Test
     public void consistentStyle() {
@@ -56,8 +56,7 @@ public class TurboLabelTest {
     }
     
     @Test
-    public void getLabelsNameList_labelsWithGroup_labelsActualNames() {
-        
+    public void getLabelsNameList_labelsWithGroup_labelsFullName() {
         TurboLabel test = new TurboLabel(REPO, "test.a");
         TurboLabel test2 = new TurboLabel(REPO, "dummy-a");
         List<TurboLabel> labels = new ArrayList<>();
@@ -67,6 +66,13 @@ public class TurboLabelTest {
         // Ensures result matches each label actual name even with delimiter
         assertEquals(Arrays.asList("test.a", "dummy-a"), TurboLabel.getLabelsNameList(labels));
     }
+
+    @Test
+    public void splitKeyword_consecutiveDelimiters_notInGroup() {
+        TurboLabel test = new TurboLabel(REPO, "..");
+        assertFalse(test.isInGroup());
+    }
+
 
     private void testWithDelimiter(String delimiter, boolean shouldBeExclusive) {
         // label format: group.name
@@ -86,18 +92,16 @@ public class TurboLabelTest {
         // The rest are unconditionally nonexlusive because there's no group.
         // The delimiter is taken to be part of the name instead.
 
-        // label format: name.
+        // label format: .name
         label = new TurboLabel(REPO, delimiter + "name");
         assertTrue(label.getGroupName().isEmpty());
-        assertEquals(delimiter + "name", label.getShortName());
         assertEquals(delimiter + "name", label.getFullName());
-        assertEquals(false, label.isInExclusiveGroup());
+        assertFalse(label.isInExclusiveGroup());
 
         // label format: .
         label = new TurboLabel(REPO, delimiter);
         assertTrue(label.getGroupName().isEmpty());
-        assertEquals(delimiter, label.getShortName());
         assertEquals(delimiter, label.getFullName());
-        assertEquals(false, label.isInExclusiveGroup());
+        assertFalse(label.isInExclusiveGroup());
     }
 }

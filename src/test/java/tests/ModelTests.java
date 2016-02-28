@@ -232,7 +232,7 @@ public class ModelTests {
 
         assertEquals(Optional.<TurboLabel>empty(),
                 modelUpdated.getLabelByActualName("Label " + (DummyRepoState.noOfDummyIssues + 1)));
-        assertEquals("Label 10", modelUpdated.getLabelByActualName("Label 10").get().getActualName());
+        assertEquals("Label 10", modelUpdated.getLabelByActualName("Label 10").get().getFullName());
 
         // Milestones
 
