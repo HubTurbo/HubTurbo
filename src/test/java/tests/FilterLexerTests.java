@@ -4,52 +4,53 @@ import filter.ParseException;
 import filter.lexer.Lexer;
 import filter.lexer.Token;
 import filter.lexer.TokenType;
+
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
 public class FilterLexerTests {
+
     @Test
-    public void lexer() {
-        assertEquals(new Lexer("").lex(), Arrays.asList(
+    public void lex_generalInputs() {
+
+        assertEquals(getTokens(""), Arrays.asList(
             new Token(TokenType.EOF, "")));
-        assertEquals(new Lexer("a' b' c'").lex(), Arrays.asList(
+
+        assertEquals(getTokens("a' b' c'"), Arrays.asList(
             new Token(TokenType.SYMBOL, "a'"),
             new Token(TokenType.SYMBOL, "b'"),
             new Token(TokenType.SYMBOL, "c'"),
             new Token(TokenType.EOF, "")));
+    }
 
-        // Repo names
-        assertEquals(new Lexer("test/test").lex(), Arrays.asList(
-            new Token(TokenType.SYMBOL, "test/test"),
-            new Token(TokenType.EOF, "")));
+    @Test
+    public void lex_repoIds() {
+        assertEquals(getTokens("test/test"), 
+            Arrays.asList(new Token(TokenType.SYMBOL, "test/test"), new Token(TokenType.EOF, "")));
+    }
 
-        // Forward slashes cannot begin symbols, so this won't work
-        try {
-            new Lexer("repo:\"test / test\"").lex();
-        } catch (ParseException ignored) {}
+    @Test
+    public void lex_sortingKeys() {
 
-        // Sorting keys
-        // Commas aren't valid symbol names and may only appear in the body of a `sort` qualifier
-        try {
-            new Lexer("a,b").lex();
-        } catch (ParseException ignored) {}
-
-        assertEquals(new Lexer("sort: a, b ").lex(), Arrays.asList(
+        assertEquals(getTokens("sort: a, b "), Arrays.asList(
             new Token(TokenType.QUALIFIER, "sort:"),
             new Token(TokenType.SYMBOL, "a"),
             new Token(TokenType.COMMA, ","),
             new Token(TokenType.SYMBOL, "b"),
             new Token(TokenType.EOF, "")));
-        assertEquals(new Lexer("sort-self-other: a, b ").lex(), Arrays.asList(
+
+        assertEquals(getTokens("sort-self-other: a, b "), Arrays.asList(
                 new Token(TokenType.QUALIFIER, "sort-self-other:"),
                 new Token(TokenType.SYMBOL, "a"),
                 new Token(TokenType.COMMA, ","),
                 new Token(TokenType.SYMBOL, "b"),
                 new Token(TokenType.EOF, "")));
-        assertEquals(new Lexer("---sort-self-other: a, b ").lex(), Arrays.asList(
+
+        assertEquals(getTokens("---sort-self-other: a, b "), Arrays.asList(
                 new Token(TokenType.NOT, "-"),
                 new Token(TokenType.NOT, "-"),
                 new Token(TokenType.NOT, "-"),
@@ -58,25 +59,48 @@ public class FilterLexerTests {
                 new Token(TokenType.COMMA, ","),
                 new Token(TokenType.SYMBOL, "b"),
                 new Token(TokenType.EOF, "")));
-        assertEquals(new Lexer("sort: a , - b").lex(), Arrays.asList(
+
+        assertEquals(getTokens("sort: a , - b"), Arrays.asList(
             new Token(TokenType.QUALIFIER, "sort:"),
             new Token(TokenType.SYMBOL, "a"),
             new Token(TokenType.COMMA, ","),
             new Token(TokenType.NOT, "-"),
             new Token(TokenType.SYMBOL, "b"),
             new Token(TokenType.EOF, "")));
+    }
 
-        // milestone aliases
-        assertEquals(new Lexer("milestone:curr-1").lex(), Arrays.asList(
+    @Test
+    public void lex_milestoneAliases() {
+
+        assertEquals(getTokens("milestone:curr-1"), Arrays.asList(
                 new Token(TokenType.QUALIFIER, "milestone:"),
                 new Token(TokenType.SYMBOL, "curr-1"),
                 new Token(TokenType.EOF, "")
         ));
-        assertEquals(new Lexer("milestone:curr+1").lex(), Arrays.asList(
+
+        assertEquals(getTokens("milestone:curr+1"), Arrays.asList(
                 new Token(TokenType.QUALIFIER, "milestone:"),
                 new Token(TokenType.SYMBOL, "curr+1"),
                 new Token(TokenType.EOF, "")
         ));
     }
 
+    @Test
+    public void lex_compoundId() {
+
+        assertEquals(getTokens("id:test/test#1"), Arrays.asList(
+                new Token(TokenType.QUALIFIER, "id:"),
+                new Token(TokenType.COMPOUND_ID, "test/test#"),
+                new Token(TokenType.SYMBOL, "1"),
+                new Token(TokenType.EOF, "")
+        ));
+    }
+
+    /**
+     * @param query
+     * @return list of tokens after lexing
+     */
+    private List<Token> getTokens(String query) {
+        return new Lexer(query).lex();
+    }
 }
