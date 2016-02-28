@@ -32,16 +32,6 @@ public class PickerLabel extends TurboLabel {
         this.canDisplayFullName = canDisplayFullName;
     }
 
-    public PickerLabel(TurboLabel label, boolean canDisplayFullName, boolean isSelected, 
-                       boolean isHighlighted, boolean isRemoved, boolean isFaded) {
-        super(label.getRepoId(), label.getColour(), label.getFullName());
-        this.isSelected = isSelected;
-        this.isHighlighted = isHighlighted;
-        this.isRemoved = isRemoved;
-        this.isFaded = isFaded;
-        this.canDisplayFullName = canDisplayFullName;
-    }
-
     @Override
     public Node getNode() {
         // actual name for labels at the top, add tick for selected labels

@@ -3,11 +3,9 @@ package ui.components.pickers;
 import backend.resource.TurboIssue;
 import backend.resource.TurboLabel;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -17,13 +15,11 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.ResourceBundle;
 
 import org.apache.logging.log4j.Logger;
 
@@ -60,7 +56,6 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         this.issue = issue;
 
         initUI(stage, issue);
-        setupEvents(stage);
         Platform.runLater(queryField::requestFocus);
     }
 
@@ -129,25 +124,26 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         TurboLabel repoInitialLabel = TurboLabel.getFirstMatchingTurboLabel(allLabels, initialLabel);
         if (!removedLabels.contains(initialLabel)) {
             if (suggestion.isPresent() && initialLabel.equals(suggestion.get())) {
-                return getStyledPickerLabel(repoInitialLabel, true, false, true, false, true);
+                return getStyledPickerLabel(
+                    new PickerLabel(repoInitialLabel, true).faded(true).removed(true));
             }
-            return getStyledPickerLabel(repoInitialLabel, false, false, false, false, true);
+            return getStyledPickerLabel(new PickerLabel(repoInitialLabel, true));
         }
 
         if (suggestion.isPresent() && initialLabel.equals(suggestion.get())) {
-            return getStyledPickerLabel(repoInitialLabel, true, false, false, false, true);
+            return getStyledPickerLabel(new PickerLabel(repoInitialLabel, true).faded(true));
         }
 
-        return getStyledPickerLabel(repoInitialLabel, false, false, true, false, true);
+        return getStyledPickerLabel(new PickerLabel(repoInitialLabel, true).removed(true));
     }
 
-    private Node getStyledPickerLabel(TurboLabel label, boolean isFaded, boolean isHighlighted, boolean isRemoved, 
-                                      boolean isSelected, boolean canDisplayFullName) {
-        PickerLabel styledLabel = new PickerLabel(
-            label, canDisplayFullName, isSelected, isHighlighted, isRemoved, isFaded);
-
-        Node node = styledLabel.getNode();
-        node.setOnMouseClicked(e -> handleLabelClick(styledLabel));
+    /**
+     * @param label
+     * @return Node from label after registering mouse handler
+     */
+    private Node getStyledPickerLabel(PickerLabel label) {
+        Node node = label.getNode();
+        node.setOnMouseClicked(e -> handleLabelClick(label));
         return node;
     }
 
@@ -168,11 +164,12 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
     private Node processAddedLabel(String addedLabel, Optional<String> suggestion) {
         if (!suggestion.isPresent() || !addedLabel.equals(suggestion.get())) {
-            return getStyledPickerLabel(TurboLabel.getFirstMatchingTurboLabel(allLabels, addedLabel),
-                    false, false, false, false, true);
+            return getStyledPickerLabel(
+                new PickerLabel(TurboLabel.getFirstMatchingTurboLabel(allLabels, addedLabel), true));
         }
-        return getStyledPickerLabel(TurboLabel.getFirstMatchingTurboLabel(allLabels, addedLabel),
-                true, false, true, false, true);
+        return getStyledPickerLabel(
+                new PickerLabel(TurboLabel.getFirstMatchingTurboLabel(allLabels, addedLabel), true)
+                .faded(true).removed(true));
     }
 
     private void populateSuggestedLabel(List<String> addedLabels, Optional<String> suggestion) {
@@ -187,8 +184,9 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     }
 
     private Node processSuggestedLabel(String suggestedLabel) {
-        return getStyledPickerLabel(TurboLabel.getFirstMatchingTurboLabel(allLabels, suggestedLabel),
-                true, false, false, false, true);
+        return getStyledPickerLabel(
+             new PickerLabel(TurboLabel.getFirstMatchingTurboLabel(allLabels, suggestedLabel), true)
+             .faded(true));
     }
 
     private void populateFeedbackLabels(List<String> assignedLabels, List<String> matchedLabels,
@@ -239,9 +237,12 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
     private Node processMatchedLabel(String repoLabel, List<String> matchedLabels, 
                                             List<String> assignedLabels, Optional<String> suggestion) {
-        boolean shouldHighlight = suggestion.isPresent() && suggestion.get().equals(repoLabel);
-        return getStyledPickerLabel(TurboLabel.getFirstMatchingTurboLabel(allLabels, repoLabel),
-                !matchedLabels.contains(repoLabel), shouldHighlight, false, assignedLabels.contains(repoLabel), false);
+
+        return getStyledPickerLabel(
+            new PickerLabel(TurboLabel.getFirstMatchingTurboLabel(allLabels, repoLabel), false)
+                .faded(!matchedLabels.contains(repoLabel))
+                .highlighted(suggestion.isPresent() && suggestion.get().equals(repoLabel))
+                .selected(assignedLabels.contains(repoLabel)));
     }
 
     private void createMainLayout() {
@@ -306,12 +307,6 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
     // Event handling 
 
-    private void setupEvents(Stage stage) {
-        showingProperty().addListener(e -> {
-            positionDialog(stage);
-        });
-    }
-
     @SuppressWarnings("PMD")
     private void handleUserInput(ObservableValue<? extends String> observable, 
                                  String oldText, String newText) {
@@ -327,24 +322,5 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         if (!queryField.isDisabled()) {
             queryField.setDisable(true);
         }
-        queryField.clear();
     }
-
-    private void positionDialog(Stage stage) {
-        if (getDialogHeight().isPresent()) {
-            setX(stage.getX() + stage.getScene().getX());
-            setY(stage.getY() +
-                    stage.getScene().getY() +
-                    (stage.getScene().getHeight() - getHeight()) / 2);
-        }
-    }
-
-    /**
-     * Checks if the height is initialized before returning the value
-     * @return height of dialog if it is initialized 
-     */
-    private Optional<Double> getDialogHeight() {
-        return Double.isNaN(getHeight()) ? Optional.empty() : Optional.of(getHeight());
-    }
-
 }
