@@ -28,7 +28,7 @@ public class RemovableRepoListAndModelsTest extends UITest {
     }
 
     @Override
-    public void setupMethod() {
+    public void beforeStageStarts() {
         // setup test json with last viewed repo "dummy/dummy"
         // obviously the json for that repo doesn't exist
         ConfigFileHandler configFileHandler =

@@ -94,7 +94,7 @@ This will not work for ambiguous expressions (containing OR or NOT operators) an
 - [`id`](#id)
 - [`keyword`](#keyword)
 - [`title`](#title)
-- [`body`](#body)
+- [`description`](#description)
 - [`milestone`](#milestone)
 - [`label`](#label)
 - [`assignee`](#assignee)
@@ -139,13 +139,15 @@ Matches all issues with text containing the given string. Same as not specifying
 
 Matches all issues with a title containing the given string.
 
-### body
+Aliases: `t`
+
+### description
 
 *Expects a string*
 
 Matches all issues with a body (or description) containing the given string.
 
-Aliases: `desc`, `description`
+Aliases: `body`, `de`, `desc`
 
 ### milestone
 
@@ -153,9 +155,9 @@ Aliases: `desc`, `description`
 
 Matches all issues associated with any milestones whose names contain the given string.
 
-`current` or `curr` can be used to refer to an open milestone with earliest due date, or an overdue open milestone with open issues if any. `curr-2`, `curr-1`, `curr+1`, `curr+2`, etc. (no space before or after `-`/`+`) can then be used to refer to milestones before or after `current`, sorted by due date. Milestones with no due date will not be considered in resolving `curr`/`current`. If there is no open milestone, `current` will refer to no milestone, while `current-1` will refer to the last closed milestone.
+`current` or `curr` can be used to refer to an open milestone with earliest due date, or an overdue open milestone with open issues if any. However, if there is only one open milestone, it will be considered as the `current` milestone even if it does not have due date. `curr-2`, `curr-1`, `curr+1`, `curr+2`, etc. (no space before or after `-`/`+`) can then be used to refer to milestones before or after `current`, sorted by due date. If there is no open milestone, `current` will refer to no milestone, while `current-1` will refer to the last closed milestone.
 
-Aliases: `m`
+Aliases: `m`, `milestones`
 
 ### label
 
@@ -193,7 +195,10 @@ Aliases: `user`
 
 Matches all issues of the given state.
 
-Aliases: `s`, `status`
+Aliases: `st`, `status`
+
+- `open` can be written as `o`
+- `closed` can be written as `c`
 
 ### has
 
@@ -201,10 +206,10 @@ Aliases: `s`, `status`
 
 Matches issues associated with the given type of resource.
 
-Aliases:
+Aliases: `h`
 
-- `label` can be written as `labels`
-- `milestone` can be written as `milestone` or `m`
+- `label` can be written as `labels` or `l`
+- `milestone` can be written as `milestones` or `m`
 - `assignee` can be written as `assignee` or `as`
 
 ### no
@@ -213,7 +218,7 @@ Aliases:
 
 The negation of `has`. Matches issues not associated with the given type of resource.
 
-Aliases: see [has](#has).
+Aliases: `n`. For input aliases, see [has](#has).
 
 ### in
 
@@ -227,11 +232,23 @@ Meta-qualifier. Changes the semantics of search terms to check only either the t
 
 Matches issues of a given issue type. Pull requests are loosely considered issues in that the same operations work on both; this predicate allows users to distinguish them.
 
+Aliases: `ty`
+
+- `issue` can be written as `i`
+- `pr` can be written as `pullrequest` or `p`
+
 ### is
 
 *Expects one of `open`, `closed`, `pr`, `issue`, `merged`, `unmerged`, `read`, `unread`*
 
 Matches issues which are either open or closed, a pull request or an issue, depending on their merged status if they are pull requests, or read or unread. Is partially an alias for `state` and `type`.
+
+Aliases: 
+
+- `merged` can be written as `mg`
+- `unmerged` can be written as `um`
+- `read` can be written as `rd`
+- `unread` can be written as `ur`
 
 ### created
 
@@ -239,11 +256,15 @@ Matches issues which are either open or closed, a pull request or an issue, depe
 
 Matches issues which were created on a given date, or within a given date range.
 
+Aliases: `cr`
+
 ### updated
 
 *Expects a number or  number range*
 
 Matches issues which were updated in the given number of hours. For example, `updated:<24` would match issues updated in the last day. If a number `n` is given, it is implicitly translated to `<n`. Number ranges are written using a relational operator (.e.g `>5`, `<=10`).
+
+Aliases: `u`
 
 ### repo
 
@@ -251,11 +272,26 @@ Matches issues which were updated in the given number of hours. For example, `up
 
 Matches issues of the given repository. If omitted, will match issues of the default repository instead (not all repositories).
 
-### sort
+Aliases: `r`
+
+### sort 
 
 *Expects a comma-separated list of sorting criteria. For example, `repo, ~updated, -comments`.*
 
 Sorts a repository by the list of criteria, going from left to right. Negated criteria will reverse the ordering that they describe.
+
+Aliases: `s`
+
+Available sorting criteria:
+
+- `comments`: sorts by number of comments (in descending order). Aliases: `cm`.
+- `repo`: sorts by repo. Only applicable if the panel is showing issues from more than one repo
+- `updated` (or `date`): sorts issues by their updated time (latest updated issues are shown first). Aliases: `d`
+- `id`: sorts by issue id (in ascending order)
+- `assignee`: sorts by assignee (in alphabetical order of assignees' names). Aliases: `a`
+- `state`: sorts by status (open issues followed by closed issues). Aliases: `status`, `st`
+- `milestone`: sorts by milestone (latest due date first). Aliases: `m`
+- Anything else is interpreted as a *label group*: sorts by the label group specified in alphabetical order. Label groups can be disambiguated by appending a `.`, if there is a label group that clashes with one of the above names. For example, `sort:priority.` will sort issues by their priorities in alphabetical order (issues with `high` priority will come first, followed by `low` priority, then `medium` priority)
 
 ### count
 
@@ -263,16 +299,7 @@ Sorts a repository by the list of criteria, going from left to right. Negated cr
 
 The maximum number of issues that can be displayed in a panel. For example, `count:4` would display a maximum of 4 issues in the panel.
 
-Available sorting criteria:
-
-- `comments`: sorts by number of comments (in descending order)
-- `repo`: sorts by repo. Only applicable if the panel is showing issues from more than one repo
-- `updated` (or `date`): sorts issues by their updated time (latest updated issues are shown first)
-- `id`: sorts by issue id (in ascending order)
-- `assignee`: sorts by assignee (in alphabetical order of assignees' names). Aliases: `a`
-- `state`: sorts by status (open issues followed by closed issues). Aliases: `status`, `s`
-- `milestone`: sorts by milestone (latest due date first). Aliases: `m`
-- Anything else is interpreted as a *label group*: sorts by the label group specified in alphabetical order. Label groups can be disambiguated by appending a `.`, if there is a label group that clashes with one of the above names. For example, `sort:priority.` will sort issues by their priorities in alphabetical order (issues with `high` priority will come first, followed by `low` priority, then `medium` priority)
+Aliases: `cn`
 
 ## Additional features
 
@@ -280,8 +307,7 @@ HubTurbo automatically downloads detailed information about issues when the [`up
 
 When the [`updated`](#updated) filter is specified, the issues to be displayed are also automatically sorted by the latest *non-self update* i.e. the last time someone other than the currently logged-in user makes a change to the issue. This order can be explicitly overridden by specifying another sort order through the [`sort`](#sort) filter.
 
-To use a reverse-non-self-update or combine sorting by non-self-update times with other sorting orders, use the `nonSelfUpdate` sorting key e.g. `sort:-nonSelfUpdate` or `sort:nonSelfUpdate,comments`
-
+To use a reverse-non-self-update or combine sorting by non-self-update times with other sorting orders, use the `nonSelfUpdate` sorting key e.g. `sort:-nonSelfUpdate` or `sort:nonSelfUpdate,comments`. Aliases: `ns`
 ## Incompatibilities
 
 HubTurbo's filter system is incompatible with GitHub's in a number of ways.

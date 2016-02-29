@@ -87,7 +87,45 @@ public class MenuControl extends MenuBar {
         return file;
 
     }
-    
+
+    /**
+     * Creates an empty board. User will be prompted to
+     * confirm the action if there are unclosed panels.
+     */
+    private void onBoardNew() {
+        logger.info("Menu: Boards > New");
+
+        if (!isNewBoardCreationDialogConfirmed()) {
+            logger.info("New board creation cancelled");
+            return;
+        }
+
+        panels.closeAllPanels();
+        onBoardSaveAs();
+    }
+
+    /**
+     * Returns a boolean indicating whether we can proceed with
+     * the new board creation. If there are no panels open, it
+     * returns true; else a dialog is shown for the user to confirm.
+     */
+    private boolean isNewBoardCreationDialogConfirmed() {
+        List<PanelInfo> panelList = panels.getCurrentPanelInfos();
+        if (panelList.isEmpty()) {
+            return true;
+        }
+
+        Alert dlg = new Alert(AlertType.CONFIRMATION, "");
+        dlg.initModality(Modality.APPLICATION_MODAL);
+        dlg.setTitle("Confirmation");
+        dlg.getDialogPane().setHeaderText("Create a new board");
+        dlg.getDialogPane().setContentText("Are you sure you want to create a new board?" +
+                " All unsaved changes to the current board will be lost.");
+        Optional<ButtonType> response = dlg.showAndWait();
+        return response.isPresent() &&
+                response.get().getButtonData() == ButtonData.OK_DONE;
+    }
+
     private void onBoardSave() {
         logger.info("Menu: Boards > Save");
         
@@ -114,17 +152,11 @@ public class MenuControl extends MenuBar {
         logger.info("Menu: Boards > Save as");
 
         List<PanelInfo> panelList = panels.getCurrentPanelInfos();
-
-        if (panelList.isEmpty()) {
-            logger.info("Did not save new board");
-            return;
-        }
-
         BoardNameDialog dlg = new BoardNameDialog(prefs, mainStage);
         Optional<String> response = dlg.showAndWait();
         ui.showMainStage();
         panels.selectFirstPanel();
-        
+
         if (response.isPresent()) {
             String boardName = response.get().trim();
             prefs.addBoard(boardName, panelList);
@@ -179,6 +211,9 @@ public class MenuControl extends MenuBar {
     }
 
     private MenuItem[] createBoardsMenu() {
+        MenuItem newBoard = new MenuItem("New");
+        newBoard.setOnAction(e -> onBoardNew());
+
         MenuItem saveAs = new MenuItem("Save as");
         saveAs.setOnAction(e -> onBoardSaveAs());
         
@@ -211,7 +246,7 @@ public class MenuControl extends MenuBar {
 
         Menu autoCreate = boardAutoCreator.generateBoardAutoCreateMenu();
 
-        return new MenuItem[] {save, saveAs, open, delete, autoCreate};
+        return new MenuItem[] {newBoard, save, saveAs, open, delete, autoCreate};
     }
     
     public void switchBoard() {
@@ -239,7 +274,7 @@ public class MenuControl extends MenuBar {
                 // we trigger the notification timeout action first before refreshing
                 ui.hideNotification();
             }
-            ui.logic.refresh(false);
+            ui.logic.refresh();
         });
         refreshMenuItem.setAccelerator(REFRESH);
         return refreshMenuItem;

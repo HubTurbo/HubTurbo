@@ -43,15 +43,28 @@ public class FilterParserTests {
 
     @Test
     public void quotes() {
-        // Quoted qualifier content
-        assertEquals(Parser.parse("created:\"a b\""), new Qualifier(CREATED, "a b"));
-        assertEquals(Parser.parse("created:\" > 2014-5-1 \""),
-            new Qualifier(CREATED, new DateRange(LocalDate.of(2014, 5, 1), null, true)));
-        assertEquals(Parser.parse("created:\" 2014-5-1 .. 2014-5-2 \""),
-            new Qualifier(CREATED, new DateRange(LocalDate.of(2014, 5, 1), LocalDate.of(2014, 5, 2))));
+        // Content with space
+        assertEquals(Parser.parse("body:\"this is\""), new Qualifier(DESCRIPTION, "this is"));
 
-        // Prefix quotes
-        assertEquals(Parser.parse("\"a b\""), new Qualifier(KEYWORD, "a b"));
+        // Symbol between quotes
+        assertEquals(Parser.parse("\":\""), new Qualifier(KEYWORD, ":"));
+
+    }
+
+    @Test(expected = ParseException.class)
+    public void emptyQuotes() {
+        Parser.parse("body: \"\""); 
+    }
+
+    @Test(expected = ParseException.class)
+    public void multiplesQuotes() {
+        Parser.parse("body: \"\"\""); 
+    }
+
+
+    @Test(expected = ParseException.class)
+    public void prefixQuotes() {
+        Parser.parse("body: test\"will not be parsed\"\""); 
     }
 
     @Test

@@ -52,10 +52,10 @@
 
     <Match>
         <Or>
-            <Class name="unstable.SavedLoginTest"/>
+            <Class name="guitests.SavedLoginTest"/>
             <Class name="guitests.WrongLastViewedTest"/>
         </Or>
-        <Method name="setupMethod" />
+        <Method name="beforeStageStarts" />
         <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD" />
     </Match>
 
@@ -85,5 +85,9 @@
     <Match>
         <Class name="tests.MilestoneUpdateServiceTests" />
         <Bug pattern="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD" />
+    </Match>
+    <Match>
+        <Class name="tests.LogicTests" />
+        <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD" />
     </Match>
 </FindBugsFilter>

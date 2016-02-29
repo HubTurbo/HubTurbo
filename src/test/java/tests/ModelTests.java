@@ -4,6 +4,7 @@ import backend.UpdateSignature;
 import backend.resource.*;
 import backend.resource.serialization.SerializableModel;
 import backend.stub.DummyRepo;
+import backend.stub.DummyRepoState;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -147,7 +148,7 @@ public class ModelTests {
         // Resources
         // Issues
         ArrayList<Integer> issueIds = new ArrayList<>();
-        for (int i = 1; i <= 10; i++) {
+        for (int i = 1; i <= DummyRepoState.noOfDummyIssues; i++) {
             issueIds.add(i);
         }
         Collections.sort(issueIds); // 1, 2..10
@@ -160,10 +161,10 @@ public class ModelTests {
 
         // Labels
         ArrayList<String> labelNames = new ArrayList<>();
-        for (int i = 1; i <= 11; i++) {
+        for (int i = 1; i <= DummyRepoState.noOfDummyIssues; i++) {
             labelNames.add("Label " + i);
         }
-        Collections.sort(labelNames); // Label 1, Label 10, Label 2..9
+        Collections.sort(labelNames); // Label 1, Label 10..12, Label 2..9
         int labelCount = 1;
         for (TurboLabel label : modelUpdated.getLabels()) {
             if (label.getActualName().startsWith("Label")) {
@@ -176,7 +177,7 @@ public class ModelTests {
 
         // Milestones
         ArrayList<Integer> milestoneIds = new ArrayList<>();
-        for (int i = 1; i <= 10; i++) {
+        for (int i = 1; i <= DummyRepoState.noOfDummyIssues; i++) {
             milestoneIds.add(i);
         }
         Collections.sort(milestoneIds); // 1, 2..10
@@ -192,7 +193,7 @@ public class ModelTests {
 
         // Users
         ArrayList<String> userLogins = new ArrayList<>();
-        for (int i = 1; i <= 10; i++) {
+        for (int i = 1; i <= DummyRepoState.noOfDummyIssues; i++) {
             userLogins.add("User " + i);
         }
         Collections.sort(userLogins); // User 1, User 10, User 2..9
@@ -217,7 +218,7 @@ public class ModelTests {
             modelUpdated.getIssueById(-1);
         } catch (AssertionError ignored) {}
 
-        assertEquals(Optional.<TurboIssue>empty(), modelUpdated.getIssueById(11));
+        assertEquals(Optional.<TurboIssue>empty(), modelUpdated.getIssueById(DummyRepoState.noOfDummyIssues + 1));
         assertEquals("Issue 10", modelUpdated.getIssueById(10).get().getTitle());
 
         // Labels
@@ -229,7 +230,8 @@ public class ModelTests {
             modelUpdated.getLabelByActualName("");
         } catch (AssertionError ignored) {}
 
-        assertEquals(Optional.<TurboLabel>empty(), modelUpdated.getLabelByActualName("Label 12"));
+        assertEquals(Optional.<TurboLabel>empty(),
+                modelUpdated.getLabelByActualName("Label " + (DummyRepoState.noOfDummyIssues + 1)));
         assertEquals("Label 10", modelUpdated.getLabelByActualName("Label 10").get().getActualName());
 
         // Milestones
@@ -249,10 +251,12 @@ public class ModelTests {
             modelUpdated.getMilestoneByTitle("");
         } catch (AssertionError ignored) {}
 
-        assertEquals(Optional.<TurboMilestone>empty(), modelUpdated.getMilestoneById(11));
+        assertEquals(Optional.<TurboMilestone>empty(),
+                modelUpdated.getMilestoneById(DummyRepoState.noOfDummyIssues + 1));
         assertEquals("Milestone 10", modelUpdated.getMilestoneById(10).get().getTitle());
 
-        assertEquals(Optional.<TurboMilestone>empty(), modelUpdated.getMilestoneByTitle("Milestone 11"));
+        assertEquals(Optional.<TurboMilestone>empty(),
+                modelUpdated.getMilestoneByTitle("Milestone " + (DummyRepoState.noOfDummyIssues + 1)));
         assertEquals("Milestone 10", modelUpdated.getMilestoneByTitle("Milestone 10").get().getTitle());
 
         // Users
@@ -264,7 +268,39 @@ public class ModelTests {
             modelUpdated.getUserByLogin("");
         } catch (AssertionError ignored) {}
 
-        assertEquals(Optional.<TurboUser>empty(), modelUpdated.getUserByLogin("User 11"));
+        assertEquals(Optional.<TurboUser>empty(),
+                modelUpdated.getUserByLogin("User " + (DummyRepoState.noOfDummyIssues + 1)));
         assertEquals("User 10", modelUpdated.getUserByLogin("User 10").get().getLoginName());
+    }
+
+    /**
+     * Tests that replaceIssueLabels returns Optional.empty() if the model for the
+     * issue given in the argument can't be found
+     */
+    @Test
+    public void replaceIssueLabels_issueNotFound() {
+        Model model = new Model("testrepo");
+        assertEquals(Optional.empty(), model.replaceIssueLabels(1, new ArrayList<>()));
+    }
+
+    /**
+     * Tests that replaceIssueLabels finds issue with the right id and successfully modify the issue's labels
+     */
+    @Test
+    public void replaceIssueLabels_successful() {
+        String repoId = "testowner/testrepo";
+        List<String> originalLabels = Arrays.asList("label1", "label2");
+        List<String> newLabels = Arrays.asList("label3", "label4");
+
+        TurboIssue issue1 = LogicTests.createIssueWithLabels(1, originalLabels);
+        TurboIssue issue2 = LogicTests.createIssueWithLabels(2, originalLabels);
+        TurboIssue issue3 = LogicTests.createIssueWithLabels(3, originalLabels);
+        List<TurboIssue> issues = Arrays.asList(issue3, issue2, issue1);
+
+        Model model = new Model(repoId, issues, new ArrayList<TurboLabel>(),
+                                new ArrayList<TurboMilestone>(), new ArrayList<TurboUser>());
+        Optional<TurboIssue> result = model.replaceIssueLabels(issue1.getId(), newLabels);
+        assertEquals(1, result.get().getId());
+        assertEquals(newLabels, result.get().getLabels());
     }
 }

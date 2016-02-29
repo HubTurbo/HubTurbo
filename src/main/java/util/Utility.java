@@ -1,9 +1,15 @@
 package util;
 
-import java.awt.Dimension;
-import java.awt.GraphicsEnvironment;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParser;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.eclipse.egit.github.core.RepositoryId;
+import ui.UI;
+import util.events.ShowErrorDialogEvent;
+
+import javax.swing.*;
+import java.awt.*;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,21 +22,11 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.List;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import javax.swing.UIManager;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.RepositoryId;
-
-import ui.UI;
-import util.events.ShowErrorDialogEvent;
-
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonParser;
 
 public final class Utility {
 
@@ -326,6 +322,24 @@ public final class Utility {
     // TODO: remove once #1078 is solved from all repoIds normalization
     public static Set<String> convertSetToLowerCase(Set<String> originalSet) {
         return originalSet.stream().map(String::toLowerCase).collect(Collectors.toSet());
+    }
+
+    /**
+     * If a value is present in the optional, applies mapping function to it and return the result,
+     * otherwise executes the ifEmpty function and returns an empty optional
+     * @param optional
+     * @param mapper
+     * @param ifEmpty
+     * @return
+     */
+    public static <T, U> Optional<U> safeFlatMapOptional(Optional<T> optional,
+                                                         Function<? super T, Optional<U>> mapper,
+                                                         Runnable ifEmpty) {
+        if (optional.isPresent()) {
+            return mapper.apply(optional.get());
+        }
+        ifEmpty.run();
+        return Optional.empty();
     }
 
     private Utility() {}

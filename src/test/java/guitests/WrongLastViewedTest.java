@@ -25,7 +25,7 @@ public class WrongLastViewedTest extends UITest {
     }
 
     @Override
-    public void setupMethod() {
+    public void beforeStageStarts() {
         UI.status = new StatusUIStub();
         UI.events = new EventDispatcherStub();
 

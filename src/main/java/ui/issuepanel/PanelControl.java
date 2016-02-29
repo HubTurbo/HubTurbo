@@ -121,6 +121,9 @@ public class PanelControl extends HBox {
     }
 
     public void selectPanel(int index) {
+        if (getPanelCount() == 0) {
+            return;
+        }
         assert index >= 0 && index < getPanelCount();
         setCurrentlySelectedPanel(Optional.of(index));
         scrollToPanel(index);
@@ -313,6 +316,10 @@ public class PanelControl extends HBox {
 
     public int getNumberOfSavedBoards() {
         return prefs.getAllBoards().size();
+    }
+
+    public List<String> getAllBoardNames() {
+        return prefs.getAllBoardNames();
     }
 
     private void scrollToPanel(int panelIndex) {

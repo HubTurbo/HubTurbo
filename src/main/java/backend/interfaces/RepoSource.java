@@ -42,7 +42,7 @@ public abstract class RepoSource implements TaskRunner {
 
     public abstract CompletableFuture<Boolean> isRepositoryValid(String repoId);
 
-    public abstract CompletableFuture<List<String>> replaceIssueLabels(TurboIssue issue, List<String> labels);
+    public abstract CompletableFuture<Boolean> replaceIssueLabels(TurboIssue issue, List<String> labels);
 
     public abstract CompletableFuture<Issue> replaceIssueMilestone(TurboIssue issue, Integer milestone);
 

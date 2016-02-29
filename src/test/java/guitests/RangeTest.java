@@ -1,5 +1,6 @@
 package guitests;
 
+import backend.stub.DummyRepoState;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import org.junit.Test;
@@ -17,7 +18,7 @@ public class RangeTest extends UITest {
         click("#dummy/dummy_col0_filterTextField");
         press(KeyCode.ENTER).release(KeyCode.ENTER);
         sleep(EVENT_DELAY);
-        assertEquals(5, ((ListPanel) find("#dummy/dummy_col0")).getIssueCount());
+        assertEquals(DummyRepoState.noOfDummyIssues - 5, ((ListPanel) find("#dummy/dummy_col0")).getIssueCount());
     }
 
     @Test
@@ -26,6 +27,6 @@ public class RangeTest extends UITest {
         click("#dummy/dummy_col0_filterTextField");
         press(KeyCode.ENTER).release(KeyCode.ENTER);
         sleep(EVENT_DELAY);
-        assertEquals(6, ((ListPanel) find("#dummy/dummy_col0")).getIssueCount());
+        assertEquals(8, ((ListPanel) find("#dummy/dummy_col0")).getIssueCount());
     }
 }

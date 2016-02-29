@@ -5,13 +5,12 @@ import static ui.components.KeyboardShortcuts.JUMP_TO_FILTER_BOX;
 import static ui.components.KeyboardShortcuts.MAXIMIZE_WINDOW;
 import static ui.components.KeyboardShortcuts.MINIMIZE_WINDOW;
 import static ui.components.KeyboardShortcuts.SWITCH_BOARD;
-
 import filter.expression.QualifierType;
 import ui.GUIController;
 import ui.GuiElement;
 import ui.components.PanelMenuBar;
 import backend.resource.TurboUser;
-import filter.ParseException;
+import filter.FilterException;
 import filter.Parser;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
@@ -47,11 +46,12 @@ import java.util.stream.Collectors;
  */
 public abstract class FilterPanel extends AbstractPanel {
 
-    private ObservableList<GuiElement> elementsToDisplay = null;
+    private final UI ui;
 
     public PanelMenuBar panelMenuBar;
     protected FilterTextField filterTextField;
-    private final UI ui;
+    private ObservableList<GuiElement> elementsToDisplay = null;
+
 
     protected FilterExpression currentFilterExpression = Qualifier.EMPTY;
 
@@ -179,12 +179,25 @@ public abstract class FilterPanel extends AbstractPanel {
             } else {
                 this.applyFilterExpression(Qualifier.EMPTY);
             }
-        } catch (ParseException ex) {
+        } catch (FilterException ex) {
             this.applyFilterExpression(Qualifier.EMPTY);
             // Overrides message in status bar
-            UI.status.displayMessage("Panel " + (panelIndex + 1)
-                + ": Parse error in filter: " + ex.getMessage());
+            UI.status.displayMessage(getUniquePanelName(
+                panelMenuBar.getPanelName()) + ": " + ex.getMessage());
         }
+    }
+
+    /**
+     * Appends panel index to panel name if a panel is unnamed.
+     * This allows user to identify each panel with a unique name 
+     * @param panelName
+     * @return final panel name shown to users
+     */
+    private String getUniquePanelName(String panelName) {
+        if (panelName.equals(PanelMenuBar.DEFAULT_PANEL_NAME)) {
+            return PanelMenuBar.DEFAULT_PANEL_NAME + " " + (panelIndex + 1);
+        }
+        return PanelMenuBar.DEFAULT_PANEL_NAME + " " + panelName;
     }
 
     /**

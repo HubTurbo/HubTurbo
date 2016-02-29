@@ -55,8 +55,10 @@ import static ui.components.KeyboardShortcuts.SWITCH_DEFAULT_REPO;
 public class UI extends Application implements EventDispatcher {
 
     public static final int VERSION_MAJOR = 3;
-    public static final int VERSION_MINOR = 18;
+    public static final int VERSION_MINOR = 20;
     public static final int VERSION_PATCH = 0;
+
+    public static final String WINDOW_TITLE = "HubTurbo %s (%s)";
 
     public static final String ARG_UPDATED_TO = "--updated-to";
 
@@ -144,6 +146,11 @@ public class UI extends Application implements EventDispatcher {
         getMainWindowHandle(mainStage.getTitle());
     }
 
+    private void createAndLoadSampleBoard(){
+        BoardAutoCreator boardCreator = new BoardAutoCreator(this, panels, prefs);
+        boardCreator.createSampleBoard(false);
+    }
+
     private void disableUI(boolean disable) {
         mainStage.setResizable(!disable);
         menuBar.setDisable(disable);
@@ -151,6 +158,9 @@ public class UI extends Application implements EventDispatcher {
     }
 
     private void showMainWindow(String repoId) {
+        //We infer this is the first time HT is being used if there are no repo data stored at the start up.
+        //This check needs to be done at the very beginning of the startup, before HT downloads any repo data.
+        boolean isAFirstTimeUser = logic.getStoredRepos().isEmpty();
         logic.openPrimaryRepository(repoId);
         logic.setDefaultRepo(repoId);
         repoSelector.setText(repoId);
@@ -175,6 +185,9 @@ public class UI extends Application implements EventDispatcher {
         // Should only be called after panels have been initialized
         ensureSelectedPanelHasFocus();
         initialisePickers();
+        if (isAFirstTimeUser && TestController.shouldOpenSampleBoard()){
+            createAndLoadSampleBoard();
+        }
     }
 
     private void initialisePickers() {
@@ -183,7 +196,7 @@ public class UI extends Application implements EventDispatcher {
     }
 
     protected void registerTestEvents() {
-        registerEvent((UILogicRefreshEventHandler) e -> Platform.runLater(() -> logic.refresh(false)));
+        registerEvent((UILogicRefreshEventHandler) e -> Platform.runLater(logic::refresh));
     }
 
     private void initPreApplicationState() {
@@ -211,10 +224,10 @@ public class UI extends Application implements EventDispatcher {
     private void initApplicationState() {
         // In the future, when more arguments are passed to logic,
         // we can pass them in the form of an array.
-        logic = new Logic(uiManager, prefs);
+        logic = new Logic(uiManager, prefs, Optional.empty());
         // TODO clear cache if necessary
         refreshTimer = new TickingTimer("Refresh Timer", REFRESH_PERIOD,
-            status::updateTimeToRefresh, () -> logic.refresh(isNotificationPaneShowing()), TimeUnit.SECONDS);
+            status::updateTimeToRefresh, logic::refresh, TimeUnit.SECONDS);
         refreshTimer.start();
         undoController = new UndoController(notificationController);
     }
@@ -315,7 +328,7 @@ public class UI extends Application implements EventDispatcher {
                     boolean shouldRefresh = browserComponent.hasBviewChanged();
                     if (shouldRefresh) {
                         logger.info("Browser view has changed; refreshing");
-                        logic.refresh(isNotificationPaneShowing());
+                        logic.refresh();
                         refreshTimer.restart();
                     }
                 }
@@ -575,8 +588,8 @@ public class UI extends Application implements EventDispatcher {
 
     public void updateTitle() {
         String openBoard = prefs.getLastOpenBoard().orElse("none");
-        String title = String.format("HubTurbo " + Utility.version(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH)
-                + " (%s)", openBoard);
+        String version = Utility.version(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
+        String title = String.format(WINDOW_TITLE, version, openBoard);
         mainStage.setTitle(title);
     }
 
