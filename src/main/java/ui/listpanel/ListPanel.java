@@ -55,7 +55,7 @@ public class ListPanel extends FilterPanel {
     private static final String markAsUnreadMenuItemText = "Mark as unread (U)";
     private static final String markAllAsUnreadMenuItemText = "Mark all below as unread";
     private static final String markAllAsReadMenuItemText = "Mark all below as read";
-    private static final Boolean IS_READ = true;
+    private static final Boolean READ = true;
     private static final MenuItem changeLabelsMenuItem = new MenuItem();
     private static final String changeLabelsMenuItemText = "Change labels (L)";
 
@@ -139,11 +139,11 @@ public class ListPanel extends FilterPanel {
         setupKeyboardShortcuts();
         setupContextMenu();
 
-        listView.setOnItemSelected((i, e) -> {
+        listView.setOnItemSelected((index, wasRightKey) -> {
             updateContextMenu(contextMenu);
 
-            TurboIssue issue = listView.getItems().get(i).getIssue();
-            if (e.booleanValue() == listView.SHOULD_LOAD_BVIEW_ISSUE) {
+            TurboIssue issue = listView.getItems().get(index).getIssue();
+            if (!wasRightKey) {
                 ui.triggerEvent(
                     new IssueSelectedEvent(issue.getRepoId(), issue.getId(), panelIndex, issue.isPullRequest())
                 );
@@ -302,12 +302,12 @@ public class ListPanel extends FilterPanel {
 
         markAllBelowAsReadMenuItem.setText(markAllAsReadMenuItemText);
         markAllBelowAsReadMenuItem.setOnAction(e -> {
-            markAllItemsBelow(IS_READ);
+            markAllItemsBelow(READ);
         });
 
         markAllBelowAsUnreadMenuItem.setText(markAllAsUnreadMenuItemText);
         markAllBelowAsUnreadMenuItem.setOnAction(e -> {
-            markAllItemsBelow(!IS_READ);
+            markAllItemsBelow(!READ);
         });
 
         contextMenu.getItems().addAll(markAsReadUnreadMenuItem, markAllBelowAsReadMenuItem,
@@ -385,7 +385,7 @@ public class ListPanel extends FilterPanel {
 
     /**
      * Mark all items on and below the selected item in the list view as read/unread
-     * @param isRead isRead set to true mark all items on and below the selected issue as read.
+     * @param isRead Setting it to true marks all items on and below the selected issue as read.
      *               Setting it to false marks all items on and below the selected issue as unread.
      */
     private void markAllItemsBelow(boolean isRead){

@@ -1,6 +1,7 @@
 package guitests;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import javafx.application.Platform;
@@ -84,8 +85,9 @@ public class ContextMenuTests extends UITest {
      */
     @Test
     public void markAllBelowAsReadUnread_tenIssuesInListView_markIssue9andBelowReadUnread() {
-        markAllReadOrUnread(true);
-        markAllReadOrUnread(false);
+        scrollToTheEndOfThePanel();
+        markAndVerifyIssuesBelow(7, true);
+        markAndVerifyIssuesBelow(7, false);
     }
 
     /**
@@ -106,25 +108,42 @@ public class ContextMenuTests extends UITest {
     }
 
     /**
-     * Tests marked issues from Issue #9 in the UI right to the end of the list as read/unread
-     * @param isTestingRead If true, tests whether issues on/below the selected issue are being correctly marked read
+     * Marks and tests issues in a panel of 12 issues
+     * from Issue #{index} in the UI right to the end of the list as read/unread
+     * @param isMarkAsRead If true, tests whether issues on/below the selected issue are being correctly marked read
      *                      If false, tests whether issues on/below the selected are being correctly marked unread
+     * @param index The issue number in the panel
      */
-    private void markAllReadOrUnread(boolean isTestingRead){
-        click("#dummy/dummy_col0_9");
-        rightClick("#dummy/dummy_col0_9");
-        if (isTestingRead){
+    private void markAndVerifyIssuesBelow(int index, boolean isMarkAsRead){
+        click("#dummy/dummy_col0_" + index);
+        rightClick("#dummy/dummy_col0_" + index);
+        PlatformEx.waitOnFxThread();
+        if (isMarkAsRead){
             click("Mark all below as read");
         } else {
             click("Mark all below as unread");
         }
-        for (int i = 9; i >= 1; i--){
-            ListPanelCell listPanelCell = find("#dummy/dummy_col0_" + i);
-            if (isTestingRead){
-                assertTrue(listPanelCell.getIssue().isCurrentlyRead());
-            } else {
-                assertFalse(listPanelCell.getIssue().isCurrentlyRead());
-            }
+        PlatformEx.waitOnFxThread();
+        for (int i = index; i >= 1; i--){
+            verifyReadStatusOfIssue(i, isMarkAsRead);
+        }
+    }
+
+    /**
+     * Tests whether a list panel cell corresponding to a particular index is marked as read/unread
+     */
+    private void verifyReadStatusOfIssue(int index, boolean isExpectedStatusRead){
+        ListPanelCell listPanelCell = find("#dummy/dummy_col0_" + index);
+        assertEquals(listPanelCell.getIssue().isCurrentlyRead(), isExpectedStatusRead);
+    }
+
+    /**
+     * Scrolls to the end of the panel by clicking an issue and pressing the down key
+     */
+    private void scrollToTheEndOfThePanel() {
+        click("#dummy/dummy_col0_9");
+        for (int i = 0; i < 15; i++) {
+            push(KeyCode.DOWN);
         }
     }
 

@@ -46,9 +46,9 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
     // (when nothing is selected, both should be no-ops)
     private boolean saveSelectionCalled = false;
 
-    public static final boolean SHOULD_LOAD_BVIEW_ISSUE = true;
+    public static final boolean IS_SECONDARY_KEY = true;
 
-    private BiConsumer<Integer, Boolean> onItemSelected = (i, e) -> {};
+    private BiConsumer<Integer, Boolean> onItemSelected = (index, wasRightClick) -> {};
 
     public NavigableListView() {
         setupKeyEvents();
@@ -114,17 +114,25 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
                 selectedIndex = Optional.of(nextIndex);
 
                 // The next item will be considered selected
-                setItemSelectedParams(nextIndex, SHOULD_LOAD_BVIEW_ISSUE);
+                triggerItemSelected(nextIndex);
             }
         }
     }
 
     /**
-     * Passes the relevant index and boolean value for whether the bview should be loaded
-     * to the callback variable onItemSelected
+     * Passes the relevant index to the onItemSelected callback variable.
+     * This method is called for primary keys e.g. keyboard keys and the left mouse key
      */
-    private void setItemSelectedParams(int index, boolean shouldLoadBViewIssue){
-        onItemSelected.accept(index, shouldLoadBViewIssue);
+    private void triggerItemSelected(int index){
+        onItemSelected.accept(index, !IS_SECONDARY_KEY);
+    }
+
+    /**
+     * Passes the relevant index to the onItemSelected callback variable.
+     * This method is called for secondary keys for e.g. the right mouse click
+     */
+    private void triggerItemSelectedSecondary(int index){
+        onItemSelected.accept(index, IS_SECONDARY_KEY);
     }
 
     public abstract boolean areItemsEqual(T item1, T item2);
@@ -138,11 +146,10 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
                 selectedIndex = Optional.of(currentlySelected);
 
                 logger.info("Mouse click on item index " + selectedIndex.get());
-                // whenever the right mouse button is clicked, do not load issue on bView.
                 if (e.getButton().equals(MouseButton.SECONDARY)){
-                    setItemSelectedParams(selectedIndex.get(), !SHOULD_LOAD_BVIEW_ISSUE);
+                    triggerItemSelectedSecondary(selectedIndex.get());
                 } else {
-                    setItemSelectedParams(selectedIndex.get(), SHOULD_LOAD_BVIEW_ISSUE);
+                    triggerItemSelected(selectedIndex.get());
                 }
             }
         });
@@ -157,7 +164,7 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
                 e.consume();
                 if (selectedIndex.isPresent()) {
                     logger.info("Enter key selection on item " + selectedIndex.get());
-                    setItemSelectedParams(selectedIndex.get(), SHOULD_LOAD_BVIEW_ISSUE);
+                    triggerItemSelected(selectedIndex.get());
                 }
             }
             if (e.getCode() == KeyCode.UP || e.getCode() == KeyCode.DOWN ||
@@ -167,7 +174,7 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
                 assert selectedIndex.isPresent() : "handleUpDownKeys doesn't set selectedIndex!";
                 if (!e.isShiftDown()) {
                     logger.info("Enter key selection on item index " + selectedIndex.get());
-                    setItemSelectedParams(selectedIndex.get(), SHOULD_LOAD_BVIEW_ISSUE);
+                    triggerItemSelected(selectedIndex.get());
                 }
             }
             if (FIRST_ISSUE.match(e)) {
@@ -213,7 +220,7 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
         getSelectionModel().clearAndSelect(n - 1);
         scrollAndShow(n - 1);
         selectedIndex = Optional.of(n - 1);
-        setItemSelectedParams(selectedIndex.get(), SHOULD_LOAD_BVIEW_ISSUE);
+        triggerItemSelected(selectedIndex.get());
     }
     
    public void selectNextItem() {
@@ -222,7 +229,7 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
            getSelectionModel().clearAndSelect(selectedIndex.get() + 1);
            scrollAndShow(selectedIndex.get() + 1);
            selectedIndex = Optional.of(selectedIndex.get() + 1);
-           setItemSelectedParams(selectedIndex.get(), SHOULD_LOAD_BVIEW_ISSUE);
+           triggerItemSelected(selectedIndex.get());
        }
    }
 
