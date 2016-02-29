@@ -6,7 +6,6 @@ import static ui.components.KeyboardShortcuts.MAXIMIZE_WINDOW;
 import static ui.components.KeyboardShortcuts.MINIMIZE_WINDOW;
 import static ui.components.KeyboardShortcuts.SWITCH_BOARD;
 import filter.expression.QualifierType;
-import javafx.application.Platform;
 import ui.GUIController;
 import ui.GuiElement;
 import ui.components.PanelMenuBar;
@@ -102,10 +101,8 @@ public abstract class FilterPanel extends AbstractPanel {
             requestFocus();
         });
 
-        ui.registerEvent((RepoOpeningEventHandler) this::showRepoOpeningIndicator);
-        ui.registerEvent((RepoOpenedEventHandler) this::hideRepoOpeningIndicator);
-        ui.registerEvent((PanelReloadingEventHandler) e -> showPanelReloadingIndicator());
-        ui.registerEvent((PanelReloadedEventHandler) e -> hidePanelReloadingIndicator());
+        ui.registerEvent((RepoOpeningEventHandler) this::startLoadingAnimationIfApplicable);
+        ui.registerEvent((RepoOpenedEventHandler) this::stopLoadingAnimationIfApplicable);
     }
 
     private final ModelUpdatedEventHandler onModelUpdate = e -> {
@@ -125,9 +122,7 @@ public abstract class FilterPanel extends AbstractPanel {
     private Node createFilterBox() {
         filterTextField = new FilterTextField("")
                 .setOnConfirm((text) -> {
-                    Platform.runLater(() -> ui.triggerEvent(new PanelReloadingEvent()));
                     applyStringFilter(text);
-                    Platform.runLater(() -> ui.triggerEvent(new PanelReloadedEvent()));
                     return text;
                 })
                 .setOnCancel(this::requestFocus);
@@ -213,24 +208,20 @@ public abstract class FilterPanel extends AbstractPanel {
         parentPanelControl.getGUIController().panelFilterExpressionChanged(this);
     }
 
-    protected abstract void showRepoOpeningIndicator(RepoOpeningEvent e);
+    protected abstract void startLoadingAnimationIfApplicable(RepoOpeningEvent e);
 
-    protected abstract void hideRepoOpeningIndicator(RepoOpenedEvent e);
-
-    protected abstract void showPanelReloadingIndicator();
-
-    protected abstract void hidePanelReloadingIndicator();
+    protected abstract void stopLoadingAnimationIfApplicable(RepoOpenedEvent e);
 
     /**
      * Implements the addition of the panel-loading indication
      */
-    protected abstract void setLoadingIndicator();
+    protected abstract void showLoadingIndicator();
 
     /**
      * Implements the removal of the panel-loading indication that was applied by the method
-     * setLoadingIndicator().
+     * showLoadingIndicator().
      */
-    protected abstract void removeLoadingIndicator();
+    protected abstract void hideLoadingIndicator();
 
     public void setFilterByString(String filterString) {
         filterTextField.setFilterText(filterString);

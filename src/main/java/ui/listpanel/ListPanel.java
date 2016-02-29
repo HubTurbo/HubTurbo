@@ -386,40 +386,37 @@ public class ListPanel extends FilterPanel {
      * Adds a style class to the listview which changes its background to contain a loading spinning gif
      */
     @Override
-    protected void setLoadingIndicator() {
+    protected void showLoadingIndicator() {
         logger.info("Preparing to add panel loading indication");
         listView.getStyleClass().add("listview-loading");
     }
 
     /**
-     * Removes the style class that was added in setLoadingIndicator() from the listview.
+     * Removes the style class that was added in showLoadingIndicator() from the listview.
      */
     @Override
-    protected void removeLoadingIndicator() {
+    protected void hideLoadingIndicator() {
         logger.info("Preparing to remove panel loading indication");
         listView.getStyleClass().removeIf(cssClass -> cssClass.equals("listview-loading"));
     }
 
     @Override
-    protected void showRepoOpeningIndicator(RepoOpeningEvent e) {
+    protected void startLoadingAnimationIfApplicable(RepoOpeningEvent e) {
+        if (isIndicatorApplicable(e.isPrimaryRepo)) startLoadingAnimation();
+    }
+
+    @Override
+    protected void stopLoadingAnimationIfApplicable(RepoOpenedEvent e) {
+        if (isIndicatorApplicable(e.isPrimaryRepo)) stopLoadingAnimation();
+    }
+
+    private void startLoadingAnimation() {
         setTranslucentCellFactory();
-        setLoadingIndicator();
+        showLoadingIndicator();
     }
 
-    @Override
-    protected void hideRepoOpeningIndicator(RepoOpenedEvent e) {
-        removeLoadingIndicator();
-    }
-
-    @Override
-    protected void showPanelReloadingIndicator() {
-        setTranslucentCellFactory();
-        setLoadingIndicator();
-    }
-
-    @Override
-    protected void hidePanelReloadingIndicator() {
-        removeLoadingIndicator();
+    private void stopLoadingAnimation() {
+        hideLoadingIndicator();
     }
 
     private void setTranslucentCellFactory() {
@@ -430,5 +427,19 @@ public class ListPanel extends FilterPanel {
             cell.setStyle(cell.getStyle() + "-fx-opacity: 40%;");
             return cell;
         });
+    }
+
+    /**
+     * Determines whether the loading indicator should show
+     *
+     * @param isPrimaryRepo
+     * @return true if the current panel's filter does not contain a repo &
+     * the parameter isPrimaryRepo is true
+     */
+    private boolean isIndicatorApplicable(boolean isPrimaryRepo) {
+        HashSet<String> allReposInFilterExpr =
+                Qualifier.getMetaQualifierContent(getCurrentFilterExpression(), QualifierType.REPO);
+        boolean isPrimaryRepoChanged = isPrimaryRepo && allReposInFilterExpr.isEmpty();
+        return isPrimaryRepoChanged;
     }
 }

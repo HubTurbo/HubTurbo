@@ -501,8 +501,8 @@ public class UI extends Application implements EventDispatcher {
 
     private void primaryRepoChanged(String repoId) {
         triggerEvent(new PrimaryRepoChangedEvent(repoId));
-        logic.openPrimaryRepository(repoId);
         logic.setDefaultRepo(repoId);
+        logic.openPrimaryRepository(repoId);
         triggerEvent(new UsedReposChangedEvent());
     }
 
