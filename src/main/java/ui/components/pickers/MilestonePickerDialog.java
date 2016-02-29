@@ -147,7 +147,8 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
         populateClosedMilestones(milestonesToDisplay, closedMilestones);
     }
 
-    private void populateAssignedMilestone(List<PickerMilestone> pickerMilestoneList, FlowPane assignedMilestoneStatus) {
+    private void populateAssignedMilestone(List<PickerMilestone> pickerMilestoneList,
+                                           FlowPane assignedMilestoneStatus) {
         assignedMilestoneStatus.getChildren().clear();
         boolean hasSuggestion = hasHighlightedMilestone(pickerMilestoneList);
 
@@ -161,23 +162,28 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
         assignedMilestoneStatus.getChildren().add(new Label("|"));
     }
 
-    private void updateSuggestedMilestone(List<PickerMilestone> pickerMilestoneList, FlowPane assignedMilestoneStatus, boolean hasSuggestion) {
+    private void updateSuggestedMilestone(List<PickerMilestone> pickerMilestoneList, FlowPane assignedMilestoneStatus,
+                                          boolean hasSuggestion) {
         pickerMilestoneList.stream()
                 .filter(milestone -> !milestone.isExisting() && milestone.isHighlighted() && !milestone.isSelected())
                 .forEach(milestone -> assignedMilestoneStatus.getChildren().add(
-                        setMouseClickForNode(milestone.getNewlyAssignedMilestoneNode(hasSuggestion), milestone.getTitle())
+                        setMouseClickForNode(milestone.getNewlyAssignedMilestoneNode(hasSuggestion),
+                                milestone.getTitle())
                 ));
     }
 
-    private void updateNewlyAddedMilestone(List<PickerMilestone> pickerMilestoneList, FlowPane assignedMilestoneStatus, boolean hasSuggestion) {
+    private void updateNewlyAddedMilestone(List<PickerMilestone> pickerMilestoneList, FlowPane assignedMilestoneStatus,
+                                           boolean hasSuggestion) {
         pickerMilestoneList.stream()
                 .filter(milestone -> milestone.isSelected() && !milestone.isExisting())
                 .forEach(milestone -> assignedMilestoneStatus.getChildren().add(
-                        setMouseClickForNode(milestone.getNewlyAssignedMilestoneNode(hasSuggestion), milestone.getTitle())
+                        setMouseClickForNode(milestone.getNewlyAssignedMilestoneNode(hasSuggestion),
+                                milestone.getTitle())
                 ));
     }
 
-    private void updateExistingMilestones(List<PickerMilestone> pickerMilestoneList, FlowPane assignedMilestoneStatus, boolean hasSuggestion) {
+    private void updateExistingMilestones(List<PickerMilestone> pickerMilestoneList, FlowPane assignedMilestoneStatus,
+                                          boolean hasSuggestion) {
         if (hasExistingMilestone(pickerMilestoneList)) {
             PickerMilestone existingMilestone = getExistingMilestone(pickerMilestoneList);
 

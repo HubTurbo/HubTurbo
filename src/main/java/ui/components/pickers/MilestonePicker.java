@@ -32,7 +32,9 @@ public class MilestonePicker {
         Optional<Pair<ButtonType, Integer>> milestoneDialogResponse = dialog.showAndWait();
 
         if (!milestoneDialogResponse.isPresent() ||
-                milestoneDialogResponse.get().getKey().equals(ButtonType.CANCEL)) return;
+                milestoneDialogResponse.get().getKey().equals(ButtonType.CANCEL)) {
+            return;
+        }
 
         Optional<Integer> newlyAssignedMilestone = Optional.ofNullable(milestoneDialogResponse.get().getValue());
 

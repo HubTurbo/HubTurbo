@@ -11,7 +11,6 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
     boolean isHighlighted = false;
     boolean isFaded = false;
     boolean isExisting = false;
-    MilestonePickerDialog dialog;
 
     public PickerMilestone(TurboMilestone milestone) {
         super(milestone.getRepoId(), milestone.getId(), milestone.getTitle());
@@ -139,11 +138,22 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
      */
     @Override
     public int compareTo(PickerMilestone milestone) {
-        if (this.getDueDate().equals(milestone)) return 0;
+        if (this.getDueDate().equals(milestone.getDueDate())) return 0;
         if (!this.getDueDate().isPresent()) return 1;
         if (!milestone.getDueDate().isPresent()) return -1;
 
         return this.getDueDate().get()
                 .isAfter(milestone.getDueDate().get()) ? 1 : -1;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
 }
