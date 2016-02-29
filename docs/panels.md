@@ -12,7 +12,7 @@ Panels can be added using the menu or keyboard shortcuts.
 
 ## Closing a Panel <a name="close"></a>
 
-- Click on the `x` button at the top of the panel.
+- Click ![The x icon](images/panels/deletePanel.png) at the top of the panel.
 
 - `Panels > Close Panel`
     - <kbd>Ctrl</kbd> + <kbd>W</kbd> will do the same.
@@ -21,5 +21,12 @@ Panels can be added using the menu or keyboard shortcuts.
 
 Panels can be reordered simply by dragging them into the desired position.
 
-- Click on the space next to the `x` button and move the panel to the left or right.
+- Click anywhere on the head or borders of the panel and drag it to the left or right.
 
+## Renaming Panels <a name="rename"></a>
+
+1. To __start__ renaming, double click the panel name or click ![The pencil icon](images/panels/startPanelRename.png?raw=true) at the top right corner of the panel.
+2. Type the new name in the text field.
+3. __Save__ the new name by pressing <kbd>Enter</kbd> or clicking ![The tick icon](images/panels/savePanelRename.png?raw=true) at the top right corner of the panel.
+
+To __abort__ the renaming action any time before step 3, press <kbd>Esc</kbd> or click ![The undo arrow icon](images/panels/cancelPanelRename.png?raw=true) at the top right corner of the panel.
