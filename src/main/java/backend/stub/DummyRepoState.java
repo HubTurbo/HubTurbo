@@ -343,7 +343,7 @@ public class DummyRepoState {
 
         markUpdatedEvents(toEdit, IssueMetadata.intermediate(eventsOfIssue, metadataOfIssue.getComments(), "", ""));
 
-        return open;
+        return true;
     }
 
     protected TurboMilestone updateMilestone(int itemId, String updateText) {

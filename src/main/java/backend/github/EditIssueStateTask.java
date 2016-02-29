@@ -25,7 +25,7 @@ public class EditIssueStateTask extends GitHubRepoTask<Boolean> {
                     repo.editIssueState(repoId, issueId, open)
             );
         } catch (IOException e) {
-            response.completeExceptionally(e);
+            response.complete(false);
         }
     }
 }

@@ -63,7 +63,7 @@ public class ContextMenuTests extends UITest {
      * context menu items
      */
     @Test
-    public void test2() {
+    public void testMarkAsReadUnread() {
         ListPanelCell listPanelCell = find("#dummy/dummy_col0_9");
 
         click("#dummy/dummy_col0_9");
@@ -85,7 +85,7 @@ public class ContextMenuTests extends UITest {
      * Tests selecting "Change labels" context menu item
      */
     @Test
-    public void test3() {
+    public void testChangeLabels() {
         click("#dummy/dummy_col0_9");
         rightClick("#dummy/dummy_col0_9");
         sleep(EVENT_DELAY);
@@ -112,6 +112,30 @@ public class ContextMenuTests extends UITest {
         assertNotNull(find("#milestonePickerTextField"));
 
         push(KeyCode.ESCAPE);
+        sleep(EVENT_DELAY);
+    }
+
+    /**
+     * Tests selecting "Close issue" and "Reopen issue"
+     */
+    @Test
+    public void testCloseReopenIssue() {
+        click("#dummy/dummy_col0_9");
+        rightClick("#dummy/dummy_col0_9");
+        sleep(EVENT_DELAY);
+        click("Close issue (C)");
+        sleep(EVENT_DELAY);
+        waitUntilNodeAppears("Undo");
+        click("Undo");
+        sleep(EVENT_DELAY);
+
+        click("#dummy/dummy_col0_6");
+        rightClick("#dummy/dummy_col0_6");
+        sleep(EVENT_DELAY);
+        click("Reopen issue (O)");
+        sleep(EVENT_DELAY);
+        waitUntilNodeAppears("Undo");
+        click("Undo");
         sleep(EVENT_DELAY);
     }
 
