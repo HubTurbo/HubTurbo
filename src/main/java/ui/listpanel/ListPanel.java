@@ -402,24 +402,27 @@ public class ListPanel extends FilterPanel {
 
     @Override
     protected void startLoadingAnimationIfApplicable(RepoOpeningEvent e) {
-        if (isIndicatorApplicable(e.isPrimaryRepo)) startLoadingAnimation();
+        if (isIndicatorApplicable(e.repoId, e.isPrimaryRepo)) startLoadingAnimation();
     }
 
     @Override
     protected void stopLoadingAnimationIfApplicable(RepoOpenedEvent e) {
-        if (isIndicatorApplicable(e.isPrimaryRepo)) stopLoadingAnimation();
+        if (isIndicatorApplicable(e.repoId, e.isPrimaryRepo)) stopLoadingAnimation();
     }
 
-    private void startLoadingAnimation() {
+    @Override
+    protected void startLoadingAnimation() {
         setTranslucentCellFactory();
         showLoadingIndicator();
     }
 
-    private void stopLoadingAnimation() {
+    @Override
+    protected void stopLoadingAnimation() {
         hideLoadingIndicator();
     }
 
     private void setTranslucentCellFactory() {
+        if (getElementsList() == null) return;
         final HashSet<Integer> issuesWithNewComments
                 = updateIssueCommentCounts(Qualifier.hasUpdatedQualifier(getCurrentFilterExpression()));
         listView.setCellFactory(list -> {
@@ -432,14 +435,18 @@ public class ListPanel extends FilterPanel {
     /**
      * Determines whether the loading indicator should show
      *
-     * @param isPrimaryRepo
-     * @return true if the current panel's filter does not contain a repo &
-     * the parameter isPrimaryRepo is true
+     * @param repoId id of the repo being opened
+     * @param isPrimaryRepo whether is repo being opened is a primary repo, i.e. opened from repository selector
+     * @return true if the current panel's filter does not contain a repo and a primary repo is opened
+     * or true if the current filter expression contains the repo being opened
      */
-    private boolean isIndicatorApplicable(boolean isPrimaryRepo) {
+    private boolean isIndicatorApplicable(String repoId, boolean isPrimaryRepo) {
         HashSet<String> allReposInFilterExpr =
                 Qualifier.getMetaQualifierContent(getCurrentFilterExpression(), QualifierType.REPO);
-        boolean isPrimaryRepoChanged = isPrimaryRepo && allReposInFilterExpr.isEmpty();
-        return isPrimaryRepoChanged;
+        if (isPrimaryRepo) {
+            return allReposInFilterExpr.isEmpty();
+        }
+
+        return allReposInFilterExpr.contains(repoId);
     }
 }

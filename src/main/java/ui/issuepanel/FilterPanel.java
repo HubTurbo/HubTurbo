@@ -122,7 +122,9 @@ public abstract class FilterPanel extends AbstractPanel {
     private Node createFilterBox() {
         filterTextField = new FilterTextField("")
                 .setOnConfirm((text) -> {
+                    startLoadingAnimation();
                     applyStringFilter(text);
+                    stopLoadingAnimation();
                     return text;
                 })
                 .setOnCancel(this::requestFocus);
@@ -211,6 +213,10 @@ public abstract class FilterPanel extends AbstractPanel {
     protected abstract void startLoadingAnimationIfApplicable(RepoOpeningEvent e);
 
     protected abstract void stopLoadingAnimationIfApplicable(RepoOpenedEvent e);
+
+    protected abstract void startLoadingAnimation();
+
+    protected abstract void stopLoadingAnimation();
 
     /**
      * Implements the addition of the panel-loading indication

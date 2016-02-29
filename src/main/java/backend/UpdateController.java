@@ -67,7 +67,7 @@ public class UpdateController {
      *
      * @param filterExprs Filter expressions to process.
      */
-    private void openRepositoriesInFilters(List<FilterExpression> filterExprs) {
+    public void openRepositoriesInFilters(List<FilterExpression> filterExprs) {
         filterExprs.stream()
                 .flatMap(filterExpr -> Qualifier.getMetaQualifierContent(filterExpr, QualifierType.REPO).stream())
                 .distinct()
