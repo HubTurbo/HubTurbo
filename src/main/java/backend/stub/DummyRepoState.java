@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 
 public class DummyRepoState {
 
+    public static final int noOfDummyIssues = 12;
     private final String dummyRepoId;
 
     private final TreeMap<Integer, TurboIssue> issues = new TreeMap<>();
@@ -49,9 +50,18 @@ public class DummyRepoState {
     }
 
     private void initializeRepoEntities() {
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < noOfDummyIssues; i++) {
+            TurboIssue dummyIssue;
             // Issue #7 is a PR
-            TurboIssue dummyIssue = (i != 6) ? makeDummyIssue() : makeDummyPR();
+            switch (i) {
+                case 6:
+                case 10:
+                    dummyIssue = makeDummyPR();
+                    break;
+                default:
+                    dummyIssue = makeDummyIssue();
+                    break;
+            }
             // All default issues are treated as if created a long time ago
             dummyIssue.setUpdatedAt(LocalDateTime.of(2000 + i, 1, 1, 0, 0));
             TurboLabel dummyLabel = makeDummyLabel();
@@ -92,7 +102,7 @@ public class DummyRepoState {
         }
 
         // Odd issues are assigned label 1, even issues are assigned label 2
-        for (int i = 1; i <= 10; i++) {
+        for (int i = 1; i <= noOfDummyIssues; i++) {
             issues.get(i).addLabel((i % 2 == 0) ? "Label 2" : "Label 1");
         }
 
@@ -100,10 +110,13 @@ public class DummyRepoState {
         labels.put("Label 11", new TurboLabel(dummyRepoId, "ffa500", "Label 11"));
         issues.get(10).addLabel("Label 11");
 
-        // Each contributor is assigned to his corresponding issue
+        // For issue 1 to 10, each contributor is assigned to his corresponding issue
         for (int i = 1; i <= 10; i++) {
             issues.get(i).setAssignee("User " + i);
         }
+        // Issues following from here will have different assignments for testing
+        issues.get(11).setAssignee("User 1");
+        issues.get(12).setAssignee("User 2");
     }
 
     private void insertInitialMetadata() {

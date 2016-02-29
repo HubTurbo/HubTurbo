@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javafx.geometry.Insets;
@@ -34,6 +35,7 @@ public class ListPanelCard extends VBox {
     private static final String OCTICON_PULL_REQUEST = "\uf009";
     private static final int CARD_WIDTH = 350;
     private static final String OCTICON_COMMENT = "\uf02b";
+    private static final String OCTICON_ARROW_RIGHT = "\uf03e";
 
     /**
      * A card that is constructed with an issue as argument. Its components
@@ -42,6 +44,7 @@ public class ListPanelCard extends VBox {
 
     private final GuiElement guiElement;
     private final FlowPane issueDetails = new FlowPane();
+    private final HBox authorAssigneeBox = new HBox();
     private final FilterPanel parentPanel;
     private final HashSet<Integer> issuesWithNewComments;
 
@@ -77,11 +80,13 @@ public class ListPanelCard extends VBox {
         }
 
         setupIssueDetailsBox();
+        setupAuthorAssigneeBox();
+        updateDetails();
 
-        setPadding(new Insets(0, 0, 3, 0));
+        setPadding(new Insets(0, 0, 0, 0));
         setSpacing(1);
 
-        getChildren().addAll(issueTitle, issueDetails);
+        getChildren().addAll(issueTitle, issueDetails, authorAssigneeBox);
 
         if (Qualifier.hasUpdatedQualifier(parentPanel.getCurrentFilterExpression())) {
             getChildren().add(getEventDisplay(issue,
@@ -191,8 +196,11 @@ public class ListPanelCard extends VBox {
         issueDetails.setPrefWrapLength(CARD_WIDTH);
         issueDetails.setHgap(3);
         issueDetails.setVgap(3);
+    }
 
-        updateDetails();
+    private void setupAuthorAssigneeBox() {
+        authorAssigneeBox.setPrefWidth(CARD_WIDTH);
+        authorAssigneeBox.setPadding(new Insets(0, 0, 1, 0));
     }
 
     private void updateDetails() {
@@ -228,23 +236,61 @@ public class ListPanelCard extends VBox {
             issueDetails.getChildren().add(new Label(milestone.getTitle()));
         }
 
-        if (issue.getAssignee().isPresent() && guiElement.getAssignee().isPresent()) {
-            TurboUser assignee = guiElement.getAssignee().get();
-            Label assigneeNameLabel = new Label(issue.getAssignee().get());
-            assigneeNameLabel.getStyleClass().add("display-box-padding");
-
-            ImageView avatar = new ImageView();
-            if (assignee.getAvatarURL().length() != 0) {
-                Image image = assignee.getAvatar();
-                assert image != null;
-                avatar.setImage(image);
+        if (issue.isPullRequest()) {
+            HBox authorBox = createDisplayUserBox(guiElement.getAuthor(), issue.getCreator());
+            authorAssigneeBox.getChildren().add(authorBox);
+            if (issue.getAssignee().isPresent()) {
+                Label rightArrow = new Label(OCTICON_ARROW_RIGHT);
+                rightArrow.getStyleClass().addAll("octicon", "pull-request-assign-icon");
+                authorAssigneeBox.getChildren().add(rightArrow);
             }
-
-            HBox assigneeBox = new HBox();
-            assigneeBox.setAlignment(Pos.BASELINE_CENTER);
-            assigneeBox.getChildren().addAll(avatar, assigneeNameLabel);
-            issueDetails.getChildren().add(assigneeBox);
         }
+
+        if (issue.getAssignee().isPresent()) {
+            HBox assigneeBox = createDisplayUserBox(guiElement.getAssignee(), issue.getAssignee().get());
+            authorAssigneeBox.getChildren().add(assigneeBox);
+        }
+    }
+
+    /**
+     * Creates a box that displays a label of userName
+     * The avatar that belongs to the user will be prepended if TurboUser has it
+     * @param user
+     * @param userName
+     * @return
+     */
+    private HBox createDisplayUserBox(Optional<TurboUser> user, String userName) {
+        HBox userBox = setupUserBox();
+        Label authorNameLabel = new Label(userName);
+        addAvatarIfPresent(userBox, user);
+        userBox.getChildren().addAll(authorNameLabel);
+        return userBox;
+    }
+
+    private void addAvatarIfPresent(HBox userBox, Optional<TurboUser> user) {
+        if (!user.isPresent()) return;
+        ImageView userAvatar = getAvatar(user.get());
+        userBox.getChildren().add(userAvatar);
+    }
+
+    private HBox setupUserBox() {
+        HBox userBox = new HBox();
+        userBox.setAlignment(Pos.BASELINE_CENTER);
+        return userBox;
+    }
+
+    /**
+     * Attempts to get the TurboUser's avatar
+     * @param user
+     * @return ImageView that contains the avatar image if it exists or an empty ImageView if it doesn't exist
+     */
+    private ImageView getAvatar(TurboUser user) {
+        ImageView userAvatar = new ImageView();
+        Image userAvatarImage = user.getAvatarImage();
+        if (userAvatarImage != null) {
+            userAvatar.setImage(userAvatarImage);
+        }
+        return userAvatar;
     }
 
 }

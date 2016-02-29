@@ -186,6 +186,12 @@ public class MultiModel implements IModel {
     }
 
     @Override
+    public Optional<TurboUser> getAuthorOfIssue(TurboIssue issue) {
+        return getModelById(issue.getRepoId())
+                .flatMap(m -> m.getCreatorOfIssue(issue));
+    }
+
+    @Override
     public List<TurboLabel> getLabelsOfIssue(TurboIssue issue, Predicate<TurboLabel> predicate) {
         return getModelById(issue.getRepoId())
             .flatMap(m -> Optional.of(m.getLabelsOfIssue(issue)))
