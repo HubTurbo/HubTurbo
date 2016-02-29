@@ -204,11 +204,6 @@ public final class Parser {
         }
     }
 
-    /**
-     * Checks if this is an enhanced id lookup i.e id:test/test#111
-     * @param type
-     * @return
-     */
     private boolean isCompoundId(QualifierType type, Token token) {
         return type == QualifierType.ID && token.getType() == TokenType.COMPOUND_ID;
     }
@@ -295,7 +290,7 @@ public final class Parser {
 
     /**
      * Parses filter for conjunction lookup of repo and id i.e id:test/test#id
-     * @return 
+     * @return filter expression
      */
     private FilterExpression parseCompoundId() {
         String repoId = consume().getValue();

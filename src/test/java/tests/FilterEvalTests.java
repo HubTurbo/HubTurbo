@@ -74,7 +74,17 @@ public class FilterEvalTests {
         TurboIssue issue1 = new TurboIssue("dummy/dummy", 1, "1");
        
         assertFalse(matches("id:test/test#1", issue1));
+        assertFalse(matches("id:dummy/dummy#2", issue1));
         assertTrue(matches("id:dummy/dummy#1", issue1));
+    }
+
+    @Test
+    public void satisfiesId_compoundIdWithRangeOperator() {
+        TurboIssue issue1 = new TurboIssue("dummy/dummy", 5, "5");
+        TurboIssue issue2 = new TurboIssue("dummy/dummy", 4, "4");
+       
+        assertTrue(matches("id:dummy/dummy#>4", issue1));
+        assertTrue(matches("id:dummy/dummy#3 .. 6", issue2));
     }
 
     @Test

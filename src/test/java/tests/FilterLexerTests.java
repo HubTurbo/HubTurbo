@@ -1,6 +1,5 @@
 package tests;
 
-import filter.ParseException;
 import filter.lexer.Lexer;
 import filter.lexer.Token;
 import filter.lexer.TokenType;
@@ -11,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 public class FilterLexerTests {
 
@@ -29,6 +29,7 @@ public class FilterLexerTests {
 
     @Test
     public void lex_repoIds() {
+
         assertEquals(getTokens("test/test"), 
             Arrays.asList(new Token(TokenType.SYMBOL, "test/test"), new Token(TokenType.EOF, "")));
     }
@@ -94,6 +95,9 @@ public class FilterLexerTests {
                 new Token(TokenType.SYMBOL, "1"),
                 new Token(TokenType.EOF, "")
         ));
+
+        // test: at least one symbol preceedes "#"
+        assertFalse(getTokens("id:#1").contains(new Token(TokenType.COMPOUND_ID, "#")));
     }
 
     /**
