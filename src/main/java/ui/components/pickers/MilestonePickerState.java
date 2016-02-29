@@ -6,13 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MilestonePickerState {
-    private List<PickerMilestone> originalMilestonesList;
     private List<PickerMilestone> currentMilestonesList;
 
     public MilestonePickerState(List<PickerMilestone> milestones) {
-        originalMilestonesList = milestones;
         currentMilestonesList = new ArrayList<>();
-        cloneList(originalMilestonesList, currentMilestonesList);
+        cloneList(milestones, currentMilestonesList);
     }
 
     public MilestonePickerState(List<PickerMilestone> milestones, String userInput) {
@@ -44,7 +42,7 @@ public class MilestonePickerState {
      * then toggles the selection status
      * @param milestoneQuery
      */
-    public void toggleMilestone(String milestoneQuery) {
+    public final void toggleMilestone(String milestoneQuery) {
         String milestoneName = getMatchingMilestoneName(milestoneQuery);
         if (milestoneName == null) return;
         this.currentMilestonesList.stream()

@@ -147,11 +147,13 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
     }
 
     @Override
+    @SuppressWarnings("PMD")
     public boolean equals(Object o) {
         return super.equals(o);
     }
 
     @Override
+    @SuppressWarnings("PMD")
     public int hashCode() {
         return super.hashCode();
     }

@@ -2,15 +2,12 @@ package ui.components.pickers;
 
 import backend.resource.TurboIssue;
 import backend.resource.TurboMilestone;
-import backend.resource.TurboUser;
 import javafx.application.Platform;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import ui.UI;
-import undo.actions.ChangeLabelsAction;
 import undo.actions.ChangeMilestoneAction;
-import util.events.ShowMilestonePickerEvent;
 import util.events.ShowMilestonePickerEventHandler;
 
 import java.util.List;

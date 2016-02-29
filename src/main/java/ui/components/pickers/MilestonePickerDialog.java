@@ -22,7 +22,6 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
     private static final String ASSIGNED_MILESTONE = "Assigned Milestone";
 
     private final List<PickerMilestone> originalMilestones = new ArrayList<>();
-    private VBox milestoneBox;
     FlowPane openMilestones, closedMilestones, assignedMilestone;
     private TextField inputField;
     private MilestonePickerState state;
@@ -105,12 +104,12 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
 
     private void setupButtons(DialogPane milestonePickerDialogPane) {
         ButtonType confirmButtonType = new ButtonType("Confirm", ButtonBar.ButtonData.OK_DONE);
-        setConfirmResultConverter(confirmButtonType);
+        setConfirmResultConverter();
 
         milestonePickerDialogPane.getButtonTypes().addAll(confirmButtonType, ButtonType.CANCEL);
     }
 
-    private void setConfirmResultConverter(ButtonType confirmButtonType) {
+    private void setConfirmResultConverter() {
         setResultConverter((dialogButton) -> {
             List<PickerMilestone> finalList = state.getCurrentMilestonesList();
             if (hasSelectedMilestone(finalList)) {
@@ -121,7 +120,7 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
     }
 
     private void initUI() {
-        milestoneBox = new VBox();
+        VBox milestoneBox = new VBox();
         assignedMilestone = createMilestoneGroup();
         openMilestones = createMilestoneGroup();
         closedMilestones = createMilestoneGroup();
