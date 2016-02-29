@@ -184,6 +184,10 @@ public class Model implements IBaseModel {
         return issue.getAssignee().flatMap(this::getUserByLogin);
     }
 
+    public Optional<TurboUser> getCreatorOfIssue(TurboIssue issue) {
+        return getUserByLogin(issue.getCreator());
+    }
+
     public List<TurboLabel> getLabelsOfIssue(TurboIssue issue) {
         return issue.getLabels().stream()
             .map(this::getLabelByActualName)

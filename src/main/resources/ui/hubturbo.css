@@ -121,6 +121,11 @@
     -fx-font-family: github-octicons;
 }
 
+.pull-request-assign-icon {
+    -fx-font-size: 10px;
+    -fx-padding: 1 4 1 4;
+}
+
 .issue-pull-request-icon {
     -fx-font-size: 16px;
     -fx-padding: -2 0 2 3;
