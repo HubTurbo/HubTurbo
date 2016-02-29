@@ -29,6 +29,7 @@ import util.GithubPageElements;
 import util.HTLog;
 import util.KeyPress;
 import util.events.IssueSelectedEvent;
+import util.events.ShowIssueCreatorEvent;
 import util.events.ShowLabelPickerEvent;
 import backend.resource.TurboIssue;
 import filter.expression.Qualifier;
@@ -231,6 +232,16 @@ public class ListPanel extends FilterPanel {
                     changeLabels();
                 }
             }
+            if (SHOW_ISSUE_CREATOR.match(event)) {
+                createIssue(Optional.empty());
+            }
+            if (SHOW_ISSUES.match(event)) {
+                if (!getSelectedElement().isPresent()) {
+                    createIssue(Optional.empty());
+                } else {
+                    createIssue(Optional.of(getSelectedElement().get().getIssue()));
+                }
+            }
             if (MANAGE_ASSIGNEES.match(event) && ui.getBrowserComponent().isCurrentUrlIssue()) {
                 ui.getBrowserComponent().switchToTab(DISCUSSION_TAB);
                 ui.getBrowserComponent().manageAssignees(event.getCode().toString());
@@ -400,5 +411,9 @@ public class ListPanel extends FilterPanel {
     protected void removePanelLoadingIndication() {
         logger.info("Preparing to remove panel loading indication");
         listView.getStyleClass().removeIf(cssClass -> cssClass.equals("listview-loading"));
+    }
+
+    private void createIssue(Optional<TurboIssue> issue) {
+        ui.triggerEvent(new ShowIssueCreatorEvent(issue));
     }
 }

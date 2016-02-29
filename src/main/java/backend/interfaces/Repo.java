@@ -7,9 +7,11 @@ import backend.resource.TurboMilestone;
 import backend.resource.TurboUser;
 import github.ReviewComment;
 import github.TurboIssueEvent;
+
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.eclipse.egit.github.core.Comment;
+import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.PullRequest;
 
@@ -41,6 +43,7 @@ public interface Repo {
 
     boolean isRepositoryValid(String repoId);
     List<Label> setLabels(String repoId, int issueId, List<String> labels) throws IOException;
+    Issue createIssue(TurboIssue issue) throws IOException;
     ImmutablePair<Integer, Long> getRateLimitResetTime() throws IOException;
 
 }

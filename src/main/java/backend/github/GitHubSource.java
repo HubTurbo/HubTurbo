@@ -6,8 +6,11 @@ import backend.interfaces.Repo;
 import backend.interfaces.RepoSource;
 import backend.resource.Model;
 import backend.resource.TurboIssue;
+
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.egit.github.core.Issue;
+
 import util.HTLog;
 
 import java.util.List;
@@ -64,7 +67,12 @@ public class GitHubSource extends RepoSource {
         return addTask(new ReplaceIssueLabelsTask(this, gitHub, issue.getRepoId(), issue.getId(), labels)).response;
     }
 
-@Override
+    @Override
+    public CompletableFuture<Issue> createIssue(TurboIssue issue) {
+        return addTask(new CreateIssueTask(this, gitHub, issue)).response;
+    }
+
+    @Override
     public CompletableFuture<ImmutablePair<Integer, Long>> getRateLimitResetTime() {
         return addTask(new CheckRateLimitTask(this, gitHub)).response;
     }

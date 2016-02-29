@@ -2,10 +2,14 @@ package backend.resource;
 
 import backend.IssueMetadata;
 import backend.resource.serialization.SerializableIssue;
+
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
+import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.PullRequest;
+import org.eclipse.egit.github.core.User;
+
 import prefs.Preferences;
 import util.HTLog;
 import util.Utility;
@@ -24,6 +28,7 @@ import static util.Utility.replaceNull;
 public class TurboIssue {
     private static final Logger logger = HTLog.get(TurboIssue.class);
 
+    public static final int NEWISSUE_ID = -1;
     public static final String STATE_CLOSED = "closed";
     public static final String STATE_OPEN = "open";
 
@@ -233,6 +238,15 @@ public class TurboIssue {
     }
 
     /**
+     * Generates list of GitHub Labels from assigned labels
+     * @param labels
+     * @return GitHub compatible list of labels
+     */
+    private List<Label> convertToGitHubLabel(List<String> labels) {
+        return labels.stream().map(label -> new Label().setName(label)).collect(Collectors.toList());
+    }
+
+    /**
      * Conceptually, operations on issues. They should only modify non-serialized fields.
      */
     @SuppressWarnings("unused")
@@ -322,6 +336,19 @@ public class TurboIssue {
         return newIssue;
     }
 
+    public static boolean isNewIssue(TurboIssue issue) {
+        return issue.getId() == NEWISSUE_ID;
+    }
+
+    /**
+     * Generates new TurboIssue given a repoId
+     * @param repoId
+     * @return
+     */
+    public static TurboIssue createNewIssue(String repoId) {
+        return new TurboIssue(repoId, NEWISSUE_ID, "");
+    }
+
     /**
      * Finds the index of an issue with specified id in a list of issues
      * @param issues
@@ -339,6 +366,30 @@ public class TurboIssue {
 
     @SuppressWarnings("unused")
     private void ______BOILERPLATE______() {}
+
+    /**
+     * Generates bare-minimum GitHub Issue 
+     * @return
+     */
+    public Issue generateBasicGitHubIssue() {
+        return new Issue()
+            .setTitle(title).setBody(description).setState(STATE_OPEN)
+            .setLabels(convertToGitHubLabel(labels));
+    }
+
+    /**
+     * Convert TurboIssue to GitHub compatible Issue
+     * @param issue
+     * @return
+     */
+    public Issue convertToGitHubIssue() {
+        Issue issue = generateBasicGitHubIssue();
+
+        if (id != NEWISSUE_ID) issue.setNumber(id);
+        if (milestone.isPresent()) issue.setMilestone(new Milestone().setNumber(milestone.get()));
+        if (assignee.isPresent()) issue.setAssignee(new User().setLogin(assignee.get()));
+        return issue;
+    }
 
     public String getRepoId() {
         return repoId;
@@ -522,4 +573,5 @@ public class TurboIssue {
         result = 31 * result + (milestone != null ? milestone.hashCode() : 0);
         return result;
     }
+
 }

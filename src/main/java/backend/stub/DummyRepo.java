@@ -8,15 +8,19 @@ import backend.resource.TurboMilestone;
 import backend.resource.TurboUser;
 import github.ReviewComment;
 import github.TurboIssueEvent;
+
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.eclipse.egit.github.core.Comment;
+import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.PullRequest;
+
 import ui.UI;
 import util.events.testevents.ClearLogicModelEvent;
 import util.events.testevents.UpdateDummyRepoEventHandler;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -196,6 +200,11 @@ public class DummyRepo implements Repo {
     @Override
     public ImmutablePair<Integer, Long> getRateLimitResetTime() {
         return new ImmutablePair<>(apiQuota, new Date().getTime() + 2700000);
+    }
+
+    @Override
+    public Issue createIssue(TurboIssue issue) throws IOException {
+        return new Issue();
     }
 
 }
