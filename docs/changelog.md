@@ -1,6 +1,13 @@
 
 # Changelog
 
+# V3.21.0
+
+- Added aliases for lots of qualifiers and keywords
+- The panel view will now resize height-wise to fill the display it's in
+- Both author and assignee are now shown in issue cards for PRs
+- Fixed bug with browser view when panel view is maximised
+
 # V3.20.0
 
 - Added menu item for creating a new board
