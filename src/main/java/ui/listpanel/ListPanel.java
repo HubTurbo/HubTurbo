@@ -41,7 +41,7 @@ public class ListPanel extends FilterPanel {
     private final GUIController guiController;
     private int issueCount;
 
-    private final IssueListView listView;
+    public final IssueListView listView;
     private final HashMap<Integer, Integer> issueCommentCounts = new HashMap<>();
     private final HashMap<Integer, Integer> issueNonSelfCommentCounts = new HashMap<>();
 
@@ -139,11 +139,11 @@ public class ListPanel extends FilterPanel {
         setupKeyboardShortcuts();
         setupContextMenu();
 
-        listView.setOnItemSelected((index, wasRightKey) -> {
+        listView.setOnItemSelected((index, rightKey) -> {
             updateContextMenu(contextMenu);
 
             TurboIssue issue = listView.getItems().get(index).getIssue();
-            if (!wasRightKey) {
+            if (!rightKey) {
                 ui.triggerEvent(
                     new IssueSelectedEvent(issue.getRepoId(), issue.getId(), panelIndex, issue.isPullRequest())
                 );

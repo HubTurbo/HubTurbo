@@ -48,7 +48,7 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
 
     public static final boolean IS_SECONDARY_KEY = true;
 
-    private BiConsumer<Integer, Boolean> onItemSelected = (index, wasRightClick) -> {};
+    private BiConsumer<Integer, Boolean> onItemSelected = (index, rightKey) -> {};
 
     public NavigableListView() {
         setupKeyEvents();
@@ -121,7 +121,7 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
 
     /**
      * Passes the relevant index to the onItemSelected callback variable.
-     * This method is called for primary keys e.g. keyboard keys and the left mouse key
+     * onItemSelected is triggered for events like key presses, left click in this method.
      */
     private void triggerItemSelected(int index){
         onItemSelected.accept(index, !IS_SECONDARY_KEY);

@@ -8,6 +8,8 @@ import javafx.application.Platform;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCode;
+import ui.GuiElement;
+import ui.components.ScrollableListView;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -16,6 +18,9 @@ import ui.components.FilterTextField;
 import ui.listpanel.ListPanel;
 import ui.listpanel.ListPanelCell;
 import util.PlatformEx;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 
 public class ContextMenuTests extends UITest {
 
@@ -84,10 +89,20 @@ public class ContextMenuTests extends UITest {
      * Tests selecting "Mark all below as read" and "Mark all below as unread" context menu items
      */
     @Test
-    public void markAllBelowAsReadUnread_tenIssuesInListView_markIssue9andBelowReadUnread() {
-        scrollToTheEndOfThePanel();
-        markAndVerifyIssuesBelow(7, true);
-        markAndVerifyIssuesBelow(7, false);
+    public void markAllBelowAsReadUnread_twelveIssuesInListView_markIssue7andBelowReadUnread() {
+        ListPanel issuePanel = find("#dummy/dummy_col0");
+        issuePanel.listView.scrollAndShow(12);
+        //checking for issue #7 and below twice to make sure issues are marked correctly for read/unread cases
+        for (int i = 0; i < 2; i++) {
+            markAndVerifyIssuesBelow(7, true);
+        }
+        for (int i = 0; i < 2; i++) {
+            markAndVerifyIssuesBelow(7, false);
+        }
+
+        //checking for the last issue to ensure correct marking of issues on/below as read/unread when no issues below
+        markAndVerifyIssuesBelow(1, true);
+        markAndVerifyIssuesBelow(1, false);
     }
 
     /**
@@ -115,15 +130,21 @@ public class ContextMenuTests extends UITest {
      * @param index The issue number in the panel
      */
     private void markAndVerifyIssuesBelow(int index, boolean isMarkAsRead){
+        ListPanel issuePanel = find("#dummy/dummy_col0");
         click("#dummy/dummy_col0_" + index);
         rightClick("#dummy/dummy_col0_" + index);
-        PlatformEx.waitOnFxThread();
+        ContextMenu contextMenu = issuePanel.getContextMenu();
+        for (MenuItem menuItem : contextMenu.getItems()){
+            awaitCondition(menuItem::isVisible);
+            System.out.println(menuItem.getText() + "blah");
+            assertTrue(menuItem.isVisible());
+        }
+        sleep(EVENT_DELAY);
         if (isMarkAsRead){
             click("Mark all below as read");
         } else {
             click("Mark all below as unread");
         }
-        PlatformEx.waitOnFxThread();
         for (int i = index; i >= 1; i--){
             verifyReadStatusOfIssue(i, isMarkAsRead);
         }

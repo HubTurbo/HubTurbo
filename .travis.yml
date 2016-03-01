@@ -7,15 +7,17 @@ env:
     - TERM=dumb
 
 script:
-    - "./gradlew clean check -i"
+    - "./gradlew clean -Dtest.single=ContextMenuTests test -i"
+    #- "./gradlew clean check -i"
 
 after_success:
     - "./gradlew jacocoRootReport coveralls"
 
 branches:
   only:
-    - master
-    - release
+    #- master
+    #- release
+    - 1256-mark-all-read
 
 before_install:
     - "export DISPLAY=:99.0"
