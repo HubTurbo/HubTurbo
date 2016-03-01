@@ -103,6 +103,8 @@ public abstract class FilterPanel extends AbstractPanel {
 
         ui.registerEvent((RepoOpeningEventHandler) this::startLoadingAnimationIfApplicable);
         ui.registerEvent((RepoOpenedEventHandler) this::stopLoadingAnimationIfApplicable);
+        ui.registerEvent((PanelLoadingEventHandler) this::startLoadingAnimationIfApplicable);
+        ui.registerEvent((PanelLoadedEventHandler) this::stopLoadingAnimationIfApplicable);
     }
 
     private final ModelUpdatedEventHandler onModelUpdate = e -> {
@@ -122,9 +124,10 @@ public abstract class FilterPanel extends AbstractPanel {
     private Node createFilterBox() {
         filterTextField = new FilterTextField("")
                 .setOnConfirm((text) -> {
-                    startLoadingAnimation();
+                    //startLoadingAnimation();
+                    ui.triggerEvent(new PanelLoadingEvent(this));
                     applyStringFilter(text);
-                    stopLoadingAnimation();
+                    //stopLoadingAnimation();
                     return text;
                 })
                 .setOnCancel(this::requestFocus);
@@ -213,6 +216,10 @@ public abstract class FilterPanel extends AbstractPanel {
     protected abstract void startLoadingAnimationIfApplicable(RepoOpeningEvent e);
 
     protected abstract void stopLoadingAnimationIfApplicable(RepoOpenedEvent e);
+
+    protected abstract void startLoadingAnimationIfApplicable(PanelLoadingEvent e);
+
+    protected abstract void stopLoadingAnimationIfApplicable(PanelLoadedEvent e);
 
     protected abstract void startLoadingAnimation();
 

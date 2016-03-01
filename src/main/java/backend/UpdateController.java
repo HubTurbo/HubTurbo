@@ -5,15 +5,23 @@ import backend.resource.MultiModel;
 import backend.resource.TurboIssue;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Logger;
 import filter.expression.QualifierType;
 import ui.GuiElement;
+import ui.UI;
+import ui.issuepanel.FilterPanel;
 import util.Futures;
 import util.HTLog;
+import util.events.PanelLoadedEvent;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static util.Futures.withResult;
 
 /**
  * Manages the flow of logic during a data retrieval cycle from the repository source.
@@ -37,29 +45,30 @@ public class UpdateController {
      *
      * @param filterExprs Filter expressions to process
      */
-    public void processAndRefresh(List<FilterExpression> filterExprs) {
+    public void processAndRefresh(List<FilterExpression> filterExprs, List<FilterPanel> filterPanels) {
         // Open specified repos
-        openRepositoriesInFilters(filterExprs);
+        openRepositoriesInFilters(filterExprs, filterPanels)
+        .thenRun(() -> {
+            // First filter, for issues requiring a metadata update.
+            Map<String, List<TurboIssue>> toUpdate = tallyMetadataUpdate(filterExprs);
 
-        // First filter, for issues requiring a metadata update.
-        Map<String, List<TurboIssue>> toUpdate = tallyMetadataUpdate(filterExprs);
-
-        if (!toUpdate.isEmpty()) {
-            // If there are issues requiring metadata update, we dispatch the metadata requests...
-            ArrayList<CompletableFuture<Boolean>> metadataRetrievalTasks = new ArrayList<>();
-            toUpdate.forEach((repoId, issues) -> metadataRetrievalTasks.add(logic.getIssueMetadata(repoId, issues)));
-            // ...and then wait for all of them to complete.
-            Futures.sequence(metadataRetrievalTasks)
-                    .thenAccept(results -> logger.info("Metadata retrieval successful for "
-                            + results.stream().filter(result -> result).count() + "/"
-                            + results.size() + " repos"))
-                    .thenCompose(n -> logic.getRateLimitResetTime())
-                    .thenApply(logic::updateRemainingRate)
-                    .thenRun(() -> logic.updateUI(processFilter(filterExprs))); // Then filter the second time.
-        } else {
-            // If no issues requiring metadata update, just run the filter and sort.
-            logic.updateUI(processFilter(filterExprs));
-        }
+            if (!toUpdate.isEmpty()) {
+                // If there are issues requiring metadata update, we dispatch the metadata requests...
+                ArrayList<CompletableFuture<Boolean>> metadataRetrievalTasks = new ArrayList<>();
+                toUpdate.forEach((repoId, issues) -> metadataRetrievalTasks.add(logic.getIssueMetadata(repoId, issues)));
+                // ...and then wait for all of them to complete.
+                Futures.sequence(metadataRetrievalTasks)
+                        .thenAccept(results -> logger.info("Metadata retrieval successful for "
+                                + results.stream().filter(result -> result).count() + "/"
+                                + results.size() + " repos"))
+                        .thenCompose(n -> logic.getRateLimitResetTime())
+                        .thenApply(logic::updateRemainingRate)
+                        .thenRun(() -> logic.updateUI(processFilter(filterExprs))); // Then filter the second time.
+            } else {
+                // If no issues requiring metadata update, just run the filter and sort.
+                logic.updateUI(processFilter(filterExprs));
+            }
+        });
     }
 
     /**
@@ -67,11 +76,35 @@ public class UpdateController {
      *
      * @param filterExprs Filter expressions to process.
      */
-    public void openRepositoriesInFilters(List<FilterExpression> filterExprs) {
-        filterExprs.stream()
+    public boolean hasRepositoriesInFilters(List<FilterExpression> filterExprs) {
+        return filterExprs.stream()
                 .flatMap(filterExpr -> Qualifier.getMetaQualifierContent(filterExpr, QualifierType.REPO).stream())
                 .distinct()
-                .forEach(logic::openRepositoryFromFilter);
+                .findAny()
+                .isPresent();
+    }
+
+    /**
+     * Given a list of filter expressions, open all repositories necessary for processing the filter expressions.
+     *
+     * @param filterExprs Filter expressions to process.
+     */
+    public CompletableFuture<List<Boolean>> openRepositoriesInFilters(List<FilterExpression> filterExprs, List<FilterPanel> panels) {
+        List<Pair<FilterExpression, FilterPanel>> list = new ArrayList<>();
+        for (int i = 0; i < panels.size(); i++) {
+            FilterPanel panel = panels.get(i);
+            FilterExpression curFilterExpr = filterExprs.get(i);
+            list.add(new ImmutablePair<>(curFilterExpr, panel));
+        }
+
+        return Futures.sequence(list.stream()
+                .flatMap(listItem -> {
+                    Stream<CompletableFuture<Boolean>> result = Qualifier.getMetaQualifierContent(listItem.getKey(), QualifierType.REPO).stream()
+                            .map(repoId -> logic.openRepositoryFromFilter(repoId, listItem.getValue()));
+                    UI.events.triggerEvent(new PanelLoadedEvent(listItem.getValue()));
+                    return result;
+                })
+                .collect(Collectors.toList()));
     }
 
     /**

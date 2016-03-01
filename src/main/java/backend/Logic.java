@@ -14,9 +14,11 @@ import prefs.Preferences;
 import ui.GuiElement;
 import ui.TestController;
 import ui.UI;
+import ui.issuepanel.FilterPanel;
 import util.Futures;
 import util.HTLog;
 import util.Utility;
+import util.events.PanelLoadedEvent;
 import util.events.RepoOpenedEvent;
 import util.events.RepoOpeningEvent;
 import util.events.testevents.ClearLogicModelEvent;
@@ -25,6 +27,7 @@ import util.events.testevents.ClearLogicModelEventHandler;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import java.util.stream.Collectors;
 
 import static util.Futures.withResult;
@@ -96,20 +99,12 @@ public class Logic {
     }
 
     public CompletableFuture<Boolean> openPrimaryRepository(String repoId) {
-        return openRepository(repoId, true);
-    }
-
-    public CompletableFuture<Boolean> openRepositoryFromFilter(String repoId) {
-        return openRepository(repoId, false);
-    }
-
-    private CompletableFuture<Boolean> openRepository(String repoId, boolean isPrimaryRepository) {
         assert Utility.isWellFormedRepoId(repoId);
-        if (isPrimaryRepository) prefs.setLastViewedRepository(repoId);
+        prefs.setLastViewedRepository(repoId);
         if (isAlreadyOpen(repoId) || models.isRepositoryPending(repoId)) {
             // The content of panels with an empty filter text should change when the primary repo is changed.
             // Thus we refresh panels even when the repo is already open.
-            if (isPrimaryRepository) refreshUI();
+            refreshUI();
             return Futures.unit(false);
         }
         models.queuePendingRepository(repoId);
@@ -120,23 +115,78 @@ public class Logic {
 
             logger.info("Opening " + repoId);
             UI.status.displayMessage("Opening " + repoId);
-            Platform.runLater(() -> UI.events.triggerEvent(new RepoOpeningEvent(repoId, isPrimaryRepository)));
+            Platform.runLater(() -> UI.events.triggerEvent(new RepoOpeningEvent(repoId, true)));
 
-            return repoOpControl.openRepository(repoId)
-                    .thenApply(models::addPending)
-                    .thenRun(this::refreshUI)
-                    .thenRun(() ->
-                            Platform.runLater(() ->
-                                    // to trigger the event from the UI thread
-                                    UI.events.triggerEvent(new RepoOpenedEvent(repoId, isPrimaryRepository))
-                            )
-                    )
+            return openRepositoryUsingRepoOp(repoId, true)
                     .thenCompose(n -> getRateLimitResetTime())
                     .thenApply(this::updateRemainingRate)
                     .thenApply(rateLimits -> true)
                     .exceptionally(withResult(false));
 
         });
+    }
+
+    public CompletableFuture<Boolean> openRepositoryFromFilter(String repoId, FilterPanel panel) {
+        assert Utility.isWellFormedRepoId(repoId);
+        if (isAlreadyOpen(repoId) || models.isRepositoryPending(repoId)) {
+            // The content of panels with an empty filter text should change when the primary repo is changed.
+            // Thus we refresh panels even when the repo is already open.
+            return Futures.unit(false);
+        }
+        models.queuePendingRepository(repoId);
+        return isRepositoryValid(repoId).thenCompose(valid -> {
+            if (!valid) {
+                return Futures.unit(false);
+            }
+
+            logger.info("Opening " + repoId);
+            UI.status.displayMessage("Opening " + repoId);
+            Platform.runLater(() -> UI.events.triggerEvent(new RepoOpeningEvent(repoId, false)));
+
+            return openRepositoryUsingRepoOp(repoId, false)
+                    .thenRun(() -> Platform.runLater(() -> UI.events.triggerEvent(new PanelLoadedEvent(panel))))
+                    .thenCompose(n -> getRateLimitResetTime())
+                    .thenApply(this::updateRemainingRate)
+                    .thenApply(rateLimits -> true)
+                    .exceptionally(withResult(false));
+
+        });
+    }
+
+    private CompletableFuture<Void> openRepository(String repoId, boolean isPrimaryRepository) {
+        assert Utility.isWellFormedRepoId(repoId);
+        if (isPrimaryRepository) prefs.setLastViewedRepository(repoId);
+        if (isAlreadyOpen(repoId) || models.isRepositoryPending(repoId)) {
+            // The content of panels with an empty filter text should change when the primary repo is changed.
+            // Thus we refresh panels even when the repo is already open.
+            if (isPrimaryRepository) refreshUI();
+            return Futures.unit(null);
+        }
+        models.queuePendingRepository(repoId);
+        return isRepositoryValid(repoId).thenCompose(valid -> {
+            if (!valid) {
+                return Futures.unit(null);
+            }
+
+            logger.info("Opening " + repoId);
+            UI.status.displayMessage("Opening " + repoId);
+            Platform.runLater(() -> UI.events.triggerEvent(new RepoOpeningEvent(repoId, isPrimaryRepository)));
+
+            return openRepositoryUsingRepoOp(repoId, false);
+
+        });
+    }
+
+    private CompletionStage<Void> openRepositoryUsingRepoOp(String repoId, boolean isPrimaryRepository) {
+        return repoOpControl.openRepository(repoId)
+                .thenApply(models::addPending)
+                .thenRun(this::refreshUI)
+                .thenRun(() ->
+                        Platform.runLater(() -> {
+                            // to trigger the event from the UI thread
+                            UI.events.triggerEvent(new RepoOpenedEvent(repoId, isPrimaryRepository));
+                        })
+                );
     }
 
     public Set<String> getOpenRepositories() {
@@ -278,18 +328,27 @@ public class Logic {
      * and then sends the data to the GUI.
      */
     private void refreshUI() {
-        updateController.processAndRefresh(getAllUIFilters());
+        updateController.processAndRefresh(getAllUIFilters(), getAllPanels());
     }
 
     /**
      * Feeds a one-element list of filter expressions to updateController.
      *
-     * @param filterExpr The filter expression to be processed by updateController.
+     * @param ui
+     * @param panel The panel whose filter expression is to be processed by updateController.
      */
-    public void refreshPanel(FilterExpression filterExpr) {
+    public void refreshPanel(UI ui, FilterPanel panel) {
         List<FilterExpression> panelExpr = new ArrayList<>();
-        panelExpr.add(filterExpr);
-        updateController.processAndRefresh(panelExpr);
+        panelExpr.add(panel.getCurrentFilterExpression());
+
+
+        List<FilterPanel> panels = new ArrayList<>();
+        panels.add(panel);
+
+        updateController.processAndRefresh(panelExpr, panels);
+        if (!updateController.hasRepositoriesInFilters(panelExpr)) {
+            ui.triggerEvent(new PanelLoadedEvent(panel));
+        }
     }
 
     /**
@@ -345,6 +404,10 @@ public class Logic {
      */
     private List<FilterExpression> getAllUIFilters() {
         return uiManager.getAllFilters();
+    }
+
+    private List<FilterPanel> getAllPanels() {
+        return uiManager.getAllPanels();
     }
 
     /**

@@ -6,6 +6,7 @@ import javafx.application.Platform;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import ui.GuiElement;
 import ui.UI;
+import ui.issuepanel.FilterPanel;
 import util.events.ModelUpdatedEvent;
 import util.events.UpdateRateLimitsEvent;
 
@@ -34,6 +35,10 @@ public class UIManager {
 
     public List<FilterExpression> getAllFilters() {
         return ui.guiController.getAllFilters();
+    }
+
+    public List<FilterPanel> getAllPanels() {
+        return ui.guiController.getAllPanels();
     }
 }
 

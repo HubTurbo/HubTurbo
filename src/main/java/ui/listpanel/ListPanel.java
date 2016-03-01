@@ -29,10 +29,7 @@ import ui.issuepanel.PanelControl;
 import util.GithubPageElements;
 import util.HTLog;
 import util.KeyPress;
-import util.events.IssueSelectedEvent;
-import util.events.RepoOpenedEvent;
-import util.events.RepoOpeningEvent;
-import util.events.ShowLabelPickerEvent;
+import util.events.*;
 import backend.resource.TurboIssue;
 import filter.expression.Qualifier;
 
@@ -408,6 +405,16 @@ public class ListPanel extends FilterPanel {
     @Override
     protected void stopLoadingAnimationIfApplicable(RepoOpenedEvent e) {
         if (isIndicatorApplicable(e.repoId, e.isPrimaryRepo)) stopLoadingAnimation();
+    }
+
+    @Override
+    protected void startLoadingAnimationIfApplicable(PanelLoadingEvent e) {
+        if (e.panel == this) startLoadingAnimation();
+    }
+
+    @Override
+    protected void stopLoadingAnimationIfApplicable(PanelLoadedEvent e) {
+        if (e.panel == this) stopLoadingAnimation();
     }
 
     @Override
