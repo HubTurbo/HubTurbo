@@ -55,7 +55,8 @@ public class UpdateController {
             if (!toUpdate.isEmpty()) {
                 // If there are issues requiring metadata update, we dispatch the metadata requests...
                 ArrayList<CompletableFuture<Boolean>> metadataRetrievalTasks = new ArrayList<>();
-                toUpdate.forEach((repoId, issues) -> metadataRetrievalTasks.add(logic.getIssueMetadata(repoId, issues)));
+                toUpdate.forEach((repoId, issues) ->
+                        metadataRetrievalTasks.add(logic.getIssueMetadata(repoId, issues)));
                 // ...and then wait for all of them to complete.
                 Futures.sequence(metadataRetrievalTasks)
                         .thenAccept(results -> logger.info("Metadata retrieval successful for "
@@ -89,7 +90,8 @@ public class UpdateController {
      *
      * @param filterExprs Filter expressions to process.
      */
-    public CompletableFuture<List<Boolean>> openRepositoriesInFilters(List<FilterExpression> filterExprs, List<FilterPanel> panels) {
+    public CompletableFuture<List<Boolean>> openRepositoriesInFilters(List<FilterExpression> filterExprs,
+                                                                      List<FilterPanel> panels) {
         List<Pair<FilterExpression, FilterPanel>> list = new ArrayList<>();
         for (int i = 0; i < panels.size(); i++) {
             FilterPanel panel = panels.get(i);
@@ -99,7 +101,8 @@ public class UpdateController {
 
         return Futures.sequence(list.stream()
                 .flatMap(listItem -> {
-                    Stream<CompletableFuture<Boolean>> result = Qualifier.getMetaQualifierContent(listItem.getKey(), QualifierType.REPO).stream()
+                    Stream<CompletableFuture<Boolean>> result = Qualifier.getMetaQualifierContent(listItem.getKey(),
+                            QualifierType.REPO).stream()
                             .map(repoId -> logic.openRepositoryFromFilter(repoId, listItem.getValue()));
                     UI.events.triggerEvent(new PanelLoadedEvent(listItem.getValue()));
                     return result;

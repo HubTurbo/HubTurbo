@@ -153,30 +153,6 @@ public class Logic {
         });
     }
 
-    private CompletableFuture<Void> openRepository(String repoId, boolean isPrimaryRepository) {
-        assert Utility.isWellFormedRepoId(repoId);
-        if (isPrimaryRepository) prefs.setLastViewedRepository(repoId);
-        if (isAlreadyOpen(repoId) || models.isRepositoryPending(repoId)) {
-            // The content of panels with an empty filter text should change when the primary repo is changed.
-            // Thus we refresh panels even when the repo is already open.
-            if (isPrimaryRepository) refreshUI();
-            return Futures.unit(null);
-        }
-        models.queuePendingRepository(repoId);
-        return isRepositoryValid(repoId).thenCompose(valid -> {
-            if (!valid) {
-                return Futures.unit(null);
-            }
-
-            logger.info("Opening " + repoId);
-            UI.status.displayMessage("Opening " + repoId);
-            Platform.runLater(() -> UI.events.triggerEvent(new RepoOpeningEvent(repoId, isPrimaryRepository)));
-
-            return openRepositoryUsingRepoOp(repoId, false);
-
-        });
-    }
-
     private CompletionStage<Void> openRepositoryUsingRepoOp(String repoId, boolean isPrimaryRepository) {
         return repoOpControl.openRepository(repoId)
                 .thenApply(models::addPending)
