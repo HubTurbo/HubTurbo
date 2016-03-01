@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * An FilterPanel is a AbstractPanel meant for containing issues and an accompanying filter text field,
+ * A FilterPanel is an AbstractPanel meant for containing issues and an accompanying filter text field,
  * which specifies the issues to be contained within as well as their order.
  *
  * The FilterPanel does not perform the filtering itself - it merely specifies how filtering is to be done.

@@ -112,6 +112,7 @@ public class FilterEvalTests {
 
         issue = new TurboIssue(REPO, 1, "this is a test");
         testForPresenceOfKeywords("in:title ", issue);
+        testForPresenceOfKeywords("in:t ", issue);
     }
 
     @Test
@@ -143,6 +144,8 @@ public class FilterEvalTests {
         IModel model = TestUtils.modelWith(issue, milestone);
 
         testMilestoneParsing("milestone", issue, model);
+        // test: qualifier alias
+        testMilestoneParsing("m", issue, model);
 
         // milestone aliases
         // - sorting of milestone is by due date
@@ -438,6 +441,9 @@ public class FilterEvalTests {
         assertTrue(Qualifier.process(model, Parser.parse("assignee:alice"), issue));
         assertTrue(Qualifier.process(model, Parser.parse("assignee:o"), issue));
         assertTrue(Qualifier.process(model, Parser.parse("assignee:lic"), issue));
+
+        // test: qualifier alias
+        assertTrue(Qualifier.process(model, Parser.parse("as:BOB"), issue));
     }
 
     @Test
@@ -449,6 +455,9 @@ public class FilterEvalTests {
         assertFalse(matches("author:alice", issue));
         assertTrue(matches("author:o", issue));
         assertFalse(matches("author:lic", issue));
+
+        // test: qualifier alias
+        assertTrue(matches("au:bob", issue));
     }
 
     @Test
@@ -469,6 +478,9 @@ public class FilterEvalTests {
         assertTrue(Qualifier.process(model, Parser.parse("involves:o"), issue));
         assertTrue(Qualifier.process(model, Parser.parse("involves:lic"), issue));
 
+        // test: qualifier alias
+        assertTrue(Qualifier.process(model, Parser.parse("user:BOB"), issue));
+
         // author
         issue = new TurboIssue(REPO, 1, "", "bob", null, false);
 
@@ -484,7 +496,12 @@ public class FilterEvalTests {
         TurboIssue issue = new TurboIssue(REPO, 1, "");
         issue.setOpen(false);
         assertFalse(matches("state:open", issue));
+        assertFalse(matches("state:o", issue));
         assertTrue(matches("state:closed", issue));
+        assertTrue(matches("state:c", issue));
+
+        // test: qualifier alias
+        assertFalse(matches("st:open", issue));
     }
 
     @Test
@@ -503,8 +520,16 @@ public class FilterEvalTests {
 
         assertFalse(matches("has:label", issue));
         assertFalse(matches("has:milestone", issue));
-        assertFalse(matches("has:m", issue));
         assertFalse(matches("has:assignee", issue));
+
+        // test: qualifier alias
+        assertFalse(matches("h:label", issue));
+
+        // test: keyword aliases  
+        assertFalse(matches("has:l", issue));
+        assertFalse(matches("has:labels", issue));
+        assertFalse(matches("has:milestones", issue));
+        assertFalse(matches("has:m", issue));
         assertFalse(matches("has:as", issue));
 
         issue.addLabel(label);
@@ -512,27 +537,21 @@ public class FilterEvalTests {
 
         assertTrue(Qualifier.process(model, Parser.parse("has:label"), issue));
         assertFalse(Qualifier.process(model, Parser.parse("has:milestone"), issue));
-        assertFalse(Qualifier.process(model, Parser.parse("has:m"), issue));
         assertFalse(Qualifier.process(model, Parser.parse("has:assignee"), issue));
-        assertFalse(Qualifier.process(model, Parser.parse("has:as"), issue));
 
         issue.setMilestone(milestone);
         model = TestUtils.modelWith(issue, label, milestone);
 
         assertTrue(Qualifier.process(model, Parser.parse("has:label"), issue));
         assertTrue(Qualifier.process(model, Parser.parse("has:milestone"), issue));
-        assertTrue(Qualifier.process(model, Parser.parse("has:m"), issue));
         assertFalse(Qualifier.process(model, Parser.parse("has:assignee"), issue));
-        assertFalse(Qualifier.process(model, Parser.parse("has:as"), issue));
 
         issue.setAssignee(user);
         model = TestUtils.modelWith(issue, label, milestone, user);
 
         assertTrue(Qualifier.process(model, Parser.parse("has:label"), issue));
         assertTrue(Qualifier.process(model, Parser.parse("has:milestone"), issue));
-        assertTrue(Qualifier.process(model, Parser.parse("has:m"), issue));
         assertTrue(Qualifier.process(model, Parser.parse("has:assignee"), issue));
-        assertTrue(Qualifier.process(model, Parser.parse("has:as"), issue));
     }
 
     @Test
@@ -551,8 +570,10 @@ public class FilterEvalTests {
 
         assertTrue(matches("no:label", issue));
         assertTrue(matches("no:milestone", issue));
-        assertTrue(matches("no:m", issue));
         assertTrue(matches("no:assignee", issue));
+
+        // test: keyword aliases  
+        assertTrue(matches("no:m", issue));
         assertTrue(matches("no:as", issue));
 
         issue.addLabel(label);
@@ -560,27 +581,21 @@ public class FilterEvalTests {
 
         assertFalse(Qualifier.process(model, Parser.parse("no:label"), issue));
         assertTrue(Qualifier.process(model, Parser.parse("no:milestone"), issue));
-        assertTrue(Qualifier.process(model, Parser.parse("no:m"), issue));
         assertTrue(Qualifier.process(model, Parser.parse("no:assignee"), issue));
-        assertTrue(Qualifier.process(model, Parser.parse("no:as"), issue));
 
         issue.setMilestone(milestone);
         model = TestUtils.modelWith(issue, label, milestone);
 
         assertFalse(Qualifier.process(model, Parser.parse("no:label"), issue));
         assertFalse(Qualifier.process(model, Parser.parse("no:milestone"), issue));
-        assertFalse(Qualifier.process(model, Parser.parse("no:m"), issue));
         assertTrue(Qualifier.process(model, Parser.parse("no:assignee"), issue));
-        assertTrue(Qualifier.process(model, Parser.parse("no:as"), issue));
 
         issue.setAssignee(user);
         model = TestUtils.modelWith(issue, label, milestone, user);
 
         assertFalse(Qualifier.process(model, Parser.parse("no:label"), issue));
         assertFalse(Qualifier.process(model, Parser.parse("no:milestone"), issue));
-        assertFalse(Qualifier.process(model, Parser.parse("no:m"), issue));
         assertFalse(Qualifier.process(model, Parser.parse("no:assignee"), issue));
-        assertFalse(Qualifier.process(model, Parser.parse("no:as"), issue));
     }
 
     @Test
@@ -594,6 +609,13 @@ public class FilterEvalTests {
 
         assertFalse(matches("type:issue", issue));
         assertTrue(matches("type:pr", issue));
+
+        // test: qualifier alias
+        assertFalse(matches("ty:issue", issue));
+
+        // test: keyword aliases
+        assertFalse(matches("type:i", issue));
+        assertTrue(matches("type:p", issue));
 
         issue = new TurboIssue(REPO, 1, "", "", null, false);
 
@@ -619,6 +641,14 @@ public class FilterEvalTests {
         assertTrue(matches("is:unmerged", issue));
         assertFalse(matches("is:closed", issue));
         assertFalse(matches("is:merged", issue));
+
+        // test: keyword aliases
+        assertFalse(matches("is:i", issue));
+        assertTrue(matches("is:p", issue));
+        assertTrue(matches("is:o", issue));
+        assertTrue(matches("is:um", issue));
+        assertFalse(matches("is:c", issue));
+        assertFalse(matches("is:mg", issue));
 
         issue.setOpen(false);
 
@@ -653,7 +683,9 @@ public class FilterEvalTests {
         assertFalse(issue.isCurrentlyRead());
 
         assertTrue(matches("is:unread", issue));
+        assertTrue(matches("is:ur", issue));
         assertFalse(matches("is:read", issue));
+        assertFalse(matches("is:rd", issue));
 
         issue.setUpdatedAt(LocalDateTime.of(2015, 2, 17, 2, 10));
         issue.setMarkedReadAt(Optional.of(LocalDateTime.of(2015, 1, 6, 12, 15)));
@@ -682,6 +714,9 @@ public class FilterEvalTests {
         assertFalse(matches("created:<=2014-12-1", issue));
         assertTrue(matches("created:>2014-12-1", issue));
         assertTrue(matches("created:2014-12-2", issue));
+        
+        // test: qualifier alias
+        assertFalse(matches("cr:<2014-12-1", issue));
     }
 
     @Test
@@ -701,6 +736,9 @@ public class FilterEvalTests {
         assertEquals(matches("updated:<24", issue),
             matches("updated:24", issue));
         assertTrue(matches("updated:>24", issue));
+
+        // test: qualifier alias
+        assertFalse(matches("u:<24", issue));
 
         issue = new TurboIssue(REPO, 1, "");
         issue.setUpdatedAt(now.minusDays(1));
@@ -722,6 +760,9 @@ public class FilterEvalTests {
 
         assertTrue(matches("repo:" + REPO, issue));
         assertFalse(matches("repo:something/else", issue));
+        
+        // test: qualifier alias
+        assertTrue(matches("r:" + REPO, issue));
     }
 
     @Test
