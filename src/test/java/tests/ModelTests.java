@@ -267,4 +267,35 @@ public class ModelTests {
         assertEquals(Optional.<TurboUser>empty(), modelUpdated.getUserByLogin("User 11"));
         assertEquals("User 10", modelUpdated.getUserByLogin("User 10").get().getLoginName());
     }
+
+    /**
+     * Tests that replaceIssueLabels returns Optional.empty() if the model for the
+     * issue given in the argument can't be found
+     */
+    @Test
+    public void replaceIssueLabels_issueNotFound() {
+        Model model = new Model("testrepo");
+        assertEquals(Optional.empty(), model.replaceIssueLabels(1, new ArrayList<>()));
+    }
+
+    /**
+     * Tests that replaceIssueLabels finds issue with the right id and successfully modify the issue's labels
+     */
+    @Test
+    public void replaceIssueLabels_successful() {
+        String repoId = "testowner/testrepo";
+        List<String> originalLabels = Arrays.asList("label1", "label2");
+        List<String> newLabels = Arrays.asList("label3", "label4");
+
+        TurboIssue issue1 = LogicTests.createIssueWithLabels(1, originalLabels);
+        TurboIssue issue2 = LogicTests.createIssueWithLabels(2, originalLabels);
+        TurboIssue issue3 = LogicTests.createIssueWithLabels(3, originalLabels);
+        List<TurboIssue> issues = Arrays.asList(issue3, issue2, issue1);
+
+        Model model = new Model(repoId, issues, new ArrayList<TurboLabel>(),
+                                new ArrayList<TurboMilestone>(), new ArrayList<TurboUser>());
+        Optional<TurboIssue> result = model.replaceIssueLabels(issue1.getId(), newLabels);
+        assertEquals(1, result.get().getId());
+        assertEquals(newLabels, result.get().getLabels());
+    }
 }

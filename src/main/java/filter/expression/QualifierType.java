@@ -93,4 +93,32 @@ public enum QualifierType {
     public String toString() {
         return name().toLowerCase();
     }
+    
+    /**
+     * Returns short description of all inputs supported by a type of qualifier
+     * @return
+     */
+    public String getDescriptionOfValidInputs() {
+        
+        switch(this) {
+            case ID:
+            case UPDATED:
+                return "a number or a number range";
+            case STATE:
+                return "\"open\" or \"closed\"";
+            case HAS:
+            case NO:
+                return "\"label\", \"milestone\", or \"assignee\"";
+            case IN:
+                return "\"title\" or \"body\"";
+            case TYPE:
+                return "\"issue\" or \"pr\"";
+            case CREATED:
+                return "a date or a date range";
+            case REPO:
+                return "a repo id";
+            default:
+                return "a string";
+        }
+    }
 }

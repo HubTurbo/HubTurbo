@@ -5,6 +5,7 @@ import backend.interfaces.IModel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import prefs.Preferences;
+import util.Utility;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -83,6 +84,20 @@ public class MultiModel implements IModel {
         return this;
     }
 
+    /**
+     * Replaces labels of an issue specified by {@code issueId} in {@code repoId} with {@code labels}
+     * @param repoId
+     * @param issueId
+     * @param labels
+     * @return the modified TurboIssue if successful
+     */
+    public synchronized Optional<TurboIssue> replaceIssueLabels(String repoId, int issueId, List<String> labels) {
+        Optional<Model> modelLookUpResult = getModelById(repoId);
+        return Utility.safeFlatMapOptional(modelLookUpResult,
+                (model) -> model.replaceIssueLabels(issueId, labels),
+                () -> logger.error("Model " + repoId + " not found in models"));
+    }
+
     public synchronized void insertMetadata(String repoId, Map<Integer, IssueMetadata> metadata, String currentUser) {
         models.get(repoId).getIssues().forEach(issue -> {
             if (metadata.containsKey(issue.getId())) {
@@ -158,7 +173,7 @@ public class MultiModel implements IModel {
     }
 
     @Override
-    public Optional<Model> getModelById(String repoId) {
+    public synchronized Optional<Model> getModelById(String repoId) {
         return models.containsKey(repoId)
             ? Optional.of(models.get(repoId))
             : Optional.empty();

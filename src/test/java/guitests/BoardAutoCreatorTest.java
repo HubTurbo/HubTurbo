@@ -5,6 +5,7 @@ import static org.loadui.testfx.Assertions.assertNodeExists;
 import static org.loadui.testfx.controls.Commons.hasText;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.junit.Before;
@@ -12,14 +13,13 @@ import org.junit.Test;
 
 import prefs.PanelInfo;
 import prefs.Preferences;
+import ui.BoardAutoCreator;
 import ui.TestController;
 import ui.UI;
 import ui.issuepanel.PanelControl;
 import util.PlatformEx;
 import static ui.BoardAutoCreator.SAMPLE_BOARD;
 import static ui.BoardAutoCreator.SAMPLE_BOARD_DIALOG;
-import static ui.BoardAutoCreator.SAMPLE_PANEL_FILTERS;
-import static ui.BoardAutoCreator.SAMPLE_PANEL_NAMES;
 
 public class BoardAutoCreatorTest extends UITest {
 
@@ -104,15 +104,22 @@ public class BoardAutoCreatorTest extends UITest {
 
         waitUntilNodeAppears(SAMPLE_BOARD_DIALOG);
         click("OK");
+        verifyBoard(panelControl, BoardAutoCreator.getSamplePanelDetails());
+    }
 
-        assertEquals(panelControl.getPanelCount(), SAMPLE_PANEL_NAMES.size());
-        assertEquals(panelControl.getCurrentlySelectedPanel(), Optional.of(0));
-        assertEquals(panelControl.getNumberOfSavedBoards(), 1);
-
-        List<PanelInfo> panelInfos = panelControl.getCurrentPanelInfos();
-        for (int i = 0; i < SAMPLE_PANEL_NAMES.size(); i++){
-            assertEquals(panelInfos.get(i).getPanelFilter(), SAMPLE_PANEL_FILTERS.get(i));
-            assertEquals(panelInfos.get(i).getPanelName(), SAMPLE_PANEL_NAMES.get(i));
+    /**
+     * Confirms the currently displayed board consists the set of panels specified in panelDetails
+     */
+    public static void verifyBoard(PanelControl pc, Map<String, String> panelDetails){
+        List<PanelInfo> panelInfos = pc.getCurrentPanelInfos();
+        assertEquals(pc.getPanelCount(), panelDetails.size());
+        assertEquals(pc.getCurrentlySelectedPanel(), Optional.of(0));
+        assertEquals(pc.getNumberOfSavedBoards(), 1);
+        int i = 0;
+        for (String panelName : panelDetails.keySet()) {
+            assertEquals(panelInfos.get(i).getPanelName(), panelName);
+            assertEquals(panelInfos.get(i).getPanelFilter(), BoardAutoCreator.getSamplePanelDetails().get(panelName));
+            i++;
         }
     }
 

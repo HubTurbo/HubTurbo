@@ -60,7 +60,7 @@ public class GitHubSource extends RepoSource {
     }
 
     @Override
-    public CompletableFuture<List<String>> replaceIssueLabels(TurboIssue issue, List<String> labels) {
+    public CompletableFuture<Boolean> replaceIssueLabels(TurboIssue issue, List<String> labels) {
         return addTask(new ReplaceIssueLabelsTask(this, gitHub, issue.getRepoId(), issue.getId(), labels)).response;
     }
 
