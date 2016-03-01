@@ -204,7 +204,7 @@ public class Logic {
         /* Calls models to replace the issue's labels locally since the the reference to the issue here
            could be invalidated by changes to the models elsewhere */
         Optional<TurboIssue> localReplaceResult =
-                models.replaceIssueLabels(issue.getRepoId().toString(), issue.getId(), newLabels);
+                models.replaceIssueLabels(issue.getRepoId(), issue.getId(), newLabels);
         if (!localReplaceResult.isPresent()) {
             return CompletableFuture.completedFuture(false);
         }
@@ -259,14 +259,14 @@ public class Logic {
      * @param originalLabels
      */
     private void revertLocalLabelsReplace(TurboIssue modifiedIssue, List<String> originalLabels) {
-        TurboIssue currentIssue = getIssue(modifiedIssue.getRepoId().toString(), modifiedIssue.getId()).orElse(modifiedIssue);
+        TurboIssue currentIssue = getIssue(modifiedIssue.getRepoId(), modifiedIssue.getId()).orElse(modifiedIssue);
         LocalDateTime originalLabelsModifiedAt = modifiedIssue.getLabelsLastModifiedAt();
         LocalDateTime currentLabelsAssignedAt = currentIssue.getLabelsLastModifiedAt();
         boolean isCurrentLabelsModifiedFromOriginalLabels = originalLabelsModifiedAt.isEqual(currentLabelsAssignedAt);
 
         if (isCurrentLabelsModifiedFromOriginalLabels) {
             logger.info("Reverting labels for issue " + currentIssue);
-            models.replaceIssueLabels(currentIssue.getRepoId().toString(), currentIssue.getId(), originalLabels);
+            models.replaceIssueLabels(currentIssue.getRepoId(), currentIssue.getId(), originalLabels);
             refreshUI();
         }
     }

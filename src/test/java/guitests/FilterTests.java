@@ -22,7 +22,7 @@ public class FilterTests extends UITest{
         type("milestone:");
         push(KeyCode.ENTER);
 
-        assertEquals(DummyRepoState.noOfDummyIssues, issuePanel.getIssueCount());
+        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES, issuePanel.getIssueCount());
     }
 
     @Test
@@ -99,7 +99,7 @@ public class FilterTests extends UITest{
         type("count:15");
         push(KeyCode.ENTER);
 
-        assertEquals(DummyRepoState.noOfDummyIssues, issuePanel.getIssueCount());
+        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES, issuePanel.getIssueCount());
 
         //multiple count qualifiers
         click("#dummy/dummy_col0_filterTextField");
@@ -107,7 +107,7 @@ public class FilterTests extends UITest{
         type("count:6 count:9");
         push(KeyCode.ENTER);
 
-        assertEquals(DummyRepoState.noOfDummyIssues, issuePanel.getIssueCount());
+        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES, issuePanel.getIssueCount());
 
         // Not-a-number
 
@@ -116,7 +116,7 @@ public class FilterTests extends UITest{
         type("count:abcd");
         push(KeyCode.ENTER);
 
-        assertEquals(DummyRepoState.noOfDummyIssues, issuePanel.getIssueCount());
+        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES, issuePanel.getIssueCount());
 
         // Test with sort qualifier as the second qualifier
 
@@ -145,7 +145,7 @@ public class FilterTests extends UITest{
         type("count:-1");
         push(KeyCode.ENTER);
 
-        assertEquals(DummyRepoState.noOfDummyIssues, issuePanel.getIssueCount());
+        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES, issuePanel.getIssueCount());
     }
 
     private void checkCurrWithResult(String milestoneAlias, String currString, ListPanel issuePanel,
