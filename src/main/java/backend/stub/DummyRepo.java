@@ -1,5 +1,6 @@
 package backend.stub;
 
+import backend.RepoId;
 import backend.UserCredentials;
 import backend.interfaces.Repo;
 import backend.resource.TurboIssue;
@@ -34,52 +35,53 @@ public class DummyRepo implements Repo {
             // UI isn't initialised
             return;
         }
+        //TODO YY remove new RepoId(e.repoId)
         UI.events.registerEvent((UpdateDummyRepoEventHandler) e -> {
             assert e.repoId != null;
             switch (e.updateType) {
                 case NEW_ISSUE:
-                    getRepoState(e.repoId).makeNewIssue();
+                    getRepoState(e.repoId.toString()).makeNewIssue();
                     break;
                 case NEW_LABEL:
-                    getRepoState(e.repoId).makeNewLabel();
+                    getRepoState(e.repoId.toString()).makeNewLabel();
                     break;
                 case NEW_MILESTONE:
-                    getRepoState(e.repoId).makeNewMilestone();
+                    getRepoState(e.repoId.toString()).makeNewMilestone();
                     break;
                 case NEW_USER:
-                    getRepoState(e.repoId).makeNewUser();
+                    getRepoState(e.repoId.toString()).makeNewUser();
                     break;
                 // TODO implement update of issue and milestone
                 // (after switching to TreeMap implementation)
                 case UPDATE_ISSUE:
-                    getRepoState(e.repoId).updateIssue(e.itemId, e.updateText);
+                    getRepoState(e.repoId.toString()).updateIssue(e.itemId, e.updateText);
                     break;
                 case UPDATE_MILESTONE:
-                    getRepoState(e.repoId).updateMilestone(e.itemId, e.updateText);
+                    getRepoState(e.repoId.toString()).updateMilestone(e.itemId, e.updateText);
                     break;
                 // Model reload is done by event handler registered in Logic in
                 // the following five:
                 case DELETE_ISSUE:
-                    getRepoState(e.repoId).deleteIssue(e.itemId);
+                    getRepoState(e.repoId.toString()).deleteIssue(e.itemId);
                     UI.events.triggerEvent(new ClearLogicModelEvent(e.repoId));
                     break;
                 case DELETE_LABEL:
-                    getRepoState(e.repoId).deleteLabel(e.idString);
+                    getRepoState(e.repoId.toString()).deleteLabel(e.idString);
                     UI.events.triggerEvent(new ClearLogicModelEvent(e.repoId));
                     break;
                 case DELETE_MILESTONE:
-                    getRepoState(e.repoId).deleteMilestone(e.itemId);
+                    getRepoState(e.repoId.toString()).deleteMilestone(e.itemId);
                     UI.events.triggerEvent(new ClearLogicModelEvent(e.repoId));
                     break;
                 case DELETE_USER:
-                    getRepoState(e.repoId).deleteUser(e.idString);
+                    getRepoState(e.repoId.toString()).deleteUser(e.idString);
                     UI.events.triggerEvent(new ClearLogicModelEvent(e.repoId));
                     break;
                 case ADD_COMMENT:
-                    getRepoState(e.repoId).commentOnIssue(e.actor, e.updateText, e.itemId);
+                    getRepoState(e.repoId.toString()).commentOnIssue(e.actor, e.updateText, e.itemId);
                     break;
                 case RESET_REPO:
-                    repoStates.put(e.repoId, new DummyRepoState(e.repoId));
+                    repoStates.put(e.repoId.toString(), new DummyRepoState(e.repoId.toString()));
                     UI.events.triggerEvent(new ClearLogicModelEvent(e.repoId));
                     break;
                 default:

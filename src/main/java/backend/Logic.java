@@ -59,16 +59,16 @@ public class Logic {
 
         List<Model> toReplace = models.toModels();
 
-        logger.info("Attempting to reset " + e.repoId);
-        if (toReplace.remove(models.get(e.repoId))) {
-            logger.info("Clearing " + e.repoId + " successful.");
+        logger.info("Attempting to reset " + e.repoId.toString());
+        if (toReplace.remove(models.get(e.repoId.toString()))) {
+            logger.info("Clearing " + e.repoId.toString() + " successful.");
         } else {
-            logger.info(e.repoId + " not currently in model.");
+            logger.info(e.repoId.toString() + " not currently in model.");
         }
         models.replace(toReplace);
 
         // Re-"download" repo after clearing
-        openPrimaryRepository(e.repoId);
+        openPrimaryRepository(e.repoId.toString());
     }
 
     private CompletableFuture<Boolean> isRepositoryValid(String repoId) {
@@ -204,7 +204,7 @@ public class Logic {
         /* Calls models to replace the issue's labels locally since the the reference to the issue here
            could be invalidated by changes to the models elsewhere */
         Optional<TurboIssue> localReplaceResult =
-                models.replaceIssueLabels(issue.getRepoId(), issue.getId(), newLabels);
+                models.replaceIssueLabels(issue.getRepoId().toString(), issue.getId(), newLabels);
         if (!localReplaceResult.isPresent()) {
             return CompletableFuture.completedFuture(false);
         }
@@ -259,14 +259,14 @@ public class Logic {
      * @param originalLabels
      */
     private void revertLocalLabelsReplace(TurboIssue modifiedIssue, List<String> originalLabels) {
-        TurboIssue currentIssue = getIssue(modifiedIssue.getRepoId(), modifiedIssue.getId()).orElse(modifiedIssue);
+        TurboIssue currentIssue = getIssue(modifiedIssue.getRepoId().toString(), modifiedIssue.getId()).orElse(modifiedIssue);
         LocalDateTime originalLabelsModifiedAt = modifiedIssue.getLabelsLastModifiedAt();
         LocalDateTime currentLabelsAssignedAt = currentIssue.getLabelsLastModifiedAt();
         boolean isCurrentLabelsModifiedFromOriginalLabels = originalLabelsModifiedAt.isEqual(currentLabelsAssignedAt);
 
         if (isCurrentLabelsModifiedFromOriginalLabels) {
             logger.info("Reverting labels for issue " + currentIssue);
-            models.replaceIssueLabels(currentIssue.getRepoId(), currentIssue.getId(), originalLabels);
+            models.replaceIssueLabels(currentIssue.getRepoId().toString(), currentIssue.getId(), originalLabels);
             refreshUI();
         }
     }

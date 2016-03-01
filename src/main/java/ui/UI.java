@@ -1,6 +1,7 @@
 package ui;
 
 import backend.Logic;
+import backend.RepoId;
 import backend.UIManager;
 import browserview.BrowserComponent;
 import browserview.BrowserComponentStub;
@@ -156,7 +157,7 @@ public class UI extends Application implements EventDispatcher {
         logic.openPrimaryRepository(repoId);
         logic.setDefaultRepo(repoId);
         repoSelector.setText(repoId);
-        triggerEvent(new PrimaryRepoChangedEvent(repoId));
+        triggerEvent(new PrimaryRepoChangedEvent(new RepoId(repoId)));
 
         triggerEvent(new BoardSavedEvent()); // Initializes boards
 
@@ -434,7 +435,7 @@ public class UI extends Application implements EventDispatcher {
     }
 
     private void primaryRepoChanged(String repoId) {
-        triggerEvent(new PrimaryRepoChangedEvent(repoId));
+        triggerEvent(new PrimaryRepoChangedEvent(new RepoId(repoId)));
         logic.openPrimaryRepository(repoId);
         logic.setDefaultRepo(repoId);
         triggerEvent(new UsedReposChangedEvent());

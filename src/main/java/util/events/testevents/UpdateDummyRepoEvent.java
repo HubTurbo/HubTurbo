@@ -1,11 +1,12 @@
 package util.events.testevents;
 
+import backend.RepoId;
 import util.events.Event;
 
 public final class UpdateDummyRepoEvent extends Event {
 
     public final UpdateType updateType;
-    public final String repoId;
+    public final RepoId repoId;
     public final int itemId; // For issues and milestones
     public final String idString; // For labels and users
     public final String updateText;
@@ -30,7 +31,7 @@ public final class UpdateDummyRepoEvent extends Event {
     private UpdateDummyRepoEvent(UpdateType updateType, String repoId, int itemId, String idString, String updateText,
                                 String actor) {
         this.updateType = updateType;
-        this.repoId = repoId;
+        this.repoId = new RepoId(repoId);
         this.itemId = itemId;
         this.idString = idString;
         this.updateText = updateText;

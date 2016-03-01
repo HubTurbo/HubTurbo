@@ -39,7 +39,7 @@ public class RepositorySelectorTest extends UITest {
 
         @Override
         protected void registerTestEvents() {
-            UI.events.registerEvent((PrimaryRepoChangedEventHandler) e -> primaryRepo = e.repoId);
+            UI.events.registerEvent((PrimaryRepoChangedEventHandler) e -> primaryRepo = e.repoId.toString());
         }
     }
 
