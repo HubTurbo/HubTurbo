@@ -1,7 +1,7 @@
 package tests;
 
 import org.junit.Test;
-import prefs.GlobalConfig;
+import prefs.SessionConfig;
 import prefs.PanelInfo;
 import prefs.Preferences;
 
@@ -14,17 +14,15 @@ import static org.mockito.Mockito.*;
 
 public class PreferencesTests {
     /**
-     * Tests that Preferences' clearLastOpenBoard method calls GlobalConfig's clearLastOpenBoard once
+     * Tests that Preferences' clearLastOpenBoard method calls SessionConfig's clearLastOpenBoard once
      */
     @Test
     public void testClearLastOpenBoard() {
-        GlobalConfig config = mock(GlobalConfig.class);
+        SessionConfig sessionConfig = mock(SessionConfig.class);
         Preferences prefs = Preferences.load(Preferences.TEST_SESSION_CONFIG_FILENAME);
 
         try {
-            Field sessionConfigField = Preferences.class.getDeclaredField("sessionConfig");
-            sessionConfigField.setAccessible(true);
-            sessionConfigField.set(prefs, config);
+            setSessionConfigField(prefs, sessionConfig);
             prefs.clearLastOpenBoard();
 
         } catch (IllegalAccessException | NoSuchFieldException e) {
@@ -32,24 +30,22 @@ public class PreferencesTests {
             fail();
         }
 
-        verify(config, times(1)).clearLastOpenBoard();
+        verify(sessionConfig, times(1)).clearLastOpenBoard();
     }
 
     /**
-     * Tests that Preferences' clearLastOpenBoard method calls GlobalConfig's getBoardPanels once
+     * Tests that Preferences' clearLastOpenBoard method calls SessionConfig's getBoardPanels once
      * and receives corresponding result
      */
     @Test
     public void testGetBoardPanels() {
-        GlobalConfig config = mock(GlobalConfig.class);
+        SessionConfig sessionConfig = mock(SessionConfig.class);
         List<PanelInfo> expected = new ArrayList<>();
-        when(config.getBoardPanels("board")).thenReturn(expected);
+        when(sessionConfig.getBoardPanels("board")).thenReturn(expected);
 
         Preferences prefs = Preferences.load(Preferences.TEST_SESSION_CONFIG_FILENAME);
         try {
-            Field sessionConfigField = Preferences.class.getDeclaredField("sessionConfig");
-            sessionConfigField.setAccessible(true);
-            sessionConfigField.set(prefs, config);
+            setSessionConfigField(prefs, sessionConfig);
             prefs.clearLastOpenBoard();
 
         } catch (IllegalAccessException | NoSuchFieldException e) {
@@ -58,7 +54,19 @@ public class PreferencesTests {
         }
         List<PanelInfo> actual = prefs.getBoardPanels("board");
 
-        verify(config, times(1)).getBoardPanels("board");
+        verify(sessionConfig, times(1)).getBoardPanels("board");
         assertEquals(expected, actual);
+    }
+
+    /**
+     * Sets the sessionConfig field in a given Preferences object to a specified SessionConfig object
+     * @param prefs The Preferences object whose field is to be set
+     * @param sessionConfig The SessionConfig object to use
+     */
+    public void setSessionConfigField(Preferences prefs, SessionConfig sessionConfig)
+            throws IllegalAccessException, NoSuchFieldException {
+        Field sessionConfigField = Preferences.class.getDeclaredField("sessionConfig");
+        sessionConfigField.setAccessible(true);
+        sessionConfigField.set(prefs, sessionConfig);
     }
 }

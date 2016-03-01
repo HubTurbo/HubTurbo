@@ -1,11 +1,7 @@
 package prefs;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.RepositoryId;
-import util.HTLog;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +24,7 @@ public class Preferences { // NOPMD
 
     private final ConfigFile sessionConfigFile;
 
-    private GlobalConfig sessionConfig;
+    private SessionConfig sessionConfig;
 
     /**
      * Private constructor that prevents external instantiation
@@ -73,7 +69,7 @@ public class Preferences { // NOPMD
      * Intiialises the session config
      */
     private void initSessionConfig() {
-        sessionConfig = new GlobalConfig();
+        sessionConfig = new SessionConfig();
         sessionConfigFile.saveConfig(sessionConfig);
     }
 
@@ -81,7 +77,7 @@ public class Preferences { // NOPMD
      * Loads the session config.
      */
     private void loadSessionConfig() {
-        sessionConfig = (GlobalConfig) sessionConfigFile.loadConfig(GlobalConfig.class).orElse(new GlobalConfig());
+        sessionConfig = (SessionConfig) sessionConfigFile.loadConfig(SessionConfig.class).orElse(new SessionConfig());
     }
 
     // Last login credentials. While the main UI is running (i.e. logged in successfully), last login
@@ -180,7 +176,7 @@ public class Preferences { // NOPMD
     }
 
     /**
-     * Retrieves the name of the last open board. May be null
+     * Retrieves the name of the last open board.
      * @return An Optional of a nullable board name
      */
     public Optional<String> getLastOpenBoard() {
@@ -211,7 +207,7 @@ public class Preferences { // NOPMD
     }
 
     /**
-     * Retrieves the panels of the board.
+     * Retrieves the panels of a board.
      * @param boardName The name of the board to retrieve the panels from
      * @return A list of panel infos from that board
      */

@@ -14,7 +14,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import prefs.ConfigFile;
-import prefs.GlobalConfig;
+import prefs.SessionConfig;
 import prefs.PanelInfo;
 import prefs.Preferences;
 import ui.TestController;
@@ -135,7 +135,7 @@ public class PanelFocusTest extends UITest {
     }
 
     private void createDefaultPanels() {
-        GlobalConfig globalConfig = new GlobalConfig();
+        SessionConfig sessionConfig = new SessionConfig();
 
         PanelInfo test1 = new PanelInfo();
         PanelInfo test2 = new PanelInfo();
@@ -145,9 +145,9 @@ public class PanelFocusTest extends UITest {
         panels.add(test2);
         panels.add(test3);
 
-        globalConfig.setPanelInfo(panels);
-        ConfigFile globalConfigFile =
+        sessionConfig.setPanelInfo(panels);
+        ConfigFile sessionConfigFile =
                 new ConfigFile(Preferences.DIRECTORY, Preferences.TEST_SESSION_CONFIG_FILENAME);
-        globalConfigFile.saveConfig(globalConfig);
+        sessionConfigFile.saveConfig(sessionConfig);
     }
 }

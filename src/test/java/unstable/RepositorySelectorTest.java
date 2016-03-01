@@ -15,7 +15,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 import prefs.ConfigFile;
-import prefs.GlobalConfig;
+import prefs.SessionConfig;
 import prefs.Preferences;
 import ui.TestController;
 import ui.UI;
@@ -52,12 +52,12 @@ public class RepositorySelectorTest extends UITest {
     public void beforeStageStarts() {
         // setup test json with last viewed repo "dummy/dummy"
         // obviously the json for that repo doesn't exist
-        GlobalConfig globalConfig = new GlobalConfig();
-        globalConfig.setLastLoginCredentials("test", "test");
-        globalConfig.setLastViewedRepository("dummy/dummy");
-        ConfigFile globalConfigFile =
+        SessionConfig sessionConfig = new SessionConfig();
+        sessionConfig.setLastLoginCredentials("test", "test");
+        sessionConfig.setLastViewedRepository("dummy/dummy");
+        ConfigFile sessionConfigFile =
                 new ConfigFile(Preferences.DIRECTORY, Preferences.TEST_SESSION_CONFIG_FILENAME);
-        globalConfigFile.saveConfig(globalConfig);
+        sessionConfigFile.saveConfig(sessionConfig);
     }
 
     @Test

@@ -18,12 +18,12 @@ import java.util.stream.Collectors;
 import java.util.Optional;
 
 /**
- * Abstractions for the contents of the global config file.
+ * Abstractions for the contents of the session config file.
  */
 @SuppressWarnings("unused")
-public class GlobalConfig implements Config {
+public class SessionConfig implements Config {
 
-    private static final Logger logger = LogManager.getLogger(GlobalConfig.class.getName());
+    private static final Logger logger = LogManager.getLogger(SessionConfig.class.getName());
 
     private List<PanelInfo> lastSessionPanels = new ArrayList<>();
     private String lastViewedRepository = "";

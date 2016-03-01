@@ -41,7 +41,7 @@ public class ConfigFile {
     }
 
     /**
-     * configure the gson object that will serialise and deserialise json data
+     * Configures the gson object that will serialise and deserialise json data
      */
     private void setupGson() {
         gson = new GsonBuilder()
@@ -103,11 +103,11 @@ public class ConfigFile {
     }
 
     /**
-     * Loads a config object from a config file in disk. The returned config object is wrapped in an Optional and may be
-     * null. A null Config is returned when either the file does not exist, or exists but deserialisation results
-     * in null.
-     * @param configType The Type of Config to load
-     * @return An Optional of nullable Config.
+     * Loads a Config object from a config file in disk. The returned Config object is wrapped in an Optional.
+     * Optional.empty() is returned when either the file does not exist, or exists but deserialisation results
+     * in a null Config object.
+     * @param configType The Class of Config to load
+     * @return A Config wrapped in an Optional. Optional.empty() returned when Config is null.
      */
     public Optional<Config> loadConfig(Class<? extends Config> configType) {
         File configFileInDisk = getConfigFileInDisk();

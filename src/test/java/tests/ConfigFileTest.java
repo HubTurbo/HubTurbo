@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import prefs.Config;
 import prefs.ConfigFile;
-import prefs.GlobalConfig;
+import prefs.SessionConfig;
 import prefs.Preferences;
 
 
@@ -151,14 +151,14 @@ public class ConfigFileTest {
     public void sessionConfig_serialisationAndDeserialisation_ableToSaveAndConstructConfig() {
         // set up the session config and write to file
         ConfigFile sessionConfigFile = new ConfigFile(SESSION_CONFIG_DIRECTORY, TEST_SESSION_CONFIG_FILENAME);
-        GlobalConfig sessionConfigToSave = new GlobalConfig();
+        SessionConfig sessionConfigToSave = new SessionConfig();
         sessionConfigToSave.setLastOpenBoard(DUMMY_BOARD_NAME);
         sessionConfigToSave.setLastViewedRepository(DUMMY_REPO_ID);
         sessionConfigFile.saveConfig(sessionConfigToSave);
 
         // read from file and check existing values
-        GlobalConfig sessionConfig;
-        sessionConfig = (GlobalConfig) sessionConfigFile.loadConfig(GlobalConfig.class).orElse(new GlobalConfig());
+        SessionConfig sessionConfig;
+        sessionConfig = (SessionConfig) sessionConfigFile.loadConfig(SessionConfig.class).orElse(new SessionConfig());
         assertEquals(DUMMY_BOARD_NAME, sessionConfig.getLastOpenBoard().get());
         assertEquals(DUMMY_REPO_ID, sessionConfig.getLastViewedRepository());
 

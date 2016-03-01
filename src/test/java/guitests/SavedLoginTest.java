@@ -12,7 +12,7 @@ import org.loadui.testfx.utils.FXTestUtils;
 import backend.RepoIO;
 import javafx.scene.control.ComboBox;
 import prefs.ConfigFile;
-import prefs.GlobalConfig;
+import prefs.SessionConfig;
 import prefs.Preferences;
 import ui.TestController;
 import ui.UI;
@@ -32,12 +32,12 @@ public class SavedLoginTest extends UITest {
         UI.events = mock(EventDispatcher.class);
         // setup test json with last viewed repo "test/test"
         // and then create the corresponding repo json file
-        GlobalConfig globalConfig = new GlobalConfig();
-        globalConfig.setLastLoginCredentials("test", "test");
-        globalConfig.setLastViewedRepository("test/test");
-        ConfigFile globalConfigFile =
+        SessionConfig sessionConfig = new SessionConfig();
+        sessionConfig.setLastLoginCredentials("test", "test");
+        sessionConfig.setLastViewedRepository("test/test");
+        ConfigFile sessionConfigFile =
                 new ConfigFile(Preferences.DIRECTORY, Preferences.TEST_SESSION_CONFIG_FILENAME);
-        globalConfigFile.saveConfig(globalConfig);
+        sessionConfigFile.saveConfig(sessionConfig);
         RepoIO testIO = TestController.createTestingRepoIO(Optional.empty());
         try {
             testIO.openRepository("test/test").get();
