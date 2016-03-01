@@ -105,38 +105,26 @@ public class RepositorySelectorTest extends UITest {
         assertEquals("dummy4/dummy4", primaryRepo);
 
         // we check if deleting used repo does not remove it
-        click("Repos");
-        push(KeyCode.DOWN);
-        push(KeyCode.RIGHT);
-        push(KeyCode.DOWN);
-        push(KeyCode.DOWN); // first used repo
+        traverseMenu("Repos", "Remove", "dummy4/dummy4 [in use, not removable]"); // first used repo
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
         assertEquals(4, comboBox.getItems().size());
 
         // we check if delete repo works
-        click("Boards"); // trigger clicking "Repos"
-        click("Repos");
-        push(KeyCode.DOWN);
-        push(KeyCode.RIGHT);
+        traverseMenu("Repos", "Remove", "dummy/dummy");
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
         assertEquals(3, comboBox.getItems().size());
 
         // we check again if deleting used repo does not remove it
-        click("Repos");
-        push(KeyCode.DOWN);
-        push(KeyCode.RIGHT);
-        push(KeyCode.DOWN);
-        push(KeyCode.DOWN); // second used repo
+        traverseMenu("Repos", "Remove", "dummy2/dummy2 [in use, not removable]"); // second used repo
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
         assertEquals(3, comboBox.getItems().size());
 
         // exit program
-        click("Boards"); // trigger clicking "Quit"
-        click("File");
-        click("Quit");
+        traverseMenu("File", "Quit");
+        push(KeyCode.ENTER);
 
         // testing that the correct repo was saved in the json
         // check if the test JSON is still there...

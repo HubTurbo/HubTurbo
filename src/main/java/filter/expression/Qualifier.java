@@ -113,6 +113,64 @@ public class Qualifier implements FilterExpression {
     }
 
     /**
+     * Expands aliases for Qualifier keyword in user input.
+     * Includes aliases for Qualifier that also functions as keyword 
+     * @param input
+     * @return 
+     */
+    public static String expandKeywordAliases(String input) {
+        
+        switch(input) {
+            case "as":
+                return "assignee";
+            case "body":
+            case "desc":
+            case "de":
+                return "description";
+            case "d":
+                return "date";
+            case "l":
+            case "labels":
+                return "label";
+            case "m":
+            case "milestones":
+                return "milestone";
+            case "r":
+                return "repo";
+            case "st":
+            case "status":
+                return "state";
+            case "t":
+                return "title";
+            case "u":
+                return "updated";
+            case "o":
+                return "open";
+            case "c":
+                return "closed";
+            case "i":
+                return "issue";
+            case "p":
+            case "pullrequest":
+                return "pr";
+            case "mg":
+                return "merged";
+            case "um":
+                return "unmerged";
+            case "rd":
+                return "read";
+            case "ur":
+                return "unread";
+            case "cm":
+                return "comments";
+            case "ns":
+                return "nonSelfUpdate";
+            default:
+                return input;
+        }
+    }
+
+    /**
      * Helper function for testing a filter expression against an issue.
      * Ensures that meta-qualifiers are taken care of.
      * Should always be used over isSatisfiedBy.
@@ -552,7 +610,7 @@ public class Qualifier implements FilterExpression {
 
         boolean isLabelGroup = false;
 
-        switch (key) {
+        switch (expandKeywordAliases(key)) {
         case "comments":
             comparator = (a, b) -> a.getCommentCount() - b.getCommentCount();
             break;
@@ -722,6 +780,7 @@ public class Qualifier implements FilterExpression {
 
     private boolean satisfiesRepo(TurboIssue issue) {
         if (!content.isPresent()) throw new SemanticException(type);
+
         return issue.getRepoId().equalsIgnoreCase(content.get());
     }
 
@@ -738,18 +797,14 @@ public class Qualifier implements FilterExpression {
 
     private boolean satisfiesHasConditions(TurboIssue issue) {
         if (!content.isPresent()) throw new SemanticException(type);
-        switch (content.get()) {
+
+        switch (expandKeywordAliases(content.get())) {
         case "label":
-        case "labels":
             return issue.getLabels().size() > 0;
         case "milestone":
-        case "milestones":
-        case "m":
             assert issue.getMilestone() != null;
             return issue.getMilestone().isPresent();
         case "assignee":
-        case "assignees":
-        case "as":
             assert issue.getAssignee() != null;
             return issue.getAssignee().isPresent();
         default:
@@ -763,7 +818,8 @@ public class Qualifier implements FilterExpression {
 
     private boolean satisfiesIsConditions(TurboIssue issue) {
         if (!content.isPresent()) throw new SemanticException(type);
-        switch (content.get()) {
+
+        switch (expandKeywordAliases(content.get())) {
         case "open":
         case "closed":
             return stateSatisfies(issue);
@@ -785,7 +841,8 @@ public class Qualifier implements FilterExpression {
 
     private boolean stateSatisfies(TurboIssue issue) {
         if (!content.isPresent()) throw new SemanticException(type);
-        String content = this.content.get().toLowerCase();
+
+        String content = expandKeywordAliases(this.content.get().toLowerCase());
         if (content.contains("open")) {
             return issue.isOpen();
         } else if (content.contains("closed")) {
@@ -884,11 +941,9 @@ public class Qualifier implements FilterExpression {
     private boolean keywordSatisfies(TurboIssue issue, MetaQualifierInfo info) {
 
         if (info.getIn().isPresent()) {
-            switch (info.getIn().get()) {
+            switch (expandKeywordAliases(info.getIn().get())) {
             case "title":
                 return titleSatisfies(issue);
-            case "body":
-            case "desc":
             case "description":
                 return bodySatisfies(issue);
             default:
@@ -912,14 +967,13 @@ public class Qualifier implements FilterExpression {
     private boolean typeSatisfies(TurboIssue issue) {
         if (!content.isPresent()) throw new SemanticException(type);
         String content = this.content.get().toLowerCase();
-        switch (content) {
-        case "issue":
-            return !issue.isPullRequest();
-        case "pr":
-        case "pullrequest":
-            return issue.isPullRequest();
-        default:
-            throw new SemanticException(type);
+        switch (expandKeywordAliases(content)) {
+            case "issue":
+                return !issue.isPullRequest();
+            case "pr":
+                return issue.isPullRequest();
+            default:
+                throw new SemanticException(type);
         }
     }
 
