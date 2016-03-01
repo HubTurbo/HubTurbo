@@ -49,7 +49,7 @@ public class RepositorySelector extends HBox {
                 return;
             }
 
-            if (RepoId.isWellFormedRepoIdString(repoId) && !changesDisabled) {
+            if (RepoId.isValidRepoId(repoId) && !changesDisabled) {
                 onValueChangeCallback.accept(repoId);
             }
         });

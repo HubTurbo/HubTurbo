@@ -14,6 +14,7 @@ import ui.TestController;
 import ui.UI;
 import util.Futures;
 import util.HTLog;
+import util.Utility;
 import util.events.RepoOpenedEvent;
 import util.events.RepoOpeningEvent;
 import util.events.testevents.ClearLogicModelEvent;
@@ -101,7 +102,7 @@ public class Logic {
     }
 
     private CompletableFuture<Boolean> openRepository(String repoId, boolean isPrimaryRepository) {
-        assert RepoId.isWellFormedRepoIdString(repoId);
+        assert RepoId.isValidRepoId(repoId);
         if (isPrimaryRepository) prefs.setLastViewedRepository(repoId);
         if (isAlreadyOpen(repoId) || models.isRepositoryPending(repoId)) {
             // The content of panels with an empty filter text should change when the primary repo is changed.

@@ -4,32 +4,34 @@ import org.eclipse.egit.github.core.RepositoryId;
 import util.Utility;
 
 /**
- * Represents the ID of a repository. To be used to ensure safe comparison
+ * RepoId represents the ID of a repository. It is to be used to ensure safe comparison.
+ * All the String attributes of the class is kept in lower case.
  */
 public final class RepoId {
 
-    //repoOwner can be an org ID or username
+    // repoOwner can be an organisation ID or username
     private final String repoOwner;
     private final String repoName;
 
-    public RepoId(String repoIdString) throws IllegalArgumentException {
-        throwExceptionIfNotWellFormed(repoIdString);
+    public RepoId(String repoId) {
+        throwExceptionIfNotWellFormed(repoId);
 
-        String[] repoIDComponents = repoIdString.toLowerCase().split("/");
+        String[] repoIDComponents = repoId.toLowerCase().split("/");
         this.repoOwner = Utility.removeAllWhitespace(repoIDComponents[0]);
         this.repoName = Utility.removeAllWhitespace(repoIDComponents[1]);
     }
 
     /**
      * Delegates to EGit's RepositoryId to check if repoString is
-     * of the correct format 
-     * @param repoIdString
-     * @return true if the repoIdString is of the form
+     * of the correct format
+     *
+     * @param repoId
+     * @return true if the repoId is of the form
      * <repoOwner>/<repoName> e.g. dave/foo-project
      */
-    public static boolean isWellFormedRepoIdString(String repoIdString) {
-        RepositoryId idGeneratedByEgit = RepositoryId.createFromId(repoIdString);
-        return idGeneratedByEgit != null && repoIdString.equals(idGeneratedByEgit.generateId());
+    public static boolean isValidRepoId(String repoId) {
+        RepositoryId idGeneratedByEgit = RepositoryId.createFromId(repoId);
+        return idGeneratedByEgit != null && repoId.equals(idGeneratedByEgit.generateId());
     }
 
     public String getRepoOwner() {
@@ -40,7 +42,8 @@ public final class RepoId {
         return repoName;
     }
 
-    public String getRepoIdString() {
+    @Override
+    public String toString() {
         return repoOwner + "/" + repoName;
     }
 
@@ -61,8 +64,8 @@ public final class RepoId {
     }
 
     private void throwExceptionIfNotWellFormed(String repoIdString) {
-        boolean isWellFormed = RepoId.isWellFormedRepoIdString(repoIdString);
-        if (!isWellFormed) {
+        boolean isValidRepoId = RepoId.isValidRepoId(repoIdString);
+        if (!isValidRepoId) {
             throw new IllegalArgumentException();
         }
     }

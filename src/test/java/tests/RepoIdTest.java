@@ -22,7 +22,7 @@ public class RepoIdTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void createInstance() {
+    public void repoId_invalidRepoIdString_throwIllegalArgumentException() {
         // Test null and empty repoIdString
         new RepoId(null);
         new RepoId("");
@@ -33,27 +33,32 @@ public class RepoIdTest {
     }
 
     @Test
-    public void isWellFormed() {
+    public void isValidRepoId_invalidRepoIdString_returnsFalse() {
         // Test null and empty repoIdString
-        assertFalse(RepoId.isWellFormedRepoIdString(""));
-        assertFalse(RepoId.isWellFormedRepoIdString(null));
+        assertFalse(RepoId.isValidRepoId(""));
+        assertFalse(RepoId.isValidRepoId(null));
 
         // Test repoIdString of the wrong format
-        assertFalse(RepoId.isWellFormedRepoIdString("invalidFormat"));
-        assertFalse(RepoId.isWellFormedRepoIdString("two/slashes/"));
-
-        // Test well formed
-        assertTrue(RepoId.isWellFormedRepoIdString("hubturbo/hubturbo"));
+        assertFalse(RepoId.isValidRepoId("invalidFormat"));
+        assertFalse(RepoId.isValidRepoId("two/slashes/"));
     }
 
     @Test
-    public void equality() {
-        // Test different objects
+    public void isValidRepoId_validRepoIdString_returnsTrue() {
+        assertTrue(RepoId.isValidRepoId("hubturbo/hubturbo"));
+    }
+
+    @Test
+    public void equals_differentRepoId_notEqual() {
         assertNotEquals(repoId, repoIdDiff);
         assertNotEquals(repoId, null);
         assertNotEquals(repoId, 1);
+    }
 
+    @Test
+    public void equals_sameRepoIdButDifferentCapitalization_areEqual() {
         // Test equality for repo names that are of different cases
+        // e.g. OWNER/REPO and owner/repo are the same RepoId
         assertEquals(repoId, repoId);
         assertEquals(repoId, repoIdAllCaps);
         assertEquals(repoId, repoIdMixed);
@@ -61,10 +66,12 @@ public class RepoIdTest {
     }
 
     @Test
-    public void hashCodeTest() {
-        // Test different objects have different hash code
+    public void hashCode_differentRepoId_haveDifferentHashCode() {
         assertNotEquals(repoId.hashCode(), repoIdDiff.hashCode());
+    }
 
+    @Test
+    public void hashCode_sameRepoIdButDifferentCapitalization_haveSameHashCode() {
         // Test hashcode of objects initialised with different cases
         // e.g. OWNER/REPO and owner/repo have the same hash code
         assertEquals(repoId.hashCode(), repoId.hashCode());
@@ -74,11 +81,7 @@ public class RepoIdTest {
     }
 
     @Test
-    public void getters(){
-        //repoIDString
-        assertEquals(REPO1.toLowerCase(), repoIdMixed.getRepoIdString());
-        assertEquals(repoIdMixed.getRepoIdString(), repoIdMixed.getRepoIdString());
-
+    public void getters_getAttributes_getAttributesCorrectly(){
         //repoOwner
         assertEquals("owner1", repoIdMixed.getRepoOwner());
         assertEquals(repoIdMixed.getRepoOwner(), repoIdMixed.getRepoOwner());
@@ -86,5 +89,11 @@ public class RepoIdTest {
         //repoName
         assertEquals("repo1", repoIdMixed.getRepoName());
         assertEquals(repoIdMixed.getRepoName(), repoIdMixed.getRepoName());
+    }
+
+    @Test
+    public void toString_getString_returnsFullRepoId() {
+        assertEquals(REPO1.toLowerCase(), repoIdMixed.toString());
+        assertEquals(repoIdMixed.toString(), repoIdMixed.toString());
     }
 }
