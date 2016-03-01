@@ -15,12 +15,20 @@ import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Handles interfacing with the graphics environment to get screen-related data, such as screen width/size.
+ * At the same time, this class also carries out computations to resize the browser component based on the
+ * main program window's size and position onscreen.
+ */
 public class ScreenManager {
 
     private static final Logger logger = LogManager.getLogger(ScreenManager.class.getName());
 
-    // The minimum fraction of available width to total screen width for the browser to be
-    // resized to available width.
+    /**
+     * If available width on screen (from getAvailableDimensions) is less than or equal to (total
+     * screen width * maximiseThreshold), maximise browser window instead of placing it next to the
+     * program window.
+     */
     private static final double maximiseThreshold = 0.1;
 
     private final Window mainStage;
@@ -49,7 +57,7 @@ public class ScreenManager {
     }
 
     /**
-     * Configure setBoundsFromScreen to trigger whenever the x-coordinate of the given stage changes.
+     * Configures setBoundsFromScreen to trigger whenever the x-coordinate of the given stage changes.
      *
      * @param stage The stage which contains the x-coordinate to listen.
      */
@@ -178,7 +186,7 @@ public class ScreenManager {
             return Optional.of(ge.getMaximumWindowBounds());
         } catch (Exception e) {
             logger.error(e.getLocalizedMessage(), e);
+            return Optional.empty();
         }
-        return Optional.empty();
     }
 }
