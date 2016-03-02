@@ -12,12 +12,9 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import backend.resource.*;
-import filter.ParseException;
+import filter.*;
 import util.Utility;
 import backend.interfaces.IModel;
-import filter.MetaQualifierInfo;
-import filter.QualifierApplicationException;
-import filter.SemanticException;
 
 public class Qualifier implements FilterExpression {
 
@@ -175,7 +172,7 @@ public class Qualifier implements FilterExpression {
      * Ensures that meta-qualifiers are taken care of.
      * Should always be used over isSatisfiedBy.
      */
-    public static boolean process(IModel model, FilterExpression expr, TurboIssue issue) {
+    public static boolean process(IModel model, FilterExpression expr, TurboIssue issue) throws WarningException {
         FilterExpression exprWithNormalQualifiers = expr.filter(Qualifier::shouldNotBeStripped);
         List<Qualifier> metaQualifiers = expr.find(Qualifier::isMetaQualifier);
 
@@ -333,7 +330,7 @@ public class Qualifier implements FilterExpression {
     }
 
     @Override
-    public boolean isSatisfiedBy(IModel model, TurboIssue issue, MetaQualifierInfo info) {
+    public boolean isSatisfiedBy(IModel model, TurboIssue issue, MetaQualifierInfo info) throws WarningException {
         assert type != null;
 
         // The empty qualifier is satisfied by anything
@@ -356,7 +353,7 @@ public class Qualifier implements FilterExpression {
         case LABEL:
             return labelsSatisfy(model, issue);
         case AUTHOR:
-            return authorSatisfies(issue);
+            return authorSatisfies(model, issue);
         case ASSIGNEE:
             return assigneeSatisfies(model, issue);
         case INVOLVES:
@@ -840,11 +837,22 @@ public class Qualifier implements FilterExpression {
         }
     }
 
-    private boolean assigneeSatisfies(IModel model, TurboIssue issue) {
+    private boolean assigneeSatisfies(IModel model, TurboIssue issue) throws WarningException {
         if (!content.isPresent()) return false;
         Optional<TurboUser> assignee = model.getAssigneeOfIssue(issue);
 
         if (!assignee.isPresent()) return false;
+
+        List<TurboUser> usersOfRepo = model.getUsersOfRepo(issue.getRepoId());
+        boolean shouldWarnUser = !usersOfRepo.stream()
+                .filter(user -> user.getLoginName().contains(content.get().toLowerCase())
+                        || user.getRealName().contains(content.get().toLowerCase()))
+                .findAny()
+                .isPresent();
+        if (shouldWarnUser) {
+            throw new WarningException(String.format("Cannot find user %s in %s%n", content.get(), issue.getRepoId()),
+                                        false);
+        }
 
         String content = this.content.get().toLowerCase();
         String login = assignee.get().getLoginName() == null ? "" : assignee.get().getLoginName().toLowerCase();
@@ -853,16 +861,27 @@ public class Qualifier implements FilterExpression {
         return login.contains(content) || name.contains(content);
     }
 
-    private boolean authorSatisfies(TurboIssue issue) {
+    private boolean authorSatisfies(IModel model, TurboIssue issue) throws WarningException {
         if (!content.isPresent()) return false;
+
+        List<TurboUser> usersOfRepo = model.getUsersOfRepo(issue.getRepoId());
+        boolean shouldWarnUser = !usersOfRepo.stream()
+                .filter(user -> user.getLoginName().contains(content.get().toLowerCase())
+                                || user.getRealName().contains(content.get().toLowerCase()))
+                .findAny()
+                .isPresent();
+        if (shouldWarnUser) {
+            throw new WarningException(String.format("Cannot find user %s in %s%n", content.get(), issue.getRepoId()),
+                                        false);
+        }
 
         String creator = issue.getCreator();
 
         return creator.toLowerCase().contains(content.get().toLowerCase());
     }
 
-    private boolean involvesSatisfies(IModel model, TurboIssue issue) {
-        return authorSatisfies(issue) || assigneeSatisfies(model, issue);
+    private boolean involvesSatisfies(IModel model, TurboIssue issue) throws WarningException {
+        return authorSatisfies(model, issue) || assigneeSatisfies(model, issue);
     }
 
     public static boolean labelMatches(String input, String candidate) {

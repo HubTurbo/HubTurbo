@@ -9,9 +9,11 @@ import ui.UI;
 import ui.issuepanel.FilterPanel;
 import util.events.ModelUpdatedEvent;
 import util.events.UpdateRateLimitsEvent;
+import util.events.WarnUserEvent;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class UIManager {
 
@@ -21,10 +23,16 @@ public class UIManager {
         this.ui = ui;
     }
 
-    public void update(Map<FilterExpression, List<GuiElement>> elementsToShow,
+    public void update(Map<FilterExpression, ImmutablePair<List<GuiElement>, List<String>>> elementsToShow,
                        List<TurboUser> users) {
+        Map<FilterExpression, List<GuiElement>> guiElementsToShow = elementsToShow.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().getLeft()));
+        Map<FilterExpression, List<String>> warningsToShow = elementsToShow.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().getRight()));
         Platform.runLater(() ->
-                ui.triggerEvent(new ModelUpdatedEvent(elementsToShow, users)));
+                ui.triggerEvent(new ModelUpdatedEvent(guiElementsToShow, users)));
+        Platform.runLater(() ->
+                ui.triggerEvent(new WarnUserEvent(warningsToShow)));
     }
 
     public void updateRateLimits(ImmutablePair<Integer, Long> rateLimits) {

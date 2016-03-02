@@ -209,6 +209,16 @@ public class MultiModel implements IModel {
     }
 
     @Override
+    public List<TurboUser> getUsersOfRepo(String repoId) {
+        Optional<Model> model = getModelById(repoId);
+        if (model.isPresent()) {
+            return model.get().getUsers();
+        } else {
+            return new ArrayList<>();
+        }
+    }
+
+    @Override
     public List<TurboLabel> getLabelsOfIssue(TurboIssue issue) {
         return getModelById(issue.getRepoId())
             .flatMap(m -> Optional.of(m.getLabelsOfIssue(issue)))

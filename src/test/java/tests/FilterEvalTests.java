@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 
+import filter.WarningException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -49,7 +50,7 @@ public class FilterEvalTests {
 
         IModel model = TestUtils.modelWith(issue, milestone);
 
-        assertFalse(Qualifier.process(model, Qualifier.FALSE, issue));
+        assertFalse(getQualifierProcessResult(model, Qualifier.FALSE, issue));
     }
 
     @Test
@@ -146,13 +147,13 @@ public class FilterEvalTests {
     }
 
     private void testMilestoneParsing(String milestoneQualifier, TurboIssue issue, IModel model) {
-        assertTrue(Qualifier.process(model, Parser.parse(milestoneQualifier + ":" + "v1.0"), issue));
-        assertTrue(Qualifier.process(model, Parser.parse(milestoneQualifier + ":" + "v1"), issue));
-        assertTrue(Qualifier.process(model, Parser.parse(milestoneQualifier + ":" + "v"), issue));
-        assertFalse(Qualifier.process(model, Parser.parse(milestoneQualifier + ":" + "1"), issue));
+        assertTrue(getQualifierProcessResult(model, Parser.parse(milestoneQualifier + ":" + "v1.0"), issue));
+        assertTrue(getQualifierProcessResult(model, Parser.parse(milestoneQualifier + ":" + "v1"), issue));
+        assertTrue(getQualifierProcessResult(model, Parser.parse(milestoneQualifier + ":" + "v"), issue));
+        assertFalse(getQualifierProcessResult(model, Parser.parse(milestoneQualifier + ":" + "1"), issue));
 
         try {
-            assertTrue(Qualifier.process(model, Parser.parse(milestoneQualifier + ":."), issue));
+            assertTrue(getQualifierProcessResult(model, Parser.parse(milestoneQualifier + ":."), issue));
             fail(". is not a valid token on its own");
         } catch (ParseException ignored) {
         }
@@ -241,77 +242,77 @@ public class FilterEvalTests {
         FilterExpression noMilestoneAlias;
 
         noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr-3"));
-        assertTrue(Qualifier.process(model, noMilestoneAlias, iCurrMin3));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin2));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin1));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurr));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+        assertTrue(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin3));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin2));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin1));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurr));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus1));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus2));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus3));
 
         noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr-2"));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin3));
-        assertTrue(Qualifier.process(model, noMilestoneAlias, iCurrMin2));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin1));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurr));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin3));
+        assertTrue(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin2));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin1));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurr));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus1));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus2));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus3));
 
         noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr-1"));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin3));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin2));
-        assertTrue(Qualifier.process(model, noMilestoneAlias, iCurrMin1));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurr));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin3));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin2));
+        assertTrue(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin1));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurr));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus1));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus2));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus3));
 
         noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr"));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin3));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin2));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin1));
-        assertTrue(Qualifier.process(model, noMilestoneAlias, iCurr));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin3));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin2));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin1));
+        assertTrue(getQualifierProcessResult(model, noMilestoneAlias, iCurr));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus1));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus2));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus3));
 
         noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr+1"));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin3));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin2));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin1));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurr));
-        assertTrue(Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin3));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin2));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin1));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurr));
+        assertTrue(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus1));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus2));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus3));
 
         noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr+2"));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin3));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin2));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin1));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurr));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
-        assertTrue(Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin3));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin2));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin1));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurr));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus1));
+        assertTrue(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus2));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus3));
 
         noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr+3"));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin3));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin2));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin1));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurr));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin3));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin2));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin1));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurr));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus1));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus2));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus3));
 
         // test: negation alias
         noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("-milestone:curr"));
-        assertTrue(Qualifier.process(model, noMilestoneAlias, iCurrMin3));
-        assertTrue(Qualifier.process(model, noMilestoneAlias, iCurrMin2));
-        assertTrue(Qualifier.process(model, noMilestoneAlias, iCurrMin1));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurr));
-        assertTrue(Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
-        assertTrue(Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
-        assertTrue(Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+        assertTrue(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin3));
+        assertTrue(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin2));
+        assertTrue(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin1));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurr));
+        assertTrue(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus1));
+        assertTrue(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus2));
+        assertTrue(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus3));
 
         // test: no milestone in model should return qualifier false
         model = TestUtils.singletonModel(new Model(REPO,
@@ -322,67 +323,67 @@ public class FilterEvalTests {
                 new ArrayList<>()));
 
         noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr-3"));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin3));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin2));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin1));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurr));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin3));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin2));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin1));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurr));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus1));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus2));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus3));
 
         noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr-2"));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin3));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin2));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin1));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurr));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin3));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin2));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin1));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurr));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus1));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus2));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus3));
 
         noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr-1"));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin3));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin2));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin1));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurr));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin3));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin2));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin1));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurr));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus1));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus2));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus3));
 
         noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr"));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin3));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin2));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin1));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurr));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin3));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin2));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin1));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurr));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus1));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus2));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus3));
 
         noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr+1"));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin3));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin2));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin1));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurr));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin3));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin2));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin1));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurr));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus1));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus2));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus3));
 
         noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr+2"));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin3));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin2));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin1));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurr));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin3));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin2));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin1));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurr));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus1));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus2));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus3));
 
         noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr+3"));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin3));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin2));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin1));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurr));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus1));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus2));
-        assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrPlus3));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin3));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin2));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrMin1));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurr));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus1));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus2));
+        assertFalse(getQualifierProcessResult(model, noMilestoneAlias, iCurrPlus3));
     }
 
     @Test
@@ -394,17 +395,17 @@ public class FilterEvalTests {
 
         IModel model = TestUtils.modelWith(issue, label);
 
-        assertFalse(Qualifier.process(model, Parser.parse("label:type"), issue));
-        assertTrue(Qualifier.process(model, Parser.parse("label:type."), issue));
-        assertTrue(Qualifier.process(model, Parser.parse("label:type.bug"), issue));
-        assertTrue(Qualifier.process(model, Parser.parse("label:bug"), issue));
+        assertFalse(getQualifierProcessResult(model, Parser.parse("label:type"), issue));
+        assertTrue(getQualifierProcessResult(model, Parser.parse("label:type."), issue));
+        assertTrue(getQualifierProcessResult(model, Parser.parse("label:type.bug"), issue));
+        assertTrue(getQualifierProcessResult(model, Parser.parse("label:bug"), issue));
         try {
-            assertTrue(Qualifier.process(model, Parser.parse("label:.bug"), issue));
+            assertTrue(getQualifierProcessResult(model, Parser.parse("label:.bug"), issue));
             fail(". cannot begin symbols");
         } catch (ParseException ignored) {
         }
         try {
-            assertFalse(Qualifier.process(model, Parser.parse("label:."), issue));
+            assertFalse(getQualifierProcessResult(model, Parser.parse("label:."), issue));
             fail(". is not a valid token on its own");
         } catch (ParseException ignored) {
         }
@@ -424,7 +425,7 @@ public class FilterEvalTests {
             new ArrayList<>(),
             new ArrayList<>())));
 
-        assertTrue(Qualifier.process(model, Parser.parse("label:t."), issue));
+        assertTrue(getQualifierProcessResult(model, Parser.parse("label:t."), issue));
 
         // Label without a group
 
@@ -435,17 +436,17 @@ public class FilterEvalTests {
 
         model = TestUtils.modelWith(issue, label);
 
-        assertFalse(Qualifier.process(model, Parser.parse("label:bug."), issue));
-        assertFalse(Qualifier.process(model, Parser.parse("label:type.bug"), issue));
-        assertFalse(Qualifier.process(model, Parser.parse("label:type"), issue));
-        assertTrue(Qualifier.process(model, Parser.parse("label:bug"), issue));
+        assertFalse(getQualifierProcessResult(model, Parser.parse("label:bug."), issue));
+        assertFalse(getQualifierProcessResult(model, Parser.parse("label:type.bug"), issue));
+        assertFalse(getQualifierProcessResult(model, Parser.parse("label:type"), issue));
+        assertTrue(getQualifierProcessResult(model, Parser.parse("label:bug"), issue));
         try {
-            assertTrue(Qualifier.process(model, Parser.parse("label:.bug"), issue));
+            assertTrue(getQualifierProcessResult(model, Parser.parse("label:.bug"), issue));
             fail(". cannot begin symbols");
         } catch (ParseException ignored) {
         }
         try {
-            assertFalse(Qualifier.process(model, Parser.parse("label:."), issue));
+            assertFalse(getQualifierProcessResult(model, Parser.parse("label:."), issue));
             fail(". is not a valid token on its own");
         } catch (ParseException ignored) {
         }
@@ -460,28 +461,29 @@ public class FilterEvalTests {
 
         IModel model = TestUtils.modelWith(issue, user);
 
-        assertTrue(Qualifier.process(model, Parser.parse("assignee:BOB"), issue));
-        assertTrue(Qualifier.process(model, Parser.parse("assignee:bob"), issue));
-        assertTrue(Qualifier.process(model, Parser.parse("assignee:alice"), issue));
-        assertTrue(Qualifier.process(model, Parser.parse("assignee:o"), issue));
-        assertTrue(Qualifier.process(model, Parser.parse("assignee:lic"), issue));
+        assertTrue(getQualifierProcessResult(model, Parser.parse("assignee:BOB"), issue));
+        assertTrue(getQualifierProcessResult(model, Parser.parse("assignee:bob"), issue));
+        assertTrue(getQualifierProcessResult(model, Parser.parse("assignee:alice"), issue));
+        assertTrue(getQualifierProcessResult(model, Parser.parse("assignee:o"), issue));
+        assertTrue(getQualifierProcessResult(model, Parser.parse("assignee:lic"), issue));
 
         // test: qualifier alias
-        assertTrue(Qualifier.process(model, Parser.parse("as:BOB"), issue));
+        assertTrue(getQualifierProcessResult(model, Parser.parse("as:BOB"), issue));
     }
 
     @Test
     public void satisfiesAuthor_validInputs() {
         TurboIssue issue = new TurboIssue(REPO, 1, "", "bob", null, false);
+        IModel model = TestUtils.modelWith(issue, new TurboUser("test/test", "bob"));
 
-        assertTrue(matches("author:BOB", issue));
-        assertTrue(matches("author:bob", issue));
-        assertFalse(matches("author:alice", issue));
-        assertTrue(matches("author:o", issue));
-        assertFalse(matches("author:lic", issue));
+        assertTrue(getQualifierProcessResult(model, Parser.parse("author:BOB"), issue));
+        assertTrue(getQualifierProcessResult(model, Parser.parse("author:bob"), issue));
+        assertFalse(getQualifierProcessResult(model, Parser.parse("author:alice"), issue));
+        assertTrue(getQualifierProcessResult(model, Parser.parse("author:o"), issue));
+        assertFalse(getQualifierProcessResult(model, Parser.parse("author:lic"), issue));
 
         // test: qualifier alias
-        assertTrue(matches("au:bob", issue));
+        assertTrue(getQualifierProcessResult(model, Parser.parse("au:bob"), issue));
     }
 
     @Test
@@ -496,23 +498,23 @@ public class FilterEvalTests {
 
         IModel model = TestUtils.modelWith(issue, user);
 
-        assertTrue(Qualifier.process(model, Parser.parse("involves:BOB"), issue));
-        assertTrue(Qualifier.process(model, Parser.parse("involves:bob"), issue));
-        assertTrue(Qualifier.process(model, Parser.parse("involves:alice"), issue));
-        assertTrue(Qualifier.process(model, Parser.parse("involves:o"), issue));
-        assertTrue(Qualifier.process(model, Parser.parse("involves:lic"), issue));
+        assertTrue(getQualifierProcessResult(model, Parser.parse("involves:BOB"), issue));
+        assertTrue(getQualifierProcessResult(model, Parser.parse("involves:bob"), issue));
+        assertTrue(getQualifierProcessResult(model, Parser.parse("involves:alice"), issue));
+        assertTrue(getQualifierProcessResult(model, Parser.parse("involves:o"), issue));
+        assertTrue(getQualifierProcessResult(model, Parser.parse("involves:lic"), issue));
 
         // test: qualifier alias
-        assertTrue(Qualifier.process(model, Parser.parse("user:BOB"), issue));
+        assertTrue(getQualifierProcessResult(model, Parser.parse("user:BOB"), issue));
 
         // author
         issue = new TurboIssue(REPO, 1, "", "bob", null, false);
 
-        assertTrue(Qualifier.process(model, Parser.parse("involves:BOB"), issue));
-        assertTrue(Qualifier.process(model, Parser.parse("involves:bob"), issue));
-        assertFalse(Qualifier.process(model, Parser.parse("involves:alice"), issue));
-        assertTrue(Qualifier.process(model, Parser.parse("involves:o"), issue));
-        assertFalse(Qualifier.process(model, Parser.parse("involves:lic"), issue));
+        assertTrue(getQualifierProcessResult(model, Parser.parse("involves:BOB"), issue));
+        assertTrue(getQualifierProcessResult(model, Parser.parse("involves:bob"), issue));
+        assertFalse(getQualifierProcessResult(model, Parser.parse("involves:alice"), issue));
+        assertTrue(getQualifierProcessResult(model, Parser.parse("involves:o"), issue));
+        assertFalse(getQualifierProcessResult(model, Parser.parse("involves:lic"), issue));
     }
 
     @Test
@@ -559,23 +561,23 @@ public class FilterEvalTests {
         issue.addLabel(label);
         IModel model = TestUtils.modelWith(issue, label);
 
-        assertTrue(Qualifier.process(model, Parser.parse("has:label"), issue));
-        assertFalse(Qualifier.process(model, Parser.parse("has:milestone"), issue));
-        assertFalse(Qualifier.process(model, Parser.parse("has:assignee"), issue));
+        assertTrue(getQualifierProcessResult(model, Parser.parse("has:label"), issue));
+        assertFalse(getQualifierProcessResult(model, Parser.parse("has:milestone"), issue));
+        assertFalse(getQualifierProcessResult(model, Parser.parse("has:assignee"), issue));
 
         issue.setMilestone(milestone);
         model = TestUtils.modelWith(issue, label, milestone);
 
-        assertTrue(Qualifier.process(model, Parser.parse("has:label"), issue));
-        assertTrue(Qualifier.process(model, Parser.parse("has:milestone"), issue));
-        assertFalse(Qualifier.process(model, Parser.parse("has:assignee"), issue));
+        assertTrue(getQualifierProcessResult(model, Parser.parse("has:label"), issue));
+        assertTrue(getQualifierProcessResult(model, Parser.parse("has:milestone"), issue));
+        assertFalse(getQualifierProcessResult(model, Parser.parse("has:assignee"), issue));
 
         issue.setAssignee(user);
         model = TestUtils.modelWith(issue, label, milestone, user);
 
-        assertTrue(Qualifier.process(model, Parser.parse("has:label"), issue));
-        assertTrue(Qualifier.process(model, Parser.parse("has:milestone"), issue));
-        assertTrue(Qualifier.process(model, Parser.parse("has:assignee"), issue));
+        assertTrue(getQualifierProcessResult(model, Parser.parse("has:label"), issue));
+        assertTrue(getQualifierProcessResult(model, Parser.parse("has:milestone"), issue));
+        assertTrue(getQualifierProcessResult(model, Parser.parse("has:assignee"), issue));
     }
 
     @Test
@@ -603,23 +605,23 @@ public class FilterEvalTests {
         issue.addLabel(label);
         IModel model = TestUtils.modelWith(issue, label);
 
-        assertFalse(Qualifier.process(model, Parser.parse("no:label"), issue));
-        assertTrue(Qualifier.process(model, Parser.parse("no:milestone"), issue));
-        assertTrue(Qualifier.process(model, Parser.parse("no:assignee"), issue));
+        assertFalse(getQualifierProcessResult(model, Parser.parse("no:label"), issue));
+        assertTrue(getQualifierProcessResult(model, Parser.parse("no:milestone"), issue));
+        assertTrue(getQualifierProcessResult(model, Parser.parse("no:assignee"), issue));
 
         issue.setMilestone(milestone);
         model = TestUtils.modelWith(issue, label, milestone);
 
-        assertFalse(Qualifier.process(model, Parser.parse("no:label"), issue));
-        assertFalse(Qualifier.process(model, Parser.parse("no:milestone"), issue));
-        assertTrue(Qualifier.process(model, Parser.parse("no:assignee"), issue));
+        assertFalse(getQualifierProcessResult(model, Parser.parse("no:label"), issue));
+        assertFalse(getQualifierProcessResult(model, Parser.parse("no:milestone"), issue));
+        assertTrue(getQualifierProcessResult(model, Parser.parse("no:assignee"), issue));
 
         issue.setAssignee(user);
         model = TestUtils.modelWith(issue, label, milestone, user);
 
-        assertFalse(Qualifier.process(model, Parser.parse("no:label"), issue));
-        assertFalse(Qualifier.process(model, Parser.parse("no:milestone"), issue));
-        assertFalse(Qualifier.process(model, Parser.parse("no:assignee"), issue));
+        assertFalse(getQualifierProcessResult(model, Parser.parse("no:label"), issue));
+        assertFalse(getQualifierProcessResult(model, Parser.parse("no:milestone"), issue));
+        assertFalse(getQualifierProcessResult(model, Parser.parse("no:assignee"), issue));
     }
 
     @Test
@@ -828,7 +830,15 @@ public class FilterEvalTests {
      * Tests the filter string in the context of an empty model
      */
     public boolean matches(String filterExpr, TurboIssue issue) {
-        return Qualifier.process(empty, Parser.parse(filterExpr), issue);
+        return getQualifierProcessResult(empty, Parser.parse(filterExpr), issue);
+    }
+
+    private boolean getQualifierProcessResult(IModel model, FilterExpression expr, TurboIssue issue) {
+        try {
+            return Qualifier.process(model, expr, issue);
+        } catch (WarningException e) {
+            return e.getFilterResult();
+        }
     }
 
     /**

@@ -4,6 +4,7 @@ import backend.interfaces.IModel;
 import backend.resource.TurboIssue;
 import filter.MetaQualifierInfo;
 import filter.QualifierApplicationException;
+import filter.WarningException;
 
 import java.util.List;
 import java.util.function.Function;
@@ -14,7 +15,7 @@ public interface FilterExpression {
     // Determines if an issue satisfies this filter expression.
     // If so, it is shown in the issue panel.
 
-    boolean isSatisfiedBy(IModel model, TurboIssue issue, MetaQualifierInfo info);
+    boolean isSatisfiedBy(IModel model, TurboIssue issue, MetaQualifierInfo info) throws WarningException;
 
     // Filter expressions may only be applied if they contain no ambiguity
     // => they must contain only qualifiers or conjunctions thereof. Disjunctions
