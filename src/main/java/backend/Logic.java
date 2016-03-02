@@ -18,9 +18,7 @@ import ui.issuepanel.FilterPanel;
 import util.Futures;
 import util.HTLog;
 import util.Utility;
-import util.events.AppliedFilterEvent;
-import util.events.PrimaryRepoOpenedEvent;
-import util.events.PrimaryRepoOpeningEvent;
+import util.events.*;
 import util.events.testevents.ClearLogicModelEvent;
 import util.events.testevents.ClearLogicModelEventHandler;
 
@@ -137,6 +135,8 @@ public class Logic {
 
             logger.info("Opening " + repoId);
             UI.status.displayMessage("Opening " + repoId);
+
+            Platform.runLater(() -> UI.events.triggerEvent(new FilterRepoOpeningEvent()));
             if (isPrimaryRepository) {
                 Platform.runLater(() -> UI.events.triggerEvent(new PrimaryRepoOpeningEvent()));
             }
@@ -145,6 +145,7 @@ public class Logic {
                     .thenApply(models::addPending)
                     .thenRun(this::refreshUI)
                     .thenRun(() -> {
+                        Platform.runLater(() -> UI.events.triggerEvent(new FilterRepoOpenedEvent()));
                         if (isPrimaryRepository) {
                             Platform.runLater(() ->
                                     UI.events.triggerEvent(new PrimaryRepoOpenedEvent()));
