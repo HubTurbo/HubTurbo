@@ -3,7 +3,6 @@ package ui.components.pickers;
 import backend.resource.TurboIssue;
 import backend.resource.TurboLabel;
 import javafx.application.Platform;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -63,7 +62,8 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
     @FXML
     public void initialize() {
-        queryField.textProperty().addListener(this::handleUserInput);
+        queryField.textProperty().addListener(
+            (observable, oldText, newText) -> handleUserInput(queryField.getText()));
     }
 
     private void initUI(Stage stage, TurboIssue issue) {
@@ -109,7 +109,9 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         assignedLabels.getChildren().clear();
         populateInitialLabels(initialLabels, removedLabels, suggestion);
         populateToBeAddedLabels(addedLabels, suggestion);
-        if (initialLabels.isEmpty()) createTextLabel("No currently selected labels. ");
+        if (initialLabels.isEmpty()) {
+            assignedLabels.getChildren().add(createTextLabel("No currently selected labels. "));
+        }
     }
 
     private final void populateInitialLabels(List<String> initialLabels, List<String> removedLabels,
@@ -124,24 +126,24 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         TurboLabel repoInitialLabel = TurboLabel.getFirstMatchingTurboLabel(allLabels, initialLabel);
         if (!removedLabels.contains(initialLabel)) {
             if (suggestion.isPresent() && initialLabel.equals(suggestion.get())) {
-                return getStyledPickerLabel(
+                return getPickerLabelNode(
                     new PickerLabel(repoInitialLabel, true).faded(true).removed(true));
             }
-            return getStyledPickerLabel(new PickerLabel(repoInitialLabel, true));
+            return getPickerLabelNode(new PickerLabel(repoInitialLabel, true));
         }
 
         if (suggestion.isPresent() && initialLabel.equals(suggestion.get())) {
-            return getStyledPickerLabel(new PickerLabel(repoInitialLabel, true).faded(true));
+            return getPickerLabelNode(new PickerLabel(repoInitialLabel, true).faded(true));
         }
 
-        return getStyledPickerLabel(new PickerLabel(repoInitialLabel, true).removed(true));
+        return getPickerLabelNode(new PickerLabel(repoInitialLabel, true).removed(true));
     }
 
     /**
      * @param label
      * @return Node from label after registering mouse handler
      */
-    private final Node getStyledPickerLabel(PickerLabel label) {
+    private final Node getPickerLabelNode(PickerLabel label) {
         Node node = label.getNode();
         node.setOnMouseClicked(e -> handleLabelClick(label));
         return node;
@@ -164,10 +166,10 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
     private final Node processAddedLabel(String addedLabel, Optional<String> suggestion) {
         if (!suggestion.isPresent() || !addedLabel.equals(suggestion.get())) {
-            return getStyledPickerLabel(
+            return getPickerLabelNode(
                 new PickerLabel(TurboLabel.getFirstMatchingTurboLabel(allLabels, addedLabel), true));
         }
-        return getStyledPickerLabel(
+        return getPickerLabelNode(
                 new PickerLabel(TurboLabel.getFirstMatchingTurboLabel(allLabels, addedLabel), true)
                 .faded(true).removed(true));
     }
@@ -184,7 +186,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     }
 
     private final Node processSuggestedLabel(String suggestedLabel) {
-        return getStyledPickerLabel(
+        return getPickerLabelNode(
              new PickerLabel(TurboLabel.getFirstMatchingTurboLabel(allLabels, suggestedLabel), true)
              .faded(true));
     }
@@ -232,13 +234,13 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                 .forEach(label -> groupless.getChildren().add(processMatchedLabel(
                     label.getFullName(), matchedLabels, finalLabels, suggestion)));
 
-        if (!groupless.getChildren().isEmpty()) feedbackLabels.getChildren().add(groupless);
+        feedbackLabels.getChildren().add(groupless);
     }
 
     private final Node processMatchedLabel(String repoLabel, List<String> matchedLabels, 
                                             List<String> assignedLabels, Optional<String> suggestion) {
 
-        return getStyledPickerLabel(
+        return getPickerLabelNode(
             new PickerLabel(TurboLabel.getFirstMatchingTurboLabel(allLabels, repoLabel), false)
                 .faded(!matchedLabels.contains(repoLabel))
                 .highlighted(suggestion.isPresent() && suggestion.get().equals(repoLabel))
@@ -263,6 +265,8 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         // defines what happens when user confirms/presses enter
         setResultConverter(dialogButton -> {
             if (dialogButton == confirmButtonType) {
+                // Ensures the last keyword in the query is toggled after confirmation
+                queryField.appendText(" ");
                 return state.getAssignedLabels();
             }
             return null;
@@ -309,22 +313,15 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
     /**
      * Updates state of the label picker based on the entire query
-     * NOPMD : Parameters are unused because the entire query is taken into consideration when 
-     * updating the state
      */
-    private final void handleUserInput(ObservableValue<? extends String> observable, // NOPMD
-                                       String oldText, String newText) {             // NOPMD
-        state = new LabelPickerState(
-            new HashSet<>(issue.getLabels()), allLabels, queryField.getText().toLowerCase());
+    private final void handleUserInput(String query) {
+        state = new LabelPickerState(new HashSet<>(issue.getLabels()), allLabels, query.toLowerCase());
         populatePanes(state);
     }
 
     private void handleLabelClick(PickerLabel label) {
+        queryField.setDisable(true);
         state.updateAssignedLabels(label);
         populatePanes(state);
-
-        if (!queryField.isDisabled()) {
-            queryField.setDisable(true);
-        }
     }
 }

@@ -2,8 +2,10 @@ package unstable;
 
 import guitests.UITest;
 import javafx.application.Platform;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.FlowPane;
 
 import org.junit.Test;
 
@@ -25,6 +27,20 @@ public class LabelPickerTests extends UITest {
         click(labelPickerTextField);
         type("world");
         assertEquals("world", labelPickerTextField.getText());
+        exitCleanly();
+    }
+
+    @Test
+    public void showLabelPicker_emptyLabels_displayedCorrectText() {
+        triggerLabelPicker(new TurboIssue("dummy/dummy", 1, ""));
+        waitUntilNodeAppears("#assignedLabels");
+        FlowPane assignedLabels = find("#assignedLabels");
+        Label label = (Label) assignedLabels.getChildren().get(0);
+        assertEquals("No currently selected labels. ", label.getText());
+        exitCleanly();
+    }
+
+    private void exitCleanly() {
         push(KeyCode.ESCAPE);
         waitUntilNodeDisappears(QUERY_FIELD_ID);
     }

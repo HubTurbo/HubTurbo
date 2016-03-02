@@ -23,6 +23,8 @@ public class TurboLabel implements Comparable<TurboLabel> {
     public static final String DEFAULT_COLOR = "ffffff";
     public static final String EXCLUSIVE_DELIMITER = ".";
     public static final String NONEXCLUSIVE_DELIMITER = "-";
+    public static final String GROUP_PATTERN = String.format(
+        "^([^\\%1$s\\%2$s]+)(\\%1$s|\\%2$s)([^\\%1$s\\%2$s]*)", EXCLUSIVE_DELIMITER, NONEXCLUSIVE_DELIMITER);
 
     private final String fullName;
     private final String shortName;
@@ -68,21 +70,19 @@ public class TurboLabel implements Comparable<TurboLabel> {
     /**
      * Extracts group name, group delimiter and short name from a keyword
      * group name is name of the group associated with a keyword
-     * short name is name of the keyword after omitting its group name 
+     * short name is name of the keyword after omitting its group name and group delimiter
      * Example: "priority.high" -> group name = "priority", group delimiter = ".", short name = "high"
      * @param keyword
      * @return String array of group name, group delimiter and short name
      */
     private static String[] splitKeyword(String keyword) {
-        Pattern p = Pattern.compile(String.format("^([^\\%s\\%s]+)(\\%s|\\%s)([^\\%s\\%s]*)",
-            EXCLUSIVE_DELIMITER, NONEXCLUSIVE_DELIMITER,
-            EXCLUSIVE_DELIMITER, NONEXCLUSIVE_DELIMITER,
-            EXCLUSIVE_DELIMITER, NONEXCLUSIVE_DELIMITER));
+        Pattern p = Pattern.compile(GROUP_PATTERN);
         Matcher m = p.matcher(keyword);
 
-        if (m.find()) return new String[] {m.group(1), m.group(2), m.group(3)};
+        if (!m.find()) return new String[] {"", "", keyword};
+            
+        return new String[] {m.group(1), m.group(2), m.group(3)};
 
-        return new String[] {"", "", keyword};
     }
 
     /**
@@ -103,12 +103,12 @@ public class TurboLabel implements Comparable<TurboLabel> {
 
     /**
      * Matches label name that contains nameQuery and the matching is case-insensitive
-     * @param repoLabels
+     * @param allLabels
      * @param nameQuery
      * @return the list of label names that matches a query
      */
-    public static List<TurboLabel> filterByNameQuery(List<TurboLabel> repoLabels, String nameQuery) {
-        return repoLabels
+    public static List<TurboLabel> filterByNameQuery(List<TurboLabel> allLabels, String nameQuery) {
+        return allLabels
                 .stream()
                 .filter(label -> Utility.containsIgnoreCase(label.getShortName(), nameQuery))
                 .collect(Collectors.toList());
@@ -117,14 +117,14 @@ public class TurboLabel implements Comparable<TurboLabel> {
     /**
      * Matches label name that contains groupQuery and the matching is
      * case-insensitive
-     * @param repoLabels
+     * @param allLabels
      * @param groupQuery
      * @return the list of label names that belongs to a group and matches a query
      */
-    public static List<TurboLabel> filterByGroupQuery(List<TurboLabel> repoLabels, String groupQuery) {
-        if (groupQuery.isEmpty()) return repoLabels;
+    public static List<TurboLabel> filterByGroupQuery(List<TurboLabel> allLabels, String groupQuery) {
+        if (groupQuery.isEmpty()) return allLabels;
 
-        return repoLabels
+        return allLabels
                 .stream()
                 .filter(label -> {
                     if (label.isInGroup()) {
@@ -136,16 +136,16 @@ public class TurboLabel implements Comparable<TurboLabel> {
     }
 
     /**
-     * @param repoLabels
+     * @param allLabels
      * @param keyword
      * @return the list of labels that matches the keyword i.e. the label's group 
      * contains keyword's group and label's name contains keyword's name
      */
-    public static List<TurboLabel> getMatchedLabels(List<TurboLabel> repoLabels, String keyword) {
+    public static List<TurboLabel> getMatchedLabels(List<TurboLabel> allLabels, String keyword) {
         String[] extractedNames = splitKeyword(keyword);
 
         List<TurboLabel> newMatchedLabels = new ArrayList<>();
-        newMatchedLabels.addAll(repoLabels);
+        newMatchedLabels.addAll(allLabels);
         newMatchedLabels = filterByNameQuery(newMatchedLabels, extractedNames[2]);
         newMatchedLabels = filterByGroupQuery(newMatchedLabels, extractedNames[0]);
         return newMatchedLabels;
@@ -154,16 +154,18 @@ public class TurboLabel implements Comparable<TurboLabel> {
     /**
      * A label is matching if:
      * the label's group contains keyword's group and label's name contains keyword's name
-     * @param repoLabels
+     * @param allLabels
      * @param keyword
-     * @return true if there is there is at least 1 matching label for the keyword
+     * @return true if there is at least 1 matching label for the keyword
      */
-    public static final boolean hasMatchedLabel(List<TurboLabel> repoLabels, String keyword) {
-        return !getMatchedLabels(repoLabels, keyword).isEmpty();
+    public static final boolean hasMatchedLabel(List<TurboLabel> allLabels, String keyword) {
+        return !getMatchedLabels(allLabels, keyword).isEmpty();
     }
 
     /**
-     * @return group name if the label belongs to a group. Empty string if otherwise
+     * @return group name if the label belongs to a group. Empty string if otherwise.
+     * Optional is not returned to make standardise handling of names consistent with short name 
+     * which always return a String
      */
     public String getGroupName() {
         return groupName;
@@ -244,8 +246,17 @@ public class TurboLabel implements Comparable<TurboLabel> {
     }
 
     private Grouping determineGrouping(String delimiter) {
-        if (delimiter.isEmpty()) return Grouping.NONE;
-
-        return delimiter.equals(EXCLUSIVE_DELIMITER) ? Grouping.EXCLUSIVE : Grouping.NON_EXCLUSIVE;
+        switch (delimiter) {
+        case EXCLUSIVE_DELIMITER:
+            return Grouping.EXCLUSIVE;
+        case NONEXCLUSIVE_DELIMITER:
+            return Grouping.NON_EXCLUSIVE;
+        case "":
+            return Grouping.NONE;
+        default:
+            assert false : "Unsupported delimiter found";
+            // should not reach here
+            return Grouping.NONE;
+        }
     }
 }

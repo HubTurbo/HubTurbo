@@ -48,6 +48,7 @@ public class LabelPickerState {
         Optional<String> keywordInProgess = getKeywordInProgress(userInput);
         if (keywordInProgess.isPresent()) {
             updateMatchedLabels(keywordInProgess.get());
+            updateSuggestionIndex(keywordInProgess.get(), matchedLabels);
         }
     }
 
@@ -90,22 +91,24 @@ public class LabelPickerState {
     /**
      * Updates the list of labels which labels' names contain the current keyword.
      * This list of labels can then be retrieved later via getMatchedLabels()
-     *
-     * The suggestion index will be pointed to the first label that matches the keyword, if there is.
-     *
      * @param keyword
      */
     private final void updateMatchedLabels(String keyword) {
         List<TurboLabel> newMatchedLabels = TurboLabel.getMatchedLabels(allLabels, keyword);
+        matchedLabels = TurboLabel.getLabelsNameList(newMatchedLabels);
+    }
 
-
+    /**
+     * Updates suggeston index to first label that matches the keyword
+     * @param keyword
+     * @param newMatchedLabels
+     */
+    private final void updateSuggestionIndex(String keyword, List<String> newMatchedLabels) {
         if (keyword.isEmpty() || newMatchedLabels.isEmpty()) {
             currentSuggestionIndex = OptionalInt.empty();
         } else {
             currentSuggestionIndex = OptionalInt.of(0);
         }
-
-        matchedLabels = TurboLabel.getLabelsNameList(newMatchedLabels);
     }
 
     /*
@@ -127,7 +130,7 @@ public class LabelPickerState {
      * @return the initial list of labels
      */
     public List<String> getInitialLabels() {
-        return convertToList(initialLabels);
+        return new ArrayList<>(initialLabels);
     }
 
     /**
@@ -227,8 +230,7 @@ public class LabelPickerState {
     }
 
     /**
-     * A keyword is considered in progress if there is no space after it i.e  given
-     * an input "test dummy world", "world" is the keyword in progress.
+     * If userInput does not end with space, split by space and return last word.
      * @param userInput
      * @return the keyword in progress based on the userInput
      */
@@ -243,18 +245,12 @@ public class LabelPickerState {
 
     /**
      * Determines if the keywordIndex-th keyword is confirmed i.e. user has typed a space after it
-     * Assumption: userInput has at at least keywordIndex+1 keywords, separated by whitespace.
+     * Assumption: userInput has at least keywordIndex+1 keywords, separated by whitespace.
      * @param userInput
      * @param keywordIndex
      * @return
      */
     private static boolean isConfirmedKeyword(String userInput, int keywordIndex) {
-        return !(keywordIndex == userInput.split("\\s+").length - 1 && !userInput.endsWith(" "));
+        return keywordIndex != userInput.split("\\s+").length - 1 || userInput.endsWith(" ");
     }
-
-    private static List<String> convertToList(Set<String> labelSet){
-        return new ArrayList<>(labelSet);
-    }
-
-
 }
