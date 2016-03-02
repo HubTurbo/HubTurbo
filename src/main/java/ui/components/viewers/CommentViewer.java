@@ -24,7 +24,6 @@ public class CommentViewer {
                 .thenRun(() -> {
                     Platform.runLater(() -> {
                         CommentViewerDialog dialog = new CommentViewerDialog(stage, issue);
-                        dialog.setHeight(500);
                         dialog.setResizable(true);
                         dialog.show();
                     });

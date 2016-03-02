@@ -1,28 +1,35 @@
 package ui.components.viewers;
 
 import backend.resource.TurboIssue;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
-import javafx.scene.control.TextArea;
+import github.ReviewComment;
+import javafx.event.EventHandler;
+import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 import org.eclipse.egit.github.core.Comment;
+import org.eclipse.egit.github.core.User;
+import org.markdown4j.Markdown4jProcessor;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CommentViewerDialog extends Dialog<Void> {
 
-    private TextArea textArea;
+    private WebView webView;
 
-    CommentViewerDialog(Stage stage, TurboIssue issue) {
+    public CommentViewerDialog(Stage stage, TurboIssue issue) {
         // UI creation
         initialiseDialog(stage, issue);
         setupButtons();
-        textArea = createTextArea();
-        populateTextArea(issue.getMetadata().getComments());
-        getDialogPane().setContent(textArea);
+        setupWebView();
+        addCommentsToWebView(issue.getMetadata().getComments());
+        getDialogPane().setContent(webView);
     }
 
     private void setupButtons() {
@@ -37,19 +44,25 @@ public class CommentViewerDialog extends Dialog<Void> {
             + " in " + turboIssue.getRepoId() + " (" + turboIssue.getMetadata().getComments().size() + ")");
     }
 
-    private TextArea createTextArea() {
-        TextArea textArea = new TextArea();
-        textArea.setEditable(false);
-        textArea.setId("commentViewerTextArea");
-        textArea.setPrefColumnCount(80);
-        return textArea;
+    private String createCommentHeader(Comment comment) {
+        User commenter = comment.getUser();
+        String result = "<b>" + commenter.getLogin() + " (" + comment.getCreatedAt().toString() + ")</b>:";
+        return result;
     }
 
-    private void populateTextArea(List<Comment> comments) {
+    private void setupWebView() {
+        webView = new WebView();
+    }
+
+    private void addCommentsToWebView(List<Comment> comments) {
+        final StringBuilder resultingHtml = new StringBuilder();
         comments.stream().forEach(comment -> {
-            textArea.setText(textArea.getText()
-                + comment.getUser().getLogin() + ": " + comment.getBodyText() + "\n\n");
+            resultingHtml.append(createCommentHeader(comment));
+            resultingHtml.append(comment.getBodyHtml());
+            resultingHtml.append("<hr>");
         });
+        WebEngine webEngine = webView.getEngine();
+        webEngine.loadContent(resultingHtml.toString());
     }
 
 }
