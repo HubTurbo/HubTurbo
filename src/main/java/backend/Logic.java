@@ -5,6 +5,8 @@ import backend.resource.Model;
 import backend.resource.MultiModel;
 import backend.resource.TurboIssue;
 import filter.expression.FilterExpression;
+import filter.expression.Qualifier;
+import filter.expression.QualifierType;
 import javafx.application.Platform;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.Logger;
@@ -312,8 +314,8 @@ public class Logic {
         panels.add(panel);
 
         updateController.processAndRefresh(panels);
-        if (!updateController.hasRepositoriesInFilter(panel.getCurrentFilterExpression())) {
-            UI.events.triggerEvent(new AppliedFilterEvent(panel));
+        if (Qualifier.getMetaQualifierContent(panel.getCurrentFilterExpression(), QualifierType.REPO).isEmpty()) {
+            Platform.runLater (() -> UI.events.triggerEvent(new AppliedFilterEvent(panel)));
         }
     }
 

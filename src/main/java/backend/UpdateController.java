@@ -5,21 +5,16 @@ import backend.resource.MultiModel;
 import backend.resource.TurboIssue;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Logger;
 import filter.expression.QualifierType;
 import ui.GuiElement;
-import ui.UI;
 import ui.issuepanel.FilterPanel;
 import util.Futures;
 import util.HTLog;
-import util.events.AppliedFilterEvent;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Manages the flow of logic during a data retrieval cycle from the repository source.
@@ -37,11 +32,13 @@ public class UpdateController {
     }
 
     /**
-     * Given a list of filter expressions, dispatch metadata update if needed and then process them to return
+     * Given a list of panels, opens the repositories specified in the panels' filters.
+     *
+     * After which, dispatch metadata update if needed and then process them to return
      * a map of filtered and sorted issues corresponding to each filter expression, based on the most recent data
      * from the repository source.
      *
-     * @param filterPanels Filter expressions to process
+     * @param filterPanels Filter panels to process
      */
     public void processAndRefresh(List<FilterPanel> filterPanels) {
         List<FilterExpression> filterExprs = getFilterExpressions(filterPanels);
@@ -51,23 +48,24 @@ public class UpdateController {
             // First filter, for issues requiring a metadata update.
             Map<String, List<TurboIssue>> toUpdate = tallyMetadataUpdate(filterExprs);
 
-            if (!toUpdate.isEmpty()) {
-                // If there are issues requiring metadata update, we dispatch the metadata requests...
-                ArrayList<CompletableFuture<Boolean>> metadataRetrievalTasks = new ArrayList<>();
-                toUpdate.forEach((repoId, issues) ->
-                        metadataRetrievalTasks.add(logic.getIssueMetadata(repoId, issues)));
-                // ...and then wait for all of them to complete.
-                Futures.sequence(metadataRetrievalTasks)
-                        .thenAccept(results -> logger.info("Metadata retrieval successful for "
-                                + results.stream().filter(result -> result).count() + "/"
-                                + results.size() + " repos"))
-                        .thenCompose(n -> logic.getRateLimitResetTime())
-                        .thenApply(logic::updateRemainingRate)
-                        .thenRun(() -> logic.updateUI(processFilter(filterExprs))); // Then filter the second time.
-            } else {
+            if (toUpdate.isEmpty()) {
                 // If no issues requiring metadata update, just run the filter and sort.
                 logic.updateUI(processFilter(filterExprs));
+                return;
             }
+
+            // If there are issues requiring metadata update, we dispatch the metadata requests...
+            ArrayList<CompletableFuture<Boolean>> metadataRetrievalTasks = new ArrayList<>();
+            toUpdate.forEach((repoId, issues) ->
+                    metadataRetrievalTasks.add(logic.getIssueMetadata(repoId, issues)));
+            // ...and then wait for all of them to complete.
+            Futures.sequence(metadataRetrievalTasks)
+                    .thenAccept(results -> logger.info("Metadata retrieval successful for "
+                            + results.stream().filter(result -> result).count() + "/"
+                            + results.size() + " repos"))
+                    .thenCompose(n -> logic.getRateLimitResetTime())
+                    .thenApply(logic::updateRemainingRate)
+                    .thenRun(() -> logic.updateUI(processFilter(filterExprs))); // Then filter the second time.
         });
     }
 
@@ -78,36 +76,15 @@ public class UpdateController {
     }
 
     /**
-     * Given a list of filter expressions, open all repositories necessary for processing the filter expressions.
-     *
-     * @param filterExprs Filter expressions to process.
-     */
-    public boolean hasRepositoriesInFilter(FilterExpression filterExprs) {
-        return !Qualifier.getMetaQualifierContent(filterExprs, QualifierType.REPO).isEmpty();
-    }
-
-    /**
-     * Given a list of filter expressions, open all repositories necessary for processing the filter expressions.
+     * Given a list of filter panels, open all repositories necessary for processing the filter expressions
      *
      * @param filterPanels
      */
-    public CompletableFuture<List<Boolean>> openRepositoriesInFilters(List<FilterPanel> filterPanels) {
-        List<FilterExpression> filterExprs  = getFilterExpressions(filterPanels);
-        List<Pair<FilterExpression, FilterPanel>> list = new ArrayList<>();
-        for (int i = 0; i < filterPanels.size(); i++) {
-            FilterPanel panel = filterPanels.get(i);
-            FilterExpression curFilterExpr = filterExprs.get(i);
-            list.add(new ImmutablePair<>(curFilterExpr, panel));
-        }
-
-        return Futures.sequence(list.stream()
-                .flatMap(listItem -> {
-                    Stream<CompletableFuture<Boolean>> result = Qualifier.getMetaQualifierContent(listItem.getKey(),
-                            QualifierType.REPO).stream()
-                            .map(repoId -> logic.openRepositoryFromFilter(repoId, listItem.getValue()));
-                    UI.events.triggerEvent(new AppliedFilterEvent(listItem.getValue()));
-                    return result;
-                })
+    private CompletableFuture<List<Boolean>> openRepositoriesInFilters(List<FilterPanel> filterPanels) {
+        return Futures.sequence(filterPanels.stream()
+                .flatMap(panel -> Qualifier.getMetaQualifierContent(panel.getCurrentFilterExpression(),
+                        QualifierType.REPO).stream()
+                        .map(repoId -> logic.openRepositoryFromFilter(repoId, panel)))
                 .collect(Collectors.toList()));
     }
 
