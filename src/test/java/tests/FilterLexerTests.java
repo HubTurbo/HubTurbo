@@ -1,5 +1,6 @@
 package tests;
 
+import filter.ParseException;
 import filter.lexer.Lexer;
 import filter.lexer.Token;
 import filter.lexer.TokenType;
@@ -17,10 +18,10 @@ public class FilterLexerTests {
     @Test
     public void lex_generalInputs() {
 
-        assertEquals(getTokens(""), Arrays.asList(
+        assertEquals(tokenise(""), Arrays.asList(
             new Token(TokenType.EOF, "")));
 
-        assertEquals(getTokens("a' b' c'"), Arrays.asList(
+        assertEquals(tokenise("a' b' c'"), Arrays.asList(
             new Token(TokenType.SYMBOL, "a'"),
             new Token(TokenType.SYMBOL, "b'"),
             new Token(TokenType.SYMBOL, "c'"),
@@ -30,28 +31,28 @@ public class FilterLexerTests {
     @Test
     public void lex_repoIds() {
 
-        assertEquals(getTokens("test/test"), 
+        assertEquals(tokenise("test/test"), 
             Arrays.asList(new Token(TokenType.SYMBOL, "test/test"), new Token(TokenType.EOF, "")));
     }
 
     @Test
     public void lex_sortingKeys() {
 
-        assertEquals(getTokens("sort: a, b "), Arrays.asList(
+        assertEquals(tokenise("sort: a, b "), Arrays.asList(
             new Token(TokenType.QUALIFIER, "sort:"),
             new Token(TokenType.SYMBOL, "a"),
             new Token(TokenType.COMMA, ","),
             new Token(TokenType.SYMBOL, "b"),
             new Token(TokenType.EOF, "")));
 
-        assertEquals(getTokens("sort-self-other: a, b "), Arrays.asList(
+        assertEquals(tokenise("sort-self-other: a, b "), Arrays.asList(
                 new Token(TokenType.QUALIFIER, "sort-self-other:"),
                 new Token(TokenType.SYMBOL, "a"),
                 new Token(TokenType.COMMA, ","),
                 new Token(TokenType.SYMBOL, "b"),
                 new Token(TokenType.EOF, "")));
 
-        assertEquals(getTokens("---sort-self-other: a, b "), Arrays.asList(
+        assertEquals(tokenise("---sort-self-other: a, b "), Arrays.asList(
                 new Token(TokenType.NOT, "-"),
                 new Token(TokenType.NOT, "-"),
                 new Token(TokenType.NOT, "-"),
@@ -61,7 +62,7 @@ public class FilterLexerTests {
                 new Token(TokenType.SYMBOL, "b"),
                 new Token(TokenType.EOF, "")));
 
-        assertEquals(getTokens("sort: a , - b"), Arrays.asList(
+        assertEquals(tokenise("sort: a , - b"), Arrays.asList(
             new Token(TokenType.QUALIFIER, "sort:"),
             new Token(TokenType.SYMBOL, "a"),
             new Token(TokenType.COMMA, ","),
@@ -73,13 +74,13 @@ public class FilterLexerTests {
     @Test
     public void lex_milestoneAliases() {
 
-        assertEquals(getTokens("milestone:curr-1"), Arrays.asList(
+        assertEquals(tokenise("milestone:curr-1"), Arrays.asList(
                 new Token(TokenType.QUALIFIER, "milestone:"),
                 new Token(TokenType.SYMBOL, "curr-1"),
                 new Token(TokenType.EOF, "")
         ));
 
-        assertEquals(getTokens("milestone:curr+1"), Arrays.asList(
+        assertEquals(tokenise("milestone:curr+1"), Arrays.asList(
                 new Token(TokenType.QUALIFIER, "milestone:"),
                 new Token(TokenType.SYMBOL, "curr+1"),
                 new Token(TokenType.EOF, "")
@@ -87,24 +88,36 @@ public class FilterLexerTests {
     }
 
     @Test
-    public void lex_compoundId() {
+    public void lex_compoundId_tokenAdded() {
 
-        assertEquals(getTokens("id:test/test#1"), Arrays.asList(
+        assertEquals(tokenise("id:test/test#1"), Arrays.asList(
                 new Token(TokenType.QUALIFIER, "id:"),
-                new Token(TokenType.COMPOUND_ID, "test/test#"),
+                new Token(TokenType.COMPOUND_ID_PREFIX, "test/test#"),
                 new Token(TokenType.SYMBOL, "1"),
                 new Token(TokenType.EOF, "")
         ));
 
-        // test: at least one symbol preceedes "#"
-        assertFalse(getTokens("id:#1").contains(new Token(TokenType.COMPOUND_ID, "#")));
+    }
+
+    @Test
+    public void lex_invalidCompoundId_tokenNotAdded() {
+        assertFalse(tokenise("id:#1").contains(new Token(TokenType.COMPOUND_ID_PREFIX, "#")));
+        // test: missing "/" 
+        assertFalse(tokenise("id:test#1").contains(new Token(TokenType.COMPOUND_ID_PREFIX, "test#")));
+        // test: symbol after "/" needed
+        assertFalse(tokenise("id:test/#1").contains(new Token(TokenType.COMPOUND_ID_PREFIX, "test/#")));
+    }
+
+    @Test(expected = ParseException.class)
+    public void lex_invalidUsernameInCompoundId_throwParseException() {
+        assertFalse(tokenise("id:-/#1").contains(new Token(TokenType.COMPOUND_ID_PREFIX, "test/#")));
     }
 
     /**
      * @param query
      * @return list of tokens after lexing
      */
-    private List<Token> getTokens(String query) {
+    private List<Token> tokenise(String query) {
         return new Lexer(query).lex();
     }
 }

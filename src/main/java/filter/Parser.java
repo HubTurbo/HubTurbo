@@ -181,7 +181,7 @@ public final class Parser {
     private FilterExpression parseQualifierContent(QualifierType type) {
         if (type == QualifierType.SORT) {
             return parseSortKeys();
-        } else if (isCompoundId(type, lookAhead())) {
+        } else if (isCompoundIdToken(type, lookAhead())) {
             return parseCompoundId();
         } else if (isRangeOperatorToken(lookAhead())) {
             // < > <= >= [number range | date range]
@@ -204,8 +204,8 @@ public final class Parser {
         }
     }
 
-    private boolean isCompoundId(QualifierType type, Token token) {
-        return type == QualifierType.ID && token.getType() == TokenType.COMPOUND_ID;
+    private boolean isCompoundIdToken(QualifierType type, Token token) {
+        return type == QualifierType.ID && token.getType() == TokenType.COMPOUND_ID_PREFIX;
     }
 
     private boolean isKeywordToken(Token token) {

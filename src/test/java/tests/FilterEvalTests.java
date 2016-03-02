@@ -71,28 +71,32 @@ public class FilterEvalTests {
 
     @Test
     public void satisfiesId_validCompoundId() {
-        TurboIssue issue1 = new TurboIssue("dummy/dummy", 1, "1");
+        TurboIssue issue = new TurboIssue("dummy/dummy", 1, "1");
        
-        assertFalse(matches("id:test/test#1", issue1));
-        assertFalse(matches("id:dummy/dummy#2", issue1));
-        assertTrue(matches("id:dummy/dummy#1", issue1));
-    }
-
-    @Test
-    public void satisfiesId_compoundIdWithRangeOperator() {
-        TurboIssue issue1 = new TurboIssue("dummy/dummy", 5, "5");
-        TurboIssue issue2 = new TurboIssue("dummy/dummy", 4, "4");
-       
-        assertTrue(matches("id:dummy/dummy#>4", issue1));
-        assertTrue(matches("id:dummy/dummy#3 .. 6", issue2));
+        assertFalse(matches("id:test/test#1", issue));
+        assertFalse(matches("id:dummy/dummy#2", issue));
+        assertTrue(matches("id:dummy/dummy#1", issue));
     }
 
     @Test
     public void satisfiesId_invalidInputs_throwSemanticException() {
         verifySemanticException(QualifierType.ID, "id:something");
+    }
 
-        // test: compound id lookup
-        verifySemanticException(QualifierType.ID, "id:dummy/dummy#hello");
+    @Test
+    public void satisfiesId_compoundIdWithRangeOperator() {
+        TurboIssue issue = new TurboIssue("dummy/dummy", 4, "4");
+       
+        assertTrue(matches("id:dummy/dummy#>3", issue));
+        assertTrue(matches("id:dummy/dummy#>=4", issue));
+        assertTrue(matches("id:dummy/dummy#<6", issue));
+        assertTrue(matches("id:dummy/dummy#<=6", issue));
+        assertTrue(matches("id:dummy/dummy#3 .. 6", issue));
+    }
+
+    @Test
+    public void satisfiesId_invalidCompoundIdInputs_throwSemanticException() {
+        verifySemanticException(QualifierType.ID, "id:test/test#something");
     }
 
     private void testForPresenceOfKeywords(String prefix, TurboIssue issue) {
@@ -832,8 +836,8 @@ public class FilterEvalTests {
      * Confirms that the input causes a Semantic Exception to be thrown
      * with correct error message. Test fails if it doesn't.
      */
-    public void verifySemanticException(QualifierType type, String invalidInput) {
-        TurboIssue issue = new TurboIssue(REPO, 1, "");
+    private void verifySemanticException(QualifierType type, String invalidInput) {
+        TurboIssue issue = new TurboIssue(REPO, 1, "1");
         thrown.expect(SemanticException.class);
         thrown.expectMessage(
             String.format(SemanticException.ERROR_MESSAGE, type, type.getDescriptionOfValidInputs()));
