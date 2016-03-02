@@ -14,14 +14,12 @@ import ui.UI;
 import ui.issuepanel.FilterPanel;
 import util.Futures;
 import util.HTLog;
-import util.events.PanelLoadedEvent;
+import util.events.AppliedFilterEvent;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static util.Futures.withResult;
 
 /**
  * Manages the flow of logic during a data retrieval cycle from the repository source.
@@ -43,11 +41,12 @@ public class UpdateController {
      * a map of filtered and sorted issues corresponding to each filter expression, based on the most recent data
      * from the repository source.
      *
-     * @param filterExprs Filter expressions to process
+     * @param filterPanels Filter expressions to process
      */
-    public void processAndRefresh(List<FilterExpression> filterExprs, List<FilterPanel> filterPanels) {
+    public void processAndRefresh(List<FilterPanel> filterPanels) {
+        List<FilterExpression> filterExprs = getFilterExpressions(filterPanels);
         // Open specified repos
-        openRepositoriesInFilters(filterExprs, filterPanels)
+        openRepositoriesInFilters(filterPanels)
         .thenRun(() -> {
             // First filter, for issues requiring a metadata update.
             Map<String, List<TurboIssue>> toUpdate = tallyMetadataUpdate(filterExprs);
@@ -72,17 +71,10 @@ public class UpdateController {
         });
     }
 
-    /**
-     * Given a list of filter expressions, open all repositories necessary for processing the filter expressions.
-     *
-     * @param filterExprs Filter expressions to process.
-     */
-    public boolean hasRepositoriesInFilters(List<FilterExpression> filterExprs) {
-        return filterExprs.stream()
-                .flatMap(filterExpr -> Qualifier.getMetaQualifierContent(filterExpr, QualifierType.REPO).stream())
-                .distinct()
-                .findAny()
-                .isPresent();
+    private List<FilterExpression> getFilterExpressions(List<FilterPanel> panels) {
+        return panels.stream()
+                .map(panel -> panel.getCurrentFilterExpression())
+                .collect(Collectors.toList());
     }
 
     /**
@@ -90,11 +82,20 @@ public class UpdateController {
      *
      * @param filterExprs Filter expressions to process.
      */
-    public CompletableFuture<List<Boolean>> openRepositoriesInFilters(List<FilterExpression> filterExprs,
-                                                                      List<FilterPanel> panels) {
+    public boolean hasRepositoriesInFilter(FilterExpression filterExprs) {
+        return !Qualifier.getMetaQualifierContent(filterExprs, QualifierType.REPO).isEmpty();
+    }
+
+    /**
+     * Given a list of filter expressions, open all repositories necessary for processing the filter expressions.
+     *
+     * @param filterPanels
+     */
+    public CompletableFuture<List<Boolean>> openRepositoriesInFilters(List<FilterPanel> filterPanels) {
+        List<FilterExpression> filterExprs  = getFilterExpressions(filterPanels);
         List<Pair<FilterExpression, FilterPanel>> list = new ArrayList<>();
-        for (int i = 0; i < panels.size(); i++) {
-            FilterPanel panel = panels.get(i);
+        for (int i = 0; i < filterPanels.size(); i++) {
+            FilterPanel panel = filterPanels.get(i);
             FilterExpression curFilterExpr = filterExprs.get(i);
             list.add(new ImmutablePair<>(curFilterExpr, panel));
         }
@@ -104,7 +105,7 @@ public class UpdateController {
                     Stream<CompletableFuture<Boolean>> result = Qualifier.getMetaQualifierContent(listItem.getKey(),
                             QualifierType.REPO).stream()
                             .map(repoId -> logic.openRepositoryFromFilter(repoId, listItem.getValue()));
-                    UI.events.triggerEvent(new PanelLoadedEvent(listItem.getValue()));
+                    UI.events.triggerEvent(new AppliedFilterEvent(listItem.getValue()));
                     return result;
                 })
                 .collect(Collectors.toList()));

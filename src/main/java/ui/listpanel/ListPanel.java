@@ -398,22 +398,22 @@ public class ListPanel extends FilterPanel {
     }
 
     @Override
-    protected void startLoadingAnimationIfApplicable(RepoOpeningEvent e) {
-        if (isIndicatorApplicable(e.repoId, e.isPrimaryRepo)) startLoadingAnimation();
+    protected void startLoadingAnimationIfApplicable(PrimaryRepoOpeningEvent e) {
+        if (isIndicatorApplicable()) startLoadingAnimation();
     }
 
     @Override
-    protected void stopLoadingAnimationIfApplicable(RepoOpenedEvent e) {
-        if (isIndicatorApplicable(e.repoId, e.isPrimaryRepo)) stopLoadingAnimation();
+    protected void stopLoadingAnimationIfApplicable(PrimaryRepoOpenedEvent e) {
+        if (isIndicatorApplicable()) stopLoadingAnimation();
     }
 
     @Override
-    protected void startLoadingAnimationIfApplicable(PanelLoadingEvent e) {
+    protected void startLoadingAnimationIfApplicable(ApplyingFilterEvent e) {
         if (e.panel == this) startLoadingAnimation();
     }
 
     @Override
-    protected void stopLoadingAnimationIfApplicable(PanelLoadedEvent e) {
+    protected void stopLoadingAnimationIfApplicable(AppliedFilterEvent e) {
         if (e.panel == this) stopLoadingAnimation();
     }
 
@@ -442,18 +442,10 @@ public class ListPanel extends FilterPanel {
     /**
      * Determines whether the loading indicator should show
      *
-     * @param repoId id of the repo being opened
-     * @param isPrimaryRepo whether is repo being opened is a primary repo, i.e. opened from repository selector
-     * @return true if the current panel's filter does not contain a repo and a primary repo is opened
-     * or true if the current filter expression contains the repo being opened
      */
-    private boolean isIndicatorApplicable(String repoId, boolean isPrimaryRepo) {
+    private boolean isIndicatorApplicable() {
         HashSet<String> allReposInFilterExpr =
                 Qualifier.getMetaQualifierContent(getCurrentFilterExpression(), QualifierType.REPO);
-        if (isPrimaryRepo) {
-            return allReposInFilterExpr.isEmpty();
-        }
-
-        return allReposInFilterExpr.contains(repoId);
+        return allReposInFilterExpr.isEmpty();
     }
 }

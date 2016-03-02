@@ -79,7 +79,7 @@ public class GUIController {
      * @param changedPanel The panel whose filter expression had been changed by the user.
      */
     public void panelFilterExpressionChanged(FilterPanel changedPanel) {
-        ui.logic.refreshPanel(ui, changedPanel);
+        ui.logic.refreshPanel(changedPanel);
         UI.events.triggerEvent(new UsedReposChangedEvent());
     }
 

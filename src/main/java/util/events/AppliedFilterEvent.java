@@ -2,10 +2,10 @@ package util.events;
 
 import ui.issuepanel.FilterPanel;
 
-public class PanelLoadingEvent extends Event {
+public class AppliedFilterEvent extends Event {
     public final FilterPanel panel;
 
-    public PanelLoadingEvent(FilterPanel panel) {
+    public AppliedFilterEvent(FilterPanel panel) {
         this.panel = panel;
     }
 }

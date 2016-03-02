@@ -6,6 +6,7 @@ import static ui.components.KeyboardShortcuts.MAXIMIZE_WINDOW;
 import static ui.components.KeyboardShortcuts.MINIMIZE_WINDOW;
 import static ui.components.KeyboardShortcuts.SWITCH_BOARD;
 import filter.expression.QualifierType;
+import javafx.application.Platform;
 import ui.GUIController;
 import ui.GuiElement;
 import ui.components.PanelMenuBar;
@@ -101,10 +102,10 @@ public abstract class FilterPanel extends AbstractPanel {
             requestFocus();
         });
 
-        ui.registerEvent((RepoOpeningEventHandler) this::startLoadingAnimationIfApplicable);
-        ui.registerEvent((RepoOpenedEventHandler) this::stopLoadingAnimationIfApplicable);
-        ui.registerEvent((PanelLoadingEventHandler) this::startLoadingAnimationIfApplicable);
-        ui.registerEvent((PanelLoadedEventHandler) this::stopLoadingAnimationIfApplicable);
+        ui.registerEvent((PrimaryRepoOpeningEventHandler) this::startLoadingAnimationIfApplicable);
+        ui.registerEvent((PrimaryRepoOpenedEventHandler) this::stopLoadingAnimationIfApplicable);
+        ui.registerEvent((ApplyingFilterEventHandler) this::startLoadingAnimationIfApplicable);
+        ui.registerEvent((AppliedFilterEventHandler) this::stopLoadingAnimationIfApplicable);
     }
 
     private final ModelUpdatedEventHandler onModelUpdate = e -> {
@@ -124,10 +125,8 @@ public abstract class FilterPanel extends AbstractPanel {
     private Node createFilterBox() {
         filterTextField = new FilterTextField("")
                 .setOnConfirm((text) -> {
-                    //startLoadingAnimation();
-                    ui.triggerEvent(new PanelLoadingEvent(this));
+                    Platform.runLater(() -> ui.triggerEvent(new ApplyingFilterEvent(this)));
                     applyStringFilter(text);
-                    //stopLoadingAnimation();
                     return text;
                 })
                 .setOnCancel(this::requestFocus);
@@ -213,13 +212,13 @@ public abstract class FilterPanel extends AbstractPanel {
         parentPanelControl.getGUIController().panelFilterExpressionChanged(this);
     }
 
-    protected abstract void startLoadingAnimationIfApplicable(RepoOpeningEvent e);
+    protected abstract void startLoadingAnimationIfApplicable(PrimaryRepoOpeningEvent e);
 
-    protected abstract void stopLoadingAnimationIfApplicable(RepoOpenedEvent e);
+    protected abstract void stopLoadingAnimationIfApplicable(PrimaryRepoOpenedEvent e);
 
-    protected abstract void startLoadingAnimationIfApplicable(PanelLoadingEvent e);
+    protected abstract void startLoadingAnimationIfApplicable(ApplyingFilterEvent e);
 
-    protected abstract void stopLoadingAnimationIfApplicable(PanelLoadedEvent e);
+    protected abstract void stopLoadingAnimationIfApplicable(AppliedFilterEvent e);
 
     protected abstract void startLoadingAnimation();
 
