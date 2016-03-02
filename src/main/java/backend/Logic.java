@@ -120,7 +120,7 @@ public class Logic {
     private CompletableFuture<Boolean> openRepository(String repoId, boolean isPrimaryRepository,
                                                       Optional<FilterPanel> panel) {
         assert Utility.isWellFormedRepoId(repoId);
-        assert (isPrimaryRepository) ? !panel.isPresent() : panel.isPresent();
+        assert isPrimaryRepository ? !panel.isPresent() : panel.isPresent();
 
         if (isPrimaryRepository) prefs.setLastViewedRepository(repoId);
         if (isAlreadyOpen(repoId) || models.isRepositoryPending(repoId)) {
@@ -363,15 +363,6 @@ public class Logic {
      */
     public void updateUI(Map<FilterExpression, List<GuiElement>> elementsToShow) {
         uiManager.update(elementsToShow, models.getUsers());
-    }
-
-    /**
-     * Retrieves all filter expressions in active panels from the UI.
-     *
-     * @return Filter expressions in the UI.
-     */
-    private List<FilterExpression> getAllUIFilters() {
-        return uiManager.getAllFilters();
     }
 
     private List<FilterPanel> getAllPanels() {
