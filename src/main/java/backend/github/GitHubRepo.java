@@ -261,7 +261,6 @@ public class GitHubRepo implements Repo {
         );
     }
 
-
     @Override
     public Issue setMilestone(String repoId, int issueId, String issueTitle, Integer issueMilestone)
             throws IOException {

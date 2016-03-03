@@ -8,6 +8,7 @@ import filter.expression.FilterExpression;
 import javafx.application.Platform;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.egit.github.core.Issue;
 import prefs.Preferences;
 import ui.GuiElement;
 import ui.TestController;
@@ -215,6 +216,38 @@ public class Logic {
                             isUpdateSuccessful, localReplaceResult.get(), originalLabels));
     }
 
+    public CompletableFuture<Boolean> replaceIssueMilestone(TurboIssue issue, Integer milestone) {
+        Optional<Integer> originalMilestone = issue.getMilestone();
+        logger.info("Changing milestone for " + issue + " on GitHub");
+
+        /* Calls models to replace the issue's labels locally since the the reference to the issue here
+           could be invalidated by changes to the models elsewhere */
+        Optional<TurboIssue> localReplaceResult =
+                models.replaceIssueMilestone(issue.getRepoId(), issue.getId(), milestone);
+        if (!localReplaceResult.isPresent()) {
+            return CompletableFuture.completedFuture(false);
+        }
+        refreshUI();
+
+        return updateIssueMilestonesOnServer(issue, milestone)
+                .thenApply((isUpdateSuccessful) -> handleIssueMilestoneUpdateOnServerResult(
+                        isUpdateSuccessful, localReplaceResult.get(), originalMilestone.orElseGet(() -> null)));
+        /*
+        return repoIO.replaceIssueMilestone(issue, milestone)
+                .thenApply(resultingIssue -> {
+                    logger.info("Changing milestone for " + issue + " on UI");
+                    if (resultingIssue.getMilestone() != null) {
+                        issue.setMilestoneById(resultingIssue.getMilestone().getNumber());
+                    } else {
+                        issue.setMilestoneById(null);
+                    }
+                    refreshUI();
+                    return true;
+                })
+                .exceptionally(Futures.withResult(false));
+                */
+    }
+
     /**
      * Gets the issue identified by {@code repoId} and {@code issueId} in {@link Logic#models}
      * @param repoId
@@ -231,6 +264,11 @@ public class Logic {
     private CompletableFuture<Boolean> updateIssueLabelsOnServer(TurboIssue issue, List<String> newLabels) {
         logger.info("Changing labels for " + issue + " on GitHub");
         return repoOpControl.replaceIssueLabels(issue, newLabels);
+    }
+
+    private CompletableFuture<Boolean> updateIssueMilestonesOnServer(TurboIssue issue, Integer milestone) {
+        logger.info("Changing milestone for " + issue + " on GitHub");
+        return repoOpControl.replaceIssueMilestone(issue, milestone);
     }
 
     /**
@@ -253,6 +291,25 @@ public class Logic {
     }
 
     /**
+     * Handles the result of updating an issue's milestone on server. Current implementation includes
+     * reverting back to the original labels locally if the server update failed.
+     * @param isUpdateSuccessful
+     * @param localModifiedIssue
+     * @param originalMilestone
+     * @return true if the server update is successful
+     */
+    private boolean handleIssueMilestoneUpdateOnServerResult(boolean isUpdateSuccessful,
+                                                          TurboIssue localModifiedIssue,
+                                                          Integer originalMilestone) {
+        if (isUpdateSuccessful) {
+            return true;
+        }
+        logger.error("Unable to update model on server");
+        revertLocalMilestoneReplace(localModifiedIssue, originalMilestone);
+        return false;
+    }
+
+    /**
      * Replaces labels of the issue in the {@link Logic#models} corresponding to {@code modifiedIssue} with
      * {@code originalLabels} if the current labels on the issue is assigned at the same time as {@code modifiedIssue}
      * @param modifiedIssue
@@ -271,20 +328,24 @@ public class Logic {
         }
     }
 
-    public CompletableFuture<Boolean> replaceIssueMilestone(TurboIssue issue, Integer milestone) {
-        logger.info("Changing milestone for " + issue + " on GitHub");
-        return repoIO.replaceIssueMilestone(issue, milestone)
-                .thenApply(resultingIssue -> {
-                    logger.info("Changing milestone for " + issue + " on UI");
-                    if (resultingIssue.getMilestone() != null) {
-                        issue.setMilestoneById(resultingIssue.getMilestone().getNumber());
-                    } else {
-                        issue.setMilestoneById(null);
-                    }
-                    refreshUI();
-                    return true;
-                })
-                .exceptionally(Futures.withResult(false));
+    /**
+     * Replaces labels of the issue in the {@link Logic#models} corresponding to {@code modifiedIssue} with
+     * {@code originalLabels} if the current labels on the issue is assigned at the same time as {@code modifiedIssue}
+     * @param modifiedIssue
+     * @param originalMilestone
+     */
+    private void revertLocalMilestoneReplace(TurboIssue modifiedIssue, Integer originalMilestone) {
+        TurboIssue currentIssue = getIssue(modifiedIssue.getRepoId(), modifiedIssue.getId()).orElse(modifiedIssue);
+        LocalDateTime originalMilestoneModifiedAt = modifiedIssue.getMilestoneLastModifiedAt();
+        LocalDateTime currentMilestoneAssignedAt = currentIssue.getMilestoneLastModifiedAt();
+        boolean isCurrentMilestoneModifiedFromOriginalLabels = originalMilestoneModifiedAt.isEqual(
+                currentMilestoneAssignedAt);
+
+        if (isCurrentMilestoneModifiedFromOriginalLabels) {
+            logger.info("Reverting milestone for issue " + currentIssue);
+            models.replaceIssueMilestone(currentIssue.getRepoId(), currentIssue.getId(), originalMilestone);
+            refreshUI();
+        }
     }
 
     /**

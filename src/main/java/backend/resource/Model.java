@@ -211,6 +211,22 @@ public class Model implements IBaseModel {
                 () -> logger.error("Issue " + issueId + " not found in model for " + repoId));
     }
 
+    /**
+     * Replaces the milestone of an issue specified by {@code issueId} with {@code milestone}
+     * @param issueId
+     * @param milestone
+     * @return the modified TurboIssue if successful
+     */
+    public synchronized Optional<TurboIssue> replaceIssueMilestone(int issueId, int milestone) {
+        Optional<TurboIssue> issueLookUpResult = getIssueById(issueId);
+        return Utility.safeFlatMapOptional(issueLookUpResult,
+                (issue) -> {
+                    issue.setMilestoneById(milestone);
+                    return Optional.of(new TurboIssue(issue));
+                },
+                () -> logger.error("Issue " + issueId + " not found in model for " + repoId));
+    }
+
     @SuppressWarnings("unused")
     private void ______BOILERPLATE______() {}
 

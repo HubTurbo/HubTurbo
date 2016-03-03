@@ -6,7 +6,7 @@ import org.eclipse.egit.github.core.Issue;
 
 import java.io.IOException;
 
-public class ReplaceIssueMilestoneTask extends GitHubRepoTask<Issue> {
+public class ReplaceIssueMilestoneTask extends GitHubRepoTask<Boolean> {
     private final String repoId;
     private final int issueId;
     private final String issueTitle;
@@ -24,9 +24,8 @@ public class ReplaceIssueMilestoneTask extends GitHubRepoTask<Issue> {
     @Override
     public void run() {
         try {
-            response.complete(
-                    repo.setMilestone(repoId, issueId, issueTitle, issueMilestone)
-            );
+            Issue result = repo.setMilestone(repoId, issueId, issueTitle, issueMilestone);
+            response.complete(result.getMilestone().equals(issueMilestone));
         } catch (IOException e) {
             response.completeExceptionally(e);
         }
