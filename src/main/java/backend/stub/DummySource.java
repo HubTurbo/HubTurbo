@@ -54,7 +54,8 @@ public class DummySource extends RepoSource {
 
     @Override
     public CompletableFuture<Issue> replaceIssueMilestone(TurboIssue issue, Integer milestone) {
-        return null;
+        return addTask(new ReplaceIssueMilestoneTask(this, dummy, issue.getRepoId(), issue.getId(), issue.getTitle(),
+                milestone)).response;
     }
 
     @Override
