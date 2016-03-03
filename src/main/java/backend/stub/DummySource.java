@@ -2,10 +2,7 @@ package backend.stub;
 
 import backend.IssueMetadata;
 import backend.UserCredentials;
-import backend.github.CheckRateLimitTask;
-import backend.github.DownloadRepoTask;
-import backend.github.ReplaceIssueLabelsTask;
-import backend.github.UpdateModelTask;
+import backend.github.*;
 import backend.interfaces.RepoSource;
 import backend.resource.Model;
 import backend.resource.TurboIssue;
@@ -57,7 +54,8 @@ public class DummySource extends RepoSource {
 
     @Override
     public CompletableFuture<Issue> replaceIssueMilestone(TurboIssue issue, Integer milestone) {
-        return null;
+        return addTask(new ReplaceIssueMilestoneTask(this, dummy, issue.getRepoId(), issue.getId(), issue.getTitle(),
+                milestone)).response;
     }
 
     @Override

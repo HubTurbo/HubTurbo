@@ -125,6 +125,7 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
         openMilestones = createMilestoneGroup();
         closedMilestones = createMilestoneGroup();
         inputField = new TextField();
+        inputField.setId("milestonePickerTextField");
 
         milestoneBox.getChildren().add(new Label(ASSIGNED_MILESTONE));
         milestoneBox.getChildren().add(assignedMilestone);
