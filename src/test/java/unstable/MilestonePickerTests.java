@@ -1,12 +1,11 @@
-package guitests;
+package unstable;
 
+import guitests.UITest;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
-import org.controlsfx.control.NotificationPane;
 import org.junit.Test;
 import ui.UI;
 import ui.listpanel.ListPanelCell;
-import util.PlatformEx;
 import util.events.ShowMilestonePickerEvent;
 
 import static org.junit.Assert.assertEquals;
