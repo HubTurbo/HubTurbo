@@ -217,7 +217,7 @@ public class Model implements IBaseModel {
      * @param milestone
      * @return the modified TurboIssue if successful
      */
-    public synchronized Optional<TurboIssue> replaceIssueMilestone(int issueId, int milestone) {
+    public synchronized Optional<TurboIssue> replaceIssueMilestone(int issueId, Integer milestone) {
         Optional<TurboIssue> issueLookUpResult = getIssueById(issueId);
         return Utility.safeFlatMapOptional(issueLookUpResult,
                 (issue) -> {
