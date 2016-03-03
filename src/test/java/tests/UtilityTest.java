@@ -96,12 +96,6 @@ public class UtilityTest {
         assertEquals("HelloWorldThisIsATest", snakeCaseToCamelCase("hello_world_this_is_a_test"));
     }
 
-    @Test(timeout = 5000)
-    public void testGettingLookAndFeelOnLinux() {
-        assertTrue(Utility.getUsableScreenDimensions().isPresent());
-        assertTrue(Utility.getScreenDimensions() != null);
-    }
-
     @Test
     public void ignoreCaseTest() {
         assertTrue(Utility.containsIgnoreCase("HeLlO wOrLd", "lLo"));

@@ -116,7 +116,6 @@ public class PanelControl extends HBox {
 
         updatePanelIndices();
         setCurrentlySelectedPanel(Optional.of(index));
-        ui.showMainStage();
         return panel;
     }
 

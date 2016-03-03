@@ -18,10 +18,7 @@ import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
@@ -41,12 +38,9 @@ import util.events.testevents.PrimaryRepoChangedEvent;
 import util.events.testevents.UILogicRefreshEventHandler;
 
 import javax.swing.*;
-import java.awt.*;
+import java.awt.Rectangle;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static ui.components.KeyboardShortcuts.SWITCH_DEFAULT_REPO;
@@ -54,14 +48,12 @@ import static ui.components.KeyboardShortcuts.SWITCH_DEFAULT_REPO;
 public class UI extends Application implements EventDispatcher {
 
     public static final int VERSION_MAJOR = 3;
-    public static final int VERSION_MINOR = 20;
+    public static final int VERSION_MINOR = 21;
     public static final int VERSION_PATCH = 0;
 
     public static final String WINDOW_TITLE = "HubTurbo %s (%s)";
 
     public static final String ARG_UPDATED_TO = "--updated-to";
-
-    private static final double WINDOW_DEFAULT_PROPORTION = 0.6;
 
     private static final String APPLICATION_LOGO_FILENAME = "logo.png";
 
@@ -91,6 +83,7 @@ public class UI extends Application implements EventDispatcher {
     private PanelControl panels;
     private MenuControl menuBar;
     private BrowserComponent browserComponent;
+    private ScreenManager screenManager;
     private RepositorySelector repoSelector;
     private Label apiBox;
     private ScrollPane panelsScrollPane;
@@ -169,17 +162,16 @@ public class UI extends Application implements EventDispatcher {
 
         if (TestController.isTestMode()) {
             if (TestController.isTestChromeDriver()) {
-                browserComponent = new BrowserComponent(this, true);
+                browserComponent = new BrowserComponent(this, screenManager, true);
                 browserComponent.initialise();
             } else {
                 browserComponent = new BrowserComponentStub(this);
             }
         } else {
-            browserComponent = new BrowserComponent(this, false);
+            browserComponent = new BrowserComponent(this, screenManager, false);
             browserComponent.initialise();
         }
 
-        setExpandedWidth(false);
         panels.init(guiController, panelsScrollPane);
         // Should only be called after panels have been initialized
         ensureSelectedPanelHasFocus();
@@ -242,8 +234,14 @@ public class UI extends Application implements EventDispatcher {
         guiController = new GUIController(this, panels, apiBox);
 
         Scene scene = new Scene(createRootNode());
+
         setupMainStage(scene);
         setupGlobalKeyboardShortcuts(scene);
+
+        screenManager = new ScreenManager(mainStage);
+        screenManager.setupStageDimensions(mainStage, panels.getPanelWidth());
+        screenManager.setupPositionListener(stage);
+
         notificationController = new NotificationController(notificationPane);
         notificationPane.setId("notificationPane");
 
@@ -359,7 +357,6 @@ public class UI extends Application implements EventDispatcher {
         panelsScrollPane.setFitToHeight(true);
         panelsScrollPane.setVbarPolicy(ScrollBarPolicy.NEVER);
         HBox.setHgrow(panelsScrollPane, Priority.ALWAYS);
-
         menuBar = new MenuControl(this, panels, panelsScrollPane, prefs, mainStage);
         menuBar.setUseSystemMenuBar(true);
 
@@ -400,19 +397,6 @@ public class UI extends Application implements EventDispatcher {
     }
 
     /**
-     * Sets the dimensions of the stage to the maximum usable size
-     * of the desktop, or to the screen size if this fails.
-     */
-    private Rectangle getDimensions() {
-        Optional<Rectangle> dimensions = Utility.getUsableScreenDimensions();
-        if (dimensions.isPresent()) {
-            return dimensions.get();
-        } else {
-            return Utility.getScreenDimensions();
-        }
-    }
-
-    /**
      * UI operations
      */
 
@@ -437,56 +421,6 @@ public class UI extends Application implements EventDispatcher {
 
     public BrowserComponent getBrowserComponent() {
         return browserComponent;
-    }
-
-    /**
-     * Returns the X position of the edge of the collapsed window.
-     * This function may be called before the main stage is initialised, in
-     * which case it simply returns a reasonable default.
-     */
-    public double getCollapsedX() {
-        if (mainStage == null) {
-            return getDimensions().getWidth() * WINDOW_DEFAULT_PROPORTION;
-        }
-        return mainStage.getWidth();
-    }
-
-    /**
-     * Returns the dimensions of the screen available for use when
-     * the main window is in a collapsed state.
-     * This function may be called before the main stage is initialised, in
-     * which case it simply returns a reasonable default.
-     */
-    public Rectangle getAvailableDimensions() {
-        Rectangle dimensions = getDimensions();
-        if (mainStage == null) {
-            return new Rectangle(
-                    (int) (dimensions.getWidth() * WINDOW_DEFAULT_PROPORTION),
-                    (int) dimensions.getHeight());
-        }
-        return new Rectangle(
-                (int) (dimensions.getWidth() - mainStage.getWidth()),
-                (int) dimensions.getHeight());
-    }
-
-    /**
-     * Controls whether or not the main window is expanded (occupying the
-     * whole screen) or not (occupying a percentage).
-     * @param expanded
-     */
-    private void setExpandedWidth(boolean expanded) {
-        Rectangle dimensions = getDimensions();
-        double width = expanded
-                ? dimensions.getWidth()
-                : dimensions.getWidth() * WINDOW_DEFAULT_PROPORTION;
-
-        mainStage.setMinWidth(panels.getPanelWidth());
-        mainStage.setMinHeight(dimensions.getHeight());
-        mainStage.setMaxWidth(width);
-        mainStage.setMaxHeight(dimensions.getHeight());
-        mainStage.setX(0);
-        mainStage.setY(0);
-        mainStage.setMaxWidth(dimensions.getWidth());
     }
 
     public HashMap<String, String> getCommandLineArgs() {
@@ -551,7 +485,7 @@ public class UI extends Application implements EventDispatcher {
     public void setDefaultWidth() {
         mainStage.setMaximized(false);
         mainStage.setIconified(false);
-        Rectangle dimensions = getDimensions();
+        Rectangle dimensions = screenManager.getDimensions();
         mainStage.setWidth(panels.getPanelWidth());
         mainStage.setHeight(dimensions.getHeight());
         mainStage.setX(0);
@@ -560,7 +494,7 @@ public class UI extends Application implements EventDispatcher {
 
     public void maximizeWindow() {
         mainStage.setMaximized(true);
-        Rectangle dimensions = getDimensions();
+        Rectangle dimensions = screenManager.getDimensions();
         mainStage.setWidth(dimensions.getWidth());
         mainStage.setHeight(dimensions.getHeight());
         mainStage.setX(0);

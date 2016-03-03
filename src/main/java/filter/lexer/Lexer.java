@@ -12,6 +12,9 @@ public class Lexer {
 
     private static final boolean SKIP_WHITESPACE = true;
     private static final Pattern NO_WHITESPACE = Pattern.compile("\\S");
+    private static final String ALPHANUMERIC = "[a-zA-Z0-9]";
+    private static final String VALID_USERNAME = String.format(
+           "%s[-a-zA-Z0-9]*%s", ALPHANUMERIC, ALPHANUMERIC);
 
     private final List<Rule> rules = Arrays.asList(
             new Rule("AND|&&?", TokenType.AND),
@@ -21,6 +24,7 @@ public class Lexer {
             // These have higher priority than Symbol
             new Rule("\\d{4}-\\d{1,2}-\\d{1,2}", TokenType.DATE), // YYYY-MM?-DD?
             new Rule("[A-Za-z]+(-[A-Za-z]+)*\\s*:", TokenType.QUALIFIER),
+            new Rule(String.format("%s/[A-Za-z0-9-]+#", VALID_USERNAME), TokenType.COMPOUND_ID_PREFIX),
             new Rule(";", TokenType.SEMICOLON),
             new Rule("[A-Za-z0-9#][/A-Za-z0-9.'+-]*", TokenType.SYMBOL),
 
