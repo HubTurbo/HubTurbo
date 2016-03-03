@@ -107,7 +107,7 @@ public class GUIController {
     }
 
     private void setDefaultRepo(PrimaryRepoChangedEvent e) {
-        defaultRepoId = e.repoId;
+        defaultRepoId = e.repoId.toString();
     }
 
     public String getDefaultRepo() {

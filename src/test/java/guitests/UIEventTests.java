@@ -29,7 +29,7 @@ public class UIEventTests extends UITest {
     }
     
     private static void getEventRepoId(PrimaryRepoChangedEvent e) {
-        defaultRepoId = e.repoId;
+        defaultRepoId = e.repoId.toString();
     }
 
     @Test

@@ -30,17 +30,6 @@ public final class Utility {
 
     private static final Logger logger = LogManager.getLogger(Utility.class.getName());
 
-    public static boolean isWellFormedRepoId(String owner, String repo) {
-        return !(owner == null || owner.isEmpty() || repo == null || repo.isEmpty())
-                && isWellFormedRepoId(RepositoryId.create(owner, repo).generateId());
-    }
-
-    public static boolean isWellFormedRepoId(String repoId) {
-        RepositoryId repositoryId = RepositoryId.createFromId(repoId);
-        return repoId != null && !repoId.isEmpty() && repositoryId != null
-            && repoId.equals(repositoryId.generateId());
-    }
-
     public static Optional<String> readFile(String fileName) {
         boolean validPath = !(fileName == null || fileName.isEmpty());
         if (validPath) {

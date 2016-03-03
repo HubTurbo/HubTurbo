@@ -59,16 +59,16 @@ public class Logic {
 
         List<Model> toReplace = models.toModels();
 
-        logger.info("Attempting to reset " + e.repoId);
-        if (toReplace.remove(models.get(e.repoId))) {
-            logger.info("Clearing " + e.repoId + " successful.");
+        logger.info("Attempting to reset " + e.repoId.toString());
+        if (toReplace.remove(models.get(e.repoId.toString()))) {
+            logger.info("Clearing " + e.repoId.toString() + " successful.");
         } else {
-            logger.info(e.repoId + " not currently in model.");
+            logger.info(e.repoId.toString() + " not currently in model.");
         }
         models.replace(toReplace);
 
         // Re-"download" repo after clearing
-        openPrimaryRepository(e.repoId);
+        openPrimaryRepository(e.repoId.toString());
     }
 
     private CompletableFuture<Boolean> isRepositoryValid(String repoId) {
@@ -102,7 +102,7 @@ public class Logic {
     }
 
     private CompletableFuture<Boolean> openRepository(String repoId, boolean isPrimaryRepository) {
-        assert Utility.isWellFormedRepoId(repoId);
+        assert RepoId.isValidRepoId(repoId);
         if (isPrimaryRepository) prefs.setLastViewedRepository(repoId);
         if (isAlreadyOpen(repoId) || models.isRepositoryPending(repoId)) {
             // The content of panels with an empty filter text should change when the primary repo is changed.
