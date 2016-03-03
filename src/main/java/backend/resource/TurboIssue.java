@@ -66,6 +66,7 @@ public class TurboIssue {
     /* This field records the most recently modified time of the issue's labels. Any method that updates
        the labels must also update this field. If this is empty, updatedAt time is used instead */
     private Optional<LocalDateTime> labelsLastModifiedAt = Optional.empty();
+    private Optional<LocalDateTime> milestoneLastModifiedAt = Optional.empty();
 
     @SuppressWarnings("unused")
     private void ______CONSTRUCTORS______() {}
@@ -425,6 +426,10 @@ public class TurboIssue {
         return this.labelsLastModifiedAt.orElse(getUpdatedAt());
     }
 
+    public LocalDateTime getMilestoneLastModifiedAt() {
+        return this.milestoneLastModifiedAt.orElse(getUpdatedAt());
+    }
+
     public void addLabel(String label) {
         this.labels.add(label);
         this.labelsLastModifiedAt = Optional.of(LocalDateTime.now());
@@ -441,10 +446,12 @@ public class TurboIssue {
     
     public void setMilestoneById(Integer milestone) {
         this.milestone = (milestone == null) ? Optional.empty() : Optional.of(milestone);
+        this.milestoneLastModifiedAt = Optional.of(LocalDateTime.now());
     }
 
     public void setMilestone(TurboMilestone milestone) {
         setMilestoneById(milestone.getId());
+        this.milestoneLastModifiedAt = Optional.of(LocalDateTime.now());
     }
 
     public IssueMetadata getMetadata() {

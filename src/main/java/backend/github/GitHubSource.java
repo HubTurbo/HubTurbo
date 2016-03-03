@@ -67,7 +67,7 @@ public class GitHubSource extends RepoSource {
     }
 
     @Override
-    public CompletableFuture<Issue> replaceIssueMilestone(TurboIssue issue, Integer milestone) {
+    public CompletableFuture<Boolean> replaceIssueMilestone(TurboIssue issue, Integer milestone) {
         return addTask(new ReplaceIssueMilestoneTask(this, gitHub, issue.getRepoId(), issue.getId(), issue.getTitle(),
                 milestone)).response;
     }

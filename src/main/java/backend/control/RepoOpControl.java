@@ -8,6 +8,7 @@ import backend.resource.MultiModel;
 import backend.resource.TurboIssue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.egit.github.core.Issue;
 
 import java.util.HashMap;
 import java.util.List;
@@ -81,6 +82,13 @@ public final class RepoOpControl {
         init(issue.getRepoId());
         CompletableFuture<Optional<TurboIssue>> result = new CompletableFuture<>();
         enqueue(new ReplaceIssueLabelsLocallyOp(models, issue, labels, result));
+        return result;
+    }
+
+    public CompletableFuture<Boolean> replaceIssueMilestone(TurboIssue issue, Integer milestone) {
+        init(issue.getRepoId());
+        CompletableFuture<Boolean> result = new CompletableFuture<>();
+        enqueue(new ReplaceIssueMilestoneOp(repoIO, result, issue, milestone));
         return result;
     }
 

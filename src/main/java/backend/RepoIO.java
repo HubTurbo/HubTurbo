@@ -203,7 +203,7 @@ public class RepoIO {
         return repoSource.replaceIssueLabels(issue, labels);
     }
 
-    public CompletableFuture<Issue> replaceIssueMilestone(TurboIssue issue, Integer milestone) {
+    public CompletableFuture<Boolean> replaceIssueMilestone(TurboIssue issue, Integer milestone) {
         return repoSource.replaceIssueMilestone(issue, milestone);
     }
 
