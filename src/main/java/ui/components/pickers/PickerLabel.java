@@ -74,6 +74,10 @@ public class PickerLabel extends TurboLabel {
         this.isHighlighted = isHighlighted;
     }
 
+    public boolean isRemoved() {
+        return isRemoved;
+    }
+
     public void setIsRemoved(boolean isRemoved) {
         this.isRemoved = isRemoved;
     }
