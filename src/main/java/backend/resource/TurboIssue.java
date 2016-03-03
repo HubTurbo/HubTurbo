@@ -446,12 +446,12 @@ public class TurboIssue {
 
     public void setMilestoneById(Integer milestone) {
         this.milestone = (milestone == null) ? Optional.empty() : Optional.of(milestone);
-        this.labelsLastModifiedAt = Optional.of(LocalDateTime.now());
+        this.milestoneLastModifiedAt = Optional.of(LocalDateTime.now());
     }
 
     public void setMilestone(TurboMilestone milestone) {
         setMilestoneById(milestone.getId());
-        this.labelsLastModifiedAt = Optional.of(LocalDateTime.now());
+        this.milestoneLastModifiedAt = Optional.of(LocalDateTime.now());
     }
 
     public IssueMetadata getMetadata() {

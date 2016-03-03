@@ -25,10 +25,12 @@ public class ReplaceIssueMilestoneTask extends GitHubRepoTask<Boolean> {
     public void run() {
         try {
             Issue result = repo.setMilestone(repoId, issueId, issueTitle, issueMilestone);
-            Integer milestoneNumber = result.getMilestone() == null ? null : result.getMilestone().getNumber();
-            if (milestoneNumber == issueMilestone) response.complete(true);
-            if (milestoneNumber == null || issueMilestone == null) response.complete(false);
-            response.complete(milestoneNumber.equals(issueMilestone));
+
+            if (result.getMilestone() == null) {
+                response.complete(issueMilestone == null);
+            } else {
+                response.complete(result.getMilestone().getNumber() == issueMilestone);
+            }
         } catch (IOException e) {
             response.completeExceptionally(e);
         }
