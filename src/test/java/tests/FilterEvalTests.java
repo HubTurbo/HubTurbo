@@ -70,8 +70,33 @@ public class FilterEvalTests {
     }
 
     @Test
+    public void satisfiesId_validCompoundId() {
+        TurboIssue issue = new TurboIssue("dummy/dummy", 1, "1");
+       
+        assertFalse(matches("id:test/test#1", issue));
+        assertFalse(matches("id:dummy/dummy#2", issue));
+        assertTrue(matches("id:dummy/dummy#1", issue));
+    }
+
+    @Test
     public void satisfiesId_invalidInputs_throwSemanticException() {
         verifySemanticException(QualifierType.ID, "id:something");
+    }
+
+    @Test
+    public void satisfiesId_compoundIdWithRangeOperator() {
+        TurboIssue issue = new TurboIssue("dummy/dummy", 4, "4");
+       
+        assertTrue(matches("id:dummy/dummy#>3", issue));
+        assertTrue(matches("id:dummy/dummy#>=4", issue));
+        assertTrue(matches("id:dummy/dummy#<6", issue));
+        assertTrue(matches("id:dummy/dummy#<=6", issue));
+        assertTrue(matches("id:dummy/dummy#3 .. 6", issue));
+    }
+
+    @Test
+    public void satisfiesId_invalidCompoundIdInputs_throwSemanticException() {
+        verifySemanticException(QualifierType.ID, "id:test/test#something");
     }
 
     private void testForPresenceOfKeywords(String prefix, TurboIssue issue) {
@@ -768,6 +793,9 @@ public class FilterEvalTests {
     @Test
     public void satisfiesRepo_invalidInputs_throwSemanticException() {
         verifySemanticException(QualifierType.REPO, "repo:2011-1-1");
+        
+        // test: compound id lookup
+        verifySemanticException(QualifierType.REPO, "id:2011#1");
     }
 
     @Test
@@ -808,8 +836,8 @@ public class FilterEvalTests {
      * Confirms that the input causes a Semantic Exception to be thrown
      * with correct error message. Test fails if it doesn't.
      */
-    public void verifySemanticException(QualifierType type, String invalidInput) {
-        TurboIssue issue = new TurboIssue(REPO, 1, "");
+    private void verifySemanticException(QualifierType type, String invalidInput) {
+        TurboIssue issue = new TurboIssue(REPO, 1, "1");
         thrown.expect(SemanticException.class);
         thrown.expectMessage(
             String.format(SemanticException.ERROR_MESSAGE, type, type.getDescriptionOfValidInputs()));
