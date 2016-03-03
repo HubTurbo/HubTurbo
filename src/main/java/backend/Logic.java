@@ -138,7 +138,11 @@ public class Logic {
         if (isAlreadyOpen(repoId) || models.isRepositoryPending(repoId)) {
             // The content of panels with an empty filter text should change when the primary repo is changed.
             // Thus we refresh panels even when the repo is already open.
-            if (isPrimaryRepository) refreshUI();
+            if (isPrimaryRepository) {
+                refreshUI();
+            } else {
+                Platform.runLater(() -> UI.events.triggerEvent(new AppliedFilterEvent(panel.get())));
+            }
             return Futures.unit(false);
         }
         models.queuePendingRepository(repoId);
