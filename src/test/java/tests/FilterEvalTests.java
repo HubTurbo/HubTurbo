@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 
-import filter.WarningException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -25,6 +24,8 @@ import filter.expression.QualifierType;
 import prefs.Preferences;
 
 public class FilterEvalTests {
+
+    private static final String QUALIFIER_TYPE_ERROR_REGEX = "\"\\w+\" expects [A-Za-z ,\"]+";
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -836,8 +837,11 @@ public class FilterEvalTests {
     private boolean getQualifierProcessResult(IModel model, FilterExpression expr, TurboIssue issue) {
         try {
             return Qualifier.process(model, expr, issue);
-        } catch (WarningException e) {
-            return e.getFilterResult();
+        } catch (SemanticException e) {
+            if (e.getMessage().matches(QUALIFIER_TYPE_ERROR_REGEX)) {
+                throw e;
+            }
+            return false;
         }
     }
 

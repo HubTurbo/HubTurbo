@@ -81,10 +81,14 @@ public abstract class FilterPanel extends AbstractPanel {
         } else {
             // build warning string
             StringBuilder warning = new StringBuilder();
-            for (int i = 0; i < warnings.size(); i++) {
-                warning.append(String.format("%d. %s", i + 1, warnings.get(i)));
-                if (i + 1 < warnings.size()) {
-                    warning.append('\n');
+            if (warnings.size() == 1) {
+                warning.append(warnings.get(0));
+            } else {
+                for (int i = 0; i < warnings.size(); i++) {
+                    warning.append(String.format("%d. %s", i + 1, warnings.get(i)));
+                    if (i + 1 < warnings.size()) {
+                        warning.append('\n');
+                    }
                 }
             }
             Tooltip tooltip = new Tooltip(warning.toString());

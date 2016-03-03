@@ -4,7 +4,6 @@ import backend.interfaces.IModel;
 import backend.resource.TurboIssue;
 import filter.MetaQualifierInfo;
 import filter.QualifierApplicationException;
-import filter.WarningException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,20 +41,8 @@ public class Negation implements FilterExpression {
     }
 
     @Override
-    public boolean isSatisfiedBy(IModel model, TurboIssue issue, MetaQualifierInfo info) throws WarningException {
-        boolean filterResult;
-        List<String> warnings = new ArrayList<>();
-        try {
-            filterResult = !expr.isSatisfiedBy(model, issue, info);
-        } catch (WarningException e) {
-            filterResult = e.getFilterResult();
-            warnings.addAll(e.getWarnings());
-        }
-        if (!warnings.isEmpty()) {
-            throw new WarningException(warnings, filterResult);
-        } else {
-            return filterResult;
-        }
+    public boolean isSatisfiedBy(IModel model, TurboIssue issue, MetaQualifierInfo info) {
+        return !expr.isSatisfiedBy(model, issue, info);
     }
 
     @Override

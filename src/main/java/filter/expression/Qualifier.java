@@ -172,7 +172,7 @@ public class Qualifier implements FilterExpression {
      * Ensures that meta-qualifiers are taken care of.
      * Should always be used over isSatisfiedBy.
      */
-    public static boolean process(IModel model, FilterExpression expr, TurboIssue issue) throws WarningException {
+    public static boolean process(IModel model, FilterExpression expr, TurboIssue issue) {
         FilterExpression exprWithNormalQualifiers = expr.filter(Qualifier::shouldNotBeStripped);
         List<Qualifier> metaQualifiers = expr.find(Qualifier::isMetaQualifier);
 
@@ -330,7 +330,7 @@ public class Qualifier implements FilterExpression {
     }
 
     @Override
-    public boolean isSatisfiedBy(IModel model, TurboIssue issue, MetaQualifierInfo info) throws WarningException {
+    public boolean isSatisfiedBy(IModel model, TurboIssue issue, MetaQualifierInfo info) {
         assert type != null;
 
         // The empty qualifier is satisfied by anything
@@ -837,7 +837,7 @@ public class Qualifier implements FilterExpression {
         }
     }
 
-    private boolean assigneeSatisfies(IModel model, TurboIssue issue) throws WarningException {
+    private boolean assigneeSatisfies(IModel model, TurboIssue issue) {
         if (!content.isPresent()) return false;
         Optional<TurboUser> assignee = model.getAssigneeOfIssue(issue);
 
@@ -850,8 +850,8 @@ public class Qualifier implements FilterExpression {
                 .findAny()
                 .isPresent();
         if (shouldWarnUser) {
-            throw new WarningException(String.format("Cannot find user %s in %s%n", content.get(), issue.getRepoId()),
-                                        false);
+            throw new SemanticException(String.format("Cannot find username containing %s in %s%n", content.get(),
+                                                                                                    issue.getRepoId()));
         }
 
         String content = this.content.get().toLowerCase();
@@ -861,7 +861,7 @@ public class Qualifier implements FilterExpression {
         return login.contains(content) || name.contains(content);
     }
 
-    private boolean authorSatisfies(IModel model, TurboIssue issue) throws WarningException {
+    private boolean authorSatisfies(IModel model, TurboIssue issue) {
         if (!content.isPresent()) return false;
 
         List<TurboUser> usersOfRepo = model.getUsersOfRepo(issue.getRepoId());
@@ -871,8 +871,8 @@ public class Qualifier implements FilterExpression {
                 .findAny()
                 .isPresent();
         if (shouldWarnUser) {
-            throw new WarningException(String.format("Cannot find user %s in %s%n", content.get(), issue.getRepoId()),
-                                        false);
+            throw new SemanticException(String.format("Cannot find username containing %s in %s%n", content.get(),
+                    issue.getRepoId()));
         }
 
         String creator = issue.getCreator();
@@ -880,7 +880,7 @@ public class Qualifier implements FilterExpression {
         return creator.toLowerCase().contains(content.get().toLowerCase());
     }
 
-    private boolean involvesSatisfies(IModel model, TurboIssue issue) throws WarningException {
+    private boolean involvesSatisfies(IModel model, TurboIssue issue) {
         return authorSatisfies(model, issue) || assigneeSatisfies(model, issue);
     }
 

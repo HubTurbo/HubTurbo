@@ -4,7 +4,6 @@ import backend.interfaces.IModel;
 import backend.resource.TurboIssue;
 import filter.MetaQualifierInfo;
 import filter.QualifierApplicationException;
-import filter.WarningException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,27 +48,8 @@ public class Disjunction implements FilterExpression {
     }
 
     @Override
-    public boolean isSatisfiedBy(IModel model, TurboIssue issue, MetaQualifierInfo info) throws WarningException {
-        boolean leftFilterResult;
-        boolean rightFilterResult;
-        List<String> warnings = new ArrayList<>();
-        try {
-            leftFilterResult = left.isSatisfiedBy(model, issue, info);
-        } catch (WarningException e) {
-            warnings.addAll(e.getWarnings());
-            leftFilterResult = e.getFilterResult();
-        }
-        try {
-            rightFilterResult = right.isSatisfiedBy(model, issue, info);
-        } catch (WarningException e) {
-            warnings.addAll(e.getWarnings());
-            rightFilterResult = e.getFilterResult();
-        }
-        if (!warnings.isEmpty()) {
-            throw new WarningException(warnings, leftFilterResult || rightFilterResult);
-        } else {
-            return leftFilterResult || rightFilterResult;
-        }
+    public boolean isSatisfiedBy(IModel model, TurboIssue issue, MetaQualifierInfo info) {
+        return left.isSatisfiedBy(model, issue, info) || right.isSatisfiedBy(model, issue, info);
     }
 
     @Override
