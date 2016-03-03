@@ -10,8 +10,6 @@ import ui.issuepanel.FilterPanel;
 import util.events.ModelUpdatedEvent;
 import util.events.UpdateRateLimitsEvent;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,10 +31,10 @@ public class UIManager {
         ui.triggerEvent(new UpdateRateLimitsEvent(rateLimits.left, rateLimits.right));
     }
 
-    public List<FilterExpression> getAllFilters() {
-        return ui.guiController.getAllFilters();
-    }
-
+    /**
+     * Gets the list of panels currently shown in the UI
+     * @return
+     */
     public List<FilterPanel> getAllPanels() {
         return ui.guiController.getAllPanels();
     }

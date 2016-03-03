@@ -76,7 +76,7 @@ public class UpdateController {
     }
 
     /**
-     * Given a list of filter panels, open all repositories necessary for processing the filter expressions
+     * Given a list of filter panels, opens all repositories necessary for processing the filter expressions
      *
      * @param filterPanels
      */

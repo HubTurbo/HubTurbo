@@ -399,16 +399,18 @@ public class ListPanel extends FilterPanel {
 
     @Override
     protected void startLoadingAnimationIfApplicable(PrimaryRepoOpeningEvent e) {
-        if (isIndicatorApplicable()) startLoadingAnimation();
+        // Repo is being opened by the repo selector, does not need to filter if repo is already specified for panel
+        if (hasReposInFilter()) startLoadingAnimation();
     }
 
     @Override
     protected void stopLoadingAnimationIfApplicable(PrimaryRepoOpenedEvent e) {
-        if (isIndicatorApplicable()) stopLoadingAnimation();
+        if (hasReposInFilter()) stopLoadingAnimation();
     }
 
     @Override
     protected void startLoadingAnimationIfApplicable(ApplyingFilterEvent e) {
+
         if (e.panel == this) startLoadingAnimation();
     }
 
@@ -439,11 +441,7 @@ public class ListPanel extends FilterPanel {
         });
     }
 
-    /**
-     * Determines whether the loading indicator should show
-     *
-     */
-    private boolean isIndicatorApplicable() {
+    private boolean hasReposInFilter() {
         HashSet<String> allReposInFilterExpr =
                 Qualifier.getMetaQualifierContent(getCurrentFilterExpression(), QualifierType.REPO);
         return allReposInFilterExpr.isEmpty();
