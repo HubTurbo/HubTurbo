@@ -1,6 +1,5 @@
 package util.events.testevents;
 
-import util.events.Event;
 import util.events.UnusedStoredReposChangedEvent;
 
 public class PrimaryRepoChangedEvent extends UnusedStoredReposChangedEvent {
