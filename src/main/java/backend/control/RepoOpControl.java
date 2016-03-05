@@ -51,9 +51,7 @@ public class RepoOpControl {
 
     public CompletableFuture<Model> updateModel(Model oldModel) {
         init(oldModel.getRepoId());
-        CompletableFuture<Model> result = new CompletableFuture<>();
-        enqueue(new UpdateModelOp(oldModel, repoIO, result));
-        return result;
+        return repoIO.updateModel(new Model(oldModel));
     }
 
     public CompletableFuture<Boolean> replaceIssueLabels(TurboIssue issue, List<String> labels) {
