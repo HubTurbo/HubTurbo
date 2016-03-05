@@ -212,28 +212,21 @@ public abstract class FilterPanel extends AbstractPanel {
         parentPanelControl.getGUIController().panelFilterExpressionChanged(this);
     }
 
+    /**
+     * Abstract method to implement a loading animation triggered by PrimaryRepoOpeningEvent
+     * Implementation should check if the event triggered should result in a loading animation
+     */
     protected abstract void startLoadingAnimationIfApplicable(PrimaryRepoOpeningEvent e);
 
     protected abstract void stopLoadingAnimationIfApplicable(PrimaryRepoOpenedEvent e);
 
+    /**
+     * Abstract method to implement a loading animation triggered by ApplyingFilterEvent
+     * Implementation should check if the event triggered should result in a loading animation
+     */
     protected abstract void startLoadingAnimationIfApplicable(ApplyingFilterEvent e);
 
     protected abstract void stopLoadingAnimationIfApplicable(AppliedFilterEvent e);
-
-    protected abstract void startLoadingAnimation();
-
-    protected abstract void stopLoadingAnimation();
-
-    /**
-     * Implements the addition of the panel-loading indication
-     */
-    protected abstract void showLoadingIndicator();
-
-    /**
-     * Implements the removal of the panel-loading indication that was applied by the method
-     * showLoadingIndicator().
-     */
-    protected abstract void hideLoadingIndicator();
 
     public void setFilterByString(String filterString) {
         filterTextField.setFilterText(filterString);

@@ -379,24 +379,6 @@ public class ListPanel extends FilterPanel {
         }
     }
 
-    /**
-     * Adds a style class to the listview which changes its background to contain a loading spinning gif
-     */
-    @Override
-    protected void showLoadingIndicator() {
-        logger.info("Preparing to add panel loading indication");
-        listView.getStyleClass().add("listview-loading");
-    }
-
-    /**
-     * Removes the style class that was added in showLoadingIndicator() from the listview.
-     */
-    @Override
-    protected void hideLoadingIndicator() {
-        logger.info("Preparing to remove panel loading indication");
-        listView.getStyleClass().removeIf(cssClass -> cssClass.equals("listview-loading"));
-    }
-
     @Override
     protected void startLoadingAnimationIfApplicable(PrimaryRepoOpeningEvent e) {
         // Repo is being opened by the repo selector, does not need to filter if repo is already specified for panel
@@ -410,7 +392,7 @@ public class ListPanel extends FilterPanel {
 
     @Override
     protected void startLoadingAnimationIfApplicable(ApplyingFilterEvent e) {
-
+        // Repo is being opened by a panel's filter, only need to show loading animation in the responsible panel
         if (e.panel == this) startLoadingAnimation();
     }
 
@@ -419,15 +401,29 @@ public class ListPanel extends FilterPanel {
         if (e.panel == this) stopLoadingAnimation();
     }
 
-    @Override
-    protected void startLoadingAnimation() {
+    private void startLoadingAnimation() {
         setTranslucentCellFactory();
         showLoadingIndicator();
     }
 
-    @Override
-    protected void stopLoadingAnimation() {
+    private void stopLoadingAnimation() {
         hideLoadingIndicator();
+    }
+
+    /**
+     * Adds a style class to the listview which changes its background to contain a loading spinning gif
+     */
+    private void showLoadingIndicator() {
+        logger.info("Preparing to add panel loading indication");
+        listView.getStyleClass().add("listview-loading");
+    }
+
+    /**
+     * Removes the style class that was added in showLoadingIndicator() from the listview.
+     */
+    private void hideLoadingIndicator() {
+        logger.info("Preparing to remove panel loading indication");
+        listView.getStyleClass().removeIf(cssClass -> cssClass.equals("listview-loading"));
     }
 
     private void setTranslucentCellFactory() {

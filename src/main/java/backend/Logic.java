@@ -96,49 +96,50 @@ public class Logic {
     }
 
     /**
-     * Opens the repoId if it isn't already open, else simply refreshes the UI
+     * Opens repoId if it isn't already open, else simply refreshes the UI
      * After opening the repo, it will trigger a PrimaryRepoOpenedEvent
      *
      * @param repoId
      * @return
      */
     public CompletableFuture<Boolean> openPrimaryRepository(String repoId) {
-        return openRepository(repoId, true, Optional.empty());
+        return openRepository(repoId, Optional.empty());
     }
 
     /**
-     * Opens the repoId if it isn't already open, else simply refreshes the UI
-     * After opening the repo, it will trigger a FilterOpeningEvent with panel as argument
+     * Opens repoId if it isn't already open, else simply refreshes the UI
+     *
+     * If a repo needs to be opened, FilterRepoOpeningEvent and FilterRepoOpenedEvent will both
+     * be triggered with panel as argument
+     *
+     * Shortly before this method terminates, an AppliedFilterEvent will be triggered
      *
      * @param repoId
+     * @param panel panel that opened the repository
      * @return
      */
     public CompletableFuture<Boolean> openRepositoryFromFilter(String repoId, FilterPanel panel) {
-        return openRepository(repoId, false, Optional.of(panel));
+        return openRepository(repoId, Optional.of(panel));
     }
 
     /**
-     * Opens the repoId if it isn't already open, else simply refreshes the UI
+     * Opens repoId if it isn't already open, else simply refreshes the UI
      *
-     * After opening the repo, it will trigger a PrimaryRepoOpenedEvent or AppliedFilterEvent depending on the
-     * caller origin determined by isPrimaryRepository
+     * During the process, it will trigger the appropriate events depending on panel's presence
      *
-     * @param repoId
-     * @param isPrimaryRepository false if it was due to repo being specified in a panel's filter
-     * @param panel should be Optional.empty() if isPrimaryRepository is true, else it should contain
-     *              the panel whose filter specified the repo
+     * @param repoId id of repository to be opened
+     * @param panel panel that opened the repository, if there is
      * @return
      */
-    private CompletableFuture<Boolean> openRepository(String repoId, boolean isPrimaryRepository,
-                                                      Optional<FilterPanel> panel) {
+    private CompletableFuture<Boolean> openRepository(String repoId, Optional<FilterPanel> panel) {
         assert Utility.isWellFormedRepoId(repoId);
-        assert isPrimaryRepository ? !panel.isPresent() : panel.isPresent();
 
+        boolean isPrimaryRepository = !panel.isPresent();
         if (isPrimaryRepository) prefs.setLastViewedRepository(repoId);
         if (isAlreadyOpen(repoId) || models.isRepositoryPending(repoId)) {
-            // The content of panels with an empty filter text should change when the primary repo is changed.
-            // Thus we refresh panels even when the repo is already open.
             if (isPrimaryRepository) {
+                // The content of panels with an empty filter text should change when the primary repo is changed.
+                // Thus we refresh panels even when the repo is already open.
                 refreshUI();
             } else {
                 Platform.runLater(() -> UI.events.triggerEvent(new AppliedFilterEvent(panel.get())));
@@ -153,25 +154,24 @@ public class Logic {
 
             logger.info("Opening " + repoId);
             UI.status.displayMessage("Opening " + repoId);
-            notifyOpening(isPrimaryRepository);
+            notifyRepoOpening(isPrimaryRepository);
 
             return repoOpControl.openRepository(repoId)
                     .thenApply(models::addPending)
                     .thenRun(this::refreshUI)
-                    .thenRun(() -> notifyDoneOpening(isPrimaryRepository, panel))
+                    .thenRun(() -> notifyRepoOpened(panel))
                     .thenCompose(n -> getRateLimitResetTime())
                     .thenApply(this::updateRemainingRate)
                     .thenApply(rateLimits -> true)
                     .exceptionally(withResult(false));
-
         });
     }
 
     /**
-     * Triggers the relevant event based on the caller source determined by isPrimaryRepository
-     * @param isPrimaryRepository true if called by repository selector, else false
+     * Triggers opening repo event based on isPrimaryRepository
+     * @param isPrimaryRepository triggers PrimaryRepoOpeningEvent if true, FilterRepoOpeningEvent otherwise
      */
-    private void notifyOpening(boolean isPrimaryRepository) {
+    private void notifyRepoOpening(boolean isPrimaryRepository) {
         if (isPrimaryRepository) {
             Platform.runLater(() -> UI.events.triggerEvent(new PrimaryRepoOpeningEvent()));
         } else {
@@ -180,21 +180,21 @@ public class Logic {
     }
 
     /**
-     * Triggers the relevant event based on the caller source determined by isPrimaryRepository
-     * If called via filter, also notifies the relevant panel that the opening of repository is done
+     * Triggers the relevant event(s) based on panel's presence
      *
-     * Assumption: panel is present if isPrimaryRepository is false
-     * @param isPrimaryRepository true if called by repository selector, else false
-     * @param panel should be Optional.empty() if isPrimaryRepository is true, else it should contain
-     *              the panel whose filter specified the repo
+     * If panel is present, it will trigger FilterRepoOpenedEvent and AppliedFilterEvent
+     * Otherwise, it will simply trigger PrimaryRepoOpenedEvent
+     *
+     * @param panel panel that opened the repository, if present
      */
-    private void notifyDoneOpening(boolean isPrimaryRepository, Optional<FilterPanel> panel) {
-        if (isPrimaryRepository) {
+    private void notifyRepoOpened(Optional<FilterPanel> panel) {
+        if (!panel.isPresent()) {
             Platform.runLater(() -> UI.events.triggerEvent(new PrimaryRepoOpenedEvent()));
-        } else {
-            Platform.runLater(() -> UI.events.triggerEvent(new FilterRepoOpenedEvent()));
-            Platform.runLater(() -> UI.events.triggerEvent(new AppliedFilterEvent(panel.get())));
+            return;
         }
+
+        Platform.runLater(() -> UI.events.triggerEvent(new FilterRepoOpenedEvent()));
+        Platform.runLater(() -> UI.events.triggerEvent(new AppliedFilterEvent(panel.get())));
     }
 
     public Set<String> getOpenRepositories() {
