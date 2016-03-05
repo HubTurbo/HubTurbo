@@ -45,11 +45,6 @@ public class GitHubSource extends RepoSource {
     }
 
     @Override
-    public CompletableFuture<Model> updateModel(Model model) {
-        return addTask(new UpdateModelTask(this, gitHub, model)).response;
-    }
-
-    @Override
     public CompletableFuture<GitHubRepoUpdatesData> downloadModelUpdates(Model model) {
         return addTask(new DownloadModelUpdatesTask(this, gitHub, model)).response;
     }

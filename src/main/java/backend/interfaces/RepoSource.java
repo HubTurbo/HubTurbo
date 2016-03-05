@@ -34,9 +34,6 @@ public abstract class RepoSource implements TaskRunner {
 
     public abstract CompletableFuture<Model> downloadRepository(String repoId);
 
-    // TODO: remove this
-    public abstract CompletableFuture<Model> updateModel(Model model);
-
     public abstract CompletableFuture<GitHubRepoUpdatesData> downloadModelUpdates(Model model);
 
     public abstract CompletableFuture<Map<Integer, IssueMetadata>>
