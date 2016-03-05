@@ -41,7 +41,7 @@ public class ListPanel extends FilterPanel {
     private final GUIController guiController;
     private int issueCount;
 
-    public final IssueListView listView;
+    private final IssueListView listView;
     private final HashMap<Integer, Integer> issueCommentCounts = new HashMap<>();
     private final HashMap<Integer, Integer> issueNonSelfCommentCounts = new HashMap<>();
 
@@ -441,5 +441,12 @@ public class ListPanel extends FilterPanel {
     protected void removePanelLoadingIndication() {
         logger.info("Preparing to remove panel loading indication");
         listView.getStyleClass().removeIf(cssClass -> cssClass.equals("listview-loading"));
+    }
+
+    /**
+     * @return listView object associated with this list panel.
+     */
+    public IssueListView getListView(){
+        return listView;
     }
 }

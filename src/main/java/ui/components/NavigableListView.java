@@ -120,16 +120,16 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
     }
 
     /**
-     * Passes the relevant index to the onItemSelected callback variable.
-     * onItemSelected is triggered for events like key presses, left click in this method.
+     * Passes the relevant index to the onItemSelected callback variable as well as "false" value as the second
+     * parameter indicating that this method is called for triggering callbacks for left clicks, key presses etc.
      */
     private void triggerItemSelected(int index){
         onItemSelected.accept(index, !IS_SECONDARY_KEY);
     }
 
     /**
-     * Passes the relevant index to the onItemSelected callback variable.
-     * This method is called for secondary keys for e.g. the right mouse click
+     * Passes the relevant index to the onItemSelected callback variable as well as "true" value as the second
+     * parameter indicating that this method is called for triggering callbacks for secondary keys like right clicks.
      */
     private void triggerItemSelectedSecondary(int index){
         onItemSelected.accept(index, IS_SECONDARY_KEY);
