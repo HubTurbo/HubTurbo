@@ -50,6 +50,11 @@ public class GitHubSource extends RepoSource {
     }
 
     @Override
+    public CompletableFuture<GitHubRepoUpdatesData> downloadModelUpdates(Model model) {
+        return addTask(new DownloadModelUpdatesTask(this, gitHub, model)).response;
+    }
+
+    @Override
     public CompletableFuture<Map<Integer, IssueMetadata>> downloadMetadata(String repoId, List<TurboIssue> issues) {
         return addTask(new DownloadMetadataTask(this, gitHub, repoId, issues)).response;
     }
