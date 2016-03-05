@@ -52,4 +52,22 @@ public class RepoIOTests {
         verify(source, times(1)).replaceIssueLabels(any(TurboIssue.class), anyListOf(String.class));
         assertEquals(response, result);
     }
+
+    /**
+     * Tests that RepoIO's replaceIssueLabels calls RepoSource's replaceIssueLabels
+     * and receives a corresponding CompletableFuture response
+     */
+    @Test
+    public void testReplaceIssueMilestones() {
+        RepoSource source = mock(RepoSource.class);
+        CompletableFuture<List<String>> response = new CompletableFuture<>();
+        doReturn(response).when(source).replaceIssueMilestone(any(TurboIssue.class),
+                any(Integer.class));
+
+        RepoIO repoIO = new RepoIO(Optional.of(source), Optional.empty(), Optional.empty());
+        CompletableFuture result = repoIO.replaceIssueMilestone(mock(TurboIssue.class), 0);
+
+        verify(source, times(1)).replaceIssueMilestone(any(TurboIssue.class), any(Integer.class));
+        assertEquals(response, result);
+    }
 }
