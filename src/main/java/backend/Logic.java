@@ -218,7 +218,7 @@ public class Logic {
 
     public CompletableFuture<Boolean> replaceIssueMilestone(TurboIssue issue, Integer milestone) {
         Optional<Integer> originalMilestone = issue.getMilestone();
-        logger.info("Changing milestone for " + issue + " on GitHub");
+        logger.info("Changing milestone for " + issue + " on UI");
 
         /* Calls models to replace the issue's milestone locally since the the reference to the issue here
            could be invalidated by changes to the models elsewhere */
