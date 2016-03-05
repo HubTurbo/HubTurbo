@@ -1,5 +1,6 @@
 package backend;
 
+import backend.github.GitHubRepoUpdatesData;
 import backend.github.GitHubSource;
 import backend.interfaces.RepoSource;
 import backend.interfaces.RepoStore;
@@ -117,6 +118,15 @@ public class RepoIO {
 
             return new Model(repoId);
         }
+    }
+
+    /**
+     * Downloads updates for issues, pull requests, labels, milestones and users from server for a model.
+     * Note that the result contains only new or modified data for the model and doesn't include existing data.
+     * @param model Model whose updates are to be downloaded
+     */
+    public CompletableFuture<GitHubRepoUpdatesData> downloadModelUpdates(Model model) {
+        return repoSource.downloadModelUpdates(model);
     }
 
     public CompletableFuture<Model> updateModel(Model model) {

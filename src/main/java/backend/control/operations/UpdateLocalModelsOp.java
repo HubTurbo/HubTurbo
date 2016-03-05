@@ -7,13 +7,17 @@ import java.util.concurrent.CompletableFuture;
 
 import static util.Futures.chain;
 
-public class UpdateLocalModelOp implements RepoOp<Model> {
+/**
+ * This class represents a mutually exclusive operation that injects
+ * updated resources into repositories stored locally as Models
+ */
+public class UpdateLocalModelsOp implements RepoOp<Model> {
 
     private final Model oldModel;
     private final RepoIO repoIO;
     private final CompletableFuture<Model> result;
 
-    public UpdateLocalModelOp(Model oldModel, RepoIO repoIO, CompletableFuture<Model> result) {
+    public UpdateLocalModelsOp(Model oldModel, RepoIO repoIO, CompletableFuture<Model> result) {
         this.oldModel = oldModel;
         this.repoIO = repoIO;
         this.result = result;

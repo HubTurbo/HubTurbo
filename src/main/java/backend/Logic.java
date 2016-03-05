@@ -86,7 +86,7 @@ public class Logic {
         UI.status.displayMessage(message);
 
         Futures.sequence(models.toModels().stream()
-                .map(repoOpControl::updateModel)
+                .map(repoIO::updateModel)
                 .collect(Collectors.toList()))
                 .thenApply(models::replace)
                 .thenRun(this::refreshUI)
