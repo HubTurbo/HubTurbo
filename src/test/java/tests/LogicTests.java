@@ -62,9 +62,9 @@ public class LogicTests {
     public void replaceIssueMilestone_successful() throws ExecutionException, InterruptedException {
         TurboIssue issue = createIssueWithMilestone(1, 0);
         mockRepoIOReplaceIssueMilestoneResult(true);
-        mockMultiModelReplaceIssueLabels(Optional.of(issue), Optional.empty());
+        mockMultiModelReplaceIssueMilestone(Optional.of(issue), Optional.empty());
 
-        assertTrue(logic.replaceIssueMilestone(issue, null).get());
+        assertTrue(logic.replaceIssueMilestone(issue, 1).get());
     }
 
     /**
@@ -76,7 +76,7 @@ public class LogicTests {
         mockRepoIOReplaceIssueMilestoneResult(true);
         mockMultiModelReplaceIssueMilestone(Optional.empty(), Optional.empty());
 
-        assertFalse(logic.replaceIssueMilestone(issue, null).get());
+        assertFalse(logic.replaceIssueMilestone(issue, 1).get());
     }
 
     /**
