@@ -2,7 +2,9 @@ package backend.control;
 
 import backend.RepoIO;
 import backend.control.operations.*;
+import backend.github.GitHubRepoUpdatesData;
 import backend.resource.Model;
+import backend.resource.MultiModel;
 import backend.resource.TurboIssue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -10,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.*;
 
 
@@ -21,12 +24,20 @@ public class RepoOpControl {
     private static final Logger logger = LogManager.getLogger(RepoOpControl.class.getName());
 
     private final RepoIO repoIO;
+    private final MultiModel models;
 
     private final ExecutorService pool = Executors.newCachedThreadPool();
     private final Map<String, BlockingQueue<RepoOp>> queues = new HashMap<>();
 
-    public RepoOpControl(RepoIO repoIO) {
+    private static final Optional<RepoOpControl> repoOpControlSingleton = Optional.empty();
+
+    private RepoOpControl(RepoIO repoIO, MultiModel models) {
         this.repoIO = repoIO;
+        this.models = models;
+    }
+
+    public static RepoOpControl createRepoOpControl(RepoIO repoIO, MultiModel models) {
+        return repoOpControlSingleton.orElseGet(() -> new RepoOpControl(repoIO, models));
     }
 
     /**
@@ -42,10 +53,10 @@ public class RepoOpControl {
         return result;
     }
 
-    public CompletableFuture<Model> updateModel(Model oldModel) {
-        init(oldModel.getRepoId());
-        CompletableFuture<Model> result = new CompletableFuture<>();
-        enqueue(new UpdateModelOp(oldModel, repoIO, result));
+    public CompletableFuture<Optional<Model>> updateLocalModel(GitHubRepoUpdatesData updates) {
+        init(updates.getRepoId());
+        CompletableFuture<Optional<Model>> result = new CompletableFuture<>();
+        enqueue(new UpdateLocalModelOp(models, updates, result));
         return result;
     }
 

@@ -31,7 +31,7 @@ public class DownloadUsersUpdatesTask extends GitHubRepoTask<GitHubRepoTask.Resu
 
         List<TurboUser> changedUsers = changes.left;
 
-        logger.info(HTLog.format(model.getRepoId(), "%s user(s)) changedUsers%s",
+        logger.info(HTLog.format(model.getRepoId(), "%s user(s)) changed%s",
             changedUsers.size(), changedUsers.isEmpty() ? "" : ": " + changedUsers));
 
         response.complete(new Result<>(changedUsers, changes.right));

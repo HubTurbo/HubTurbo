@@ -46,7 +46,7 @@ public class LogicTests {
         logic = new Logic(mock(UIManager.class), mockedPreferences, Optional.of(mockedMultiModel));
         Field repoOpControlField = logic.getClass().getDeclaredField("repoOpControl");
         repoOpControlField.setAccessible(true);
-        repoOpControlField.set(logic, new RepoOpControl(mockedRepoIO));
+        repoOpControlField.set(logic, RepoOpControl.createRepoOpControl(mockedRepoIO, mockedMultiModel));
     }
 
     @Before

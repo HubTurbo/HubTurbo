@@ -78,9 +78,15 @@ public class MultiModel implements IModel {
         return new ArrayList<>(models.values());
     }
 
+    // TODO: remove this
     public synchronized MultiModel replace(List<Model> newModels) {
         this.models.clear();
         newModels.forEach(this::add);
+        return this;
+    }
+
+    public synchronized MultiModel replace(Model newModel) {
+        this.add(newModel);
         return this;
     }
 
