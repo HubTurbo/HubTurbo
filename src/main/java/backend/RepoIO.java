@@ -134,8 +134,15 @@ public class RepoIO {
     }
 
     public CompletableFuture<Model> updateModel(Model model, int remainingTries) {
-        return repoSource.updateModel(model)
-            .thenApply(newModel -> {
+        return downloadModelUpdates(model)
+            .thenCompose(Logic.repoOpControl::updateLocalModel)
+            .thenApply(newModelOptional -> {
+                if (!newModelOptional.isPresent()) {
+                    UI.events.triggerEvent(new UpdateProgressEvent(model.getRepoId()));
+                    return model;
+                }
+                Model newModel = newModelOptional.get();
+
                 boolean corruptedJson = false;
                 if (!model.equals(newModel)) {
                     try {

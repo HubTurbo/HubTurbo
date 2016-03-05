@@ -31,7 +31,7 @@ public class DownloadMilestonesUpdatesTask extends GitHubRepoTask<GitHubRepoTask
 
         List<TurboMilestone> changedMilestones = changes.left;
 
-        logger.info(HTLog.format(model.getRepoId(), "%s milestone(s)) changedMilestones%s",
+        logger.info(HTLog.format(model.getRepoId(), "%s milestone(s)) changed%s",
             changedMilestones.size(), changedMilestones.isEmpty() ? "" : ": " + changedMilestones));
 
         response.complete(new Result<>(changedMilestones, changes.right));
