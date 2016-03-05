@@ -65,13 +65,12 @@ public class MilestonePickerState {
     }
 
     private void highlightFirstMatchingMilestone() {
-        if (hasMatchingMilestone(this.currentMilestonesList)) {
-            this.currentMilestonesList.stream()
-                    .filter(milestone -> !milestone.isFaded())
-                    .findAny()
-                    .get()
-                    .setHighlighted(true);
-        }
+        if (!hasMatchingMilestone(this.currentMilestonesList)) return;
+        this.currentMilestonesList.stream()
+                .filter(milestone -> !milestone.isFaded())
+                .findAny()
+                .get()
+                .setHighlighted(true);
     }
 
     private boolean hasMatchingMilestone(List<PickerMilestone> milestoneList) {

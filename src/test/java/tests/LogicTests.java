@@ -52,6 +52,30 @@ public class LogicTests {
     }
 
     /**
+     * Tests that replaceIssueMilestone succeeds when both models and repoIO succeed
+     */
+    @Test
+    public void replaceIssueMilestone_successful() throws ExecutionException, InterruptedException {
+        TurboIssue issue = createIssueWithMilestone(1, 0);
+        mockRepoIOReplaceIssueMilestoneResult(true);
+        mockMultiModelReplaceIssueMilestone(Optional.of(issue), Optional.empty());
+
+        assertTrue(logic.replaceIssueMilestone(issue, 1).get());
+    }
+
+    /**
+     * Tests that replaceIssueMilestone fails when models return empty result
+     */
+    @Test
+    public void replaceIssueMilestone_repoIOFailed() throws ExecutionException, InterruptedException {
+        TurboIssue issue = createIssueWithMilestone(1, 0);
+        mockRepoIOReplaceIssueMilestoneResult(true);
+        mockMultiModelReplaceIssueMilestone(Optional.empty(), Optional.empty());
+
+        assertFalse(logic.replaceIssueMilestone(issue, 1).get());
+    }
+
+    /**
      * Tests that replaceIssueLabelsOnServer succeed when both models and repoIO succeeded
      */
     @Test
@@ -137,6 +161,11 @@ public class LogicTests {
                 .thenReturn(CompletableFuture.completedFuture(replaceResult));
     }
 
+    private void mockRepoIOReplaceIssueMilestoneResult(boolean replaceResult) {
+        when(mockedRepoIO.replaceIssueMilestone(any(TurboIssue.class), any(Integer.class)))
+                .thenReturn(CompletableFuture.completedFuture(replaceResult));
+    }
+
     private void mockMultiModelReplaceIssueLabels(Optional<TurboIssue> replaceResult,
                                                   Optional<Model> modelLookUpResult) {
         when(mockedMultiModel.replaceIssueLabels(anyString(), anyInt(), anyListOf(String.class)))
@@ -144,9 +173,22 @@ public class LogicTests {
         when(mockedMultiModel.getModelById(anyString())).thenReturn(modelLookUpResult);
     }
 
+    private void mockMultiModelReplaceIssueMilestone(Optional<TurboIssue> replaceResult,
+                                                  Optional<Model> modelLookUpResult) {
+        when(mockedMultiModel.replaceIssueMilestone(anyString(), anyInt(), any(Integer.class)))
+                .thenReturn(replaceResult);
+        when(mockedMultiModel.getModelById(anyString())).thenReturn(modelLookUpResult);
+    }
+
     public static TurboIssue createIssueWithLabels(int issueId, List<String> labels) {
         TurboIssue issue = new TurboIssue("testowner/testrepo", issueId, "Issue title");
         issue.setLabels(labels);
+        return issue;
+    }
+
+    public static TurboIssue createIssueWithMilestone(int issueId, Integer milestone) {
+        TurboIssue issue = new TurboIssue("testowner/testrepo", issueId, "Issue title");
+        issue.setMilestoneById(milestone);
         return issue;
     }
 }
