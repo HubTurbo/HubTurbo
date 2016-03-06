@@ -44,7 +44,7 @@ public class StartupBoardLauncherTest extends UITest{
 
         //Ensures that only 1 board was created and it was the sample board
         List<String> boardNames = panelControl.getAllBoardNames();
-        assertEquals(boardNames, Arrays.asList(new String[] {SAMPLE_BOARD}));
+        assertEquals(Arrays.asList(new String[] {SAMPLE_BOARD}), boardNames);
 
         //Verifies the panel details of the sample board created.
         verifyBoard(panelControl, BoardAutoCreator.getSamplePanelDetails());
