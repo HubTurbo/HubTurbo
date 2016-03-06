@@ -46,7 +46,7 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
     // (when nothing is selected, both should be no-ops)
     private boolean saveSelectionCalled = false;
 
-    public static final boolean IS_SECONDARY_KEY = true;
+    public static final boolean IS_RIGHT_CLICK = true;
 
     private BiConsumer<Integer, Boolean> onItemSelected = (index, rightKey) -> {};
 
@@ -120,19 +120,22 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
     }
 
     /**
-     * Passes the relevant index to the onItemSelected callback variable as well as "false" value as the second
-     * parameter indicating that this method is called for triggering callbacks for left clicks, key presses etc.
+     * This method triggers the callback for onItemSelected with the index and "false" parameter indicating that
+     * it is called for left clicks, key presses etc but not right clicks.
+     * The boolean parameter enables us to perform different actions
+     * (e.g. deciding whether the bView should be loaded with that issue) based on different kinds of inputs
      */
     private void triggerItemSelected(int index){
-        onItemSelected.accept(index, !IS_SECONDARY_KEY);
+        onItemSelected.accept(index, !IS_RIGHT_CLICK);
     }
 
     /**
-     * Passes the relevant index to the onItemSelected callback variable as well as "true" value as the second
-     * parameter indicating that this method is called for triggering callbacks for secondary keys like right clicks.
+     * This method triggers the callback for onItemSelected with the index and "true" parameter indicating that
+     * it is called for right clicks. The boolean parameter enables us to perform different actions
+     * (e.g. deciding whether the bView should be loaded with that issue) based on different kinds of inputs
      */
     private void triggerItemSelectedSecondary(int index){
-        onItemSelected.accept(index, IS_SECONDARY_KEY);
+        onItemSelected.accept(index, IS_RIGHT_CLICK);
     }
 
     public abstract boolean areItemsEqual(T item1, T item2);
@@ -147,9 +150,9 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
 
                 logger.info("Mouse click on item index " + selectedIndex.get());
                 if (e.getButton().equals(MouseButton.SECONDARY)){
-                    triggerItemSelectedSecondary(selectedIndex.get());
+                    triggerItemSelectedSecondary(currentlySelected);
                 } else {
-                    triggerItemSelected(selectedIndex.get());
+                    triggerItemSelected(currentlySelected);
                 }
             }
         });

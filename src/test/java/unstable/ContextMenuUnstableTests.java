@@ -8,8 +8,10 @@ import javafx.scene.input.KeyCode;
 import org.junit.Before;
 import org.junit.Test;
 import ui.components.FilterTextField;
+import ui.components.IssueListView;
 import ui.listpanel.ListPanel;
 import ui.listpanel.ListPanelCell;
+import java.lang.reflect.*;
 
 import static org.junit.Assert.assertEquals;
 
@@ -36,8 +38,19 @@ public class ContextMenuUnstableTests extends UITest {
     @Test
     public void markAllBelowAsReadUnread_twelveIssuesInListView_issuesCorrectlyMarkedReadUnread() {
         ListPanel issuePanel = find(PANEL_IDENTIFIER);
-        // scrolls to the end of the panel
-        issuePanel.getListView().scrollAndShow(12);
+        try {
+            Field listViewField = ListPanel.class.getDeclaredField("listView");
+            listViewField.setAccessible(true);
+            IssueListView listViewValue = (IssueListView) listViewField.get(issuePanel);
+
+            // scrolls to the end of the panel
+            listViewValue.scrollAndShow(12);
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+
 
         //checking for issue #7 and below twice to make sure issues are marked correctly for read/unread cases
         for (int i = 0; i < 2; i++) {

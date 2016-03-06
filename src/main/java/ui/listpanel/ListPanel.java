@@ -442,11 +442,4 @@ public class ListPanel extends FilterPanel {
         logger.info("Preparing to remove panel loading indication");
         listView.getStyleClass().removeIf(cssClass -> cssClass.equals("listview-loading"));
     }
-
-    /**
-     * @return listView object associated with this list panel.
-     */
-    public IssueListView getListView(){
-        return listView;
-    }
 }
