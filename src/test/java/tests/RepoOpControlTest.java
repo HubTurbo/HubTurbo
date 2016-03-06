@@ -123,7 +123,7 @@ public class RepoOpControlTest {
             .then(invocation -> createResult(counter, new Model(REPO)));
         when(stub.removeRepository(REPO))
             .then(invocation -> createResult(counter, true));
-        when(stub.updateModel(new Model(REPO)))
+        when(stub.updateModel(new Model(REPO), false))
             .then(invocation -> createResult(counter, new Model(REPO)));
 
         for (int i = 0; i < 3; i++) {
@@ -131,7 +131,7 @@ public class RepoOpControlTest {
                 .then(invocation -> createResult(counter, new Model(REPO)));
             when(stub.removeRepository(REPO + i))
                 .then(invocation -> createResult(counter, true));
-            when(stub.updateModel(new Model(REPO + i)))
+            when(stub.updateModel(new Model(REPO + i), false))
                 .then(invocation -> createResult(counter, new Model(REPO)));
         }
 

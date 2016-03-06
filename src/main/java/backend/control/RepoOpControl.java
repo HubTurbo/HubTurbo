@@ -2,7 +2,7 @@ package backend.control;
 
 import backend.RepoIO;
 import backend.control.operations.*;
-import backend.github.GitHubRepoUpdatesData;
+import backend.github.GitHubModelUpdatesData;
 import backend.resource.Model;
 import backend.resource.MultiModel;
 import backend.resource.TurboIssue;
@@ -17,9 +17,11 @@ import java.util.concurrent.*;
 
 
 /**
- * A means of repo-level synchronisation for select RepoIO operations.
+ * A means of repo-level synchronisation for select RepoIO operations. Only one instance of this class
+ * is available at any time availabel through {@code getRepoOpControl}. A new instance can be created with
+ * {@code createRepoOpControl} and will replace any existing instance
  */
-public class RepoOpControl {
+public final class RepoOpControl {
 
     private static final Logger logger = LogManager.getLogger(RepoOpControl.class.getName());
 
@@ -29,15 +31,24 @@ public class RepoOpControl {
     private final ExecutorService pool = Executors.newCachedThreadPool();
     private final Map<String, BlockingQueue<RepoOp>> queues = new HashMap<>();
 
-    private static final Optional<RepoOpControl> repoOpControlSingleton = Optional.empty();
+    private static Optional<RepoOpControl> repoOpControlOptional = Optional.empty();
 
     private RepoOpControl(RepoIO repoIO, MultiModel models) {
         this.repoIO = repoIO;
         this.models = models;
     }
 
+    /**
+     * Gets an RepoOpControl instance that has been created previously by {@code createRepoOpControl}
+     * @return
+     */
+    public static RepoOpControl getRepoOpControl() {
+        return repoOpControlOptional.get();
+    }
+
     public static RepoOpControl createRepoOpControl(RepoIO repoIO, MultiModel models) {
-        return repoOpControlSingleton.orElseGet(() -> new RepoOpControl(repoIO, models));
+        repoOpControlOptional = Optional.of(new RepoOpControl(repoIO, models));
+        return repoOpControlOptional.get();
     }
 
     /**
@@ -53,10 +64,23 @@ public class RepoOpControl {
         return result;
     }
 
-    public CompletableFuture<Optional<Model>> updateLocalModel(GitHubRepoUpdatesData updates) {
+    /**
+     * Updates repository stored locally with data from a GitHubModelUpdatesData object.
+     * Set syncOperation to queue this operation in the blocking queue for the updating repository
+     * @param updates
+     * @param syncOperation
+     * @return
+     */
+    public CompletableFuture<Model> updateLocalModel(GitHubModelUpdatesData updates,
+                                                     boolean syncOperation) {
         init(updates.getRepoId());
-        CompletableFuture<Optional<Model>> result = new CompletableFuture<>();
-        enqueue(new UpdateLocalModelOp(models, updates, result));
+        CompletableFuture<Model> result = new CompletableFuture<>();
+        UpdateLocalModelOp op = new UpdateLocalModelOp(models, updates, result);
+        if (syncOperation) {
+            enqueue(new UpdateLocalModelOp(models, updates, result));
+        } else {
+            op.perform();
+        }
         return result;
     }
 

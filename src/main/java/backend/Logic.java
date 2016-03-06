@@ -37,8 +37,8 @@ public class Logic {
     private final UIManager uiManager;
     protected final Preferences prefs;
     private final RepoIO repoIO = TestController.createApplicationRepoIO();
-    public static RepoOpControl repoOpControl;
 
+    private final RepoOpControl repoOpControl;
     public LoginController loginController;
     public UpdateController updateController;
 
@@ -46,8 +46,8 @@ public class Logic {
         this.uiManager = uiManager;
         this.prefs = prefs;
         this.models = models.orElse(new MultiModel(prefs));
-        repoOpControl = RepoOpControl.createRepoOpControl(repoIO, this.models);
 
+        repoOpControl = RepoOpControl.createRepoOpControl(repoIO, this.models);
         loginController = new LoginController(this);
         updateController = new UpdateController(this);
 
@@ -87,7 +87,7 @@ public class Logic {
         UI.status.displayMessage(message);
 
         Futures.sequence(models.toModels().stream()
-                .map(repoIO::updateModel)
+                .map((model) -> repoIO.updateModel(model, true))
                 .collect(Collectors.toList()))
                 .thenRun(this::refreshUI)
                 .thenCompose(n -> getRateLimitResetTime())
@@ -156,7 +156,7 @@ public class Logic {
             UI.status.displayMessage("Opening " + repoId);
             notifyRepoOpening(isPrimaryRepository);
 
-            return repoIO.openRepository(repoId)
+            return repoOpControl.openRepository(repoId)
                     .thenApply(models::addPending)
                     .thenRun(this::refreshUI)
                     .thenRun(() -> notifyRepoOpened(panel))

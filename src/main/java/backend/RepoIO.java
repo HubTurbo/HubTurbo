@@ -1,6 +1,7 @@
 package backend;
 
-import backend.github.GitHubRepoUpdatesData;
+import backend.control.RepoOpControl;
+import backend.github.GitHubModelUpdatesData;
 import backend.github.GitHubSource;
 import backend.interfaces.RepoSource;
 import backend.interfaces.RepoStore;
@@ -91,7 +92,7 @@ public class RepoIO {
 
     private CompletableFuture<Model> loadRepoFromStoreAsync(String repoId) {
         return jsonStore.loadRepository(repoId)
-                .thenCompose(this::updateModel);
+                .thenCompose((model) -> this.updateModel(model, false));
     }
 
     private CompletableFuture<Model> downloadRepoFromSourceAsync(String repoID) {
@@ -101,7 +102,7 @@ public class RepoIO {
     private CompletableFuture<Model> downloadRepoFromSourceAsync(String repoId, int remainingTries) {
         UI.status.displayMessage("Downloading " + repoId);
         return repoSource.downloadRepository(repoId)
-                .thenCompose(newModel -> updateModel(newModel, remainingTries))
+                .thenCompose(newModel -> updateModel(newModel, false, remainingTries))
                 .thenApply(model -> {
                     storedRepos.add(repoId);
                     return model;
@@ -125,24 +126,27 @@ public class RepoIO {
      * Note that the result contains only new or modified data for the model and doesn't include existing data.
      * @param model Model whose updates are to be downloaded
      */
-    public CompletableFuture<GitHubRepoUpdatesData> downloadModelUpdates(Model model) {
+    public CompletableFuture<GitHubModelUpdatesData> downloadModelUpdates(Model model) {
         return repoSource.downloadModelUpdates(model);
     }
 
-    public CompletableFuture<Model> updateModel(Model model) {
-        return updateModel(model, MAX_REDOWNLOAD_TRIES);
+    /**
+     * Updates a repository, represented locally by a Model, by downloading, reconciling the updates
+     * with the existing Model and replacing that Model in {@link Logic#models}.
+     * @param model the Model to be updated
+     * @param syncOperation true if this update operation is to be mutually exclusive with other operation
+     *                      on the same repository. This is to prevent deadlock when this method is called
+     *                      inside another method that is already synced
+     * @return
+     */
+    public CompletableFuture<Model> updateModel(Model model, boolean syncOperation) {
+        return updateModel(model, syncOperation, MAX_REDOWNLOAD_TRIES);
     }
 
-    public CompletableFuture<Model> updateModel(Model model, int remainingTries) {
+    public CompletableFuture<Model> updateModel(Model model, boolean syncOperation, int remainingTries) {
         return downloadModelUpdates(model)
-            .thenCompose(Logic.repoOpControl::updateLocalModel)
-            .thenApply(newModelOptional -> {
-                if (!newModelOptional.isPresent()) {
-                    UI.events.triggerEvent(new UpdateProgressEvent(model.getRepoId()));
-                    return model;
-                }
-                Model newModel = newModelOptional.get();
-
+            .thenCompose((updates) -> RepoOpControl.getRepoOpControl().updateLocalModel(updates, syncOperation))
+            .thenApply(newModel -> {
                 boolean corruptedJson = false;
                 if (!model.equals(newModel)) {
                     try {
