@@ -172,11 +172,8 @@ public class Logic {
      * @param isPrimaryRepository triggers PrimaryRepoOpeningEvent if true, FilterRepoOpeningEvent otherwise
      */
     private void notifyRepoOpening(boolean isPrimaryRepository) {
-        if (isPrimaryRepository) {
-            Platform.runLater(() -> UI.events.triggerEvent(new PrimaryRepoOpeningEvent()));
-        } else {
-            Platform.runLater(() -> UI.events.triggerEvent(new FilterRepoOpeningEvent()));
-        }
+        Event eventToTrigger = isPrimaryRepository ? new PrimaryRepoOpeningEvent() : new FilterRepoOpeningEvent();
+        Platform.runLater(() -> UI.events.triggerEvent(eventToTrigger));
     }
 
     /**

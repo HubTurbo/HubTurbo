@@ -34,7 +34,7 @@ public class UpdateController {
     /**
      * Given a list of panels, opens the repositories specified in the panels' filters.
      *
-     * After which, dispatch metadata update if needed and then process them to return
+     * After which, dispatches metadata update if needed and then processes them to return
      * a map of filtered and sorted issues corresponding to each filter expression, based on the most recent data
      * from the repository source.
      *
