@@ -2,7 +2,7 @@ package backend.interfaces;
 
 import backend.IssueMetadata;
 import backend.UserCredentials;
-import backend.github.GitHubRepoUpdatesData;
+import backend.github.GitHubModelUpdatesData;
 import backend.resource.Model;
 import backend.resource.TurboIssue;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -34,7 +34,7 @@ public abstract class RepoSource implements TaskRunner {
 
     public abstract CompletableFuture<Model> downloadRepository(String repoId);
 
-    public abstract CompletableFuture<GitHubRepoUpdatesData> downloadModelUpdates(Model model);
+    public abstract CompletableFuture<GitHubModelUpdatesData> downloadModelUpdates(Model model);
 
     public abstract CompletableFuture<Map<Integer, IssueMetadata>>
         downloadMetadata(String repoId, List<TurboIssue> issues);

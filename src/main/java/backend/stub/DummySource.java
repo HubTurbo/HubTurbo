@@ -35,7 +35,7 @@ public class DummySource extends RepoSource {
     }
 
     @Override
-    public CompletableFuture<GitHubRepoUpdatesData> downloadModelUpdates(Model model) {
+    public CompletableFuture<GitHubModelUpdatesData> downloadModelUpdates(Model model) {
         return addTask(new DownloadModelUpdatesTask(this, dummy, model)).response;
     }
 

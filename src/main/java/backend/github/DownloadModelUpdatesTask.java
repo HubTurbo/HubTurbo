@@ -13,7 +13,7 @@ import java.util.concurrent.ExecutionException;
 /**
  * This class represents an async task that downloads updates for a repository represented as a Model
  */
-public class DownloadModelUpdatesTask extends GitHubRepoTask<GitHubRepoUpdatesData> {
+public class DownloadModelUpdatesTask extends GitHubRepoTask<GitHubModelUpdatesData> {
 
     private static final Logger logger = HTLog.get(DownloadModelUpdatesTask.class);
 
@@ -21,7 +21,7 @@ public class DownloadModelUpdatesTask extends GitHubRepoTask<GitHubRepoUpdatesDa
 
     public DownloadModelUpdatesTask(TaskRunner taskRunner, Repo repo, Model model) {
         super(taskRunner, repo);
-        this.model = model;
+        this.model = new Model(model);
     }
 
     @Override
@@ -45,7 +45,7 @@ public class DownloadModelUpdatesTask extends GitHubRepoTask<GitHubRepoUpdatesDa
             Result<TurboUser> usersResult = usersTask.response.get();
             List<PullRequest> pullRequestsResult = pullRequestsTask.response.get();
 
-            GitHubRepoUpdatesData updates = new GitHubRepoUpdatesData(model.getRepoId(),
+            GitHubModelUpdatesData updates = new GitHubModelUpdatesData(model,
                     issuesResult, pullRequestsResult, labelsResult, milestonesResult, usersResult);
             logger.info(HTLog.format(model.getRepoId(), "Updates download completed"));
             response.complete(updates);

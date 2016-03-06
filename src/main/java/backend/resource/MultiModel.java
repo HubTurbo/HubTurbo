@@ -13,6 +13,9 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
+ * This represents the true state of local repositories data. Operations meant to change the state
+ * of local repositories data but do not go through the methods in this class i.e. operating on
+ * dangling references its sub-components are considered unsafe
  * Thread-safe. The only top-level state in the application.
  */
 @SuppressWarnings("unused")
@@ -78,7 +81,6 @@ public class MultiModel implements IModel {
         return new ArrayList<>(models.values());
     }
 
-    // TODO: remove this
     public synchronized MultiModel replace(List<Model> newModels) {
         this.models.clear();
         newModels.forEach(this::add);

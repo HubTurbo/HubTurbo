@@ -1,30 +1,27 @@
 package backend.github;
 
-import backend.resource.TurboIssue;
-import backend.resource.TurboLabel;
-import backend.resource.TurboMilestone;
-import backend.resource.TurboUser;
+import backend.resource.*;
 import org.eclipse.egit.github.core.PullRequest;
 
 import java.util.List;
 
 /**
- * This classes stores the updates data for a repository downloaded from GitHub
+ * This classes stores the updates data downloaded from GitHub for a repository represented locally as a Model
  */
-public final class GitHubRepoUpdatesData {
-    private final String repoId;
+public final class GitHubModelUpdatesData {
+    private final Model model;
     private final GitHubRepoTask.Result<TurboIssue> issues;
     private final List<PullRequest> pullRequests;
     private final GitHubRepoTask.Result<TurboLabel> labels;
     private final GitHubRepoTask.Result<TurboMilestone> milestones;
     private final GitHubRepoTask.Result<TurboUser> users;
 
-    public GitHubRepoUpdatesData(String repoId,
-                                 GitHubRepoTask.Result<TurboIssue> issues, List<PullRequest> pullRequests,
-                                 GitHubRepoTask.Result<TurboLabel> labels,
-                                 GitHubRepoTask.Result<TurboMilestone> milestones,
-                                 GitHubRepoTask.Result<TurboUser> users) {
-        this.repoId = repoId;
+    public GitHubModelUpdatesData(Model model,
+                                  GitHubRepoTask.Result<TurboIssue> issues, List<PullRequest> pullRequests,
+                                  GitHubRepoTask.Result<TurboLabel> labels,
+                                  GitHubRepoTask.Result<TurboMilestone> milestones,
+                                  GitHubRepoTask.Result<TurboUser> users) {
+        this.model = model;
         this.issues = issues;
         this.pullRequests = pullRequests;
         this.labels = labels;
@@ -33,7 +30,11 @@ public final class GitHubRepoUpdatesData {
     }
 
     public String getRepoId() {
-        return repoId;
+        return model.getRepoId();
+    }
+
+    public Model getModel() {
+        return model;
     }
 
     public GitHubRepoTask.Result<TurboIssue> getIssues() {

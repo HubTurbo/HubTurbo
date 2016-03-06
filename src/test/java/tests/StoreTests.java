@@ -74,7 +74,7 @@ public class StoreTests {
         // Spawn new issue (to be stored in JSON)
         UI.events.triggerEvent(UpdateDummyRepoEvent.newIssue("dummy1/dummy1"));
         // Trigger store
-        dummy1 = testIO.updateModel(dummy1).get();
+        dummy1 = testIO.updateModel(dummy1, false).get();
         assertEquals(DummyRepoState.noOfDummyIssues + 1, dummy1.getIssues().size());
 
         TestUtils.delay(2); // Wait 2 seconds for Gson to convert model to JSON and write
@@ -133,7 +133,7 @@ public class StoreTests {
 
         Model dummy1 = testIO.openRepository("dummy1/dummy1").get();
         UI.events.triggerEvent(UpdateDummyRepoEvent.newIssue("dummy1/dummy1"));
-        testIO.updateModel(dummy1).get();
+        testIO.updateModel(dummy1, false).get();
 
         assertEquals(true, Files.exists(Paths.get("store/test/dummy1-dummy1.json")));
 
