@@ -120,19 +120,14 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
     }
 
     /**
-     * This method triggers the callback for onItemSelected with the index and "false" parameter indicating that
-     * it is called for left clicks, key presses etc but not right clicks.
-     * The boolean parameter enables us to perform different actions
-     * (e.g. deciding whether the bView should be loaded with that issue) based on different kinds of inputs
+     * Triggers the selected item on the card at the specified {index} for actions that are not right clicks
      */
     private void triggerItemSelected(int index){
         onItemSelected.accept(index, !IS_RIGHT_CLICK);
     }
 
     /**
-     * This method triggers the callback for onItemSelected with the index and "true" parameter indicating that
-     * it is called for right clicks. The boolean parameter enables us to perform different actions
-     * (e.g. deciding whether the bView should be loaded with that issue) based on different kinds of inputs
+     * Triggers the selected item on the card at the specified {index} for actions that are right clicks
      */
     private void triggerItemSelectedSecondary(int index){
         onItemSelected.accept(index, IS_RIGHT_CLICK);

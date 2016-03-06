@@ -311,7 +311,7 @@ public class ListPanel extends FilterPanel {
         });
 
         contextMenu.getItems().addAll(markAsReadUnreadMenuItem, markAllBelowAsReadMenuItem,
-                markAllBelowAsUnreadMenuItem, changeLabelsMenuItem);
+                                      markAllBelowAsUnreadMenuItem, changeLabelsMenuItem);
         contextMenu.setOnShowing(e -> updateContextMenu(contextMenu));
         listView.setContextMenu(contextMenu);
 
@@ -384,7 +384,7 @@ public class ListPanel extends FilterPanel {
     }
 
     /**
-     * Mark all items on and below the selected item in the list view as read/unread
+     * Marks the selected item and item below it in the list view as read/unread
      * @param isRead Setting it to true marks all items on and below the selected issue as read.
      *               Setting it to false marks all items on and below the selected issue as unread.
      */
