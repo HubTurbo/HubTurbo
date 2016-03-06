@@ -36,46 +36,44 @@ public class ContextMenuUnstableTests extends UITest {
      * Tests selecting "Mark all below as read" and "Mark all below as unread" context menu items
      */
     @Test
-    public void markAllBelowAsReadUnread_twelveIssuesInListView_issuesCorrectlyMarkedReadUnread() {
-        ListPanel issuePanel = find(PANEL_IDENTIFIER);
-        try {
-            Field listViewField = ListPanel.class.getDeclaredField("listView");
-            listViewField.setAccessible(true);
-            IssueListView listViewValue = (IssueListView) listViewField.get(issuePanel);
+    public void markAllBelowAsReadUnread_twelveIssuesInListView_issuesCorrectlyMarkedReadUnread()
+            throws NoSuchFieldException, IllegalAccessException {
 
-            // scrolls to the end of the panel
-            listViewValue.scrollAndShow(12);
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
+        ListPanel issuePanel = find(PANEL_IDENTIFIER);
+        Field listViewField = ListPanel.class.getDeclaredField("listView");
+        listViewField.setAccessible(true);
+        IssueListView listViewValue = (IssueListView) listViewField.get(issuePanel);
+
+        // scrolls to the end of the panel
+        listViewValue.scrollAndShow(12);
 
 
         //checking for issue #7 and below twice to make sure issues are marked correctly for read/unread cases
-        for (int i = 0; i < 2; i++) {
-            markAndVerifyIssuesBelow(7, true);
-        }
-        for (int i = 0; i < 2; i++) {
-            markAndVerifyIssuesBelow(7, false);
-        }
+        markAndVerifyIssuesBelow(issuePanel, 7, true);
+        verifyReadStatusOfIssuesBelow(issuePanel, 7, true);
+        markAndVerifyIssuesBelow(issuePanel, 7, true);
+        verifyReadStatusOfIssuesBelow(issuePanel, 7, true);
+        markAndVerifyIssuesBelow(issuePanel, 7, false);
+        verifyReadStatusOfIssuesBelow(issuePanel, 7, false);
+        markAndVerifyIssuesBelow(issuePanel, 7, false);
+        verifyReadStatusOfIssuesBelow(issuePanel, 7, false);
 
         //checking for the last issue to ensure correct marking of issues on/below as read/unread when no issues below
-        markAndVerifyIssuesBelow(1, true);
-        markAndVerifyIssuesBelow(1, false);
+        markAndVerifyIssuesBelow(issuePanel, 1, true);
+        verifyReadStatusOfIssuesBelow(issuePanel, 1, true);
+        markAndVerifyIssuesBelow(issuePanel, 1, false);
+        verifyReadStatusOfIssuesBelow(issuePanel, 1, false);
     }
 
     /**
-     * Marks and tests issues in a panel of 12 issues
-     * from Issue #{index} in the UI right to the end of the list as read/unread
-     * @param isMarkAsRead If true, tests whether issues on/below the selected issue are being correctly marked read
-     *                      If false, tests whether issues on/below the selected are being correctly marked unread
+     * Marks issues in the panel from Issue index in the UI right to the end of the list as read/unread
+     * @param isMarkAsRead If true, marks the selected issue and below as read
+     *                     If false, marks the selected issue and below as unread
      * @param index The issue number in the panel
      */
-    private void markAndVerifyIssuesBelow(int index, boolean isMarkAsRead){
-        ListPanel issuePanel = find(PANEL_IDENTIFIER);
-        click(PANEL_IDENTIFIER + "_" + index);
-        rightClick(PANEL_IDENTIFIER + "_" + index);
+    private void markAndVerifyIssuesBelow(ListPanel issuePanel, int index, boolean isMarkAsRead){
+        click("#" + issuePanel.getId() + "_" + index);
+        rightClick("#" + issuePanel.getId() + "_" + index);
         ContextMenu contextMenu = issuePanel.getContextMenu();
         for (MenuItem menuItem : contextMenu.getItems()){
             awaitCondition(menuItem::isVisible);
@@ -85,16 +83,15 @@ public class ContextMenuUnstableTests extends UITest {
         } else {
             click("Mark all below as unread");
         }
-        for (int i = index; i >= 1; i--){
-            verifyReadStatusOfIssue(i, isMarkAsRead);
-        }
     }
 
     /**
-     * Tests whether a list panel cell corresponding to a particular index is marked as read/unread
+     * Tests whether list panel cells corresponding to a particular index and below are marked as read/unread
      */
-    private void verifyReadStatusOfIssue(int index, boolean isExpectedStatusRead){
-        ListPanelCell listPanelCell = find(PANEL_IDENTIFIER + "_" + index);
-        assertEquals(listPanelCell.getIssue().isCurrentlyRead(), isExpectedStatusRead);
+    private void verifyReadStatusOfIssuesBelow(ListPanel issuePanel, int index, boolean isExpectedStatusRead){
+        for (int i = index; i >= 1; i--){
+            ListPanelCell listPanelCell = find("#" + issuePanel.getId() + "_" + index);
+            assertEquals(listPanelCell.getIssue().isCurrentlyRead(), isExpectedStatusRead);
+        }
     }
 }

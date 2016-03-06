@@ -16,6 +16,8 @@ public class IssueSelectedEventTest extends UITest{
 
     static int eventTestCount;
 
+    private static final String PANEL_IDENTIFIER = "#dummy/dummy_col0";
+
     public static void increaseEventTestCount() {
         eventTestCount++;
     }
@@ -29,17 +31,14 @@ public class IssueSelectedEventTest extends UITest{
         UI.events.registerEvent((IssueSelectedEventHandler) e -> IssueSelectedEventTest.increaseEventTestCount());
     }
 
-    /**
-     * Tests whether right click doesn't trigger IssueSelectedEvent
-     */
     @Test
     public void noTriggerIssueSelectedOnRightClick_IssueInPanelRightClicked_IssueSelectedNotTriggered() {
         resetEventTestCount();
 
-        ListPanel issuePanel = find("#dummy/dummy_col0");
+        ListPanel issuePanel = find(PANEL_IDENTIFIER);
 
         //testing whether right click occurred by checking the presence of context menu items
-        rightClick("#dummy/dummy_col0_9");
+        rightClick(PANEL_IDENTIFIER + "_9");
         ContextMenu contextMenu = issuePanel.getContextMenu();
         for (MenuItem menuItem : contextMenu.getItems()){
             assertTrue(!menuItem.isDisable());
@@ -56,7 +55,7 @@ public class IssueSelectedEventTest extends UITest{
     public void triggerIssueSelectedOnLeftClickAndKey_IssueInPanelLeftClickedAndKeyed_IssueSelectedTriggered() {
         resetEventTestCount();
 
-        click("#dummy/dummy_col0_9");
+        click(PANEL_IDENTIFIER + "_9");
 
         // testing IssueSelectedEvent is triggered on left click
         assertEquals(1, eventTestCount);

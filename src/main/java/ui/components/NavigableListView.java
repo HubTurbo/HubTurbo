@@ -120,7 +120,7 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
     }
 
     /**
-     * Triggers the selected item on the card at the specified {index} for actions that are not right clicks
+     * Triggers the selected item on the card at the specified index for actions that are not right clicks
      */
     private void triggerItemSelected(int index){
         onItemSelected.accept(index, !IS_RIGHT_CLICK);
