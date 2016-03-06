@@ -213,7 +213,7 @@ public class TurboIssue {
      * @param otherIssue
      */
     private void reconcile(TurboIssue otherIssue) {
-        logger.info("Reconciling issue %s in %s", this, otherIssue, this.getRepoId());
+        logger.info(String.format("Reconciling issue %s in %s", this, this.getRepoId()));
         this.reconcileLabels(otherIssue);
     }
 
@@ -225,7 +225,7 @@ public class TurboIssue {
         LocalDateTime thisIssueLabelsModifiedAt = this.getLabelsLastModifiedAt();
         LocalDateTime otherIssueLabelsModifiedAt = otherIssue.getLabelsLastModifiedAt();
         if (thisIssueLabelsModifiedAt.isBefore(otherIssueLabelsModifiedAt)) {
-            logger.info("Issue %s's labels %s are stale, replacing with %s",
+            logger.info(String.format("Issue %s's labels %s are stale, replacing with %s"),
                         this, this.getLabels(), otherIssue.getLabels());
             this.labels = otherIssue.getLabels();
             this.labelsLastModifiedAt = Optional.of(otherIssue.getLabelsLastModifiedAt());
