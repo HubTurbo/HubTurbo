@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 
+import filter.expression.QualifierType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCodeCombination;
@@ -28,8 +29,7 @@ import ui.issuepanel.PanelControl;
 import util.GithubPageElements;
 import util.HTLog;
 import util.KeyPress;
-import util.events.IssueSelectedEvent;
-import util.events.ShowLabelPickerEvent;
+import util.events.*;
 import backend.resource.TurboIssue;
 import filter.expression.Qualifier;
 
@@ -379,26 +379,67 @@ public class ListPanel extends FilterPanel {
         }
     }
 
-    /**
-     * Adds a style class to the listview which changes its background to contain a loading spinning gif
-     */
     @Override
-    protected void addPanelLoadingIndication() {
-        logger.info("Preparing to add panel loading indication");
-        listView.getStyleClass().add("listview-loading");
+    protected void startLoadingAnimationIfApplicable(PrimaryRepoOpeningEvent e) {
+        // Repo is being opened by the repo selector, does not need to filter if repo is already specified for panel
+        if (hasReposInFilter()) startLoadingAnimation();
+    }
 
-        // Remove the items in the issue list because they are not relevant to the filter anymore.
-        // This also makes the listview background visible, since we intend to show a loading indicator on the
-        // background.
-        listView.setItems(null);
+    @Override
+    protected void stopLoadingAnimationIfApplicable(PrimaryRepoOpenedEvent e) {
+        if (hasReposInFilter()) stopLoadingAnimation();
+    }
+
+    @Override
+    protected void startLoadingAnimationIfApplicable(ApplyingFilterEvent e) {
+        // Repo is being opened by a panel's filter, only need to show loading animation in the responsible panel
+        if (e.panel == this) startLoadingAnimation();
+    }
+
+    @Override
+    protected void stopLoadingAnimationIfApplicable(AppliedFilterEvent e) {
+        if (e.panel == this) stopLoadingAnimation();
+    }
+
+    private void startLoadingAnimation() {
+        setTranslucentCellFactory();
+        showLoadingIndicator();
+    }
+
+    private void stopLoadingAnimation() {
+        hideLoadingIndicator();
     }
 
     /**
-     * Removes the style class that was added in addPanelLoadingIndicator() from the listview.
+     * Adds a style class to the listview which changes its background to contain a loading spinning gif
      */
-    @Override
-    protected void removePanelLoadingIndication() {
+    private void showLoadingIndicator() {
+        logger.info("Preparing to add panel loading indication");
+        listView.getStyleClass().add("listview-loading");
+    }
+
+    /**
+     * Removes the style class that was added in showLoadingIndicator() from the listview.
+     */
+    private void hideLoadingIndicator() {
         logger.info("Preparing to remove panel loading indication");
         listView.getStyleClass().removeIf(cssClass -> cssClass.equals("listview-loading"));
+    }
+
+    private void setTranslucentCellFactory() {
+        if (getElementsList() == null) return;
+        final HashSet<Integer> issuesWithNewComments
+                = updateIssueCommentCounts(Qualifier.hasUpdatedQualifier(getCurrentFilterExpression()));
+        listView.setCellFactory(list -> {
+            ListPanelCell cell = new ListPanelCell(this, panelIndex, issuesWithNewComments);
+            cell.setStyle(cell.getStyle() + "-fx-opacity: 40%;");
+            return cell;
+        });
+    }
+
+    private boolean hasReposInFilter() {
+        HashSet<String> allReposInFilterExpr =
+                Qualifier.getMetaQualifierContent(getCurrentFilterExpression(), QualifierType.REPO);
+        return allReposInFilterExpr.isEmpty();
     }
 }

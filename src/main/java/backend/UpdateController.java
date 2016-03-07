@@ -8,6 +8,7 @@ import filter.expression.Qualifier;
 import org.apache.logging.log4j.Logger;
 import filter.expression.QualifierType;
 import ui.GuiElement;
+import ui.issuepanel.FilterPanel;
 import util.Futures;
 import util.HTLog;
 
@@ -31,23 +32,32 @@ public class UpdateController {
     }
 
     /**
-     * Given a list of filter expressions, dispatch metadata update if needed and then process them to return
+     * Given a list of panels, opens the repositories specified in the panels' filters.
+     *
+     * After which, dispatches metadata update if needed and then processes them to return
      * a map of filtered and sorted issues corresponding to each filter expression, based on the most recent data
      * from the repository source.
      *
-     * @param filterExprs Filter expressions to process
+     * @param filterPanels Filter panels to process
      */
-    public void processAndRefresh(List<FilterExpression> filterExprs) {
+    public void processAndRefresh(List<FilterPanel> filterPanels) {
+        List<FilterExpression> filterExprs = getFilterExpressions(filterPanels);
         // Open specified repos
-        openRepositoriesInFilters(filterExprs);
+        openRepositoriesInFilters(filterPanels)
+        .thenRun(() -> {
+            // First filter, for issues requiring a metadata update.
+            Map<String, List<TurboIssue>> toUpdate = tallyMetadataUpdate(filterExprs);
 
-        // First filter, for issues requiring a metadata update.
-        Map<String, List<TurboIssue>> toUpdate = tallyMetadataUpdate(filterExprs);
+            if (toUpdate.isEmpty()) {
+                // If no issues requiring metadata update, just run the filter and sort.
+                logic.updateUI(processFilter(filterExprs));
+                return;
+            }
 
-        if (!toUpdate.isEmpty()) {
             // If there are issues requiring metadata update, we dispatch the metadata requests...
             ArrayList<CompletableFuture<Boolean>> metadataRetrievalTasks = new ArrayList<>();
-            toUpdate.forEach((repoId, issues) -> metadataRetrievalTasks.add(logic.getIssueMetadata(repoId, issues)));
+            toUpdate.forEach((repoId, issues) ->
+                    metadataRetrievalTasks.add(logic.getIssueMetadata(repoId, issues)));
             // ...and then wait for all of them to complete.
             Futures.sequence(metadataRetrievalTasks)
                     .thenAccept(results -> logger.info("Metadata retrieval successful for "
@@ -56,22 +66,26 @@ public class UpdateController {
                     .thenCompose(n -> logic.getRateLimitResetTime())
                     .thenApply(logic::updateRemainingRate)
                     .thenRun(() -> logic.updateUI(processFilter(filterExprs))); // Then filter the second time.
-        } else {
-            // If no issues requiring metadata update, just run the filter and sort.
-            logic.updateUI(processFilter(filterExprs));
-        }
+        });
+    }
+
+    private List<FilterExpression> getFilterExpressions(List<FilterPanel> panels) {
+        return panels.stream()
+                .map(panel -> panel.getCurrentFilterExpression())
+                .collect(Collectors.toList());
     }
 
     /**
-     * Given a list of filter expressions, open all repositories necessary for processing the filter expressions.
+     * Given a list of filter panels, opens all repositories necessary for processing the filter expressions
      *
-     * @param filterExprs Filter expressions to process.
+     * @param filterPanels
      */
-    private void openRepositoriesInFilters(List<FilterExpression> filterExprs) {
-        filterExprs.stream()
-                .flatMap(filterExpr -> Qualifier.getMetaQualifierContent(filterExpr, QualifierType.REPO).stream())
-                .distinct()
-                .forEach(logic::openRepositoryFromFilter);
+    private CompletableFuture<List<Boolean>> openRepositoriesInFilters(List<FilterPanel> filterPanels) {
+        return Futures.sequence(filterPanels.stream()
+                .flatMap(panel -> Qualifier.getMetaQualifierContent(panel.getCurrentFilterExpression(),
+                        QualifierType.REPO).stream()
+                        .map(repoId -> logic.openRepositoryFromFilter(repoId, panel)))
+                .collect(Collectors.toList()));
     }
 
     /**
