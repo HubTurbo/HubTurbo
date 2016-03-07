@@ -21,7 +21,8 @@ Pressing <kbd>L</kbd> after selecting an issue card brings up the Label Picker.
 
 The Label Picker is split into 2 parts, the part above the text field shows the labels that are currently applied to the particular item. The part below the text field shows all the labels that current exist in the repository. 
 
-Clicking on labels in either part toggles their state. 
+Clicking on labels in either part toggles their state.  
+> Text field will be disabled after clicking on a label. 
 
 ![](images/labels/demo.gif?raw=true)
 
