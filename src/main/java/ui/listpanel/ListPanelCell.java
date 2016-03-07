@@ -24,7 +24,6 @@ public class ListPanelCell extends ListCell<GuiElement> {
         this.parentPanelIndex = parentPanelIndex;
         this.issuesWithNewComments = issuesWithNewComments;
         setAlignment(Pos.CENTER);
-        getStyleClass().add("bottom-borders");
     }
 
     @Override
@@ -35,13 +34,14 @@ public class ListPanelCell extends ListCell<GuiElement> {
         }
         this.guiElement = guiElement;
         TurboIssue issue = guiElement.getIssue();
+        getStyleClass().add("bottom-borders");
         updateStyleToMatchStatus(issue);
 
         setGraphic(new ListPanelCard(guiElement, parent, issuesWithNewComments));
         this.setId(issue.getRepoId() + "_col" + parentPanelIndex + "_" + issue.getId());
     }
 
-    private void updateStyleToMatchStatus(TurboIssue issue){
+    private void updateStyleToMatchStatus(TurboIssue issue) {
         final String closedStyle = "issue-cell-closed";
         boolean isCurrentStyleClosed = getStyleClass().contains(closedStyle);
         if (!issue.isOpen()){

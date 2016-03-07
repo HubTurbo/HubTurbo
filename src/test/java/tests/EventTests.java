@@ -67,9 +67,9 @@ public class EventTests {
         EventBus eventsSuperSub = new EventBus();
 
         final EventHandler superclassHandlerSucceed = (UnusedStoredReposChangedEventHandler) e -> assertTrue(true);
-        final EventHandler subclassHandlerSucceed = (RepoOpenedEventHandler) e -> assertTrue(true);
+        final EventHandler subclassHandlerSucceed = (PrimaryRepoOpenedEventHandler) e -> assertTrue(true);
         final EventHandler subclassHandlerFail =
-                (RepoOpenedEventHandler) e -> fail("RepoOpenedEventHandler failed");
+                (PrimaryRepoOpenedEventHandler) e -> fail("PrimaryRepoOpenedEventHandler failed");
 
         // Dispatch superclass event, ensure subclass handler doesn't fire
         eventsSuperSub.register(superclassHandlerSucceed);
@@ -86,7 +86,7 @@ public class EventTests {
         eventsSuperSub.register(superclassHandlerSucceed);
         eventsSuperSub.register(subclassHandlerSucceed);
 
-        RepoOpenedEvent subclassEvent = new RepoOpenedEvent("", false);
+        PrimaryRepoOpenedEvent subclassEvent = new PrimaryRepoOpenedEvent();
 
         eventsSuperSub.post(subclassEvent);
     }

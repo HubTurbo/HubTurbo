@@ -710,9 +710,9 @@ public class Qualifier implements FilterExpression {
 
             // Matches labels belong to the given group
             Predicate<TurboLabel> sameGroup = l ->
-                l.getGroup().isPresent() && l.getGroup().get().equals(group);
+                l.isInGroup() && l.getGroupName().equals(group);
 
-            Comparator<TurboLabel> labelComparator = (x, y) -> x.getName().compareTo(y.getName());
+            Comparator<TurboLabel> labelComparator = (x, y) -> x.compareTo(y);
 
             List<TurboLabel> aLabels = model.getLabelsOfIssue(a, sameGroup);
             List<TurboLabel> bLabels = model.getLabelsOfIssue(b, sameGroup);
@@ -884,26 +884,26 @@ public class Qualifier implements FilterExpression {
         TurboLabel candidateLabel = new TurboLabel("", candidate.toLowerCase());
 
         String group = "";
-        if (inputLabel.hasGroup()) {
-            group = inputLabel.getGroup().get();
+        if (inputLabel.isInGroup()) {
+            group = inputLabel.getGroupName();
         }
-        String labelName = inputLabel.getName();
+        String labelName = inputLabel.getShortName();
 
-        if (candidateLabel.hasGroup()) {
+        if (candidateLabel.isInGroup()) {
             if (labelName.isEmpty()) {
                 // Check the group
-                if (candidateLabel.getGroup().get().contains(group)) {
+                if (candidateLabel.getGroupName().contains(group)) {
                     return true;
                 }
             } else {
-                if (candidateLabel.getGroup().get().contains(group)
-                    && candidateLabel.getName().contains(labelName)) {
+                if (candidateLabel.getGroupName().contains(group)
+                    && candidateLabel.getShortName().contains(labelName)) {
                     return true;
                 }
             }
         } else {
             // Check only the label name
-            if (group.isEmpty() && !labelName.isEmpty() && candidateLabel.getName().contains(labelName)) {
+            if (group.isEmpty() && !labelName.isEmpty() && candidateLabel.getShortName().contains(labelName)) {
                 return true;
             }
         }
@@ -919,7 +919,7 @@ public class Qualifier implements FilterExpression {
         // it does not express.
 
         for (TurboLabel label : model.getLabelsOfIssue(issue)) {
-            if (labelMatches(content.get(), label.getActualName())) {
+            if (labelMatches(content.get(), label.getFullName())) {
                 return true;
             }
         }
@@ -1017,7 +1017,7 @@ public class Qualifier implements FilterExpression {
 
         // Find labels containing the label name
         List<TurboLabel> labels = model.getLabels().stream()
-                .filter(l -> l.getActualName().toLowerCase().contains(content.get().toLowerCase()))
+                .filter(l -> l.getFullName().toLowerCase().contains(content.get().toLowerCase()))
             .collect(Collectors.toList());
 
         if (labels.isEmpty()) {
@@ -1029,7 +1029,7 @@ public class Qualifier implements FilterExpression {
 
         // Find labels with the exact label name
         labels = model.getLabels().stream()
-            .filter(l -> l.getActualName().toLowerCase().equals(content.get().toLowerCase()))
+            .filter(l -> l.getFullName().toLowerCase().equals(content.get().toLowerCase()))
             .collect(Collectors.toList());
 
         if (labels.isEmpty()) {

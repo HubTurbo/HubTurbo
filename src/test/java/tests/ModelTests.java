@@ -167,10 +167,10 @@ public class ModelTests {
         Collections.sort(labelNames); // Label 1, Label 10..12, Label 2..9
         int labelCount = 1;
         for (TurboLabel label : modelUpdated.getLabels()) {
-            if (label.getActualName().startsWith("Label")) {
-                assertEquals(labelNames.get(labelCount - 1), label.getActualName());
+            if (label.getFullName().startsWith("Label")) {
+                assertEquals(labelNames.get(labelCount - 1), label.getFullName());
                 assertEquals("Label " + labelCount,
-                        modelUpdated.getLabelByActualName("Label " + labelCount).get().getActualName());
+                        modelUpdated.getLabelByActualName("Label " + labelCount).get().getFullName());
                 labelCount++;
             }
         }
@@ -232,7 +232,7 @@ public class ModelTests {
 
         assertEquals(Optional.<TurboLabel>empty(),
                 modelUpdated.getLabelByActualName("Label " + (DummyRepoState.noOfDummyIssues + 1)));
-        assertEquals("Label 10", modelUpdated.getLabelByActualName("Label 10").get().getActualName());
+        assertEquals("Label 10", modelUpdated.getLabelByActualName("Label 10").get().getFullName());
 
         // Milestones
 
