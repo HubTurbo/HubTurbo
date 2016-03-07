@@ -1,47 +1,41 @@
 package ui.components.pickers;
 
 import backend.resource.TurboLabel;
+
 import com.sun.javafx.tk.FontLoader;
 import com.sun.javafx.tk.Toolkit;
+
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 
-// for use with LabelPickerDialog
+/**
+ * This class is to represent a label in LabelPickerDialog
+ *
+ * It contains attributes such as selected, highlighted, removed and faded in order
+ * to produce the appropriate styled node through getNode()
+ */
 public class PickerLabel extends TurboLabel {
 
-    private final LabelPickerUILogic labelPickerUILogic;
     private boolean isSelected;
     private boolean isHighlighted;
     private boolean isRemoved;
     private boolean isFaded;
-    private final boolean isTop;
+    private final boolean canDisplayFullName;
 
-    public PickerLabel(TurboLabel label, LabelPickerUILogic labelPickerUILogic, boolean isTop) {
-        super(label.getRepoId(), label.getColour(), label.getActualName());
-        this.labelPickerUILogic = labelPickerUILogic;
+    public PickerLabel(TurboLabel label, boolean canDisplayFullName) {
+        super(label.getRepoId(), label.getColour(), label.getFullName());
         isSelected = false;
         isHighlighted = false;
         isRemoved = false;
         isFaded = false;
-        this.isTop = isTop;
-    }
-
-    public PickerLabel(TurboLabel label, LabelPickerUILogic labelPickerUILogic,
-                       boolean isSelected, boolean isHighlighted, boolean isRemoved, boolean isFaded, boolean isTop) {
-        super(label.getRepoId(), label.getColour(), label.getActualName());
-        this.labelPickerUILogic = labelPickerUILogic;
-        this.isSelected = isSelected;
-        this.isHighlighted = isHighlighted;
-        this.isRemoved = isRemoved;
-        this.isFaded = isFaded;
-        this.isTop = isTop;
+        this.canDisplayFullName = canDisplayFullName;
     }
 
     @Override
     public Node getNode() {
         // actual name for labels at the top, add tick for selected labels
-        Label label = new Label((isTop ? getActualName() : getName()));
+        Label label = new Label((canDisplayFullName ? getFullName() : getShortName()));
         label.getStyleClass().add("labels");
         if (isRemoved) label.getStyleClass().add("labels-removed"); // add strikethrough
         String style = getStyle() + (isHighlighted ? " -fx-border-color: black;" : ""); // add highlight border
@@ -51,39 +45,37 @@ public class PickerLabel extends TurboLabel {
         FontLoader fontLoader = Toolkit.getToolkit().getFontLoader();
         double width = (double) fontLoader.computeStringWidth(label.getText(), label.getFont());
         label.setPrefWidth(width + 30);
-        label.setText(label.getText() + (!isTop && isSelected ? " ✓" : ""));
+        label.setText(label.getText() + (!canDisplayFullName && isSelected ? " ✓" : ""));
 
-        if (getGroup().isPresent()) {
-            Tooltip groupTooltip = new Tooltip(getGroup().get());
+        if (isInGroup()) {
+            Tooltip groupTooltip = new Tooltip(getGroupName());
             label.setTooltip(groupTooltip);
         }
-
-        label.setOnMouseClicked(e -> labelPickerUILogic.toggleLabel(getActualName()));
         return label;
     }
 
-    public void setIsSelected(boolean isSelected) {
+    public boolean isSelected() {
+        return isSelected;
+    }
+
+    public PickerLabel selected(boolean isSelected) {
         this.isSelected = isSelected;
+        return this;
     }
 
-    public boolean isHighlighted() {
-        return isHighlighted;
-    }
-
-    public void setIsHighlighted(boolean isHighlighted) {
+    public PickerLabel highlighted(boolean isHighlighted) {
         this.isHighlighted = isHighlighted;
+        return this;
     }
 
-    public void setIsRemoved(boolean isRemoved) {
+    public PickerLabel removed(boolean isRemoved) {
         this.isRemoved = isRemoved;
+        return this;
     }
 
-    public boolean isFaded() {
-        return isFaded;
-    }
-
-    public void setIsFaded(boolean isFaded) {
+    public PickerLabel faded(boolean isFaded) {
         this.isFaded = isFaded;
+        return this;
     }
 
     /**

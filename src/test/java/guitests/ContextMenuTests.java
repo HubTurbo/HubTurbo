@@ -91,7 +91,7 @@ public class ContextMenuTests extends UITest {
         click("Change labels (L)");
         sleep(DIALOG_DELAY);
 
-        assertNotNull(find("#labelPickerTextField"));
+        assertNotNull(find("#queryField"));
 
         push(KeyCode.ESCAPE);
         sleep(EVENT_DELAY);
