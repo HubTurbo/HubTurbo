@@ -51,6 +51,9 @@ public class UI extends Application implements EventDispatcher {
     public static final int VERSION_MINOR = 22;
     public static final int VERSION_PATCH = 0;
 
+    // HT Required Java Version
+    public static final String REQUIRED_VERSION = "1.8.0_60";
+
     public static final String WINDOW_TITLE = "HubTurbo %s (%s)";
 
     public static final String ARG_UPDATED_TO = "--updated-to";
@@ -99,6 +102,7 @@ public class UI extends Application implements EventDispatcher {
         initPreApplicationState();
         initUI(stage);
         initApplicationState();
+        warnIfJavaVersionOutdated();
         login(TestController.isBypassLogin());
     }
 
@@ -539,5 +543,28 @@ public class UI extends Application implements EventDispatcher {
 
     public boolean isWindowFocused() {
         return mainStage.isFocused();
+    }
+
+    /**
+     * Warns user if the Java runtime version is lower than HT's requirement
+     */
+    private void warnIfJavaVersionOutdated() {
+        try {
+            JavaVersion runtimeVersion = JavaVersion.fromString(System.getProperty("java.runtime.version"));
+            JavaVersion requiredVersion = JavaVersion.fromString(REQUIRED_VERSION);
+
+            if (JavaVersion.isJavaVersionTooLow(runtimeVersion, requiredVersion)) {
+                showJavaVersionOutdatedWarning(runtimeVersion, requiredVersion);
+            }
+        } catch (IllegalArgumentException e) {
+            logger.error("Java Version string failed to be parsed.", e);
+        }
+    }
+
+    private void showJavaVersionOutdatedWarning(JavaVersion runtimeVersion, JavaVersion requiredVersion) {
+        String message = String.format(JavaVersion.OUTDATED_JAVA_VERSION_MESSAGE,
+                requiredVersion.toString(), runtimeVersion.toString());
+        DialogMessage.showInformationDialog("Update your Java version",
+                message);
     }
 }
