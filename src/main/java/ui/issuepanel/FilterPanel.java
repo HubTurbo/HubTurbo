@@ -177,11 +177,13 @@ public abstract class FilterPanel extends AbstractPanel {
             FilterExpression filter = Parser.parse(filterString);
             if (filter != null) {
                 this.applyFilterExpression(filter);
+                filterTextField.setStyleForValidFilter();
             } else {
                 this.applyFilterExpression(Qualifier.EMPTY);
             }
         } catch (FilterException ex) {
             this.applyFilterExpression(Qualifier.EMPTY);
+            filterTextField.setStyleForInvalidFilter();
             // Overrides message in status bar
             UI.status.displayMessage(getUniquePanelName(
                 panelMenuBar.getPanelName()) + ": " + ex.getMessage());
