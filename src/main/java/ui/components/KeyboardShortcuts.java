@@ -125,6 +125,8 @@ public final class KeyboardShortcuts {
     //ui.RepositorySelector
     public static final KeyCodeCombination REMOVE_FOCUS =
             new KeyCodeCombination(KeyCode.ESCAPE);
+    public static final KeyCodeCombination SHOW_REPO_PICKER =
+            new KeyCodeCombination(KeyCode.R, KeyCombination.CONTROL_DOWN);
 
     // ui.MenuControl
     public static final KeyCodeCombination NEW_ISSUE =
