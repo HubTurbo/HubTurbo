@@ -7,7 +7,6 @@ import static ui.components.KeyboardShortcuts.MINIMIZE_WINDOW;
 import static ui.components.KeyboardShortcuts.SWITCH_BOARD;
 import filter.expression.QualifierType;
 import javafx.application.Platform;
-import javafx.scene.control.Tooltip;
 import ui.GUIController;
 import ui.GuiElement;
 import ui.components.PanelMenuBar;
@@ -32,7 +31,6 @@ import util.events.testevents.UIComponentFocusEvent;
 import prefs.PanelInfo;
 
 import java.util.*;
-import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -70,33 +68,6 @@ public abstract class FilterPanel extends AbstractPanel {
             }
         });
         setupKeyboardShortcuts();
-    }
-
-    public void warnUser(List<String> warnings) {
-        // hide old tooltip first
-        filterTextField.hideTooltip();
-
-        if (warnings.isEmpty()) {
-            filterTextField.setTooltip(null);
-        } else {
-            // build warning string
-            StringBuilder warning = new StringBuilder();
-            if (warnings.size() == 1) {
-                warning.append(warnings.get(0));
-            } else {
-                for (int i = 0; i < warnings.size(); i++) {
-                    warning.append(String.format("%d. %s", i + 1, warnings.get(i)));
-                    if (i + 1 < warnings.size()) {
-                        warning.append('\n');
-                    }
-                }
-            }
-            Tooltip tooltip = new Tooltip(warning.toString());
-            tooltip.setHideOnEscape(true);
-            tooltip.setAutoHide(false);
-            filterTextField.setTooltip(tooltip);
-            filterTextField.showTooltip();
-        }
     }
 
     private void setupKeyboardShortcuts() {

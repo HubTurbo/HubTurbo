@@ -41,7 +41,6 @@ public class GUIController {
 
     public final void registerEvents() {
         UI.events.registerEvent((ModelUpdatedEventHandler) this::modelUpdated);
-        UI.events.registerEvent((WarnUserEventHandler) this::warnUser);
         UI.events.registerEvent((UpdateRateLimitsEventHandler) this::updateAPIBox);
         UI.events.registerEvent((ShowErrorDialogEventHandler) this::showErrorDialog);
         UI.events.registerEvent((PrimaryRepoChangedEventHandler) this::setDefaultRepo);
@@ -67,22 +66,6 @@ public class GUIController {
                             e.elementsToShow.get(((FilterPanel) child).getCurrentFilterExpression());
 
                     if (filterResult != null) ((FilterPanel) child).updatePanel(filterResult);
-                });
-    }
-
-    /**
-     * Handler method for a WarnUserEvent.
-     * @param e
-     */
-    private void warnUser(WarnUserEvent e) {
-        panelControl.getChildren().stream()
-                .filter(child -> child instanceof FilterPanel)
-                .forEach(child -> {
-                    // Search for the corresponding entry in e.warningsToShow
-                    List<String> filterResult =
-                            e.warningsToShow.get(((FilterPanel) child).getCurrentFilterExpression());
-
-                    if (filterResult != null) ((FilterPanel) child).warnUser(filterResult);
                 });
     }
 

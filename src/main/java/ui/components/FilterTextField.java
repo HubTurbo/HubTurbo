@@ -1,16 +1,13 @@
 package ui.components;
 
 import javafx.application.Platform;
-import javafx.geometry.Bounds;
 import javafx.scene.control.IndexRange;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;

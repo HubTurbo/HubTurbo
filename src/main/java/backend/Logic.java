@@ -398,9 +398,10 @@ public class Logic {
     }
 
     /**
-     * Carries the current set of GUI elements, as well as the current list of users in the model, to the GUI.
+     * Carries the current set of GUI elements including warning, as well as
+     * the current list of users in the model, to the GUI.
      */
-    public void updateUI(Map<FilterExpression, ImmutablePair<List<GuiElement>, List<String>>> elementsToShow) {
+    public void updateUI(Map<FilterExpression, List<GuiElement>> elementsToShow) {
         uiManager.update(elementsToShow, models.getUsers());
     }
 
