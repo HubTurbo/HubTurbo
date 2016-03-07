@@ -8,6 +8,7 @@ import javafx.scene.Node;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
 import prefs.Preferences;
 import prefs.PanelInfo;
 import ui.GUIController;
@@ -27,13 +28,15 @@ import java.util.stream.Stream;
 public class PanelControl extends HBox {
 
     private final UI ui;
+    private final Stage mainStage;
     private final Preferences prefs;
     private ScrollPane panelsScrollPane;
     private GUIController guiController;
     private Optional<Integer> currentlySelectedPanel = Optional.empty();
 
-    public PanelControl(UI ui, Preferences prefs) {
+    public PanelControl(UI ui, Stage mainStage, Preferences prefs) {
         this.ui = ui;
+        this.mainStage = mainStage;
         this.prefs = prefs;
         
         setSpacing(10);
@@ -108,7 +111,7 @@ public class PanelControl extends HBox {
     }
 
     public FilterPanel addPanelAt(int index) {
-        FilterPanel panel = new ListPanel(ui, guiController, this, index);
+        FilterPanel panel = new ListPanel(ui, guiController, mainStage, this, index);
         getChildren().add(index, panel);
 
         // Populates the panel with the default repo issues.

@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import filter.expression.QualifierType;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCodeCombination;
@@ -22,6 +23,7 @@ import javafx.scene.text.Text;
 import javafx.scene.paint.Color;
 
 import javafx.scene.text.TextFlow;
+import javafx.stage.Stage;
 import org.apache.logging.log4j.Logger;
 
 import ui.GUIController;
@@ -50,6 +52,8 @@ public class ListPanel extends FilterPanel {
     private int issuesCount = 0;
     private int closedIssuesCount = 0;
     private int openIssuesCount = 0;
+
+    private final Stage mainStage;
 
     private final IssueListView listView;
     private final HashMap<Integer, Integer> issueCommentCounts = new HashMap<>();
@@ -83,10 +87,13 @@ public class ListPanel extends FilterPanel {
     private static final String closeIssueMenuItemText = "Close issue (C)";
     private static final String reopenIssueMenuItemText = "Reopen issue (O)";
 
-    public ListPanel(UI ui, GUIController guiController, PanelControl parentPanelControl, int panelIndex) {
+    public ListPanel(UI ui, GUIController guiController, Stage mainStage,
+                     PanelControl parentPanelControl, int panelIndex) {
         super(ui, guiController, parentPanelControl, panelIndex);
         this.ui = ui;
         this.guiController = guiController;
+        this.mainStage = mainStage;
+
         listView = new IssueListView();
         setupListView();
         getChildren().add(listView);
@@ -566,17 +573,28 @@ public class ListPanel extends FilterPanel {
         }
     }
 
+    private void confirmCloseReopen(GuiElement element, boolean open) {
+        ConfirmCloseReopenDialog dialog = new ConfirmCloseReopenDialog(mainStage, open);
+        Optional<ButtonType> response = dialog.showAndWait();
+        response.ifPresent(res -> {
+            if (res == ButtonType.OK) {
+                ui.undoController.addAction(element.getIssue(),
+                        new EditIssueStateAction(ui.logic, open));
+            } else {
+                // Do nothing
+            }
+        });
+    }
+
     private void closeIssue() {
         getSelectedElement().ifPresent(element -> {
-            ui.undoController.addAction(element.getIssue(),
-                    new EditIssueStateAction(ui.logic, false));
+            confirmCloseReopen(element, false);
         });
     }
 
     private void reopenIssue() {
         getSelectedElement().ifPresent(element -> {
-            ui.undoController.addAction(element.getIssue(),
-                    new EditIssueStateAction(ui.logic, true));
+            confirmCloseReopen(element, true);
         });
     }
 

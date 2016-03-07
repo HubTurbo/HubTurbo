@@ -181,12 +181,14 @@ public class KeyboardShortcutsTest extends UITest {
 
         // close issue
         push(getKeyCode("CLOSE_ISSUE"));
+        push(KeyCode.ENTER);
         assertEquals(true, issuePanel.getSelectedElement().isPresent());
         assertEquals(false, issuePanel.getSelectedElement().get().getIssue().isOpen());
         clearSelectedIssueId();
 
         // reopen issue
         push(getKeyCode("REOPEN_ISSUE"));
+        push(KeyCode.ENTER);
         assertEquals(true, issuePanel.getSelectedElement().isPresent());
         assertEquals(true, issuePanel.getSelectedElement().get().getIssue().isOpen());
         clearSelectedIssueId();
