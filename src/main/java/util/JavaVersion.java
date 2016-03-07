@@ -1,0 +1,86 @@
+package util;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+/**
+ * Represents Java version
+ */
+public class JavaVersion implements Comparable<JavaVersion> {
+
+    private static final Pattern JAVA_8_VERSION_PATTERN =
+            Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)\\_(\\d+)(-b(\\d+))?");
+
+    public static final String OUTDATED_JAVA_VERSION_MESSAGE =
+            "Your Java version is older than HubTurbo's requirement. " +
+            "Use it at your own risk.%n%n" +
+            "Required version\t: %s%n" +
+            "Installed version\t: %s";
+
+    // Java version in String is formatted as "<discard>.<major>.<minor>_<update>" with optional suffix of
+    // "-b<build>". Discard is not used because all Java versions (up to Java 8) will start with "1.".
+    // This might change in Java 9.
+    private final int discard, major, minor, update, build;
+
+    public JavaVersion(int discard, int major, int minor, int update, int build) {
+        this.discard = discard;
+        this.major = major;
+        this.minor = minor;
+        this.update = update;
+        this.build = build;
+    }
+
+    public static JavaVersion fromString(String javaVersion) throws IllegalArgumentException {
+        Matcher javaVersionMatcher = JAVA_8_VERSION_PATTERN.matcher(javaVersion);
+
+        if (javaVersionMatcher.find()) {
+            return new JavaVersion(Integer.parseInt(javaVersionMatcher.group(1)),
+                    Integer.parseInt(javaVersionMatcher.group(2)),
+                    Integer.parseInt(javaVersionMatcher.group(3)),
+                    Integer.parseInt(javaVersionMatcher.group(4)),
+                    Integer.parseInt((javaVersionMatcher.group(6) != null ? javaVersionMatcher.group(6) : "0")));
+        } else {
+            throw new IllegalArgumentException("String is not a valid Java Version. " + javaVersion);
+        }
+    }
+
+    public String toString() {
+        return String.format("%d.%d.%d_%d-b%d", discard, major, minor, update, build);
+    }
+
+    @Override
+    public int compareTo(JavaVersion other) {
+        return this.discard != other.discard ? this.discard - other.discard :
+                this.major != other.major ? this.major - other.major :
+                this.minor != other.minor ? this.minor - other.minor :
+                this.update != other.update ? this.update - other.update :
+                this.build != other.build ? this.build - other.build : 0;
+    }
+
+    @Override
+    public int hashCode() {
+        String hash = String.format("%1$d%2$d%3$d%4$03d%5$03d", discard, major, minor, update, build);
+
+        return Integer.parseInt(hash);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof JavaVersion)) {
+            return false;
+        }
+        final JavaVersion other = (JavaVersion) obj;
+
+        return compareTo(other) == 0;
+    }
+
+    public static boolean isJavaVersionTooLow(JavaVersion runtime, JavaVersion required) {
+        return runtime.compareTo(required) < 0;
+    }
+}
