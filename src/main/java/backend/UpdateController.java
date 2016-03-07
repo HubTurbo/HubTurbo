@@ -3,14 +3,18 @@ package backend;
 import backend.resource.Model;
 import backend.resource.MultiModel;
 import backend.resource.TurboIssue;
+import filter.FilterException;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
+import javafx.application.Platform;
 import org.apache.logging.log4j.Logger;
 import filter.expression.QualifierType;
 import ui.GuiElement;
+import ui.UI;
 import ui.issuepanel.FilterPanel;
 import util.Futures;
 import util.HTLog;
+import util.events.FilterExceptionEvent;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -55,7 +59,7 @@ public class UpdateController {
 
             if (toUpdate.isEmpty()) {
                 // If no issues requiring metadata update, just run the filter and sort.
-                logic.updateUI(processFilter(filterExprs));
+                logic.updateUI(processPanels(filterPanels));
                 return;
             }
 
@@ -70,7 +74,7 @@ public class UpdateController {
                             + results.size() + " repos"))
                     .thenCompose(n -> logic.getRateLimitResetTime())
                     .thenApply(logic::updateRemainingRate)
-                    .thenRun(() -> logic.updateUI(processFilter(filterExprs))); // Then filter the second time.
+                    .thenRun(() -> logic.updateUI(processPanels(filterPanels))); // Then filter the second time.
         });
     }
 
@@ -112,32 +116,37 @@ public class UpdateController {
     }
 
     /**
-     * Filters, sorts and counts issues within the model according to the given filter expressions.
+     * Filters, sorts and counts issues within the model according to the given panels' filter expressions.
      * In here, "processed" is equivalent to "filtered, sorted and counted".
      *
-     * @param filterExprs Filter expressions to process.
+     * @param filterPanels Filter panels to process.
      * @return Filter expressions and their corresponding issues after filtering, sorting and counting.
      */
-    private Map<FilterExpression, List<GuiElement>> processFilter(List<FilterExpression> filterExprs) {
+    private Map<FilterExpression, List<GuiElement>> processPanels(List<FilterPanel> filterPanels) {
         MultiModel models = logic.getModels();
         List<TurboIssue> allModelIssues = models.getIssues();
 
         Map<FilterExpression, List<GuiElement>> processed = new HashMap<>();
 
-        filterExprs.stream().distinct().forEach(filterExpr -> {
+        filterPanels.stream().distinct().forEach(filterPanel -> {
+            FilterExpression filterExpr = filterPanel.getCurrentFilterExpression();
             boolean hasUpdatedQualifier = Qualifier.hasUpdatedQualifier(filterExpr);
 
-            FilterExpression filterExprNoAlias = Qualifier.replaceMilestoneAliases(models, filterExpr);
+            try {
+                FilterExpression filterExprNoAlias = Qualifier.replaceMilestoneAliases(models, filterExpr);
 
-            List<TurboIssue> processedIssues = allModelIssues.stream()
-                    .filter(issue -> Qualifier.process(models, filterExprNoAlias, issue))
-                    .sorted(determineComparator(filterExprNoAlias, hasUpdatedQualifier))
-                    .limit(Qualifier.determineCount(allModelIssues, filterExprNoAlias))
-                    .collect(Collectors.toList());
+                List<TurboIssue> processedIssues = allModelIssues.stream()
+                        .filter(issue -> Qualifier.process(models, filterExprNoAlias, issue))
+                        .sorted(determineComparator(filterExprNoAlias, hasUpdatedQualifier))
+                        .limit(Qualifier.determineCount(allModelIssues, filterExprNoAlias))
+                        .collect(Collectors.toList());
 
-            List<GuiElement> processedElements = produceGuiElements(models, processedIssues);
+                List<GuiElement> processedElements = produceGuiElements(models, processedIssues);
 
-            processed.put(filterExpr, processedElements);
+                processed.put(filterExpr, processedElements);
+            } catch (FilterException e) {
+                Platform.runLater(() -> UI.events.triggerEvent(new FilterExceptionEvent(filterPanel, e.getMessage())));
+            }
         });
 
         return processed;
