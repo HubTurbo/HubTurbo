@@ -29,6 +29,7 @@ import ui.components.HTStatusBar;
 import ui.components.KeyboardShortcuts;
 import ui.components.StatusUI;
 import ui.components.pickers.LabelPicker;
+import ui.components.viewers.CommentViewer;
 import ui.issuepanel.PanelControl;
 import undo.UndoController;
 import util.*;
@@ -179,10 +180,15 @@ public class UI extends Application implements EventDispatcher {
         if (isAFirstTimeUser && TestController.shouldOpenSampleBoard()){
             createAndLoadSampleBoard();
         }
+        initialiseViewers();
     }
 
     private void initialisePickers() {
         new LabelPicker(this, mainStage);
+    }
+
+    private void initialiseViewers() {
+        new CommentViewer(this, mainStage);
     }
 
     protected void registerTestEvents() {
