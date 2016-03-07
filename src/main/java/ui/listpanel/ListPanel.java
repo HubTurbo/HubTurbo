@@ -53,8 +53,8 @@ public class ListPanel extends FilterPanel {
     private final MenuItem markAllBelowAsUnreadMenuItem = new MenuItem();
     private static final String markAsReadMenuItemText = "Mark as read (E)";
     private static final String markAsUnreadMenuItemText = "Mark as unread (U)";
-    private static final String markAllAsUnreadMenuItemText = "Mark all below as unread";
-    private static final String markAllAsReadMenuItemText = "Mark all below as read";
+    public static final String markAllAsUnreadMenuItemText = "Mark all below as unread";
+    public static final String markAllAsReadMenuItemText = "Mark all below as read";
     private static final Boolean READ = true;
     private static final MenuItem changeLabelsMenuItem = new MenuItem();
     private static final String changeLabelsMenuItemText = "Change labels (L)";

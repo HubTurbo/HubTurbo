@@ -7,6 +7,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCode;
 import org.junit.Before;
 import org.junit.Test;
+import org.loadui.testfx.GuiTest;
 import ui.components.FilterTextField;
 import ui.components.IssueListView;
 import ui.listpanel.ListPanel;
@@ -36,7 +37,7 @@ public class ContextMenuUnstableTests extends UITest {
      * Tests selecting "Mark all below as read" and "Mark all below as unread" context menu items
      */
     @Test
-    public void markAllBelowAsReadUnread_twelveIssuesInListView_issuesCorrectlyMarkedReadUnread()
+    public void markAllBelowAsReadUnread_multipleIssuesInListView_issuesCorrectlyMarked()
             throws NoSuchFieldException, IllegalAccessException {
 
         ListPanel issuePanel = find(PANEL_IDENTIFIER);
@@ -45,22 +46,30 @@ public class ContextMenuUnstableTests extends UITest {
         IssueListView listViewValue = (IssueListView) listViewField.get(issuePanel);
 
         // scrolls to the end of the panel
-        listViewValue.scrollAndShow(12);
+        listViewValue.scrollAndShow(issuePanel.getIssueCount());
 
 
-        //checking for issue #7 and below twice to make sure issues are marked correctly for read/unread cases
+        //checking for issue #7 and below as marked read
         clickAndMarkIssuesBelow(issuePanel, 7, true);
         verifyReadStatusOfIssuesBelow(issuePanel, 7, true);
+
+        //checking for issue #7 and below as marked read
         clickAndMarkIssuesBelow(issuePanel, 7, true);
         verifyReadStatusOfIssuesBelow(issuePanel, 7, true);
-        clickAndMarkIssuesBelow(issuePanel, 7, false);
-        verifyReadStatusOfIssuesBelow(issuePanel, 7, false);
+
+        //checking for issue #7 and below as marked unread
         clickAndMarkIssuesBelow(issuePanel, 7, false);
         verifyReadStatusOfIssuesBelow(issuePanel, 7, false);
 
-        //checking for the last issue to ensure correct marking of issues on/below as read/unread when no issues below
+        //checking for issue #7 and below as marked unread
+        clickAndMarkIssuesBelow(issuePanel, 7, false);
+        verifyReadStatusOfIssuesBelow(issuePanel, 7, false);
+
+        //checking for the last issue as marked read
         clickAndMarkIssuesBelow(issuePanel, 1, true);
         verifyReadStatusOfIssuesBelow(issuePanel, 1, true);
+
+        //checking for the last issue as marked unread
         clickAndMarkIssuesBelow(issuePanel, 1, false);
         verifyReadStatusOfIssuesBelow(issuePanel, 1, false);
     }
@@ -78,11 +87,8 @@ public class ContextMenuUnstableTests extends UITest {
         for (MenuItem menuItem : contextMenu.getItems()){
             awaitCondition(menuItem::isVisible);
         }
-        if (isMarkAsRead){
-            click("Mark all below as read");
-        } else {
-            click("Mark all below as unread");
-        }
+        GuiTest markListPanelCell = isMarkAsRead ? click(ListPanel.markAllAsReadMenuItemText) :
+                                                  click(ListPanel.markAllAsUnreadMenuItemText);
     }
 
     /**
