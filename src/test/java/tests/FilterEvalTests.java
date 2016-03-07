@@ -387,7 +387,7 @@ public class FilterEvalTests {
 
     @Test
     public void satisfiesLabel_validInputs() {
-        TurboLabel label = TurboLabel.exclusive(REPO, "type", "bug");
+        TurboLabel label = new TurboLabel(REPO, "type.bug");
 
         TurboIssue issue = new TurboIssue(REPO, 1, "");
         issue.addLabel(label);
@@ -413,7 +413,6 @@ public class FilterEvalTests {
         // that the qualifier doesn't express, i.e. it should only be rejected if it does not
         // have any label that the qualifier expresses. See Qualifier#labelsSatisfy for details.
 
-        label = TurboLabel.exclusive(REPO, "type", "bug");
         TurboLabel label2 = new TurboLabel(REPO, "something");
         issue = new TurboIssue(REPO, 1, "");
         issue.addLabel(label2);
@@ -537,7 +536,7 @@ public class FilterEvalTests {
 
     @Test
     public void satisfiesHasConditions_validInputs() {
-        TurboLabel label = TurboLabel.exclusive(REPO, "type", "bug");
+        TurboLabel label = new TurboLabel(REPO, "type.bug");
         TurboUser user = new TurboUser(REPO, "bob", "alice");
         TurboMilestone milestone = new TurboMilestone(REPO, 1, "v1.0");
 
@@ -587,7 +586,7 @@ public class FilterEvalTests {
 
     @Test
     public void satisfiesNoConditions_validInputs() {
-        TurboLabel label = TurboLabel.exclusive(REPO, "type", "bug");
+        TurboLabel label = new TurboLabel(REPO, "type.bug");
         TurboUser user = new TurboUser(REPO, "bob", "alice");
         TurboMilestone milestone = new TurboMilestone(REPO, 1, "v1.0");
 

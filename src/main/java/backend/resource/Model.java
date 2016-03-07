@@ -139,7 +139,7 @@ public class Model implements IBaseModel {
     public Optional<TurboLabel> getLabelByActualName(String labelName) {
         assert labelName != null && !labelName.isEmpty() : "Invalid label name " + labelName;
         for (TurboLabel label : getLabels()) {
-            if (label.getActualName().equals(labelName)) {
+            if (label.getFullName().equals(labelName)) {
                 return Optional.of(label);
             }
         }
