@@ -49,19 +49,19 @@ public class ContextMenuUnstableTests extends UITest {
 
 
         //checking for issue #7 and below twice to make sure issues are marked correctly for read/unread cases
-        markAndVerifyIssuesBelow(issuePanel, 7, true);
+        clickAndMarkIssuesBelow(issuePanel, 7, true);
         verifyReadStatusOfIssuesBelow(issuePanel, 7, true);
-        markAndVerifyIssuesBelow(issuePanel, 7, true);
+        clickAndMarkIssuesBelow(issuePanel, 7, true);
         verifyReadStatusOfIssuesBelow(issuePanel, 7, true);
-        markAndVerifyIssuesBelow(issuePanel, 7, false);
+        clickAndMarkIssuesBelow(issuePanel, 7, false);
         verifyReadStatusOfIssuesBelow(issuePanel, 7, false);
-        markAndVerifyIssuesBelow(issuePanel, 7, false);
+        clickAndMarkIssuesBelow(issuePanel, 7, false);
         verifyReadStatusOfIssuesBelow(issuePanel, 7, false);
 
         //checking for the last issue to ensure correct marking of issues on/below as read/unread when no issues below
-        markAndVerifyIssuesBelow(issuePanel, 1, true);
+        clickAndMarkIssuesBelow(issuePanel, 1, true);
         verifyReadStatusOfIssuesBelow(issuePanel, 1, true);
-        markAndVerifyIssuesBelow(issuePanel, 1, false);
+        clickAndMarkIssuesBelow(issuePanel, 1, false);
         verifyReadStatusOfIssuesBelow(issuePanel, 1, false);
     }
 
@@ -71,7 +71,7 @@ public class ContextMenuUnstableTests extends UITest {
      *                     If false, marks the selected issue and below as unread
      * @param index The issue number in the panel
      */
-    private void markAndVerifyIssuesBelow(ListPanel issuePanel, int index, boolean isMarkAsRead){
+    private void clickAndMarkIssuesBelow(ListPanel issuePanel, int index, boolean isMarkAsRead){
         click("#" + issuePanel.getId() + "_" + index);
         rightClick("#" + issuePanel.getId() + "_" + index);
         ContextMenu contextMenu = issuePanel.getContextMenu();
