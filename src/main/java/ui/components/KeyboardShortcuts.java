@@ -161,7 +161,7 @@ public final class KeyboardShortcuts {
         Map<String, String> defaultKeyboardShortcuts = new HashMap<>();
         defaultKeyboardShortcuts.put("MARK_AS_READ", "E");
         defaultKeyboardShortcuts.put("MARK_AS_UNREAD", "U");
-        defaultKeyboardShortcuts.put("CLOSE_ISSUE", "C");
+        defaultKeyboardShortcuts.put("CLOSE_ISSUE", "X");
         defaultKeyboardShortcuts.put("REOPEN_ISSUE", "O");
         defaultKeyboardShortcuts.put("SCROLL_TO_TOP", "I");
         defaultKeyboardShortcuts.put("SCROLL_TO_BOTTOM", "N");
