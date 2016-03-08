@@ -20,8 +20,8 @@ public class IssueSelectedEventTest extends UITest{
 
     @Test
     public void noTriggerIssueSelectedOnRightClick_IssueInPanelRightClicked_IssueSelectedNotTriggered() {
-        AtomicInteger result = new AtomicInteger(0);
-        UI.events.registerEvent((IssueSelectedEventHandler) e -> result.incrementAndGet());
+        AtomicInteger eventCount = new AtomicInteger(0);
+        UI.events.registerEvent((IssueSelectedEventHandler) e -> eventCount.incrementAndGet());
         ListPanel issuePanel = find(PANEL_IDENTIFIER);
 
         //testing whether right click occurred by checking the presence of context menu items
@@ -32,7 +32,7 @@ public class IssueSelectedEventTest extends UITest{
         }
 
         // testing IssueSelectedEvent not registered on right click
-        assertEquals(0, result.get());
+        assertEquals(0, eventCount.get());
     }
 
     /**
@@ -40,17 +40,17 @@ public class IssueSelectedEventTest extends UITest{
      */
     @Test
     public void triggerIssueSelectedOnLeftClickAndKey_IssueInPanelLeftClickedAndKeyed_IssueSelectedTriggered() {
-        AtomicInteger result = new AtomicInteger(0);
-        UI.events.registerEvent((IssueSelectedEventHandler) e -> result.incrementAndGet());
+        AtomicInteger eventCount = new AtomicInteger(0);
+        UI.events.registerEvent((IssueSelectedEventHandler) e -> eventCount.incrementAndGet());
 
         click(PANEL_IDENTIFIER + "_9");
 
         // testing IssueSelectedEvent is triggered on left click
-        assertEquals(1, result.get());
+        assertEquals(1, eventCount.get());
 
         //testing IssueSelectedEvent is triggered on key down to a particular issue
         push(KeyCode.DOWN);
-        assertEquals(2, result.get());
+        assertEquals(2, eventCount.get());
     }
 
 }
