@@ -23,7 +23,6 @@ public class RepositoryPickerDialog extends Dialog<String> {
 
     private void initUi(Stage stage, Set<String> storedRepos, String defaultRepo) {
         state = new RepositoryPickerState(storedRepos);
-        state.updateQuery(defaultRepo);
 
         initialiseDialog(stage);
         createComboBox(storedRepos, defaultRepo);
