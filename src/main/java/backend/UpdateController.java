@@ -110,7 +110,15 @@ public class UpdateController {
         return filterExprs.stream()
                 .filter(Qualifier::hasUpdatedQualifier)
                 .flatMap(filterExpr -> allModelIssues.stream()
-                        .filter(issue -> Qualifier.process(models, filterExpr, issue)))
+                        .filter(issue -> {
+                            try {
+                                return Qualifier.process(models, filterExpr, issue);
+                            } catch (FilterException e) {
+                                Platform.runLater(() -> UI.events.triggerEvent(
+                                        new FilterExceptionEvent(filterExpr, e.getMessage())));
+                                return false;
+                            }
+                        }))
                 .distinct()
                 .collect(Collectors.groupingBy(TurboIssue::getRepoId));
     }
