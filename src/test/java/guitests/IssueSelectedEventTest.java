@@ -9,21 +9,23 @@ import ui.UI;
 import ui.listpanel.ListPanel;
 import util.events.IssueSelectedEventHandler;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class IssueSelectedEventTest extends UITest{
 
-    static int eventTestCount;
-
     private static final String PANEL_IDENTIFIER = "#dummy/dummy_col0";
 
+    private static AtomicInteger eventTestCount = new AtomicInteger();
+
     public static void increaseEventTestCount() {
-        eventTestCount++;
+        eventTestCount.getAndIncrement();
     }
 
     private static void resetEventTestCount() {
-        eventTestCount = 0;
+        eventTestCount.set(0);
     }
 
     @Before
@@ -45,7 +47,7 @@ public class IssueSelectedEventTest extends UITest{
         }
 
         // testing IssueSelectedEvent not registered on right click
-        assertEquals(0, eventTestCount);
+        assertEquals(0, eventTestCount.get());
     }
 
     /**
@@ -58,11 +60,11 @@ public class IssueSelectedEventTest extends UITest{
         click(PANEL_IDENTIFIER + "_9");
 
         // testing IssueSelectedEvent is triggered on left click
-        assertEquals(1, eventTestCount);
+        assertEquals(1, eventTestCount.get());
 
         //testing IssueSelectedEvent is triggered on key down to a particular issue
         push(KeyCode.DOWN);
-        assertEquals(2, eventTestCount);
+        assertEquals(2, eventTestCount.get());
     }
 
 }

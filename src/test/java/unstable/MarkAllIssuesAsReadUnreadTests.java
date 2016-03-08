@@ -12,22 +12,22 @@ import ui.components.FilterTextField;
 import ui.components.IssueListView;
 import ui.listpanel.ListPanel;
 import ui.listpanel.ListPanelCell;
+import util.PlatformEx;
+
 import java.lang.reflect.*;
 
 import static org.junit.Assert.assertEquals;
 
-public class ContextMenuUnstableTests extends UITest {
+public class MarkAllIssuesAsReadUnreadTests extends UITest {
 
     private static final String PANEL_IDENTIFIER = "#dummy/dummy_col0";
 
     @Before
     public void setup() {
-        Platform.runLater(stage::show);
-        Platform.runLater(stage::requestFocus);
+        PlatformEx.runAndWait(stage::requestFocus);
 
         FilterTextField filterTextField = find(PANEL_IDENTIFIER + "_filterTextField");
         filterTextField.setText("");
-        Platform.runLater(filterTextField::requestFocus);
 
         click(PANEL_IDENTIFIER + "_filterTextField");
         push(KeyCode.ENTER);

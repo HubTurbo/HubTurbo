@@ -127,9 +127,9 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
     }
 
     /**
-     * Triggers the selected item on the card at the specified {index} for actions that are right clicks
+     * Triggers the selected item on the card at the specified index for actions that are right clicks
      */
-    private void triggerItemSelectedSecondary(int index){
+    private void triggerItemSelectedRightClick(int index){
         onItemSelected.accept(index, IS_RIGHT_CLICK);
     }
 
@@ -145,7 +145,7 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
 
                 logger.info("Mouse click on item index " + selectedIndex.get());
                 if (e.getButton().equals(MouseButton.SECONDARY)){
-                    triggerItemSelectedSecondary(currentlySelected);
+                    triggerItemSelectedRightClick(currentlySelected);
                 } else {
                     triggerItemSelected(currentlySelected);
                 }
