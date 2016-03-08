@@ -19,7 +19,7 @@ public class IssueSelectedEventTest extends UITest{
     private static final String PANEL_IDENTIFIER = "#dummy/dummy_col0";
 
     @Test
-    public void noTriggerIssueSelectedOnRightClick_IssueInPanelRightClicked_IssueSelectedNotTriggered() {
+    public void eventTriggerOnIssueSelection_byRightClick_selectionEventNotTriggered() {
         AtomicInteger eventCount = new AtomicInteger(0);
         UI.events.registerEvent((IssueSelectedEventHandler) e -> eventCount.incrementAndGet());
         ListPanel issuePanel = find(PANEL_IDENTIFIER);
@@ -43,7 +43,7 @@ public class IssueSelectedEventTest extends UITest{
         AtomicInteger eventCount = new AtomicInteger(0);
         UI.events.registerEvent((IssueSelectedEventHandler) e -> eventCount.incrementAndGet());
 
-        click(PANEL_IDENTIFIER + "_9");
+        click(PANEL_IDENTIFIER + "_10");
 
         // testing IssueSelectedEvent is triggered on left click
         assertEquals(1, eventCount.get());

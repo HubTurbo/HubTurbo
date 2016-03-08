@@ -89,9 +89,9 @@ public class MarkAllIssuesAsReadUnreadTests extends UITest {
         }
 
         if (isMarkAsRead){
-            click(ListPanel.markAllAsReadMenuItemText);
+            click(ListPanel.MARK_ALL_AS_READ_MENU_ITEM_TEXT);
         } else {
-            click(ListPanel.markAllAsUnreadMenuItemText);
+            click(ListPanel.MARK_ALL_AS_UNREAD_MENU_ITEM_TEXT);
         }
     }
 

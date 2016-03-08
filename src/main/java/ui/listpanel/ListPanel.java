@@ -51,13 +51,13 @@ public class ListPanel extends FilterPanel {
     private final MenuItem markAsReadUnreadMenuItem = new MenuItem();
     private final MenuItem markAllBelowAsReadMenuItem = new MenuItem();
     private final MenuItem markAllBelowAsUnreadMenuItem = new MenuItem();
-    private static final String markAsReadMenuItemText = "Mark as read (E)";
-    private static final String markAsUnreadMenuItemText = "Mark as unread (U)";
-    public static final String markAllAsUnreadMenuItemText = "Mark all below as unread";
-    public static final String markAllAsReadMenuItemText = "Mark all below as read";
+    private static final String MARK_AS_READ_MENU_ITEM_TEXT = "Mark as read (E)";
+    private static final String MARK_AS_UNREAD_MENU_ITEM_TEXT = "Mark as unread (U)";
+    public static final String MARK_ALL_AS_UNREAD_MENU_ITEM_TEXT = "Mark all below as unread";
+    public static final String MARK_ALL_AS_READ_MENU_ITEM_TEXT = "Mark all below as read";
     private static final Boolean READ = true;
     private static final MenuItem changeLabelsMenuItem = new MenuItem();
-    private static final String changeLabelsMenuItemText = "Change labels (L)";
+    private static final String CHANGE_LABELS_MENU_ITEM_TEXT = "Change labels (L)";
 
     public ListPanel(UI ui, GUIController guiController, PanelControl parentPanelControl, int panelIndex) {
         super(ui, guiController, parentPanelControl, panelIndex);
@@ -288,24 +288,24 @@ public class ListPanel extends FilterPanel {
         markAsReadUnreadMenuItem.setOnAction(e -> {
             String menuItemText = markAsReadUnreadMenuItem.getText();
 
-            if (menuItemText.equals(markAsReadMenuItemText)) {
+            if (menuItemText.equals(MARK_AS_READ_MENU_ITEM_TEXT)) {
                 markAsRead();
-            } else if (menuItemText.equals(markAsUnreadMenuItemText)) {
+            } else if (menuItemText.equals(MARK_AS_UNREAD_MENU_ITEM_TEXT)) {
                 markAsUnread();
             }
         });
 
-        changeLabelsMenuItem.setText(changeLabelsMenuItemText);
+        changeLabelsMenuItem.setText(CHANGE_LABELS_MENU_ITEM_TEXT);
         changeLabelsMenuItem.setOnAction(e -> {
             changeLabels();
         });
 
-        markAllBelowAsReadMenuItem.setText(markAllAsReadMenuItemText);
+        markAllBelowAsReadMenuItem.setText(MARK_ALL_AS_READ_MENU_ITEM_TEXT);
         markAllBelowAsReadMenuItem.setOnAction(e -> {
             markAllItemsBelow(READ);
         });
 
-        markAllBelowAsUnreadMenuItem.setText(markAllAsUnreadMenuItemText);
+        markAllBelowAsUnreadMenuItem.setText(MARK_ALL_AS_UNREAD_MENU_ITEM_TEXT);
         markAllBelowAsUnreadMenuItem.setOnAction(e -> {
             markAllItemsBelow(!READ);
         });
@@ -349,9 +349,9 @@ public class ListPanel extends FilterPanel {
             TurboIssue selectedIssue = item.get().getIssue();
 
             if (selectedIssue.isCurrentlyRead()) {
-                markAsReadUnreadMenuItem.setText(markAsUnreadMenuItemText);
+                markAsReadUnreadMenuItem.setText(MARK_AS_UNREAD_MENU_ITEM_TEXT);
             } else {
-                markAsReadUnreadMenuItem.setText(markAsReadMenuItemText);
+                markAsReadUnreadMenuItem.setText(MARK_AS_READ_MENU_ITEM_TEXT);
             }
         } else {
             markAsReadUnreadMenuItem.setDisable(true);
