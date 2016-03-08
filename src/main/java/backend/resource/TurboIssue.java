@@ -225,8 +225,8 @@ public class TurboIssue {
         LocalDateTime thisIssueLabelsModifiedAt = this.getLabelsLastModifiedAt();
         LocalDateTime otherIssueLabelsModifiedAt = otherIssue.getLabelsLastModifiedAt();
         if (thisIssueLabelsModifiedAt.isBefore(otherIssueLabelsModifiedAt)) {
-            logger.info(String.format("Issue %s's labels %s are stale, replacing with %s"),
-                        this, this.getLabels(), otherIssue.getLabels());
+            logger.info(String.format("Issue %s's labels %s are stale, replacing with %s",
+                        this, this.getLabels(), otherIssue.getLabels()));
             this.labels = otherIssue.getLabels();
             this.labelsLastModifiedAt = Optional.of(otherIssue.getLabelsLastModifiedAt());
         }

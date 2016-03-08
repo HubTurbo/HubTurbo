@@ -1,5 +1,7 @@
 package tests;
 
+import backend.RepoIO;
+import backend.control.RepoOpControl;
 import backend.interfaces.IModel;
 import backend.resource.*;
 import org.apache.commons.io.IOUtils;
@@ -12,7 +14,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
+
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public final class TestUtils {
 
@@ -154,4 +161,17 @@ public final class TestUtils {
         Thread.sleep(delay);
         runnable.run();
     }
+
+    /**
+     * Creates a RepoOpControl singleton instance that RepoIO requires for some operations but often
+     * not yet created e.g. when RepoIO is tested alone without any Logic instance. The RepoOpControl
+     * also includes an empty MultiModel.
+     * @param repoIO
+     */
+    public static void createTestRepoOpControl(RepoIO repoIO) {
+        MultiModel models = mock(MultiModel.class);
+        when(models.getModelById(anyString())).thenReturn(Optional.empty());
+        RepoOpControl.createRepoOpControl(repoIO, models);
+    }
+
 }
