@@ -168,10 +168,10 @@ public final class TestUtils {
      * also includes an empty MultiModel.
      * @param repoIO
      */
-    public static void createTestRepoOpControl(RepoIO repoIO) {
+    public static RepoOpControl createTestRepoOpControl(RepoIO repoIO) {
         MultiModel models = mock(MultiModel.class);
         when(models.getModelById(anyString())).thenReturn(Optional.empty());
-        RepoOpControl.createRepoOpControl(repoIO, models);
+        return RepoOpControl.createRepoOpControl(repoIO, models);
     }
 
 }

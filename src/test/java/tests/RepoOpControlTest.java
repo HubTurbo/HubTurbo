@@ -2,6 +2,8 @@ package tests;
 
 import backend.RepoIO;
 import backend.control.RepoOpControl;
+import backend.github.GitHubModelUpdatesData;
+import backend.github.GitHubRepoTask;
 import backend.resource.Model;
 import backend.resource.MultiModel;
 import org.apache.logging.log4j.LogManager;
@@ -11,6 +13,7 @@ import util.AtomicMaxInteger;
 import util.Futures;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -29,28 +32,36 @@ public class RepoOpControlTest {
 
     private final Executor executor = Executors.newCachedThreadPool();
 
-    // TODO: replace this test
-    /*
+    private <T> GitHubRepoTask.Result<T> createEmptyUpdatesResult() {
+        return new GitHubRepoTask.Result<>(new ArrayList<>(), "", new Date());
+    }
+
+    private GitHubModelUpdatesData createEmptyModelUpdatesData(Model model) {
+        return new GitHubModelUpdatesData(model, createEmptyUpdatesResult(), new ArrayList<>(),
+                                          createEmptyUpdatesResult(), createEmptyUpdatesResult(),
+                                          createEmptyUpdatesResult());
+    }
+
     @Test
     public void opsWithinMultipleRepos() throws ExecutionException, InterruptedException {
 
         // Operations on different repositories can execute concurrently
 
         AtomicMaxInteger counter = new AtomicMaxInteger(0);
-        RepoOpControl control = new RepoOpControl(stubbedRepoIO(counter));
+        RepoOpControl control = TestUtils.createTestRepoOpControl(stubbedRepoIO(counter));
 
         List<CompletableFuture<Model>> futures = new ArrayList<>();
 
         futures.add(control.openRepository(REPO));
-        futures.add(control.updateModel(new Model(REPO + 1)));
+        futures.add(control.updateLocalModel(createEmptyModelUpdatesData(new Model(REPO + 1)), true));
         futures.add(control.openRepository(REPO));
-        futures.add(control.updateModel(new Model(REPO + 1)));
+        futures.add(control.updateLocalModel(createEmptyModelUpdatesData(new Model(REPO + 1)), true));
         control.removeRepository(REPO + 2).get();
         control.removeRepository(REPO + 2).get();
 
         Futures.sequence(futures).get();
 
-        assertEquals(3, counter.getMax());
+        assertEquals(2, counter.getMax());
     }
 
     @Test
@@ -59,21 +70,21 @@ public class RepoOpControlTest {
         // Operations on the same repository cannot execute concurrently
 
         AtomicMaxInteger counter = new AtomicMaxInteger(0);
-        RepoOpControl control = new RepoOpControl(stubbedRepoIO(counter), MultiModel);
+        RepoOpControl control = TestUtils.createTestRepoOpControl(stubbedRepoIO(counter));
 
         List<CompletableFuture<Model>> futures = new ArrayList<>();
 
         futures.add(control.openRepository(REPO));
         control.removeRepository(REPO).get();
-        futures.add(control.updateModel(new Model(REPO)));
+        futures.add(control.updateLocalModel(createEmptyModelUpdatesData(new Model(REPO)), true));
         control.removeRepository(REPO).get();
         futures.add(control.openRepository(REPO));
-        futures.add(control.updateModel(new Model(REPO)));
+        futures.add(control.updateLocalModel(createEmptyModelUpdatesData(new Model(REPO)), true));
 
         Futures.sequence(futures).get();
 
         assertEquals(1, counter.getMax());
-    }*/
+    }
 
     @Test
     public void openingSameRepo() throws ExecutionException, InterruptedException {
