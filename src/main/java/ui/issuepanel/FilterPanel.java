@@ -228,7 +228,7 @@ public abstract class FilterPanel extends AbstractPanel {
     protected abstract void stopLoadingAnimationIfApplicable(AppliedFilterEvent e);
 
     private void handleFilterException(FilterExceptionEvent e) {
-        if (e.filterExpr != getCurrentFilterExpression()) return;
+        if (!e.filterExpr.equals(getCurrentFilterExpression())) return;
         emptyFilterAndShowError(e.exceptionMessage);
     }
 
