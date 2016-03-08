@@ -87,8 +87,12 @@ public class MarkAllIssuesAsReadUnreadTests extends UITest {
         for (MenuItem menuItem : contextMenu.getItems()){
             awaitCondition(menuItem::isVisible);
         }
-        GuiTest markListPanelCell = isMarkAsRead ? click(ListPanel.markAllAsReadMenuItemText) :
-                                                  click(ListPanel.markAllAsUnreadMenuItemText);
+
+        if (isMarkAsRead){
+            click(ListPanel.markAllAsReadMenuItemText);
+        } else {
+            click(ListPanel.markAllAsUnreadMenuItemText);
+        }
     }
 
     /**
