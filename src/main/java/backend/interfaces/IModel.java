@@ -16,6 +16,7 @@ public interface IModel extends IBaseModel {
     void setDefaultRepo(String repoId);
     Optional<Model> getModelById(String repoId);
     Optional<TurboUser> getAssigneeOfIssue(TurboIssue issue);
+    Optional<TurboUser> getAuthorOfIssue(TurboIssue issue);
     List<TurboLabel> getLabelsOfIssue(TurboIssue issue);
     List<TurboLabel> getLabelsOfIssue(TurboIssue issue, Predicate<TurboLabel> predicate);
     Optional<TurboMilestone> getMilestoneOfIssue(TurboIssue issue);

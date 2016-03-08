@@ -3,6 +3,7 @@ package guitests;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 
+import backend.stub.DummyRepoState;
 import javafx.scene.input.KeyCode;
 import org.junit.Test;
 import ui.listpanel.ListPanel;
@@ -21,7 +22,7 @@ public class FilterTests extends UITest{
         type("milestone:");
         push(KeyCode.ENTER);
 
-        assertEquals(10, issuePanel.getIssueCount());
+        assertEquals(DummyRepoState.noOfDummyIssues, issuePanel.getIssueCount());
     }
 
     @Test
@@ -98,7 +99,7 @@ public class FilterTests extends UITest{
         type("count:15");
         push(KeyCode.ENTER);
 
-        assertEquals(10, issuePanel.getIssueCount());
+        assertEquals(DummyRepoState.noOfDummyIssues, issuePanel.getIssueCount());
 
         //multiple count qualifiers
         click("#dummy/dummy_col0_filterTextField");
@@ -106,7 +107,7 @@ public class FilterTests extends UITest{
         type("count:6 count:9");
         push(KeyCode.ENTER);
 
-        assertEquals(10, issuePanel.getIssueCount());
+        assertEquals(DummyRepoState.noOfDummyIssues, issuePanel.getIssueCount());
 
         // Not-a-number
 
@@ -115,7 +116,7 @@ public class FilterTests extends UITest{
         type("count:abcd");
         push(KeyCode.ENTER);
 
-        assertEquals(10, issuePanel.getIssueCount());
+        assertEquals(DummyRepoState.noOfDummyIssues, issuePanel.getIssueCount());
 
         // Test with sort qualifier as the second qualifier
 
@@ -144,7 +145,7 @@ public class FilterTests extends UITest{
         type("count:-1");
         push(KeyCode.ENTER);
 
-        assertEquals(10, issuePanel.getIssueCount());
+        assertEquals(DummyRepoState.noOfDummyIssues, issuePanel.getIssueCount());
     }
 
     private void checkCurrWithResult(String milestoneAlias, String currString, ListPanel issuePanel,

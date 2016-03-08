@@ -8,8 +8,6 @@ import org.eclipse.egit.github.core.RepositoryId;
 import ui.UI;
 import util.events.ShowErrorDialogEvent;
 
-import javax.swing.*;
-import java.awt.*;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -261,29 +259,6 @@ public final class Utility {
         }
         m.appendTail(sb);
         return sb.toString();
-    }
-
-    public static Rectangle getScreenDimensions() {
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        return new Rectangle((int) screenSize.getWidth(), (int) screenSize.getHeight());
-    }
-
-    public static Optional<Rectangle> getUsableScreenDimensions() {
-        try {
-            if (PlatformSpecific.isOnLinux()) {
-                UIManager.setLookAndFeel(
-                    UIManager.getCrossPlatformLookAndFeelClassName());
-            } else {
-                UIManager.setLookAndFeel(
-                    UIManager.getSystemLookAndFeelClassName());
-            }
-
-            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-            return Optional.of(ge.getMaximumWindowBounds());
-        } catch (Exception e) {
-            logger.error(e.getLocalizedMessage(), e);
-        }
-        return Optional.empty();
     }
 
     public static boolean containsIgnoreCase(String source, String query) {

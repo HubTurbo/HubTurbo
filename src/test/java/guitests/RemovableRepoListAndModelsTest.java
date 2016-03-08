@@ -1,5 +1,6 @@
 package guitests;
 
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
@@ -11,6 +12,7 @@ import prefs.GlobalConfig;
 import prefs.Preferences;
 import ui.TestController;
 import ui.UI;
+import util.PlatformEx;
 
 import java.io.File;
 import java.util.Optional;
@@ -94,7 +96,8 @@ public class RemovableRepoListAndModelsTest extends UITest {
         // it's still 1 repo in use
         noOfUsedRepo = 1;
         totalRepoInSystem = 1;
-        click("#dummy/dummy_col0_filterTextField");
+        Platform.runLater(find("#dummy/dummy_col0_filterTextField")::requestFocus);
+        PlatformEx.waitOnFxThread();
         selectAll();
         type("repo:dummY/Dummy");
         push(KeyCode.ENTER);

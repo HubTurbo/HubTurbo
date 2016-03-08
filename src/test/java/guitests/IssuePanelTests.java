@@ -98,6 +98,7 @@ public class IssuePanelTests extends UITest {
                 new TurboIssue("test/test", 1, "Test issue"),
                 new ArrayList<>(),
                 Optional.empty(),
+                Optional.empty(),
                 Optional.empty());
 
         assertEquals(0,
@@ -125,6 +126,7 @@ public class IssuePanelTests extends UITest {
                 new TurboIssue("test/test", 1, "issue"),
                 labels,
                 Optional.empty(),
+                Optional.empty(),
                 Optional.empty());
 
         List<TurboIssueEvent> events =
@@ -147,6 +149,7 @@ public class IssuePanelTests extends UITest {
                 new TurboIssue("test/test", 1, "Test issue"),
                 new ArrayList<>(),
                 Optional.empty(),
+                Optional.empty(),
                 Optional.empty());
 
         List<TurboIssueEvent> events = new ArrayList<>();
@@ -159,5 +162,32 @@ public class IssuePanelTests extends UITest {
         assertEquals(1,
                 TurboIssueEvent.createLabelUpdateEventNodes(
                         guiElement, events).size());
+    }
+
+    @Test
+    public void showAuthorAssignee_assignedPullRequest_authorAssigneeShown() {
+        click("#dummy/dummy_col0_filterTextField");
+        selectAll();
+        type("id:11");
+        push(KeyCode.ENTER);
+        assertEquals(true, GuiTest.exists("User 11"));
+        // arrow to indicate assignment i.e. author -> assignee
+        assertEquals(true, GuiTest.exists("\uf03e"));
+        assertEquals(true, GuiTest.exists("User 1"));
+    }
+
+    @Test
+    public void showAuthorAssignee_assignedIssue_onlyAssigneeShown() {
+        click("#dummy/dummy_col0_filterTextField");
+        selectAll();
+        type("id:12");
+        push(KeyCode.ENTER);
+        // author should not show since it is an issue
+        try {
+            GuiTest.exists("User 12");
+            fail();
+        } catch (NoNodesFoundException e) { /* Successful since it should not show */ }
+        // assignee should still show
+        assertEquals(true, GuiTest.exists("User 2"));
     }
 }

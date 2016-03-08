@@ -6,7 +6,7 @@ import ui.UI;
 public class BrowserComponentStub extends BrowserComponent {
 
     public BrowserComponentStub(UI ui) {
-        super(ui, false);
+        super(ui, null, false);
     }
 
     @Override
