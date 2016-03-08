@@ -50,11 +50,9 @@ public class ContextMenuTests extends UITest {
         sleep(EVENT_DELAY);
 
         ContextMenu contextMenu = issuePanel.getContextMenu();
-        MenuItem readUnreadItem = contextMenu.getItems().get(0);
-        MenuItem changeLabelsItem = contextMenu.getItems().get(1);
-
-        assertTrue(readUnreadItem.isDisable());
-        assertTrue(changeLabelsItem.isDisable());
+        for(MenuItem menuItem : contextMenu.getItems()){
+            assertTrue(menuItem.isDisable());
+        }
     }
 
     /**
@@ -78,6 +76,28 @@ public class ContextMenuTests extends UITest {
         click("Mark as unread (U)");
         sleep(EVENT_DELAY);
         assertFalse(listPanelCell.getIssue().isCurrentlyRead());
+    }
+
+    /**
+     * Tests selecting "Mark all below as read" and "Mark all below as unread" context menu items
+     */
+    @Test
+    public void markAllBelowAsReadUnread() {
+        click("#dummy/dummy_col0_9");
+        rightClick("#dummy/dummy_col0_9");
+        click("Mark all below as read");
+        for(int i=9; i >= 1; i--){
+            ListPanelCell listPanelCell = find("#dummy/dummy_col0_" + String.valueOf(i));
+            assertTrue(listPanelCell.getIssue().isCurrentlyRead());
+        }
+
+        click("#dummy/dummy_col0_9");
+        rightClick("#dummy/dummy_col0_9");
+        click("Mark all below as unread");
+        for(int i=9; i >= 1; i--){
+            ListPanelCell listPanelCell = find("#dummy/dummy_col0_" + String.valueOf(i));
+            assertFalse(listPanelCell.getIssue().isCurrentlyRead());
+        }
     }
 
     /**
