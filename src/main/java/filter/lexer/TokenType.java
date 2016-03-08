@@ -20,5 +20,6 @@ public enum TokenType {
     GTE,
     QUALIFIER,
     STAR,
+    COMPOUND_ID_PREFIX,
     DATE
 }

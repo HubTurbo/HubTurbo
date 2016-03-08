@@ -6,6 +6,7 @@ import static ui.components.KeyboardShortcuts.MAXIMIZE_WINDOW;
 import static ui.components.KeyboardShortcuts.MINIMIZE_WINDOW;
 import static ui.components.KeyboardShortcuts.SWITCH_BOARD;
 import filter.expression.QualifierType;
+import javafx.application.Platform;
 import ui.GUIController;
 import ui.GuiElement;
 import ui.components.PanelMenuBar;
@@ -29,9 +30,7 @@ import util.events.*;
 import util.events.testevents.UIComponentFocusEvent;
 import prefs.PanelInfo;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -103,9 +102,10 @@ public abstract class FilterPanel extends AbstractPanel {
             requestFocus();
         });
 
-        ui.registerEvent((RepoOpeningEventHandler) this::indicatePanelLoading);
-
-        ui.registerEvent((RepoOpenedEventHandler) this::unindicatePanelLoading);
+        ui.registerEvent((PrimaryRepoOpeningEventHandler) this::startLoadingAnimationIfApplicable);
+        ui.registerEvent((PrimaryRepoOpenedEventHandler) this::stopLoadingAnimationIfApplicable);
+        ui.registerEvent((ApplyingFilterEventHandler) this::startLoadingAnimationIfApplicable);
+        ui.registerEvent((AppliedFilterEventHandler) this::stopLoadingAnimationIfApplicable);
     }
 
     private final ModelUpdatedEventHandler onModelUpdate = e -> {
@@ -125,6 +125,7 @@ public abstract class FilterPanel extends AbstractPanel {
     private Node createFilterBox() {
         filterTextField = new FilterTextField("")
                 .setOnConfirm((text) -> {
+                    Platform.runLater(() -> ui.triggerEvent(new ApplyingFilterEvent(this)));
                     applyStringFilter(text);
                     return text;
                 })
@@ -176,11 +177,13 @@ public abstract class FilterPanel extends AbstractPanel {
             FilterExpression filter = Parser.parse(filterString);
             if (filter != null) {
                 this.applyFilterExpression(filter);
+                filterTextField.setStyleForValidFilter();
             } else {
                 this.applyFilterExpression(Qualifier.EMPTY);
             }
         } catch (FilterException ex) {
             this.applyFilterExpression(Qualifier.EMPTY);
+            filterTextField.setStyleForInvalidFilter();
             // Overrides message in status bar
             UI.status.displayMessage(getUniquePanelName(
                 panelMenuBar.getPanelName()) + ": " + ex.getMessage());
@@ -211,37 +214,21 @@ public abstract class FilterPanel extends AbstractPanel {
         parentPanelControl.getGUIController().panelFilterExpressionChanged(this);
     }
 
-    private void indicatePanelLoading(RepoOpeningEvent e) {
-        if (isIndicatorApplicable(e.isPrimaryRepo)) {
-            addPanelLoadingIndication();
-        }
-    }
+    /**
+     * Abstract method to implement a loading animation triggered by PrimaryRepoOpeningEvent
+     * Implementation should check if the event triggered should result in a loading animation
+     */
+    protected abstract void startLoadingAnimationIfApplicable(PrimaryRepoOpeningEvent e);
 
-    private void unindicatePanelLoading(RepoOpenedEvent e) {
-        if (isIndicatorApplicable(e.isPrimaryRepo)) {
-            removePanelLoadingIndication();
-        }
-    }
-
-    private boolean isIndicatorApplicable(boolean isPrimaryRepo) {
-        HashSet<String> allReposInFilterExpr =
-                Qualifier.getMetaQualifierContent(getCurrentFilterExpression(), QualifierType.REPO);
-
-        boolean isPrimaryRepoChanged = isPrimaryRepo && allReposInFilterExpr.isEmpty();
-
-        return isPrimaryRepoChanged;
-    }
+    protected abstract void stopLoadingAnimationIfApplicable(PrimaryRepoOpenedEvent e);
 
     /**
-     * Implements a user-visible indication that the current panel is loading a repo.
+     * Abstract method to implement a loading animation triggered by ApplyingFilterEvent
+     * Implementation should check if the event triggered should result in a loading animation
      */
-    protected abstract void addPanelLoadingIndication();
+    protected abstract void startLoadingAnimationIfApplicable(ApplyingFilterEvent e);
 
-    /**
-     * Implements the removal of the panel-loading indication that was applied by the method
-     * addPanelLoadingIndication().
-     */
-    protected abstract void removePanelLoadingIndication();
+    protected abstract void stopLoadingAnimationIfApplicable(AppliedFilterEvent e);
 
     public void setFilterByString(String filterString) {
         filterTextField.setFilterText(filterString);

@@ -26,6 +26,11 @@ public class FilterTextField extends TextField {
     // Specialised to HubTurbo's filter syntax.
     private static final String WORD_BOUNDARY_REGEX = "[ (:)]";
 
+    // Background colours of FilterTextField.
+    // The background colour set depends on whether the text in the textfield is a valid filter.
+    private static final String VALID_FILTER_STYLE = "-fx-control-inner-background: white";
+    private static final String INVALID_FILTER_STYLE = "-fx-control-inner-background: #EE8993";
+
     // Callback functions
     private Runnable cancel = () -> {};
     private Function<String, String> confirm = (s) -> s;
@@ -51,8 +56,10 @@ public class FilterTextField extends TextField {
             boolean wasError = false;
             try {
                 Parser.parse(getText());
+                setStyleForValidFilter();
             } catch (ParseException e) {
                 wasError = true;
+                setStyleForInvalidFilter();
             }
             return ValidationResult.fromErrorIf(this, "Parse error", wasError);
         });
@@ -91,6 +98,20 @@ public class FilterTextField extends TextField {
                 }
             }
         });
+    }
+
+    /**
+     * Sets the style of FilterTextField to the style for valid filter
+     */
+    public final void setStyleForValidFilter() {
+        this.setStyle(VALID_FILTER_STYLE);
+    }
+
+    /**
+     * Sets the style of FilterTextField to the style for invalid filter
+     */
+    public final void setStyleForInvalidFilter() {
+        this.setStyle(INVALID_FILTER_STYLE);
     }
 
     /**

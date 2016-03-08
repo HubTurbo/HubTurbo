@@ -79,7 +79,7 @@ public class GUIController {
      * @param changedPanel The panel whose filter expression had been changed by the user.
      */
     public void panelFilterExpressionChanged(FilterPanel changedPanel) {
-        ui.logic.refreshPanel(changedPanel.getCurrentFilterExpression());
+        ui.logic.refreshPanel(changedPanel);
         UI.events.triggerEvent(new UsedReposChangedEvent());
     }
 
@@ -92,6 +92,13 @@ public class GUIController {
         return panelControl.getChildren().stream()
                 .filter(child -> child instanceof FilterPanel)
                 .map(child -> ((FilterPanel) child).getCurrentFilterExpression())
+                .collect(Collectors.toList());
+    }
+
+    public List<FilterPanel> getAllPanels() {
+        return panelControl.getChildren().stream()
+                .filter(child -> child instanceof FilterPanel)
+                .map(child -> (FilterPanel) child)
                 .collect(Collectors.toList());
     }
 

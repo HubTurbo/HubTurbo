@@ -48,7 +48,7 @@ import static ui.components.KeyboardShortcuts.SWITCH_DEFAULT_REPO;
 public class UI extends Application implements EventDispatcher {
 
     public static final int VERSION_MAJOR = 3;
-    public static final int VERSION_MINOR = 21;
+    public static final int VERSION_MINOR = 22;
     public static final int VERSION_PATCH = 0;
 
     public static final String WINDOW_TITLE = "HubTurbo %s (%s)";
@@ -435,8 +435,8 @@ public class UI extends Application implements EventDispatcher {
 
     private void primaryRepoChanged(String repoId) {
         triggerEvent(new PrimaryRepoChangedEvent(repoId));
-        logic.openPrimaryRepository(repoId);
         logic.setDefaultRepo(repoId);
+        logic.openPrimaryRepository(repoId);
         triggerEvent(new UsedReposChangedEvent());
     }
 

@@ -1,8 +1,8 @@
 package util.events.testevents;
 
-import util.events.Event;
+import util.events.UnusedStoredReposChangedEvent;
 
-public class PrimaryRepoChangedEvent extends Event {
+public class PrimaryRepoChangedEvent extends UnusedStoredReposChangedEvent {
     public final String repoId;
 
     public PrimaryRepoChangedEvent(String repoId) {

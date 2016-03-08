@@ -431,7 +431,7 @@ public class TurboIssue {
     }
 
     public void addLabel(TurboLabel label) {
-        addLabel(label.getActualName());
+        addLabel(label.getFullName());
         this.labelsLastModifiedAt = Optional.of(LocalDateTime.now());
     }
 

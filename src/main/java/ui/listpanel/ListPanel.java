@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 
+import filter.expression.QualifierType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCodeCombination;
@@ -28,8 +29,7 @@ import ui.issuepanel.PanelControl;
 import util.GithubPageElements;
 import util.HTLog;
 import util.KeyPress;
-import util.events.IssueSelectedEvent;
-import util.events.ShowLabelPickerEvent;
+import util.events.*;
 import backend.resource.TurboIssue;
 import filter.expression.Qualifier;
 
@@ -49,11 +49,15 @@ public class ListPanel extends FilterPanel {
     private final ContextMenu contextMenu = new ContextMenu();
 
     private final MenuItem markAsReadUnreadMenuItem = new MenuItem();
-    private static final String markAsReadMenuItemText = "Mark as read (E)";
-    private static final String markAsUnreadMenuItemText = "Mark as unread (U)";
-
+    private final MenuItem markAllBelowAsReadMenuItem = new MenuItem();
+    private final MenuItem markAllBelowAsUnreadMenuItem = new MenuItem();
+    private static final String MARK_AS_READ_MENU_ITEM_TEXT = "Mark as read (E)";
+    private static final String MARK_AS_UNREAD_MENU_ITEM_TEXT = "Mark as unread (U)";
+    public static final String MARK_ALL_AS_UNREAD_MENU_ITEM_TEXT = "Mark all below as unread";
+    public static final String MARK_ALL_AS_READ_MENU_ITEM_TEXT = "Mark all below as read";
+    private static final Boolean READ = true;
     private static final MenuItem changeLabelsMenuItem = new MenuItem();
-    private static final String changeLabelsMenuItemText = "Change labels (L)";
+    private static final String CHANGE_LABELS_MENU_ITEM_TEXT = "Change labels (L)";
 
     public ListPanel(UI ui, GUIController guiController, PanelControl parentPanelControl, int panelIndex) {
         super(ui, guiController, parentPanelControl, panelIndex);
@@ -135,14 +139,15 @@ public class ListPanel extends FilterPanel {
         setupKeyboardShortcuts();
         setupContextMenu();
 
-        listView.setOnItemSelected(i -> {
+        listView.setOnItemSelected((index, rightKey) -> {
             updateContextMenu(contextMenu);
 
-            TurboIssue issue = listView.getItems().get(i).getIssue();
-            ui.triggerEvent(
+            TurboIssue issue = listView.getItems().get(index).getIssue();
+            if (!rightKey) {
+                ui.triggerEvent(
                     new IssueSelectedEvent(issue.getRepoId(), issue.getId(), panelIndex, issue.isPullRequest())
-            );
-
+                );
+            }
             // Save the stored comment count as its own comment count.
             // The refreshItems(false) call that follows will remove the highlighted effect of the comment bubble.
             // (if it was there before)
@@ -283,19 +288,30 @@ public class ListPanel extends FilterPanel {
         markAsReadUnreadMenuItem.setOnAction(e -> {
             String menuItemText = markAsReadUnreadMenuItem.getText();
 
-            if (menuItemText.equals(markAsReadMenuItemText)) {
+            if (menuItemText.equals(MARK_AS_READ_MENU_ITEM_TEXT)) {
                 markAsRead();
-            } else if (menuItemText.equals(markAsUnreadMenuItemText)) {
+            } else if (menuItemText.equals(MARK_AS_UNREAD_MENU_ITEM_TEXT)) {
                 markAsUnread();
             }
         });
 
-        changeLabelsMenuItem.setText(changeLabelsMenuItemText);
+        changeLabelsMenuItem.setText(CHANGE_LABELS_MENU_ITEM_TEXT);
         changeLabelsMenuItem.setOnAction(e -> {
             changeLabels();
         });
 
-        contextMenu.getItems().addAll(markAsReadUnreadMenuItem, changeLabelsMenuItem);
+        markAllBelowAsReadMenuItem.setText(MARK_ALL_AS_READ_MENU_ITEM_TEXT);
+        markAllBelowAsReadMenuItem.setOnAction(e -> {
+            markAllItemsBelow(READ);
+        });
+
+        markAllBelowAsUnreadMenuItem.setText(MARK_ALL_AS_UNREAD_MENU_ITEM_TEXT);
+        markAllBelowAsUnreadMenuItem.setOnAction(e -> {
+            markAllItemsBelow(!READ);
+        });
+
+        contextMenu.getItems().addAll(markAsReadUnreadMenuItem, markAllBelowAsReadMenuItem,
+                                      markAllBelowAsUnreadMenuItem, changeLabelsMenuItem);
         contextMenu.setOnShowing(e -> updateContextMenu(contextMenu));
         listView.setContextMenu(contextMenu);
 
@@ -328,15 +344,19 @@ public class ListPanel extends FilterPanel {
         Optional<GuiElement> item = listView.getSelectedItem();
         if (item.isPresent()) {
             markAsReadUnreadMenuItem.setDisable(false);
+            markAllBelowAsReadMenuItem.setDisable(false);
+            markAllBelowAsUnreadMenuItem.setDisable(false);
             TurboIssue selectedIssue = item.get().getIssue();
 
             if (selectedIssue.isCurrentlyRead()) {
-                markAsReadUnreadMenuItem.setText(markAsUnreadMenuItemText);
+                markAsReadUnreadMenuItem.setText(MARK_AS_UNREAD_MENU_ITEM_TEXT);
             } else {
-                markAsReadUnreadMenuItem.setText(markAsReadMenuItemText);
+                markAsReadUnreadMenuItem.setText(MARK_AS_READ_MENU_ITEM_TEXT);
             }
         } else {
             markAsReadUnreadMenuItem.setDisable(true);
+            markAllBelowAsReadMenuItem.setDisable(true);
+            markAllBelowAsUnreadMenuItem.setDisable(true);
         }
 
         return markAsReadUnreadMenuItem;
@@ -363,6 +383,27 @@ public class ListPanel extends FilterPanel {
         }
     }
 
+    /**
+     * Marks the selected item and item below it in the list view as read/unread
+     * @param isRead Setting it to true marks all items on and below the selected issue as read.
+     *               Setting it to false marks all items on and below the selected issue as unread.
+     */
+    private void markAllItemsBelow(boolean isRead){
+        if (!listView.getSelectedIndex().isPresent()) {
+            return;
+        }
+        for (int i = listView.getSelectedIndex().get(); i < listView.getItems().size(); i++) {
+            TurboIssue issue = listView.getItems().get(i).getIssue();
+            if (isRead){
+                issue.markAsRead(UI.prefs);
+            } else {
+                issue.markAsUnread(UI.prefs);
+            }
+        }
+
+        parentPanelControl.refresh();
+    }
+
     private void markAsUnread() {
         Optional<GuiElement> item = listView.getSelectedItem();
         if (item.isPresent()) {
@@ -379,26 +420,67 @@ public class ListPanel extends FilterPanel {
         }
     }
 
-    /**
-     * Adds a style class to the listview which changes its background to contain a loading spinning gif
-     */
     @Override
-    protected void addPanelLoadingIndication() {
-        logger.info("Preparing to add panel loading indication");
-        listView.getStyleClass().add("listview-loading");
+    protected void startLoadingAnimationIfApplicable(PrimaryRepoOpeningEvent e) {
+        // Repo is being opened by the repo selector, does not need to filter if repo is already specified for panel
+        if (hasReposInFilter()) startLoadingAnimation();
+    }
 
-        // Remove the items in the issue list because they are not relevant to the filter anymore.
-        // This also makes the listview background visible, since we intend to show a loading indicator on the
-        // background.
-        listView.setItems(null);
+    @Override
+    protected void stopLoadingAnimationIfApplicable(PrimaryRepoOpenedEvent e) {
+        if (hasReposInFilter()) stopLoadingAnimation();
+    }
+
+    @Override
+    protected void startLoadingAnimationIfApplicable(ApplyingFilterEvent e) {
+        // Repo is being opened by a panel's filter, only need to show loading animation in the responsible panel
+        if (e.panel == this) startLoadingAnimation();
+    }
+
+    @Override
+    protected void stopLoadingAnimationIfApplicable(AppliedFilterEvent e) {
+        if (e.panel == this) stopLoadingAnimation();
+    }
+
+    private void startLoadingAnimation() {
+        setTranslucentCellFactory();
+        showLoadingIndicator();
+    }
+
+    private void stopLoadingAnimation() {
+        hideLoadingIndicator();
     }
 
     /**
-     * Removes the style class that was added in addPanelLoadingIndicator() from the listview.
+     * Adds a style class to the listview which changes its background to contain a loading spinning gif
      */
-    @Override
-    protected void removePanelLoadingIndication() {
+    private void showLoadingIndicator() {
+        logger.info("Preparing to add panel loading indication");
+        listView.getStyleClass().add("listview-loading");
+    }
+
+    /**
+     * Removes the style class that was added in showLoadingIndicator() from the listview.
+     */
+    private void hideLoadingIndicator() {
         logger.info("Preparing to remove panel loading indication");
         listView.getStyleClass().removeIf(cssClass -> cssClass.equals("listview-loading"));
+    }
+
+    private void setTranslucentCellFactory() {
+        if (getElementsList() == null) return;
+        final HashSet<Integer> issuesWithNewComments
+                = updateIssueCommentCounts(Qualifier.hasUpdatedQualifier(getCurrentFilterExpression()));
+        listView.setCellFactory(list -> {
+            ListPanelCell cell = new ListPanelCell(this, panelIndex, issuesWithNewComments);
+            cell.setStyle(cell.getStyle() + "-fx-opacity: 40%;");
+            return cell;
+        });
+    }
+
+    private boolean hasReposInFilter() {
+        HashSet<String> allReposInFilterExpr =
+                Qualifier.getMetaQualifierContent(getCurrentFilterExpression(), QualifierType.REPO);
+        return allReposInFilterExpr.isEmpty();
     }
 }

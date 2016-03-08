@@ -5,6 +5,8 @@ import backend.resource.Model;
 import backend.resource.MultiModel;
 import backend.resource.TurboIssue;
 import filter.expression.FilterExpression;
+import filter.expression.Qualifier;
+import filter.expression.QualifierType;
 import javafx.application.Platform;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.Logger;
@@ -12,11 +14,11 @@ import prefs.Preferences;
 import ui.GuiElement;
 import ui.TestController;
 import ui.UI;
+import ui.issuepanel.FilterPanel;
 import util.Futures;
 import util.HTLog;
 import util.Utility;
-import util.events.RepoOpenedEvent;
-import util.events.RepoOpeningEvent;
+import util.events.*;
 import util.events.testevents.ClearLogicModelEvent;
 import util.events.testevents.ClearLogicModelEventHandler;
 
@@ -93,21 +95,55 @@ public class Logic {
                 .exceptionally(Futures::log);
     }
 
+    /**
+     * Opens repoId if it isn't already open, else simply refreshes the UI
+     * After opening the repo, it will trigger a PrimaryRepoOpenedEvent
+     *
+     * @param repoId
+     * @return
+     */
     public CompletableFuture<Boolean> openPrimaryRepository(String repoId) {
-        return openRepository(repoId, true);
+        return openRepository(repoId, Optional.empty());
     }
 
-    public CompletableFuture<Boolean> openRepositoryFromFilter(String repoId) {
-        return openRepository(repoId, false);
+    /**
+     * Opens repoId if it isn't already open, else simply refreshes the UI
+     *
+     * If a repo needs to be opened, FilterRepoOpeningEvent and FilterRepoOpenedEvent will both
+     * be triggered with panel as argument
+     *
+     * Shortly before this method terminates, an AppliedFilterEvent will be triggered
+     *
+     * @param repoId
+     * @param panel panel that opened the repository
+     * @return
+     */
+    public CompletableFuture<Boolean> openRepositoryFromFilter(String repoId, FilterPanel panel) {
+        return openRepository(repoId, Optional.of(panel));
     }
 
-    private CompletableFuture<Boolean> openRepository(String repoId, boolean isPrimaryRepository) {
+    /**
+     * Opens repoId if it isn't already open, else simply refreshes the UI
+     *
+     * During the process, it will trigger the appropriate events depending on panel's presence
+     *
+     * @param repoId id of repository to be opened
+     * @param panel panel that opened the repository, if there is
+     * @return
+     */
+    private CompletableFuture<Boolean> openRepository(String repoId, Optional<FilterPanel> panel) {
         assert Utility.isWellFormedRepoId(repoId);
+
+        boolean isPrimaryRepository = !panel.isPresent();
         if (isPrimaryRepository) prefs.setLastViewedRepository(repoId);
         if (isAlreadyOpen(repoId) || models.isRepositoryPending(repoId)) {
-            // The content of panels with an empty filter text should change when the primary repo is changed.
-            // Thus we refresh panels even when the repo is already open.
-            if (isPrimaryRepository) refreshUI();
+            if (isPrimaryRepository) {
+                // The content of panels with an empty filter text should change when the primary repo is changed.
+                // Thus we refresh panels even when the repo is already open.
+                refreshUI();
+            } else {
+                Platform.runLater(() -> UI.events.triggerEvent(new AppliedFilterEvent(panel.get())));
+            }
             return Futures.unit(false);
         }
         models.queuePendingRepository(repoId);
@@ -118,23 +154,44 @@ public class Logic {
 
             logger.info("Opening " + repoId);
             UI.status.displayMessage("Opening " + repoId);
-            Platform.runLater(() -> UI.events.triggerEvent(new RepoOpeningEvent(repoId, isPrimaryRepository)));
+            notifyRepoOpening(isPrimaryRepository);
 
             return repoOpControl.openRepository(repoId)
                     .thenApply(models::addPending)
                     .thenRun(this::refreshUI)
-                    .thenRun(() ->
-                            Platform.runLater(() ->
-                                    // to trigger the event from the UI thread
-                                    UI.events.triggerEvent(new RepoOpenedEvent(repoId, isPrimaryRepository))
-                            )
-                    )
+                    .thenRun(() -> notifyRepoOpened(panel))
                     .thenCompose(n -> getRateLimitResetTime())
                     .thenApply(this::updateRemainingRate)
                     .thenApply(rateLimits -> true)
                     .exceptionally(withResult(false));
-
         });
+    }
+
+    /**
+     * Triggers opening repo event based on isPrimaryRepository
+     * @param isPrimaryRepository triggers PrimaryRepoOpeningEvent if true, FilterRepoOpeningEvent otherwise
+     */
+    private void notifyRepoOpening(boolean isPrimaryRepository) {
+        Event eventToTrigger = isPrimaryRepository ? new PrimaryRepoOpeningEvent() : new FilterRepoOpeningEvent();
+        Platform.runLater(() -> UI.events.triggerEvent(eventToTrigger));
+    }
+
+    /**
+     * Triggers the relevant event(s) based on panel's presence
+     *
+     * If panel is present, it will trigger FilterRepoOpenedEvent and AppliedFilterEvent
+     * Otherwise, it will simply trigger PrimaryRepoOpenedEvent
+     *
+     * @param panel panel that opened the repository, if present
+     */
+    private void notifyRepoOpened(Optional<FilterPanel> panel) {
+        if (!panel.isPresent()) {
+            Platform.runLater(() -> UI.events.triggerEvent(new PrimaryRepoOpenedEvent()));
+            return;
+        }
+
+        Platform.runLater(() -> UI.events.triggerEvent(new FilterRepoOpenedEvent()));
+        Platform.runLater(() -> UI.events.triggerEvent(new AppliedFilterEvent(panel.get())));
     }
 
     public Set<String> getOpenRepositories() {
@@ -276,18 +333,27 @@ public class Logic {
      * and then sends the data to the GUI.
      */
     private void refreshUI() {
-        updateController.processAndRefresh(getAllUIFilters());
+        updateController.processAndRefresh(getAllPanels());
     }
 
     /**
-     * Feeds a one-element list of filter expressions to updateController.
+     * Feeds the panel's filter expression to updateController.
      *
-     * @param filterExpr The filter expression to be processed by updateController.
+     * @param panel The panel whose filter expression is to be processed by updateController.
      */
-    public void refreshPanel(FilterExpression filterExpr) {
-        List<FilterExpression> panelExpr = new ArrayList<>();
-        panelExpr.add(filterExpr);
-        updateController.processAndRefresh(panelExpr);
+    public void refreshPanel(FilterPanel panel) {
+        List<FilterPanel> panels = new ArrayList<>();
+        panels.add(panel);
+        updateController.processAndRefresh(panels);
+
+        // AppliedFilterEvent will be triggered asynchronously when repo(s) have finished opening, so just terminate
+        if (hasRepoSpecifiedInFilter(panel)) return;
+
+        Platform.runLater (() -> UI.events.triggerEvent(new AppliedFilterEvent(panel)));
+    }
+
+    private boolean hasRepoSpecifiedInFilter(FilterPanel panel) {
+        return !Qualifier.getMetaQualifierContent(panel.getCurrentFilterExpression(), QualifierType.REPO).isEmpty();
     }
 
     /**
@@ -336,13 +402,8 @@ public class Logic {
         uiManager.update(elementsToShow, models.getUsers());
     }
 
-    /**
-     * Retrieves all filter expressions in active panels from the UI.
-     *
-     * @return Filter expressions in the UI.
-     */
-    private List<FilterExpression> getAllUIFilters() {
-        return uiManager.getAllFilters();
+    private List<FilterPanel> getAllPanels() {
+        return uiManager.getAllPanels();
     }
 
     /**
