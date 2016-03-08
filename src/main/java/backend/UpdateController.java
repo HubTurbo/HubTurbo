@@ -59,7 +59,7 @@ public class UpdateController {
 
             if (toUpdate.isEmpty()) {
                 // If no issues requiring metadata update, just run the filter and sort.
-                logic.updateUI(processPanels(filterPanels));
+                logic.updateUI(processFilters(filterExprs));
                 return;
             }
 
@@ -74,7 +74,7 @@ public class UpdateController {
                             + results.size() + " repos"))
                     .thenCompose(n -> logic.getRateLimitResetTime())
                     .thenApply(logic::updateRemainingRate)
-                    .thenRun(() -> logic.updateUI(processPanels(filterPanels))); // Then filter the second time.
+                    .thenRun(() -> logic.updateUI(processFilters(filterExprs))); // Then filter the second time.
         });
     }
 
@@ -116,20 +116,19 @@ public class UpdateController {
     }
 
     /**
-     * Filters, sorts and counts issues within the model according to the given panels' filter expressions.
+     * Filters, sorts and counts issues within the model according to the given filter expressions
      * In here, "processed" is equivalent to "filtered, sorted and counted".
      *
-     * @param filterPanels Filter panels to process.
+     * @param filterExprs Filter expressions
      * @return Filter expressions and their corresponding issues after filtering, sorting and counting.
      */
-    private Map<FilterExpression, List<GuiElement>> processPanels(List<FilterPanel> filterPanels) {
+    private Map<FilterExpression, List<GuiElement>> processFilters(List<FilterExpression> filterExprs) {
         MultiModel models = logic.getModels();
         List<TurboIssue> allModelIssues = models.getIssues();
 
         Map<FilterExpression, List<GuiElement>> processed = new HashMap<>();
 
-        filterPanels.stream().distinct().forEach(filterPanel -> {
-            FilterExpression filterExpr = filterPanel.getCurrentFilterExpression();
+        filterExprs.stream().distinct().forEach(filterExpr -> {
             boolean hasUpdatedQualifier = Qualifier.hasUpdatedQualifier(filterExpr);
 
             try {
@@ -145,7 +144,7 @@ public class UpdateController {
 
                 processed.put(filterExpr, processedElements);
             } catch (FilterException e) {
-                Platform.runLater(() -> UI.events.triggerEvent(new FilterExceptionEvent(filterPanel, e.getMessage())));
+                Platform.runLater(() -> UI.events.triggerEvent(new FilterExceptionEvent(filterExpr, e.getMessage())));
             }
         });
 
