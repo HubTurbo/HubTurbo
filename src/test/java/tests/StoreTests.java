@@ -23,7 +23,8 @@ import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class StoreTests {
 
@@ -45,6 +46,7 @@ public class StoreTests {
     public void testStoreStub() throws ExecutionException, InterruptedException {
         // DummyRepo constructor gets called, together with the testing handlers to update repo state
         RepoIO testIO = TestController.createTestingRepoIO(Optional.of(new JSONStoreStub()));
+        TestUtils.createTestRepoOpControl(testIO);
 
         // Repo not stored, "download" from DummySource
         Model dummy1 = testIO.openRepository("dummy1/dummy1").get();
@@ -66,6 +68,7 @@ public class StoreTests {
     public void testStore() throws ExecutionException, InterruptedException {
         // Now we enable JSON store. RepoIO is thus connected with an actual JSONStore object.
         RepoIO testIO = TestController.createTestingRepoIO(Optional.empty());
+        TestUtils.createTestRepoOpControl(testIO);
 
         // Repo currently not stored, "download" from DummySource
         Model dummy1 = testIO.openRepository("dummy1/dummy1").get();
@@ -114,6 +117,7 @@ public class StoreTests {
         RepoStore.write("testrepo/testrepo", "abcde", 10);
 
         RepoIO repoIO = TestController.createTestingRepoIO(Optional.empty());
+        TestUtils.createTestRepoOpControl(repoIO);
         Model model = repoIO.openRepository("testrepo/testrepo").get();
 
         TestUtils.delay(1); // allow for file to be written
@@ -123,6 +127,7 @@ public class StoreTests {
     @Test
     public void testLoadNonExistentRepo() throws InterruptedException, ExecutionException {
         RepoIO repoIO = TestController.createTestingRepoIO(Optional.empty());
+        TestUtils.createTestRepoOpControl(repoIO);
         Model model = repoIO.openRepository("nonexistent/nonexistent").get();
         assertEquals(DummyRepoState.noOfDummyIssues, model.getIssues().size());
     }
@@ -130,6 +135,7 @@ public class StoreTests {
     @Test
     public void testRemoveRepo() throws InterruptedException, ExecutionException {
         RepoIO testIO = TestController.createTestingRepoIO(Optional.empty());
+        TestUtils.createTestRepoOpControl(testIO);
 
         Model dummy1 = testIO.openRepository("dummy1/dummy1").get();
         UI.events.triggerEvent(UpdateDummyRepoEvent.newIssue("dummy1/dummy1"));
