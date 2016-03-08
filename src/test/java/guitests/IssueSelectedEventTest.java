@@ -18,25 +18,10 @@ public class IssueSelectedEventTest extends UITest{
 
     private static final String PANEL_IDENTIFIER = "#dummy/dummy_col0";
 
-    private static AtomicInteger eventTestCount = new AtomicInteger();
-
-    public static void increaseEventTestCount() {
-        eventTestCount.getAndIncrement();
-    }
-
-    private static void resetEventTestCount() {
-        eventTestCount.set(0);
-    }
-
-    @Before
-    public void setup() {
-        UI.events.registerEvent((IssueSelectedEventHandler) e -> IssueSelectedEventTest.increaseEventTestCount());
-    }
-
     @Test
     public void noTriggerIssueSelectedOnRightClick_IssueInPanelRightClicked_IssueSelectedNotTriggered() {
-        resetEventTestCount();
-
+        AtomicInteger result = new AtomicInteger(0);
+        UI.events.registerEvent((IssueSelectedEventHandler) e -> result.incrementAndGet());
         ListPanel issuePanel = find(PANEL_IDENTIFIER);
 
         //testing whether right click occurred by checking the presence of context menu items
@@ -47,7 +32,7 @@ public class IssueSelectedEventTest extends UITest{
         }
 
         // testing IssueSelectedEvent not registered on right click
-        assertEquals(0, eventTestCount.get());
+        assertEquals(0, result.get());
     }
 
     /**
@@ -55,16 +40,17 @@ public class IssueSelectedEventTest extends UITest{
      */
     @Test
     public void triggerIssueSelectedOnLeftClickAndKey_IssueInPanelLeftClickedAndKeyed_IssueSelectedTriggered() {
-        resetEventTestCount();
+        AtomicInteger result = new AtomicInteger(0);
+        UI.events.registerEvent((IssueSelectedEventHandler) e -> result.incrementAndGet());
 
         click(PANEL_IDENTIFIER + "_9");
 
         // testing IssueSelectedEvent is triggered on left click
-        assertEquals(1, eventTestCount.get());
+        assertEquals(1, result.get());
 
         //testing IssueSelectedEvent is triggered on key down to a particular issue
         push(KeyCode.DOWN);
-        assertEquals(2, eventTestCount.get());
+        assertEquals(2, result.get());
     }
 
 }
