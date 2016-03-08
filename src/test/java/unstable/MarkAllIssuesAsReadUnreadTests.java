@@ -53,7 +53,7 @@ public class MarkAllIssuesAsReadUnreadTests extends UITest {
         clickAndMarkIssuesBelow(issuePanel, 7, true);
         verifyReadStatusOfIssuesBelow(issuePanel, 7, true);
 
-        //checking for issue #7 and below as marked read
+        //checking for issue #7 and below as marked read again to ensure they remain read even on a repeated command
         clickAndMarkIssuesBelow(issuePanel, 7, true);
         verifyReadStatusOfIssuesBelow(issuePanel, 7, true);
 
@@ -61,7 +61,8 @@ public class MarkAllIssuesAsReadUnreadTests extends UITest {
         clickAndMarkIssuesBelow(issuePanel, 7, false);
         verifyReadStatusOfIssuesBelow(issuePanel, 7, false);
 
-        //checking for issue #7 and below as marked unread
+        //checking for issue #7 and below as marked unread again to ensure they remain unread
+        // even on a repeated command
         clickAndMarkIssuesBelow(issuePanel, 7, false);
         verifyReadStatusOfIssuesBelow(issuePanel, 7, false);
 
