@@ -63,6 +63,8 @@
         <Class name="ui.components.KeyboardShortcuts" />
         <Bug pattern="MS_CANNOT_BE_FINAL" />
         <Or>
+            <Field name="closeIssue" />
+            <Field name="reopenIssue" />
             <Field name="downIssue" />
             <Field name="leftPanel" />
             <Field name="markAsRead" />
