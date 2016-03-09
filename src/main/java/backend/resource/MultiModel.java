@@ -63,7 +63,7 @@ public class MultiModel implements IModel {
         if (!repoIdCorrectCase.isPresent()) {
             logger.error("RepoId specified does not have a model.");
         }
-        
+
         Optional<Model> repoModelToBeDeleted = getModelById(repoIdCorrectCase.get());
         if (repoModelToBeDeleted.isPresent()) {
             this.models.remove(repoModelToBeDeleted.get().getRepoId());

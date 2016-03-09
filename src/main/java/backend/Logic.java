@@ -258,18 +258,13 @@ public class Logic {
         List<String> originalLabels = issue.getLabels();
 
         logger.info("Changing labels for " + issue + " on UI");
-        /* Calls models to replace the issue's labels locally since the the reference to the issue here
-           could be invalidated by changes to the models elsewhere */
-        Optional<TurboIssue> localReplaceResult =
-                models.replaceIssueLabels(issue.getRepoId(), issue.getId(), newLabels);
-        if (!localReplaceResult.isPresent()) {
-            return CompletableFuture.completedFuture(false);
-        }
-        refreshUI();
+        CompletableFuture<Optional<TurboIssue>> localReplaceResult =
+                repoOpControl.replaceIssueLabelsLocally(issue, newLabels);
+        localReplaceResult.thenRun(this::refreshUI);
 
         return updateIssueLabelsOnServer(issue, newLabels)
                 .thenApply((isUpdateSuccessful) -> handleIssueLabelsUpdateOnServerResult(
-                            isUpdateSuccessful, localReplaceResult.get(), originalLabels));
+                            isUpdateSuccessful, localReplaceResult.join().get(), originalLabels));
     }
 
     /**
@@ -287,7 +282,7 @@ public class Logic {
 
     private CompletableFuture<Boolean> updateIssueLabelsOnServer(TurboIssue issue, List<String> newLabels) {
         logger.info("Changing labels for " + issue + " on GitHub");
-        return repoOpControl.replaceIssueLabels(issue, newLabels);
+        return repoOpControl.replaceIssueLabelsOnServer(issue, newLabels);
     }
 
     /**

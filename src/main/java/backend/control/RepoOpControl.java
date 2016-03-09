@@ -91,10 +91,17 @@ public final class RepoOpControl {
         return result;
     }
 
-    public CompletableFuture<Boolean> replaceIssueLabels(TurboIssue issue, List<String> labels) {
+    public CompletableFuture<Boolean> replaceIssueLabelsOnServer(TurboIssue issue, List<String> labels) {
         init(issue.getRepoId());
         CompletableFuture<Boolean> result = new CompletableFuture<>();
-        enqueue(new ReplaceIssueLabelsOp(repoIO, result, issue, labels));
+        enqueue(new ReplaceIssueLabelsOnServerOp(repoIO, result, issue, labels));
+        return result;
+    }
+
+    public CompletableFuture<Optional<TurboIssue>> replaceIssueLabelsLocally(TurboIssue issue, List<String> labels) {
+        init(issue.getRepoId());
+        CompletableFuture<Optional<TurboIssue>> result = new CompletableFuture<>();
+        enqueue(new ReplaceIssueLabelsLocallyOp(models, issue, labels, result));
         return result;
     }
 

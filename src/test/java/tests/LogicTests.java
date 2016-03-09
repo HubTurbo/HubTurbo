@@ -56,7 +56,7 @@ public class LogicTests {
     }
 
     /**
-     * Tests that replaceIssueLabels succeed when both models and repoIO succeeded
+     * Tests that replaceIssueLabelsOnServer succeed when both models and repoIO succeeded
      */
     @Test
     public void replaceIssueLabels_successful() throws ExecutionException, InterruptedException {
@@ -68,7 +68,7 @@ public class LogicTests {
     }
 
     /**
-     * Tests that replaceIssueLabels failed when models return empty result
+     * Tests that replaceIssueLabelsOnServer failed when models return empty result
      */
     @Test
     public void replaceIssueLabels_repoIOFailed() throws ExecutionException, InterruptedException {
@@ -80,7 +80,7 @@ public class LogicTests {
     }
 
     /**
-     * Tests that replaceIssueLabels failed when repoIO failed to update labels
+     * Tests that replaceIssueLabelsOnServer failed when repoIO failed to update labels
      */
     @Test
     public void replaceIssueLabels_modelsFailed() throws ExecutionException, InterruptedException {
