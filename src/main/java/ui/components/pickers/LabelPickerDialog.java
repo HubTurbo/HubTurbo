@@ -81,6 +81,8 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         initModality(Modality.APPLICATION_MODAL);
         setTitle("Edit Labels for " + (issue.isPullRequest() ? "PR #" : "Issue #") +
                 issue.getId() + " in " + issue.getRepoId());
+        // Ensures height and width of dialog has been initialized before positioning
+        Platform.runLater(() -> positionDialog(stage));
     }
 
     private void setDialogPaneContent(TurboIssue issue) {
@@ -245,6 +247,15 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                 .faded(!matchedLabels.contains(repoLabel))
                 .highlighted(suggestion.isPresent() && suggestion.get().equals(repoLabel))
                 .selected(assignedLabels.contains(repoLabel)));
+    }
+
+    /**
+     * Positions dialog based on width and height of stage
+     * @param stage
+     */
+    private final void positionDialog(Stage stage) {
+        setX(stage.getX() + stage.getWidth() / 2 - getWidth() / 2);
+        setY(stage.getY() + stage.getHeight() / 2 - getHeight() / 2);
     }
 
     private void createMainLayout() {
