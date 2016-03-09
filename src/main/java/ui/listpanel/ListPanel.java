@@ -580,8 +580,6 @@ public class ListPanel extends FilterPanel {
             if (res == ButtonType.OK) {
                 ui.undoController.addAction(element.getIssue(),
                         new EditIssueStateAction(ui.logic, open));
-            } else {
-                // Do nothing
             }
         });
     }
