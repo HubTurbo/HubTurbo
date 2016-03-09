@@ -71,6 +71,7 @@ allprojects {
         compile "org.ocpsoft.prettytime:prettytime:$prettytimeVersion"
         compile "org.seleniumhq.selenium:selenium-java:$seleniumJavaVersion"
         compile "org.seleniumhq.selenium:selenium-server:$seleniumServerVersion"
+		compile group: 'org.fxmisc.richtext', name: 'richtextfx', version: '0.6.10'
 
         testCompile "junit:junit:$junitVersion"
         testCompile "org.loadui:testFx:$testFxVersion"
