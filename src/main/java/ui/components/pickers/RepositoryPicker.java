@@ -29,7 +29,7 @@ public class RepositoryPicker {
     private void showRepositoryPicker() {
         Set<String> storedRepos = ui.logic.getStoredRepos();
         String defaultRepo = ui.logic.getDefaultRepo();
-        RepositoryPickerDialog dialog = new RepositoryPickerDialog(storedRepos, defaultRepo, stage);
+        RepositoryPickerDialog dialog = new RepositoryPickerDialog(storedRepos, stage);
         Optional<String> chosenRepo = dialog.showAndWait();
         if (chosenRepo.isPresent() && !defaultRepo.equals(chosenRepo.get())) {
             onValueChangeCallback.accept(chosenRepo.get());
