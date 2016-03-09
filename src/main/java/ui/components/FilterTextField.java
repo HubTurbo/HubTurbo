@@ -73,14 +73,10 @@ public class FilterTextField extends TextField {
                 return;
             }
             char typed = e.getCharacter().charAt(0);
-            // \b will allow us to detect deletion, but we can't find out the characters deleted
-            if (typed == '\t') {
-                e.consume();
-                if (!getSelectedText().isEmpty()) {
-                    confirmCompletion();
-                }
-            } else if (Character.isAlphabetic(typed) && shouldStartCompletion()) {
+
+            if (typed == '\t' && shouldStartCompletion()) {
                 startCompletion(e);
+                e.consume();
             }
         });
         setOnKeyPressed(e -> {
