@@ -31,10 +31,13 @@ public class SuggestionMenu extends ContextMenu {
         getItems().clear();
         // Resets selection for every new trigger 
         selected = Optional.empty();
-
         searchResult.stream().limit(maxEntries).forEach(this::addMenuItem);
-        // Sets focus on first item if not empty
-        if (!searchResult.isEmpty()) getSkin().getNode().lookup(".menu-item").requestFocus();
+
+        // Sets focus on first item and select it as default suggestion
+        if (isShowing() && !searchResult.isEmpty()) {
+            getSkin().getNode().lookup(".menu-item").requestFocus();
+            selected = Optional.ofNullable(searchResult.get(0));
+        }
     }
 
     /**
