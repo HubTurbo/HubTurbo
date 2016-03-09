@@ -321,7 +321,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
     private void handleLabelClick(PickerLabel label) {
         queryField.setDisable(true);
-        state.updateAssignedLabels(label);
+        state.updateAssignedLabels(Optional.of(label));
         populatePanes(state);
     }
 }

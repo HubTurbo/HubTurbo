@@ -42,7 +42,7 @@ public class LabelPickerState {
     private final void update(String userInput) {
         List<String> confirmedKeywords = getConfirmedKeywords(userInput);
         for (String confirmedKeyword : confirmedKeywords) {
-            updateIfMatchesLabel(confirmedKeyword);
+            updateAssignedLabels(Optional.ofNullable(TurboLabel.getMatchedLabels(allLabels, confirmedKeyword).get(0)));
         }
 
         Optional<String> keywordInProgess = getKeywordInProgress(userInput);
@@ -53,26 +53,16 @@ public class LabelPickerState {
     }
 
     /**
-     * Updates current state if there is at least one matching label based on the 
-     * given keyword
-     * @param keyword
-     */
-    private final void updateIfMatchesLabel(String keyword) {
-        if (TurboLabel.hasMatchedLabel(allLabels, keyword)) {
-            updateAssignedLabels(TurboLabel.getFirstMatchingTurboLabel(allLabels, keyword));
-        }
-    }
-
-    /**
      * Updates assignedLabels based on properties of a label 
      * @param label
      */
-    public final void updateAssignedLabels(TurboLabel label) {
-        String labelName = label.getFullName();
+    public final void updateAssignedLabels(Optional<TurboLabel> label) {
+        if (!label.isPresent()) return;
 
+        String labelName = label.get().getFullName();
         if (isAnInitialLabel(labelName)) {
             if (isARemovedLabel(labelName)) {
-                removeConflictingLabels(label);
+                removeConflictingLabels(label.get());
                 removedLabels.remove(labelName);
             } else {
                 removedLabels.add(labelName);
@@ -82,7 +72,7 @@ public class LabelPickerState {
                 addedLabels.remove(labelName);
             } else {
                 // add new label
-                removeConflictingLabels(label);
+                removeConflictingLabels(label.get());
                 addedLabels.add(labelName);
             }
         }
