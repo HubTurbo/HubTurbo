@@ -52,6 +52,7 @@ public class RepositoryPickerDialog extends Dialog<String> {
 
     private void createComboBox() {
         comboBox = new ComboBox<>();
+        comboBox.setId("repositoryPicker");
         comboBox.setEditable(true);
         comboBox.getItems().addAll(state.getMatchingRepositories("", DEFAULT_MATCHING_MODE));
         comboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -90,7 +91,7 @@ public class RepositoryPickerDialog extends Dialog<String> {
         List<String> matchingRepositories = state.getMatchingRepositories(comboBox.getEditor().getText(),
                                                                             DEFAULT_MATCHING_MODE);
         updateRepositoryList(matchingRepositories);
-        comboBox.show();
+        if (comboBox.getItems().size() > 0) comboBox.show();
     }
 
     /**
