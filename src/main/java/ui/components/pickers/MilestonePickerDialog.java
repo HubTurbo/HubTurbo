@@ -89,11 +89,8 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
     }
 
     private boolean isExistingMilestone(TurboIssue issue, PickerMilestone milestone) {
-        if (issue.getMilestone().isPresent()) {
-            return issue.getMilestone().get() == milestone.getId();
-        } else {
-            return false;
-        }
+        if (!issue.getMilestone().isPresent()) return false;
+        return issue.getMilestone().get() == milestone.getId();
     }
 
     private void selectAssignedMilestone(List<PickerMilestone> milestones, TurboIssue issue) {
@@ -184,13 +181,12 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
 
     private void updateExistingMilestones(List<PickerMilestone> pickerMilestoneList, FlowPane assignedMilestoneStatus,
                                           boolean hasSuggestion) {
-        if (hasExistingMilestone(pickerMilestoneList)) {
-            PickerMilestone existingMilestone = getExistingMilestone(pickerMilestoneList);
+        if (!hasExistingMilestone(pickerMilestoneList)) return;
+        PickerMilestone existingMilestone = getExistingMilestone(pickerMilestoneList);
 
-            Node existingMilestoneNode = setMouseClickForNode(existingMilestone.getExistingMilestoneNode(hasSuggestion),
-                    existingMilestone.getTitle());
-            assignedMilestoneStatus.getChildren().add(existingMilestoneNode);
-        }
+        Node existingMilestoneNode = setMouseClickForNode(existingMilestone.getExistingMilestoneNode(hasSuggestion),
+                existingMilestone.getTitle());
+        assignedMilestoneStatus.getChildren().add(existingMilestoneNode);
     }
 
     private boolean hasExistingMilestone(List<PickerMilestone> milestoneList) {
