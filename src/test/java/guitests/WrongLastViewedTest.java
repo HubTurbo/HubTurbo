@@ -7,6 +7,7 @@ import org.loadui.testfx.utils.FXTestUtils;
 import prefs.ConfigFileHandler;
 import prefs.GlobalConfig;
 import prefs.Preferences;
+import tests.TestUtils;
 import ui.TestController;
 import ui.UI;
 import ui.components.StatusUIStub;
@@ -38,6 +39,7 @@ public class WrongLastViewedTest extends UITest {
         globalConfig.setLastViewedRepository("test/test");
         configFileHandler.saveGlobalConfig(globalConfig);
         RepoIO testIO = TestController.createTestingRepoIO(Optional.empty());
+        TestUtils.createTestRepoOpControl(testIO);
         try {
             testIO.openRepository("test2/test2").get();
         } catch (InterruptedException | ExecutionException e) {
