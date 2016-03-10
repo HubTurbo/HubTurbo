@@ -260,11 +260,18 @@ public class Logic {
         logger.info("Changing labels for " + issue + " on UI");
         CompletableFuture<Optional<TurboIssue>> localReplaceResult =
                 repoOpControl.replaceIssueLabelsLocally(issue, newLabels);
+        if (localReplaceResult.isCompletedExceptionally() || localReplaceResult.isCancelled()) {
+            return CompletableFuture.completedFuture(false);
+        }
+        Optional<TurboIssue> locallyModifiedIssue = localReplaceResult.join();
+        if (!locallyModifiedIssue.isPresent()) {
+            return CompletableFuture.completedFuture(false);
+        }
         localReplaceResult.thenRun(this::refreshUI);
 
         return updateIssueLabelsOnServer(issue, newLabels)
                 .thenApply((isUpdateSuccessful) -> handleIssueLabelsUpdateOnServerResult(
-                            isUpdateSuccessful, localReplaceResult.join().get(), originalLabels));
+                            isUpdateSuccessful, locallyModifiedIssue.get(), originalLabels));
     }
 
     /**

@@ -1,23 +1,23 @@
 package guitests;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-
-import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-
-import org.junit.Test;
-import org.loadui.testfx.utils.FXTestUtils;
-
 import backend.RepoIO;
 import javafx.scene.control.ComboBox;
+import org.junit.Test;
+import org.loadui.testfx.utils.FXTestUtils;
 import prefs.ConfigFileHandler;
 import prefs.GlobalConfig;
 import prefs.Preferences;
+import tests.TestUtils;
 import ui.TestController;
 import ui.UI;
 import ui.components.StatusUI;
 import util.events.EventDispatcher;
+
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 public class SavedLoginTest extends UITest {
 
@@ -39,6 +39,7 @@ public class SavedLoginTest extends UITest {
         globalConfig.setLastViewedRepository("test/test");
         configFileHandler.saveGlobalConfig(globalConfig);
         RepoIO testIO = TestController.createTestingRepoIO(Optional.empty());
+        TestUtils.createTestRepoOpControl(testIO);
         try {
             testIO.openRepository("test/test").get();
         } catch (InterruptedException | ExecutionException e) {

@@ -13,10 +13,10 @@ import java.util.concurrent.CompletableFuture;
  * This class represents a mutually exclusive operation to replace an issue's labels locally
  */
 public class ReplaceIssueLabelsLocallyOp implements RepoOp<Optional<TurboIssue>> {
-    private MultiModel models;
-    private TurboIssue issue;
-    private List<String> newLabels;
-    private CompletableFuture<Optional<TurboIssue>> result;
+    private final MultiModel models;
+    private final TurboIssue issue;
+    private final List<String> newLabels;
+    private final CompletableFuture<Optional<TurboIssue>> result;
 
     private static final Logger logger = HTLog.get(UpdateLocalModelOp.class);
 

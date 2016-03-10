@@ -6,6 +6,7 @@ import backend.github.GitHubModelUpdatesData;
 import backend.github.GitHubRepoTask;
 import backend.resource.Model;
 import backend.resource.MultiModel;
+import backend.resource.TurboIssue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;
@@ -15,6 +16,7 @@ import util.Futures;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
@@ -120,6 +122,20 @@ public class RepoOpControlTest {
         Futures.sequence(futures).get();
 
         assertEquals(3, counter.getMax());
+    }
+
+    /**
+     * Tests that replaceIssueLabelsLocally calls replaceIssueLabels method from models and return corresponding result
+     */
+    @Test
+    public void replaceIssueLabelsLocally() throws ExecutionException, InterruptedException {
+        MultiModel models = mock(MultiModel.class);
+        TurboIssue returnedIssue = new TurboIssue("testrepo/testrepo", 1, "Issue title");
+        when(models.replaceIssueLabels("testrepo/testrepo", 1, new ArrayList<>()))
+        .thenReturn(Optional.of(returnedIssue));
+        RepoOpControl repoOpControl = RepoOpControl.createRepoOpControl(mock(RepoIO.class), models);
+        TurboIssue result = repoOpControl.replaceIssueLabelsLocally(returnedIssue, new ArrayList<>()).join().get();
+        assertEquals(returnedIssue, result);
     }
 
     /**
