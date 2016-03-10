@@ -66,15 +66,15 @@ public class RepositoryPickerDialog extends Dialog<String> {
             }
         });
         comboBox.setOnKeyReleased(event -> {
-            if (isQueryUpdateByComboBoxTraversal(event)) {
+            if (isComboBoxTraversalEvent(event)) {
                 handleComboBoxItemsTraversal();
-            } else if (isQueryUpdateByUser(event)) {
-                handleUserQueryUpdate();
+            } else {
+                handlePossibleUserQueryUpdate();
             }
         });
     }
 
-    private boolean isQueryUpdateByComboBoxTraversal(KeyEvent event) {
+    private boolean isComboBoxTraversalEvent(KeyEvent event) {
         return event.getCode() == KeyCode.UP || event.getCode() == KeyCode.DOWN;
     }
 
@@ -85,13 +85,15 @@ public class RepositoryPickerDialog extends Dialog<String> {
         comboBox.getEditor().positionCaret(comboBox.getEditor().getText().length());
     }
 
-    private void handleUserQueryUpdate() {
-        // hide and show is needed so that the combo box will readjust its row count
-        comboBox.hide();
+    private void handlePossibleUserQueryUpdate() {
         List<String> matchingRepositories = state.getMatchingRepositories(comboBox.getEditor().getText(),
                                                                             DEFAULT_MATCHING_MODE);
-        updateRepositoryList(matchingRepositories);
-        if (comboBox.getItems().size() > 0) comboBox.show();
+        if (!matchingRepositories.equals(comboBox.getItems())) {
+            // hide and show is needed so that the combo box will readjust its row count
+            comboBox.hide();
+            updateRepositoryList(matchingRepositories);
+            if (matchingRepositories.size() > 0) comboBox.show();
+        }
     }
 
     /**
@@ -105,22 +107,6 @@ public class RepositoryPickerDialog extends Dialog<String> {
 
         comboBox.getEditor().setText(originalQuery);
         comboBox.getEditor().positionCaret(originalCaretPosition);
-    }
-
-    private boolean isQueryUpdateByUser(KeyEvent event) {
-        if (event.getCode() == KeyCode.ENTER || event.getCode().isNavigationKey()) {
-            return false;
-        }
-        // TODO: Support more characters?
-        boolean result = false;
-        result |= event.getCode().isLetterKey();
-        result |= event.getCode().isDigitKey();
-        result |= event.getCode() == KeyCode.SLASH;
-        result |= event.getCode() == KeyCode.UNDERSCORE;
-        result |= event.getCode() == KeyCode.MINUS;
-        result |= event.getCode() == KeyCode.BACK_SPACE;
-        result |= event.getCode() == KeyCode.DELETE;
-        return result;
     }
 
     private void createButtons() {
