@@ -275,7 +275,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         setResultConverter(dialogButton -> {
             if (dialogButton == confirmButtonType) {
                 // Ensures the last keyword in the query is toggled after confirmation
-                queryField.appendText(" ");
+                if (!queryField.isDisabled()) queryField.appendText(" ");
                 return TurboLabel.getLabelsNameList(state.getAssignedLabels());
             }
             return null;
@@ -332,7 +332,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     private void handleLabelClick(String labelName) {
         queryField.setDisable(true);
         state.updateAssignedLabels(
-            Optional.of(TurboLabel.getFirstMatchingTurboLabel(allLabels, labelName)));
+            Optional.of(TurboLabel.getMatchedLabels(allLabels, labelName).get(0)));
         populatePanes(state);
     }
 }
