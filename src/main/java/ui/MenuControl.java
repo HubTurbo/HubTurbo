@@ -294,10 +294,11 @@ public class MenuControl extends MenuBar {
     }
 
     public void switchBoard() {
-        Optional<String> name = prefs.switchBoard();
-        if (name.isPresent()) {
-            onBoardOpen(name.get(), prefs.getBoardPanels(name.get()));
-        }
+        ui.triggerEvent(new ShowBoardPickerEvent(prefs.getAllBoardNames()));
+    }
+
+    public void switchBoard(String name) {
+        onBoardOpen(name, prefs.getBoardPanels(name));
     }
 
     private MenuItem createDocumentationMenuItem() {
