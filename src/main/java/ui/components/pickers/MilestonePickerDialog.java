@@ -7,6 +7,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Pair;
@@ -14,8 +15,10 @@ import javafx.util.Pair;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
+    private static final String OCTICON_ARROW = "\uf03e";
     private static final String DIALOG_TITLE = "Select Milestone";
     private static final String OPEN_MILESTONES = "Open Milestones";
     private static final String CLOSED_MILESTONES = "Closed Milestones";
@@ -72,6 +75,12 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
                 .isPresent();
     }
 
+    private Optional<PickerMilestone> getHighlightedMilestone(List<PickerMilestone> milestones) {
+        return milestones.stream()
+                .filter(milestone -> milestone.isHighlighted())
+                .findAny();
+    }
+
     private List<PickerMilestone> convertToPickerMilestones(TurboIssue issue, List<TurboMilestone> milestones) {
         List<PickerMilestone> originalMilestones = new ArrayList<>();
         for (int i = 0; i < milestones.size(); i++) {
@@ -110,7 +119,7 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
         setResultConverter((dialogButton) -> {
             List<PickerMilestone> finalList = state.getCurrentMilestonesList();
             if (hasSelectedMilestone(finalList)) {
-                return new Pair<>(dialogButton, getSelectedMilestone(finalList).getId());
+                return new Pair<>(dialogButton, getSelectedMilestone(finalList).get().getId());
             }
             return new Pair<>(dialogButton, null);
         });
@@ -118,7 +127,9 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
 
     private void initUI() {
         VBox milestoneBox = new VBox();
-        assignedMilestone = createMilestoneGroup();
+        assignedMilestone = new FlowPane();//createMilestoneGroup();
+        assignedMilestone.setPadding(new Insets(5, 5, 5, 5));
+        assignedMilestone.setStyle("-fx-alignment:center;");
         openMilestones = createMilestoneGroup();
         closedMilestones = createMilestoneGroup();
         inputField = new TextField();
@@ -127,9 +138,7 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
         milestoneBox.getChildren().add(new Label(ASSIGNED_MILESTONE));
         milestoneBox.getChildren().add(assignedMilestone);
         milestoneBox.getChildren().add(inputField);
-        milestoneBox.getChildren().add(new Label(OPEN_MILESTONES));
         milestoneBox.getChildren().add(openMilestones);
-        milestoneBox.getChildren().add(new Label(CLOSED_MILESTONES));
         milestoneBox.getChildren().add(closedMilestones);
 
         getDialogPane().setContent(milestoneBox);
@@ -149,44 +158,49 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
         assignedMilestoneStatus.getChildren().clear();
         boolean hasSuggestion = hasHighlightedMilestone(pickerMilestoneList);
 
-        updateExistingMilestones(pickerMilestoneList, assignedMilestoneStatus, hasSuggestion);
+        updateExistingMilestones(pickerMilestoneList, assignedMilestoneStatus);
         addSeparator(assignedMilestoneStatus);
         updateNewlyAddedMilestone(pickerMilestoneList, assignedMilestoneStatus, hasSuggestion);
-        updateSuggestedMilestone(pickerMilestoneList, assignedMilestoneStatus, hasSuggestion);
     }
 
     private void addSeparator(FlowPane assignedMilestoneStatus) {
-        assignedMilestoneStatus.getChildren().add(new Label("|"));
+        Label separator = new Label(OCTICON_ARROW);
+        separator.getStyleClass().add("octicon");
+        separator.setPadding(new Insets(5, 5, 5, 5));
+        assignedMilestoneStatus.getChildren().add(separator);
+
     }
 
-    private void updateSuggestedMilestone(List<PickerMilestone> pickerMilestoneList, FlowPane assignedMilestoneStatus,
-                                          boolean hasSuggestion) {
-        pickerMilestoneList.stream()
-                .filter(milestone -> !milestone.isExisting() && milestone.isHighlighted() && !milestone.isSelected())
-                .forEach(milestone -> assignedMilestoneStatus.getChildren().add(
-                        setMouseClickForNode(milestone.getNewlyAssignedMilestoneNode(hasSuggestion),
-                                milestone.getTitle())
-                ));
+    private void updateNewlyAddedMilestone(List<PickerMilestone> pickerMilestoneList, FlowPane assignedMilestoneStatus, boolean hasSuggestion) {
+        HBox newlyAssignedMilestoneBox = createNewlyAssignedMilestoneBox();
+        if (hasSuggestion) {
+            newlyAssignedMilestoneBox.getChildren().add(getHighlightedMilestone(pickerMilestoneList).get().getNewlyAssignedMilestoneNode(hasSuggestion));
+            assignedMilestoneStatus.getChildren().add(newlyAssignedMilestoneBox);
+            return;
+        }
+
+        if (hasSelectedMilestone(pickerMilestoneList)) {
+            newlyAssignedMilestoneBox.getChildren().add(getSelectedMilestone(pickerMilestoneList).get().getNewlyAssignedMilestoneNode(hasSuggestion));
+            assignedMilestoneStatus.getChildren().add(newlyAssignedMilestoneBox);
+            return;
+        }
+
+        assignedMilestoneStatus.getChildren().add(newlyAssignedMilestoneBox);
     }
 
-    private void updateNewlyAddedMilestone(List<PickerMilestone> pickerMilestoneList, FlowPane assignedMilestoneStatus,
-                                           boolean hasSuggestion) {
-        pickerMilestoneList.stream()
-                .filter(milestone -> milestone.isSelected() && !milestone.isExisting())
-                .forEach(milestone -> assignedMilestoneStatus.getChildren().add(
-                        setMouseClickForNode(milestone.getNewlyAssignedMilestoneNode(hasSuggestion),
-                                milestone.getTitle())
-                ));
-    }
+    private void updateExistingMilestones(List<PickerMilestone> pickerMilestoneList, FlowPane assignedMilestoneStatus) {
+        HBox assignedMilestoneBox = createPreviouslyAssignedMilestoneBox();
+        if (!hasExistingMilestone(pickerMilestoneList)) {
+            assignedMilestoneStatus.getChildren().add(assignedMilestoneBox);
+            return;
+        }
+        PickerMilestone existingMilestone = getExistingMilestone(pickerMilestoneList).get();
 
-    private void updateExistingMilestones(List<PickerMilestone> pickerMilestoneList, FlowPane assignedMilestoneStatus,
-                                          boolean hasSuggestion) {
-        if (!hasExistingMilestone(pickerMilestoneList)) return;
-        PickerMilestone existingMilestone = getExistingMilestone(pickerMilestoneList);
-
-        Node existingMilestoneNode = setMouseClickForNode(existingMilestone.getExistingMilestoneNode(hasSuggestion),
+        Node existingMilestoneNode = setMouseClickForNode(existingMilestone.getSimpleNode(),
                 existingMilestone.getTitle());
-        assignedMilestoneStatus.getChildren().add(existingMilestoneNode);
+
+        assignedMilestoneBox.getChildren().add(existingMilestoneNode);
+        assignedMilestoneStatus.getChildren().add(assignedMilestoneBox);
     }
 
     private boolean hasExistingMilestone(List<PickerMilestone> milestoneList) {
@@ -196,11 +210,10 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
                 .isPresent();
     }
 
-    private PickerMilestone getExistingMilestone(List<PickerMilestone> milestoneList) {
+    private Optional<PickerMilestone> getExistingMilestone(List<PickerMilestone> milestoneList) {
         return milestoneList.stream()
                 .filter(milestone -> milestone.isExisting())
-                .findAny()
-                .get();
+                .findAny();
     }
 
     private void populateClosedMilestones(List<PickerMilestone> pickerMilestoneList, FlowPane closedMilestones) {
@@ -232,6 +245,23 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
         return milestoneGroup;
     }
 
+    private HBox createNewlyAssignedMilestoneBox() {
+        HBox milestoneBox = new HBox();
+        milestoneBox.setPrefWidth(150);
+        milestoneBox.setPrefHeight(50);
+        milestoneBox.setStyle("-fx-border-radius: 3;-fx-border-style: dotted;-fx-alignment:center");
+        return milestoneBox;
+    }
+
+    private HBox createPreviouslyAssignedMilestoneBox() {
+        HBox milestoneBox = new HBox();
+        milestoneBox.setPrefWidth(120);
+        milestoneBox.setPrefHeight(30);
+        milestoneBox.setMaxHeight(30);
+        milestoneBox.setStyle("-fx-border-radius: 3;-fx-border-style: dotted;-fx-alignment:center");
+        return milestoneBox;
+    }
+
     private boolean hasSelectedMilestone(List<PickerMilestone> milestoneList) {
         return milestoneList.stream()
                 .filter(milestone -> milestone.isSelected())
@@ -239,10 +269,9 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
                 .isPresent();
     }
 
-    private PickerMilestone getSelectedMilestone(List<PickerMilestone> milestoneList) {
+    private Optional<PickerMilestone> getSelectedMilestone(List<PickerMilestone> milestoneList) {
         return milestoneList.stream()
                 .filter(milestone -> milestone.isSelected())
-                .findAny()
-                .get();
+                .findAny();
     }
 }
