@@ -7,6 +7,8 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 
 public class PickerMilestone extends TurboMilestone implements Comparable<PickerMilestone> {
+    public static final String OPEN_COLOUR = "#84BE54";
+    public static final String CLOSE_COLOUR = "#AD3E27";
     boolean isSelected = false;
     boolean isHighlighted = false;
     boolean isFaded = false;
@@ -22,12 +24,7 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
     }
 
     public PickerMilestone(PickerMilestone milestone) {
-        super(milestone.getRepoId(), milestone.getId(), milestone.getTitle());
-        setDueDate(milestone.getDueDate());
-        setDescription(milestone.getDescription() == null ? "" : milestone.getDescription());
-        setOpen(milestone.isOpen());
-        setOpenIssues(milestone.getOpenIssues());
-        setClosedIssues(milestone.getClosedIssues());
+        this((TurboMilestone)milestone);
         setFaded(milestone.isFaded());
         setHighlighted(milestone.isHighlighted());
         setSelected(milestone.isSelected());
@@ -35,64 +32,73 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
     }
 
     public Node getNode() {
-        Label milestone = new Label(getTitle());
-        FontLoader fontLoader = Toolkit.getToolkit().getFontLoader();
-        double width = fontLoader.computeStringWidth(milestone.getText(), milestone.getFont());
-        milestone.setPrefWidth(width + 30);
-        milestone.getStyleClass().add("labels");
-        milestone.setStyle("-fx-background-color: yellow;");
+        Label milestone = createLabel();
+        setOpenStatusColour(milestone);
 
-        if (isSelected) {
-            milestone.setText(milestone.getText() + " ✓");
-        }
+        if (isSelected) setSelectedInUI(milestone);
 
-        if (isHighlighted) {
-            milestone.setStyle(milestone.getStyle() + "-fx-border-color: black;");
-        }
+        if (isHighlighted) setHighlightedInUI(milestone);
 
-        if (isFaded) {
-            milestone.setStyle(milestone.getStyle() + "-fx-opacity: 40%;");
-        }
+        if (isFaded) setFadedInUI(milestone);
 
         return milestone;
     }
 
-    public Node getNewlyAssignedMilestoneNode(boolean hasSuggestion) {
+    private Label createLabel() {
         Label milestone = new Label(getTitle());
         FontLoader fontLoader = Toolkit.getToolkit().getFontLoader();
         double width = fontLoader.computeStringWidth(milestone.getText(), milestone.getFont());
         milestone.setPrefWidth(width + 30);
         milestone.getStyleClass().add("labels");
-        milestone.setStyle("-fx-background-color: yellow;");
+        return milestone;
+    }
+
+    private void setOpenStatusColour(Label milestone) {
+        milestone.setStyle("-fx-background-color: " + (isOpen() ? OPEN_COLOUR : CLOSE_COLOUR) + ";");
+    }
+
+    private void setFadedInUI(Label milestone) {
+        milestone.setStyle(milestone.getStyle() + "-fx-opacity: 40%;");
+    }
+
+    private void setHighlightedInUI(Label milestone) {
+        milestone.setStyle(milestone.getStyle() + "-fx-border-color: black;");
+    }
+
+    private void setSelectedInUI(Label milestone) {
+        milestone.setText(milestone.getText() + " ✓");
+    }
+
+    private void setRemovedInUI(Label milestone) {
+        milestone.getStyleClass().add("labels-removed"); // add strikethrough
+    }
+
+    public Node getNewlyAssignedMilestoneNode(boolean hasSuggestion) {
+        Label milestone = createLabel();
+        setOpenStatusColour(milestone);
 
         if (hasSuggestion) {
-            milestone.setStyle(milestone.getStyle() + "-fx-opacity: 40%;");
-            if (isSelected) {
-                milestone.getStyleClass().add("labels-removed"); // add strikethrough
-            }
+            setFadedInUI(milestone);
+            if (isSelected) setRemovedInUI(milestone);
         }
 
         if (isSelected) {
-            milestone.setStyle(milestone.getStyle() + "-fx-border-color: black;");
+            setHighlightedInUI(milestone);
         }
 
         return milestone;
     }
 
     public Node getExistingMilestoneNode(boolean hasSuggestion) {
-        Label milestone = new Label(getTitle());
-        FontLoader fontLoader = Toolkit.getToolkit().getFontLoader();
-        double width = fontLoader.computeStringWidth(milestone.getText(), milestone.getFont());
-        milestone.setPrefWidth(width + 30);
-        milestone.getStyleClass().add("labels");
-        milestone.setStyle("-fx-background-color: yellow;");
+        Label milestone = createLabel();
+        setOpenStatusColour(milestone);
 
         if (isSelected && (hasSuggestion || isHighlighted)) {
-            milestone.setStyle(milestone.getStyle() + "-fx-opacity: 40%;");
+            setFadedInUI(milestone);
         }
 
         if (!isExisting || !isSelected || hasSuggestion || isHighlighted) {
-            milestone.getStyleClass().add("labels-removed"); // add strikethrough
+            setRemovedInUI(milestone);
         }
 
         return milestone;

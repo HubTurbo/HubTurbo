@@ -126,11 +126,11 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
 
         milestoneBox.getChildren().add(new Label(ASSIGNED_MILESTONE));
         milestoneBox.getChildren().add(assignedMilestone);
+        milestoneBox.getChildren().add(inputField);
         milestoneBox.getChildren().add(new Label(OPEN_MILESTONES));
         milestoneBox.getChildren().add(openMilestones);
         milestoneBox.getChildren().add(new Label(CLOSED_MILESTONES));
         milestoneBox.getChildren().add(closedMilestones);
-        milestoneBox.getChildren().add(inputField);
 
         getDialogPane().setContent(milestoneBox);
         Platform.runLater(inputField::requestFocus);
