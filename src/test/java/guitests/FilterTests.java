@@ -4,6 +4,7 @@ import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 import backend.stub.DummyRepoState;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import org.junit.Test;
 import ui.listpanel.ListPanel;
@@ -23,6 +24,20 @@ public class FilterTests extends UITest{
         push(KeyCode.ENTER);
 
         assertEquals(DummyRepoState.noOfDummyIssues, issuePanel.getIssueCount());
+    }
+
+    @Test
+    public void filterTextField_semanticException_backgroundError() {
+        ListPanel issuePanel = find("#dummy/dummy_col0");
+        TextField textField = find("#dummy/dummy_col0_filterTextField");
+
+        click("#dummy/dummy_col0_filterTextField");
+        selectAll();
+        type("id:buggy");
+        push(KeyCode.ENTER);
+        
+        assertEquals(DummyRepoState.noOfDummyIssues, issuePanel.getIssueCount());
+        assertTrue(textField.getStyle().contains("-fx-control-inner-background: #EE8993"));
     }
 
     @Test
