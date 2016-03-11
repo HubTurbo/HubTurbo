@@ -5,6 +5,7 @@ import com.sun.javafx.tk.FontLoader;
 import com.sun.javafx.tk.Toolkit;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.text.Font;
 
 public class PickerMilestone extends TurboMilestone implements Comparable<PickerMilestone> {
     public static final String OPEN_COLOUR = "#84BE54";
@@ -31,14 +32,18 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
         setExisting(milestone.isExisting());
     }
 
+    public Node getSimpleNode() {
+        Label milestone = createSmallLabel();
+        setOpenStatusColour(milestone);
+        return milestone;
+    }
+
     public Node getNode() {
         Label milestone = createLabel();
         setOpenStatusColour(milestone);
 
         if (isSelected) setSelectedInUI(milestone);
-
         if (isHighlighted) setHighlightedInUI(milestone);
-
         if (isFaded) setFadedInUI(milestone);
 
         return milestone;
@@ -46,6 +51,26 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
 
     private Label createLabel() {
         Label milestone = new Label(getTitle());
+        FontLoader fontLoader = Toolkit.getToolkit().getFontLoader();
+        double width = fontLoader.computeStringWidth(milestone.getText(), milestone.getFont());
+        milestone.setPrefWidth(width + 30);
+        milestone.getStyleClass().add("labels");
+        return milestone;
+    }
+
+    private Label createSmallLabel() {
+        Label milestone = new Label(getTitle());
+        milestone.setFont(new Font(11));
+        FontLoader fontLoader = Toolkit.getToolkit().getFontLoader();
+        double width = fontLoader.computeStringWidth(milestone.getText(), milestone.getFont());
+        milestone.setPrefWidth(width + 30);
+        milestone.getStyleClass().add("labels");
+        return milestone;
+    }
+
+    private Label createBigLabel() {
+        Label milestone = new Label(getTitle());
+        milestone.setFont(new Font(16));
         FontLoader fontLoader = Toolkit.getToolkit().getFontLoader();
         double width = fontLoader.computeStringWidth(milestone.getText(), milestone.getFont());
         milestone.setPrefWidth(width + 30);
@@ -74,7 +99,7 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
     }
 
     public Node getNewlyAssignedMilestoneNode(boolean hasSuggestion) {
-        Label milestone = createLabel();
+        Label milestone = createBigLabel();
         setOpenStatusColour(milestone);
 
         if (hasSuggestion) {
@@ -84,21 +109,6 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
 
         if (isSelected) {
             setHighlightedInUI(milestone);
-        }
-
-        return milestone;
-    }
-
-    public Node getExistingMilestoneNode(boolean hasSuggestion) {
-        Label milestone = createLabel();
-        setOpenStatusColour(milestone);
-
-        if (isSelected && (hasSuggestion || isHighlighted)) {
-            setFadedInUI(milestone);
-        }
-
-        if (!isExisting || !isSelected || hasSuggestion || isHighlighted) {
-            setRemovedInUI(milestone);
         }
 
         return milestone;
