@@ -35,6 +35,7 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
     public Node getSimpleNode() {
         Label milestone = createSmallLabel();
         setOpenStatusColour(milestone);
+        setRemovedInUI(milestone);
         return milestone;
     }
 
@@ -60,7 +61,7 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
 
     private Label createSmallLabel() {
         Label milestone = new Label(getTitle());
-        milestone.setFont(new Font(11));
+        milestone.setFont(new Font(12));
         FontLoader fontLoader = Toolkit.getToolkit().getFontLoader();
         double width = fontLoader.computeStringWidth(milestone.getText(), milestone.getFont());
         milestone.setPrefWidth(width + 30);
@@ -146,7 +147,10 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
     }
 
     /**
-     * This treats null milestones with no set due date to be "larger than"
+     * Milestones which are open are deemed to be smaller than milestones which are closed
+     * Milestones with earlier due dates are deemed to be "larger".
+     *
+     * In addition, this treats null milestones with no set due date to be "smaller than"
      * those which have due dates
      *
      * @param milestone
@@ -155,11 +159,14 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
     @Override
     public int compareTo(PickerMilestone milestone) {
         if (this.getDueDate().equals(milestone.getDueDate())) return 0;
-        if (!this.getDueDate().isPresent()) return 1;
-        if (!milestone.getDueDate().isPresent()) return -1;
+        if (this.isOpen() != milestone.isOpen()) {
+            return this.isOpen() ? -1 : 1;
+        }
+        if (!this.getDueDate().isPresent()) return -1;
+        if (!milestone.getDueDate().isPresent()) return 1;
 
         return this.getDueDate().get()
-                .isAfter(milestone.getDueDate().get()) ? 1 : -1;
+                .isAfter(milestone.getDueDate().get()) ? -1 : 1;
     }
 
     @Override
