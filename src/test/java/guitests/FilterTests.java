@@ -31,7 +31,7 @@ public class FilterTests extends UITest{
     }
 
     @Test
-    public void filterTextField_semanticException_backgroundError() {
+    public void filterTextField_semanticException_emptyFilter() {
         ListPanel issuePanel = find("#dummy/dummy_col0");
 
         // test semantic exception dummy/dummy_col0_filterTextField");
@@ -76,6 +76,8 @@ public class FilterTests extends UITest{
         PlatformEx.waitOnFxThread();
         assertEquals(DummyRepoState.noOfDummyIssues, issuePanel2.getIssueCount());
         assertEquals(1, issuePanel.getIssueCount());
+
+        pushKeys(new KeyCodeCombination(KeyCode.W, KeyCombination.SHORTCUT_DOWN));
     }
 
     @Test
