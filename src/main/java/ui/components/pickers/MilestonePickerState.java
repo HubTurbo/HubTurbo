@@ -4,6 +4,7 @@ import util.Utility;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class MilestonePickerState {
@@ -39,16 +40,35 @@ public class MilestonePickerState {
     }
 
     /**
-     * Finds the PickerMilestone in the milestoneToDisplay list which has milestoneQuery in title,
-     * then toggles the selection status
+     * Gets a milestone that is the ONLY match to the given milestoneQuery
+     * Changes the selection statuses of all milestones in the milestone list,
+     * such that the new given milestone is toggled, and the rest are not selected
      * @param milestoneQuery
      */
     public final void toggleMilestone(String milestoneQuery) {
-        String milestoneName = getMatchingMilestoneName(milestoneQuery);
-        if (milestoneName == null) return;
+        Optional<PickerMilestone> onlyMatchingMilestone = getMatchingMilestoneIfOnlyMatch(milestoneQuery);
+        if (!onlyMatchingMilestone.isPresent()) return;
         this.currentMilestonesList.stream()
-                .forEach(milestone -> milestone.setSelected(milestone.getTitle().equals(milestoneName)
+                .forEach(milestone -> milestone.setSelected(milestone.equals(onlyMatchingMilestone.get())
                         && !milestone.isSelected()));
+    }
+
+    /**
+     * Gets the current list of milestones
+     * @return
+     */
+    public List<PickerMilestone> getCurrentMilestonesList() {
+        return this.currentMilestonesList;
+    }
+
+    /**
+     * Gets the list of milestones that matches the current query i.e. not faded
+     * @return
+     */
+    public List<PickerMilestone> getMatchingMilestonesList() {
+        return this.currentMilestonesList.stream()
+                .filter(milestone -> !milestone.isFaded())
+                .collect(Collectors.toList());
     }
 
     private void filterMilestones(String query) {
@@ -58,22 +78,10 @@ public class MilestonePickerState {
                     milestone.setFaded(!matchQuery);
                 });
 
-        if (hasExactlyOneMatchingMilestone(currentMilestonesList, query)) {
-            highlightFirstMatchingMilestone();
-        }
+        if (hasExactlyOneMatchingMilestone(currentMilestonesList, query)) highlightAnyMatchingMilestone();
     }
 
-    public List<PickerMilestone> getCurrentMilestonesList() {
-        return this.currentMilestonesList;
-    }
-
-    public List<PickerMilestone> getMatchingMilestonesList() {
-        return this.currentMilestonesList.stream()
-                .filter(milestone -> !milestone.isFaded())
-                .collect(Collectors.toList());
-    }
-
-    private void highlightFirstMatchingMilestone() {
+    private void highlightAnyMatchingMilestone() {
         if (!hasMatchingMilestone(this.currentMilestonesList)) return;
         this.currentMilestonesList.stream()
                 .filter(milestone -> !milestone.isFaded())
@@ -94,10 +102,10 @@ public class MilestonePickerState {
      * @param query
      * @return
      */
-    private String getMatchingMilestoneName(String query) {
-        if (!hasExactlyOneMatchingMilestone(currentMilestonesList, query)) return null;
+    private Optional<PickerMilestone> getMatchingMilestoneIfOnlyMatch(String query) {
+        if (!hasExactlyOneMatchingMilestone(currentMilestonesList, query)) return Optional.empty();
 
-        return getMatchingMilestoneName(currentMilestonesList, query);
+        return Optional.of(getMatchingMilestone(currentMilestonesList, query));
     }
 
     private boolean hasExactlyOneMatchingMilestone(List<PickerMilestone> milestoneList, String query) {
@@ -106,11 +114,10 @@ public class MilestonePickerState {
                 .count() == 1;
     }
 
-    private String getMatchingMilestoneName(List<PickerMilestone> milestoneList, String query) {
+    private PickerMilestone getMatchingMilestone(List<PickerMilestone> milestoneList, String query) {
         return milestoneList.stream()
                 .filter(milestone -> Utility.containsIgnoreCase(milestone.getTitle(), query))
                 .findFirst()
-                .get()
-                .getTitle();
+                .get();
     }
 }
