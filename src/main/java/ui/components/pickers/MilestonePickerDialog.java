@@ -20,12 +20,10 @@ import java.util.Optional;
 public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
     private static final String OCTICON_ARROW = "\uf03e";
     private static final String DIALOG_TITLE = "Select Milestone";
-    private static final String OPEN_MILESTONES = "Open Milestones";
-    private static final String CLOSED_MILESTONES = "Closed Milestones";
-    private static final String ASSIGNED_MILESTONE = "Assigned Milestone";
 
     private final List<PickerMilestone> originalMilestones = new ArrayList<>();
-    FlowPane openMilestones, closedMilestones, assignedMilestone;
+    FlowPane assignedMilestone;
+    VBox matchingMilestones;
     private TextField inputField;
     private MilestonePickerState state;
 
@@ -130,16 +128,13 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
         assignedMilestone = new FlowPane();//createMilestoneGroup();
         assignedMilestone.setPadding(new Insets(5, 5, 5, 5));
         assignedMilestone.setStyle("-fx-alignment:center;");
-        openMilestones = createMilestoneGroup();
-        closedMilestones = createMilestoneGroup();
+        matchingMilestones = createMilestoneGroup();
         inputField = new TextField();
         inputField.setId("milestonePickerTextField");
 
-        milestoneBox.getChildren().add(new Label(ASSIGNED_MILESTONE));
         milestoneBox.getChildren().add(assignedMilestone);
         milestoneBox.getChildren().add(inputField);
-        milestoneBox.getChildren().add(openMilestones);
-        milestoneBox.getChildren().add(closedMilestones);
+        milestoneBox.getChildren().add(matchingMilestones);
 
         getDialogPane().setContent(milestoneBox);
         Platform.runLater(inputField::requestFocus);
@@ -149,8 +144,9 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
     private void refreshUI(MilestonePickerState state) {
         List<PickerMilestone> milestonesToDisplay = state.getCurrentMilestonesList();
         populateAssignedMilestone(milestonesToDisplay, assignedMilestone);
-        populateOpenMilestones(milestonesToDisplay, openMilestones);
-        populateClosedMilestones(milestonesToDisplay, closedMilestones);
+
+        List<PickerMilestone> matchingMilestones = state.getMatchingMilestonesList();
+        populateMatchingMilestones(matchingMilestones, this.matchingMilestones);
     }
 
     private void populateAssignedMilestone(List<PickerMilestone> pickerMilestoneList,
@@ -216,19 +212,23 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
                 .findAny();
     }
 
-    private void populateClosedMilestones(List<PickerMilestone> pickerMilestoneList, FlowPane closedMilestones) {
-        closedMilestones.getChildren().clear();
+    private void populateMatchingMilestones(List<PickerMilestone> pickerMilestoneList, VBox matchingMilestones) {
+        matchingMilestones.getChildren().clear();
         pickerMilestoneList.stream()
-                .filter(milestone -> !milestone.isOpen())
-                .forEach(milestone -> closedMilestones.getChildren().add(milestone.getNode()));
+                .sorted()
+                .limit(5)
+                .forEach(milestone -> matchingMilestones.getChildren().add(createDetailedMilestoneBox(milestone)));
     }
 
-    private void populateOpenMilestones(List<PickerMilestone> pickerMilestoneList, FlowPane openMilestones) {
-        openMilestones.getChildren().clear();
-        pickerMilestoneList.stream()
-                .filter(milestone -> milestone.isOpen())
-                .forEach(milestone -> openMilestones.getChildren().add(setMouseClickForNode(milestone.getNode(),
-                        milestone.getTitle())));
+    private HBox createDetailedMilestoneBox(PickerMilestone milestone) {
+        HBox detailedMilestoneBox = new HBox();
+        detailedMilestoneBox.setSpacing(3);
+        detailedMilestoneBox.getChildren().add(setMouseClickForNode(milestone.getNode(), milestone.getTitle()));
+        if (!milestone.getDueDate().isPresent()) return detailedMilestoneBox;
+
+        Label dueDate = new Label("Due on: " + milestone.getDueDate().get().toString());
+        detailedMilestoneBox.getChildren().add(dueDate);
+        return detailedMilestoneBox;
     }
 
     private Node setMouseClickForNode(Node node, String milestoneName) {
@@ -236,19 +236,18 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
         return node;
     }
 
-    private FlowPane createMilestoneGroup() {
-        FlowPane milestoneGroup = new FlowPane();
+    private VBox createMilestoneGroup() {
+        VBox milestoneGroup = new VBox();
         milestoneGroup.setPadding(new Insets(3));
-        milestoneGroup.setHgap(3);
-        milestoneGroup.setVgap(3);
+        milestoneGroup.setSpacing(3);
         milestoneGroup.setStyle("-fx-border-radius: 3;-fx-background-color: white;-fx-border-color: black;");
         return milestoneGroup;
     }
 
     private HBox createNewlyAssignedMilestoneBox() {
         HBox milestoneBox = new HBox();
-        milestoneBox.setPrefWidth(150);
-        milestoneBox.setPrefHeight(50);
+        milestoneBox.setPrefWidth(140);
+        milestoneBox.setPrefHeight(40);
         milestoneBox.setStyle("-fx-border-radius: 3;-fx-border-style: dotted;-fx-alignment:center");
         return milestoneBox;
     }

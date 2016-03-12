@@ -4,6 +4,7 @@ import util.Utility;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MilestonePickerState {
     private List<PickerMilestone> currentMilestonesList;
@@ -57,11 +58,19 @@ public class MilestonePickerState {
                     milestone.setFaded(!matchQuery);
                 });
 
-        highlightFirstMatchingMilestone();
+        if (hasExactlyOneMatchingMilestone(currentMilestonesList, query)) {
+            highlightFirstMatchingMilestone();
+        }
     }
 
     public List<PickerMilestone> getCurrentMilestonesList() {
         return this.currentMilestonesList;
+    }
+
+    public List<PickerMilestone> getMatchingMilestonesList() {
+        return this.currentMilestonesList.stream()
+                .filter(milestone -> !milestone.isFaded())
+                .collect(Collectors.toList());
     }
 
     private void highlightFirstMatchingMilestone() {
@@ -90,7 +99,6 @@ public class MilestonePickerState {
 
         return getMatchingMilestoneName(currentMilestonesList, query);
     }
-
 
     private boolean hasExactlyOneMatchingMilestone(List<PickerMilestone> milestoneList, String query) {
         return milestoneList.stream()
