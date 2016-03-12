@@ -258,7 +258,7 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
         int totalIssues = milestone.getOpenIssues() + milestone.getClosedIssues();
         double progressValue;
         if (totalIssues > 0) {
-            progressValue = milestone.getOpenIssues() / (milestone.getOpenIssues() + milestone.getClosedIssues());
+            progressValue = milestone.getClosedIssues() / (milestone.getOpenIssues() + milestone.getClosedIssues());
         } else {
             progressValue = 0;
         }
