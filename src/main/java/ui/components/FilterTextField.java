@@ -16,6 +16,9 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import ui.UI;
+import static ui.components.KeyboardShortcuts.SHOW_DOCS;
+
 /**
  * A field augmented with the ability to revert edits, autocompletion, on-the-fly error
  * checking, and callbacks for various actions.
@@ -39,9 +42,12 @@ public class FilterTextField extends TextField {
     // For on-the-fly parsing and checking
     private final ValidationSupport validationSupport = new ValidationSupport();
 
-    public FilterTextField(String initialText) {
+    private final UI ui;
+
+    public FilterTextField(String initialText, UI ui) {
         super(initialText);
         previousText = initialText;
+        this.ui = ui;
         setup();
     }
 
@@ -74,10 +80,16 @@ public class FilterTextField extends TextField {
             }
         });
         setOnKeyPressed(e -> {
-             if (e.getCode() == KeyCode.TAB) {
-                 // Disable tab for UI traversal
-                 e.consume();
-             }
+            if (e.getCode() == KeyCode.TAB) {
+             // Disable tab for UI traversal
+             e.consume();
+            }
+//            switch (e.getCode()) {
+//            case KeyCode.TAB:
+//                e.consume();
+//                break;
+//            case KeyCode.F1:
+//            }
         });
         setOnKeyReleased(e -> {
             e.consume();
@@ -89,6 +101,11 @@ public class FilterTextField extends TextField {
                 } else {
                     revertEdit();
                 }
+            }
+        });
+        addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (SHOW_DOCS.match(event)) {
+                ui.getBrowserComponent().showDocs();
             }
         });
     }

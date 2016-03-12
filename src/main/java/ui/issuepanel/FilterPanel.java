@@ -123,7 +123,7 @@ public abstract class FilterPanel extends AbstractPanel {
     };
 
     private Node createFilterBox() {
-        filterTextField = new FilterTextField("")
+        filterTextField = new FilterTextField("", ui)
                 .setOnConfirm((text) -> {
                     applyStringFilter(text);
                     return text;
