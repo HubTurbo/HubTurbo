@@ -158,6 +158,8 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
      */
     @Override
     public int compareTo(PickerMilestone milestone) {
+        if (isHighlighted) return -1;
+        if (milestone.isHighlighted()) return 1;
         if (this.getDueDate().equals(milestone.getDueDate())) return 0;
         if (this.isOpen() != milestone.isOpen()) {
             return this.isOpen() ? -1 : 1;
