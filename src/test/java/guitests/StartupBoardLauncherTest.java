@@ -5,12 +5,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
 import org.loadui.testfx.utils.TestUtils;
-import prefs.Preferences;
 import ui.BoardAutoCreator;
 import ui.TestController;
-import ui.UI;
 import ui.issuepanel.PanelControl;
-import ui.listpanel.ListPanel;
 import util.PlatformEx;
 
 import java.util.Arrays;
