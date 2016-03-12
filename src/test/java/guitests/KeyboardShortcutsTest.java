@@ -182,6 +182,7 @@ public class KeyboardShortcutsTest extends UITest {
         click("#dummy/dummy_col1_filterTextField");
         type("id:5");
         push(KeyCode.ENTER);
+        PlatformEx.waitOnFxThread();
         press(JUMP_TO_FIRST_ISSUE);
         push(getKeyCode("MARK_AS_READ"));
         // focus should remain at the only issue shown
