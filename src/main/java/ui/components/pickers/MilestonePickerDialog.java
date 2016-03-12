@@ -4,6 +4,7 @@ import backend.resource.TurboIssue;
 import backend.resource.TurboMilestone;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
@@ -11,6 +12,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Pair;
+import ui.components.TextProgressBar;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -125,10 +127,11 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
 
     private void initUI() {
         VBox milestoneBox = new VBox();
-        assignedMilestone = new FlowPane();//createMilestoneGroup();
+        milestoneBox.setSpacing(3);
+        assignedMilestone = new FlowPane();
         assignedMilestone.setPadding(new Insets(5, 5, 5, 5));
         assignedMilestone.setStyle("-fx-alignment:center;");
-        matchingMilestones = createMilestoneGroup();
+        matchingMilestones = createMatchingMilestonesBox();
         inputField = new TextField();
         inputField.setId("milestonePickerTextField");
 
@@ -217,17 +220,53 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
         pickerMilestoneList.stream()
                 .sorted()
                 .limit(5)
-                .forEach(milestone -> matchingMilestones.getChildren().add(createDetailedMilestoneBox(milestone)));
+                    .forEach(milestone -> matchingMilestones.getChildren().add(createDetailedMilestoneBox(milestone)));
+
+        if (pickerMilestoneList.size() <= 5) return;
+        Label moreMilestonesIndicator = new Label("and " + (pickerMilestoneList.size() - 5) + " more...");
+        moreMilestonesIndicator.setPadding(new Insets(3, 3, 3, 3));
+        matchingMilestones.getChildren().add(moreMilestonesIndicator);
     }
 
     private HBox createDetailedMilestoneBox(PickerMilestone milestone) {
         HBox detailedMilestoneBox = new HBox();
         detailedMilestoneBox.setSpacing(3);
-        detailedMilestoneBox.getChildren().add(setMouseClickForNode(milestone.getNode(), milestone.getTitle()));
-        if (!milestone.getDueDate().isPresent()) return detailedMilestoneBox;
+        detailedMilestoneBox.setPadding(new Insets(3, 3, 3, 3));
+        detailedMilestoneBox.setStyle("-fx-border-width: 0 0 1 0; -fx-border-style: solid;");
 
-        Label dueDate = new Label("Due on: " + milestone.getDueDate().get().toString());
-        detailedMilestoneBox.getChildren().add(dueDate);
+        HBox milestoneNodeBox = new HBox();
+        milestoneNodeBox.setPrefWidth(150);
+        milestoneNodeBox.setAlignment(Pos.CENTER);
+
+        HBox milestoneDetailsBox = new HBox();
+        milestoneDetailsBox.setSpacing(3);
+        milestoneDetailsBox.setPrefWidth(250);
+        milestoneDetailsBox.setAlignment(Pos.CENTER_RIGHT);
+
+        Label separator = new Label("|");
+        detailedMilestoneBox.getChildren().setAll(milestoneNodeBox, separator, milestoneDetailsBox);
+
+        Node milestoneNode = setMouseClickForNode(milestone.getNode(), milestone.getTitle());
+        milestoneNodeBox.getChildren().add(milestoneNode);
+
+
+        if (milestone.getDueDate().isPresent()) {
+            Label dueDate = new Label("Due on: " + milestone.getDueDate().get().toString());
+            dueDate.setPrefWidth(150);
+            milestoneDetailsBox.getChildren().add(dueDate);
+        }
+        int totalIssues = milestone.getOpenIssues() + milestone.getClosedIssues();
+        double progressValue;
+        if (totalIssues > 0) {
+            progressValue = milestone.getOpenIssues() / (milestone.getOpenIssues() + milestone.getClosedIssues());
+        } else {
+            progressValue = 0;
+        }
+        MilestoneProgressBar progressBar = new MilestoneProgressBar(progressValue);
+        Label progressLabel = new Label(String.format("%3.0f%%", progressValue*100));
+        progressLabel.setPrefWidth(50);
+        milestoneDetailsBox.getChildren().addAll(progressBar, progressLabel);
+
         return detailedMilestoneBox;
     }
 
@@ -236,10 +275,8 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
         return node;
     }
 
-    private VBox createMilestoneGroup() {
+    private VBox createMatchingMilestonesBox() {
         VBox milestoneGroup = new VBox();
-        milestoneGroup.setPadding(new Insets(3));
-        milestoneGroup.setSpacing(3);
         milestoneGroup.setStyle("-fx-border-radius: 3;-fx-background-color: white;-fx-border-color: black;");
         return milestoneGroup;
     }
