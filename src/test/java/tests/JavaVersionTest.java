@@ -1,6 +1,7 @@
 package tests;
 
 import org.junit.Test;
+import ui.UI;
 import util.JavaVersion;
 
 import static org.junit.Assert.assertEquals;
@@ -10,79 +11,36 @@ import static org.junit.Assert.fail;
 
 public class JavaVersionTest {
     @Test
-    public void javaVersionParsing_Java8VersionNoBuild_ParsedVersionCorrectly() {
-        String version = "1.8.0_60";
-        JavaVersion expectedVersion = new JavaVersion(1, 8, 0, 60, 0);
-        JavaVersion javaVersion = JavaVersion.fromString(version);
-        assertEquals(expectedVersion, javaVersion);
+    public void javaVersionParsing_RequiredVersionString_NoExceptionThrown() {
+        JavaVersion.fromString(UI.REQUIRED_JAVA_VERSION);
     }
 
     @Test
-    public void javaVersionParsing_Java8VersionWithBuild_ParsedVersionCorrectly() {
-        String version = "1.8.0_60-b40";
-        JavaVersion expectedVersion = new JavaVersion(1, 8, 0, 60, 40);
-        JavaVersion javaVersion = JavaVersion.fromString(version);
-        assertEquals(expectedVersion, javaVersion);
+    public void javaVersionParsing_AcceptableVersionString_ParsedVersionCorrectly() {
+        // Java version no build
+        verifyJavaVersionParsedCorrectly("1.8.0_60", 1, 8, 0, 60, 0);
+        // Java version with build
+        verifyJavaVersionParsedCorrectly("1.8.0_60-b40", 1, 8, 0, 60, 40);
+        // Arbitrary big version numbers no build
+        verifyJavaVersionParsedCorrectly("10.80.100_60", 10, 80, 100, 60, 0);
+        // Arbitrary big version numbers with build
+        verifyJavaVersionParsedCorrectly("010.080.100_60", 10, 80, 100, 60, 0);
     }
 
-    @Test
-    public void javaVersionParsing_Java8VersionBigNumbers_ParsedVersionCorrectly() {
-        String version = "10.80.100_60";
-        JavaVersion expectedVersion = new JavaVersion(10, 80, 100, 60, 0);
-        JavaVersion javaVersion = JavaVersion.fromString(version);
-        assertEquals(expectedVersion, javaVersion);
-
-        version = "010.080.100_60";
-        expectedVersion = new JavaVersion(10, 80, 100, 60, 0);
-        javaVersion = JavaVersion.fromString(version);
-        assertEquals(expectedVersion, javaVersion);
+    @Test(expected = IllegalArgumentException.class)
+    public void javaVersionParsing_JavaVersionNoUpdateNoBuild_ThrowsException() {
+        JavaVersion.fromString("1.8.0");
     }
 
-    @Test
-    public void javaVersionParsing_Java8VersionNoUpdateNoBuild_ThrowsException() {
-        String version = "1.8.0";
-        try {
-            JavaVersion.fromString(version);
-            fail("Java version string with no update and built is parsed with no exception returned.");
-        } catch (IllegalArgumentException e) {
-            // pass
-        }
-    }
-
-    @Test
-    public void javaVersionParsing_NotJavaVersion_ThrowsException() {
-        String version;
-
-        version = "this should throw exception";
-        try {
-            JavaVersion.fromString(version);
-            fail("Invalid Java version string is parsed with no exception returned.");
-        } catch (IllegalArgumentException e) {
-            // pass
-        }
-
-        version = "1.8_9";
-        try {
-            JavaVersion.fromString(version);
-            fail("Invalid Java version string is parsed with no exception returned.");
-        } catch (IllegalArgumentException e) {
-            // pass
-        }
-
-        version = "1.0.7";
-        try {
-            JavaVersion.fromString(version);
-            fail("Invalid Java version string is parsed with no exception returned.");
-        } catch (IllegalArgumentException e) {
-            // pass
-        }
+    @Test(expected = IllegalArgumentException.class)
+    public void javaVersionParsing_RandomString_ThrowsException() {
+        JavaVersion.fromString("this should throw exception");
     }
 
     @Test
     public void javaVersionToString_JavaVersion_ReturnsCorrectString() {
         JavaVersion version = new JavaVersion(0, 0, 0, 0, 0);
         String versionString = "0.0.0_0-b0";
-
         assertEquals(versionString, version.toString());
 
         version = new JavaVersion(100, 200, 300, 400, 500);
@@ -91,7 +49,7 @@ public class JavaVersionTest {
     }
 
     @Test
-    public void javaVersionComparable_Java8Version_HashCodesAndEqualAreCorrect() {
+    public void javaVersionComparable_JavaVersion_HashCodesAndEqualAreCorrect() {
         String version = "1.8.0_60";
         JavaVersion expectedVersion = new JavaVersion(1, 8, 0, 60, 0);
         JavaVersion javaVersion = JavaVersion.fromString(version);
@@ -108,28 +66,35 @@ public class JavaVersionTest {
     @Test
     public void javaVersionTooLow_JavaVersion_ReturnsCorrectResult() {
         JavaVersion age0 = new JavaVersion(0, 0, 0, 0, 0);
-        JavaVersion ageUpdate1 = new JavaVersion(0, 0, 0, 0, 1);
-        JavaVersion ageBuild1Update0  = new JavaVersion(0, 0, 0, 1, 0);
-        JavaVersion ageBuild1Update1  = new JavaVersion(0, 0, 0, 1, 1);
+        JavaVersion ageBuild1 = new JavaVersion(0, 0, 0, 0, 1);
+        JavaVersion ageUpdate1Build0  = new JavaVersion(0, 0, 0, 1, 0);
+        JavaVersion ageUpdate1Build1  = new JavaVersion(0, 0, 0, 1, 1);
         JavaVersion ageMinor1 = new JavaVersion(0, 0, 1, 0, 0);
         JavaVersion ageMajor1 = new JavaVersion(0, 1, 0, 0, 0);
         JavaVersion ageDiscard2 = new JavaVersion(2, 0, 0, 0, 0);
 
         // Case version too low
-        assertTrue(JavaVersion.isJavaVersionTooLow(age0, ageUpdate1));
-        assertTrue(JavaVersion.isJavaVersionTooLow(ageUpdate1, ageBuild1Update0));
-        assertTrue(JavaVersion.isJavaVersionTooLow(ageBuild1Update0, ageBuild1Update1));
-        assertTrue(JavaVersion.isJavaVersionTooLow(ageBuild1Update1, ageMinor1));
-        assertTrue(JavaVersion.isJavaVersionTooLow(ageBuild1Update1, ageMajor1));
-        assertTrue(JavaVersion.isJavaVersionTooLow(ageMinor1, ageMajor1));
-        assertTrue(JavaVersion.isJavaVersionTooLow(ageMajor1, ageDiscard2));
+        assertTrue(JavaVersion.isJavaVersionLower(age0, ageBuild1));
+        assertTrue(JavaVersion.isJavaVersionLower(ageBuild1, ageUpdate1Build0));
+        assertTrue(JavaVersion.isJavaVersionLower(ageUpdate1Build0, ageUpdate1Build1));
+        assertTrue(JavaVersion.isJavaVersionLower(ageUpdate1Build1, ageMinor1));
+        assertTrue(JavaVersion.isJavaVersionLower(ageUpdate1Build1, ageMajor1));
+        assertTrue(JavaVersion.isJavaVersionLower(ageMinor1, ageMajor1));
+        assertTrue(JavaVersion.isJavaVersionLower(ageMajor1, ageDiscard2));
 
         // Case equal
-        assertFalse(JavaVersion.isJavaVersionTooLow(age0, age0));
-        assertFalse(JavaVersion.isJavaVersionTooLow(ageUpdate1, ageUpdate1));
+        assertFalse(JavaVersion.isJavaVersionLower(age0, age0));
+        assertFalse(JavaVersion.isJavaVersionLower(ageBuild1, ageBuild1));
 
         // Case version higher
-        assertFalse(JavaVersion.isJavaVersionTooLow(ageBuild1Update0, ageUpdate1));
-        assertFalse(JavaVersion.isJavaVersionTooLow(ageDiscard2, ageMajor1));
+        assertFalse(JavaVersion.isJavaVersionLower(ageUpdate1Build0, ageBuild1));
+        assertFalse(JavaVersion.isJavaVersionLower(ageDiscard2, ageMajor1));
+    }
+
+    private void verifyJavaVersionParsedCorrectly(String versionString, int verDiscard, int verMajor, int verMinor,
+                                                  int verUpdate, int verBuild) {
+        JavaVersion expectedVersion = new JavaVersion(verDiscard, verMajor, verMinor, verUpdate, verBuild);
+        JavaVersion javaVersion = JavaVersion.fromString(versionString);
+        assertEquals(expectedVersion, javaVersion);
     }
 }

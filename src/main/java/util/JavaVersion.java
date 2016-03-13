@@ -14,15 +14,21 @@ public class JavaVersion implements Comparable<JavaVersion> {
     private static final Pattern JAVA_8_VERSION_PATTERN =
             Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)\\_(\\d+)(-b(\\d+))?");
 
-    public static final String OUTDATED_JAVA_VERSION_MESSAGE =
+    public static final String WARNING_MSG_OUTDATED_JAVA_VERSION =
             "Your Java version is older than HubTurbo's requirement. " +
             "Use it at your own risk.%n%n" +
             "Required version\t: %s%n" +
             "Installed version\t: %s";
+    public static final String ERROR_MSG_JAVA_RUNTIME_VERSION_PARSING =
+            "Java runtime version is not known and may not be compatible with HubTurbo.%n%n" +
+            "Use it at your own risk.%n%nRuntime version: %s";
+    private static final String EXCEPTION_STRING_NOT_JAVA_VERSION = "String is not a valid Java Version. %s";
 
-    // Java version in String is formatted as "<discard>.<major>.<minor>_<update>" with optional suffix of
-    // "-b<build>". Discard is not used because all Java versions (up to Java 8) will start with "1.".
-    // This might change in Java 9.
+    /**
+     * Java version in String is formatted as "<discard>.<major>.<minor>_<update>" with optional suffix of
+     * "-b<build>". Discard is not used because all Java versions (up to Java 8) will start with "1.".
+     * This might change in Java 9.
+     */
     private final int discard, major, minor, update, build;
 
     public JavaVersion(int discard, int major, int minor, int update, int build) {
@@ -36,15 +42,15 @@ public class JavaVersion implements Comparable<JavaVersion> {
     public static JavaVersion fromString(String javaVersion) throws IllegalArgumentException {
         Matcher javaVersionMatcher = JAVA_8_VERSION_PATTERN.matcher(javaVersion);
 
-        if (javaVersionMatcher.find()) {
-            return new JavaVersion(Integer.parseInt(javaVersionMatcher.group(1)),
-                    Integer.parseInt(javaVersionMatcher.group(2)),
-                    Integer.parseInt(javaVersionMatcher.group(3)),
-                    Integer.parseInt(javaVersionMatcher.group(4)),
-                    Integer.parseInt((javaVersionMatcher.group(6) != null ? javaVersionMatcher.group(6) : "0")));
-        } else {
-            throw new IllegalArgumentException("String is not a valid Java Version. " + javaVersion);
+        if (!javaVersionMatcher.find()) {
+            throw new IllegalArgumentException(String.format(EXCEPTION_STRING_NOT_JAVA_VERSION, javaVersion));
         }
+
+        return new JavaVersion(Integer.parseInt(javaVersionMatcher.group(1)),
+                Integer.parseInt(javaVersionMatcher.group(2)),
+                Integer.parseInt(javaVersionMatcher.group(3)),
+                Integer.parseInt(javaVersionMatcher.group(4)),
+                Integer.parseInt((javaVersionMatcher.group(6) != null ? javaVersionMatcher.group(6) : "0")));
     }
 
     public String toString() {
@@ -80,7 +86,7 @@ public class JavaVersion implements Comparable<JavaVersion> {
         return compareTo(other) == 0;
     }
 
-    public static boolean isJavaVersionTooLow(JavaVersion runtime, JavaVersion required) {
+    public static boolean isJavaVersionLower(JavaVersion runtime, JavaVersion required) {
         return runtime.compareTo(required) < 0;
     }
 }
