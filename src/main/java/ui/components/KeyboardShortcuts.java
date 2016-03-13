@@ -69,6 +69,8 @@ public final class KeyboardShortcuts {
             new KeyCodeCombination(KeyCode.D, KeyCombination.SHORTCUT_DOWN);
     public static final KeyCodeCombination SWITCH_DEFAULT_REPO =
             new KeyCodeCombination(KeyCode.R, KeyCombination.SHORTCUT_DOWN);
+    public static final KeyCodeCombination SHOW_ISSUES =
+            new KeyCodeCombination(KeyCode.I, KeyCombination.SHORTCUT_DOWN);
     public static final KeyCodeCombination SWITCH_BOARD = 
             new KeyCodeCombination(KeyCode.B, KeyCombination.SHORTCUT_DOWN);
     public static final KeyCodeCombination UNDO_LABEL_CHANGES =
@@ -88,8 +90,6 @@ public final class KeyboardShortcuts {
             new KeyCodeCombination(KeyCode.G);
     public static final KeyCodeCombination SHOW_LABELS =
             new KeyCodeCombination(KeyCode.L);
-    public static final KeyCodeCombination SHOW_ISSUES =
-            new KeyCodeCombination(KeyCode.I);
     public static final KeyCodeCombination SHOW_MILESTONES =
             new KeyCodeCombination(KeyCode.M);
     public static final KeyCodeCombination SHOW_PULL_REQUESTS =

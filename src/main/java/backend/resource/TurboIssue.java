@@ -339,6 +339,17 @@ public class TurboIssue {
         return Optional.empty();
     }
 
+    /**
+     * @param issues
+     * @param query
+     * @return list of issues that contain given query 
+     */
+    public static List<TurboIssue> getMatchedIssues(List<TurboIssue> issues, String query){
+        return issues.stream()
+            .filter(issue -> issue.toString().contains(query) || issue.getTitle().contains(query))
+            .collect(Collectors.toList());
+    }
+
     @SuppressWarnings("unused")
     private void ______BOILERPLATE______() {}
 
