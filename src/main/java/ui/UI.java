@@ -51,6 +51,12 @@ public class UI extends Application implements EventDispatcher {
     public static final int VERSION_MINOR = 22;
     public static final int VERSION_PATCH = 0;
 
+    private static final Logger logger = LogManager.getLogger(UI.class.getName());
+    private static HWND mainWindowHandle;
+    private final GlobalHotkey globalHotkey = new GlobalHotkey(this);
+
+    private static final int REFRESH_PERIOD = 60;
+
     /**
      * HT Required Java Version
      */
@@ -62,11 +68,15 @@ public class UI extends Application implements EventDispatcher {
 
     private static final String APPLICATION_LOGO_FILENAME = "logo.png";
 
-    private static final Logger logger = LogManager.getLogger(UI.class.getName());
-    private static HWND mainWindowHandle;
-    private final GlobalHotkey globalHotkey = new GlobalHotkey(this);
+    public static final String WARNING_MSG_OUTDATED_JAVA_VERSION =
+            "Your Java version is older than HubTurbo's requirement. " +
+                    "Use it at your own risk.%n%n" +
+                    "Required version\t: %s%n" +
+                    "Installed version\t: %s";
+    public static final String ERROR_MSG_JAVA_RUNTIME_VERSION_PARSING =
+            "Java runtime version is not known and may not be compatible with HubTurbo.%n%n" +
+                    "Use it at your own risk.%n%nRuntime version: %s";
 
-    private static final int REFRESH_PERIOD = 60;
 
     // Application-level state
 
@@ -575,13 +585,13 @@ public class UI extends Application implements EventDispatcher {
     }
 
     private void showJavaVersionOutdatedWarning(JavaVersion runtimeVersion, JavaVersion requiredVersion) {
-        String message = String.format(JavaVersion.WARNING_MSG_OUTDATED_JAVA_VERSION,
+        String message = String.format(WARNING_MSG_OUTDATED_JAVA_VERSION,
                                        requiredVersion.toString(), runtimeVersion.toString());
         DialogMessage.showInformationDialog("Update your Java version", message);
     }
 
     private void showJavaRuntimeVersionNotCompatible(String javaRuntimeVersionString) {
-        String message = String.format(JavaVersion.ERROR_MSG_JAVA_RUNTIME_VERSION_PARSING, javaRuntimeVersionString);
+        String message = String.format(ERROR_MSG_JAVA_RUNTIME_VERSION_PARSING, javaRuntimeVersionString);
         DialogMessage.showInformationDialog("Java version unknown", message);
     }
 }

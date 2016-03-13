@@ -14,14 +14,6 @@ public class JavaVersion implements Comparable<JavaVersion> {
     private static final Pattern JAVA_8_VERSION_PATTERN =
             Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)\\_(\\d+)(-b(\\d+))?");
 
-    public static final String WARNING_MSG_OUTDATED_JAVA_VERSION =
-            "Your Java version is older than HubTurbo's requirement. " +
-            "Use it at your own risk.%n%n" +
-            "Required version\t: %s%n" +
-            "Installed version\t: %s";
-    public static final String ERROR_MSG_JAVA_RUNTIME_VERSION_PARSING =
-            "Java runtime version is not known and may not be compatible with HubTurbo.%n%n" +
-            "Use it at your own risk.%n%nRuntime version: %s";
     private static final String EXCEPTION_STRING_NOT_JAVA_VERSION = "String is not a valid Java Version. %s";
 
     /**

@@ -64,6 +64,68 @@ public class JavaVersionTest {
     }
 
     @Test
+    public void javaVersionComparable_JavaVersion_CompareToIsCorrect() {
+        JavaVersion lower, higher;
+
+        // Tests equality
+        lower = new JavaVersion(0, 0, 0, 0, 0);
+        higher = new JavaVersion(0, 0, 0, 0, 0);
+        assertTrue(lower.compareTo(higher) == 0);
+
+        lower = new JavaVersion(10, 10, 10, 10, 10);
+        higher = new JavaVersion(10, 10, 10, 10, 10);
+        assertTrue(lower.compareTo(higher) == 0);
+
+        // Tests different build
+        lower = new JavaVersion(0, 0, 0, 0, 0);
+        higher = new JavaVersion(0, 0, 0, 0, 1);
+        assertTrue(lower.compareTo(higher) < 0);
+        assertTrue(higher.compareTo(lower) > 0);
+
+        // Tests different update
+        lower = new JavaVersion(0, 0, 0, 0, 0);
+        higher = new JavaVersion(0, 0, 0, 2, 0);
+        assertTrue(lower.compareTo(higher) < 0);
+        assertTrue(higher.compareTo(lower) > 0);
+
+        // Tests different minor
+        lower = new JavaVersion(0, 0, 0, 0, 0);
+        higher = new JavaVersion(0, 0, 10, 0, 0);
+        assertTrue(lower.compareTo(higher) < 0);
+        assertTrue(higher.compareTo(lower) > 0);
+
+        // Tests different major
+        lower = new JavaVersion(0, 0, 0, 0, 0);
+        higher = new JavaVersion(0, 100, 0, 0, 0);
+        assertTrue(lower.compareTo(higher) < 0);
+        assertTrue(higher.compareTo(lower) > 0);
+
+        // Tests different discard
+        lower = new JavaVersion(0, 0, 0, 0, 0);
+        higher = new JavaVersion(100, 0, 0, 0, 0);
+        assertTrue(lower.compareTo(higher) < 0);
+        assertTrue(higher.compareTo(lower) > 0);
+
+        // Tests high major vs low discard
+        lower = new JavaVersion(0, 100, 0, 0, 0);
+        higher = new JavaVersion(1, 0, 0, 0, 0);
+        assertTrue(lower.compareTo(higher) < 0);
+        assertTrue(higher.compareTo(lower) > 0);
+
+        // Tests low minor vs high major
+        lower = new JavaVersion(0, 0, 10, 0, 0);
+        higher = new JavaVersion(0, 100, 0, 0, 0);
+        assertTrue(lower.compareTo(higher) < 0);
+        assertTrue(higher.compareTo(lower) > 0);
+
+        // Tests combinations with same discard and major, higher minor, lower update and build
+        lower = new JavaVersion(1, 3, 5, 6, 8);
+        higher = new JavaVersion(1, 3, 7, 0, 1);
+        assertTrue(lower.compareTo(higher) < 0);
+        assertTrue(higher.compareTo(lower) > 0);
+    }
+
+    @Test
     public void javaVersionTooLow_JavaVersion_ReturnsCorrectResult() {
         JavaVersion age0 = new JavaVersion(0, 0, 0, 0, 0);
         JavaVersion ageBuild1 = new JavaVersion(0, 0, 0, 0, 1);
