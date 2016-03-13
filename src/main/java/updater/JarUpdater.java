@@ -230,7 +230,7 @@ public class JarUpdater extends Application {
      * @return true if JAR can be executed, false otherwise
      */
     private static boolean executeJar(String jarPath, String argsAndOptions) {
-        String command = String.format("java -jar %1$s %2$s", jarPath, argsAndOptions).trim();
+        String command = String.format("java -jar %s %s", jarPath, argsAndOptions).trim();
         log("Starting JAR with command: " + command);
 
         Process process;
