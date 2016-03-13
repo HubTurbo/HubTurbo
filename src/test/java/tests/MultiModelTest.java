@@ -79,6 +79,16 @@ public class MultiModelTest {
         MultiModel models = new MultiModel(mock(Preferences.class));
         assertEquals(Optional.empty(), models.replaceIssueLabels("nonexistentrepo", 1, new ArrayList<>()));
     }
+    
+     /**
+     * Tests that replaceIssueAssignee returns Optional.empty if the model for the
+     * issue given in the argument can't be found
+     */
+    @Test
+    public void replaceIssueAssignee_modelNotFound() {
+        MultiModel models = new MultiModel(mock(Preferences.class));
+        assertEquals(Optional.empty(), models.replaceIssueAssignee("nonexistentrepo", 1, ""));
+    }
 
     /**
      * Tests that {@code editIssueState} returns Optional.empty() if the model for the
@@ -207,5 +217,27 @@ public class MultiModelTest {
 
         models.editIssueState(repoId, issueId, false);
         verify(mockedModel).editIssueState(issueId, false);
+    }
+
+    /**
+     * Tests that replaceIssueAssignee called the Model with the same id as the argument
+     * repoId and invoke replaceIssueAssignee on that Model
+     */
+    @Test
+    public void replaceIssueAssignee_successful() {
+        String repoId = "testowner/testrepo";
+        int issueId = 1;
+        String assignee = "user1";
+
+        Model mockedModel = mock(Model.class);
+        when(mockedModel.getRepoId()).thenReturn(repoId);
+        when(mockedModel.getIssues()).thenReturn(new ArrayList<>());
+
+        MultiModel models = new MultiModel(mock(Preferences.class));
+        models.queuePendingRepository(repoId);
+        models.addPending(mockedModel);
+
+        models.replaceIssueAssignee(repoId, issueId, assignee);
+        verify(mockedModel).replaceIssueAssignee(issueId, assignee);
     }
 }
