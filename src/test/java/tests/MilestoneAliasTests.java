@@ -159,10 +159,6 @@ public class MilestoneAliasTests {
     public void milestoneAlias_onlyOpenMilestoneWithoutDueDate_openMilestoneConsideredAsCurrent() {
         //ongoing milestone -> open && (!overdue || (overdue && openIssues > 0))
 
-        TurboMilestone msFinished0 = new TurboMilestone(REPO, 0, "finished0");
-        msFinished0.setDueDate(Optional.of(LocalDate.now()));
-        msFinished0.setOpen(false);
-
         TurboMilestone msFinished1 = new TurboMilestone(REPO, 1, "finished1");
         msFinished1.setDueDate(Optional.of(LocalDate.now().minusDays(1)));
         msFinished1.setOpen(false);

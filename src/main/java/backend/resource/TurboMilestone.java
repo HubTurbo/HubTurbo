@@ -119,10 +119,8 @@ public class TurboMilestone {
      */
     public static Comparator<TurboMilestone> getDueDateComparator() {
         return (a, b) -> {
-            assert a.getDueDate().isPresent();
-            assert b.getDueDate().isPresent();
-            LocalDate aDueDate = a.getDueDate().get();
-            LocalDate bDueDate = b.getDueDate().get();
+            LocalDate aDueDate = a.getDueDate().orElse(a.isOpen() ? LocalDate.MAX : LocalDate.MIN);
+            LocalDate bDueDate = b.getDueDate().orElse(b.isOpen() ? LocalDate.MAX : LocalDate.MIN);
             return aDueDate.compareTo(bDueDate);
         };
     }
@@ -133,16 +131,9 @@ public class TurboMilestone {
      * (i.e. relative ordering of 2 milestones with the same due date will be retained)
      */
     public static List<TurboMilestone> sortByDueDate(List<TurboMilestone> milestones) {
-        List<TurboMilestone> milestonesWithDueDate = milestones.stream()
-                .filter(ms -> ms.getDueDate().isPresent())
-                .sorted(getDueDateComparator())
+        return milestones.stream()
+                .sorted(TurboMilestone.getDueDateComparator())
                 .collect(Collectors.toList());
-        List<TurboMilestone> milestonesWithoutDueDate = milestones.stream()
-                .filter(ms -> !ms.getDueDate().isPresent())
-                .collect(Collectors.toList());
-        List<TurboMilestone> result = milestonesWithDueDate;
-        result.addAll(milestonesWithoutDueDate);
-        return result;
     }
 
     @Override
