@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import util.DialogMessage;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -33,6 +34,10 @@ public class JarUpdater extends Application {
     private static final int MAX_RETRY = 10;
     private static final int WAIT_TIME = 2000;
     private static final String BACKUP_FILENAME_SUFFIX = "_backup";
+    private static final String ERROR_ON_UPDATING =
+            "Update cannot be applied. Update will be aborted. Please close this window.";
+
+    private Label updatingLabel;
 
     @SuppressWarnings("PMD")
     // PMD - "Consider using varargs for methods or constructors which take an array the last parameter."
@@ -55,7 +60,7 @@ public class JarUpdater extends Application {
         stage.setScene(scene);
         scene.setRoot(windowMainLayout);
 
-        Label updatingLabel = new Label();
+        updatingLabel = new Label();
         updatingLabel.setText("Please wait. HubTurbo is being updated...");
         updatingLabel.setPadding(new Insets(50));
 
@@ -87,7 +92,10 @@ public class JarUpdater extends Application {
             quit();
         }
 
-        prepareTargetJarFile(targetJarFile);
+        if (!prepareTargetJarFile(targetJarFile)) {
+            showCriticalErrorOnUpdating();
+            return;
+        }
 
         log("Moving source to target");
         if (!moveFile(sourceJarFile.toPath(), targetJarFile.toPath())) {
@@ -135,16 +143,19 @@ public class JarUpdater extends Application {
     /**
      * Creates directories for target file if they do not exist.
      * Otherwise, makes backup if target file exists.
+     * @return true if preparation successful, false otherwise
      */
-    private void prepareTargetJarFile(File targetJarFile) {
+    private boolean prepareTargetJarFile(File targetJarFile) {
         if (targetJarFile.getParentFile() != null &&
                 !createDirectories(targetJarFile.getParentFile().getAbsoluteFile())) {
             log("Failed to make directories of target file.");
-            quit();
+            return false;
         } else if (targetJarFile.exists() && !makeJarBackup(targetJarFile)) {
             log("Failed to make backup.");
-            quit();
+            return false;
         }
+
+        return true;
     }
 
     /**
@@ -232,6 +243,15 @@ public class JarUpdater extends Application {
         }
 
         return process.isAlive();
+    }
+
+    private void showCriticalErrorOnUpdating() {
+        String header = "Failed to update";
+        String message = "Update cannot be applied. Update will be aborted.";
+        Platform.runLater(() -> {
+            DialogMessage.showErrorDialog(header, message);
+            quit();
+        });
     }
 
     /**
