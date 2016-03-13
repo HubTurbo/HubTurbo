@@ -31,31 +31,10 @@ public final class RepoOpControl {
     private final ExecutorService pool = Executors.newCachedThreadPool();
     private final Map<String, BlockingQueue<RepoOp>> queues = new HashMap<>();
 
-    private static Optional<RepoOpControl> repoOpControlOptional = Optional.empty();
-
-    private RepoOpControl(RepoIO repoIO, MultiModel models) {
+    public RepoOpControl(RepoIO repoIO, MultiModel models) {
         this.repoIO = repoIO;
         this.models = models;
     }
-
-    /**
-     * Gets an RepoOpControl instance that has been created previously by {@code createRepoOpControl}
-     * @return
-     */
-    public static RepoOpControl getRepoOpControl() {
-        return repoOpControlOptional.get();
-    }
-
-    public static RepoOpControl createRepoOpControl(RepoIO repoIO, MultiModel models) {
-        repoOpControlOptional = Optional.of(new RepoOpControl(repoIO, models));
-        return repoOpControlOptional.get();
-    }
-
-    /**
-     * Wrapped operations. These methods correspond to RepoIO operations
-     * which should not be executed concurrently. For example, we don't want
-     * a model that is being updated to be deleted until the update is complete.
-     */
 
     public CompletableFuture<Model> openRepository(String repoId) {
         init(repoId);

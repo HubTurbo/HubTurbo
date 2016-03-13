@@ -55,11 +55,12 @@ public class RepositorySelectorPopulationTests {
     @Test
     public void oneValidJsonFile() throws ExecutionException, InterruptedException {
         RepoIO testIO = TestController.createTestingRepoIO(Optional.empty());
+        testIO.setRepoOpControl(TestUtils.createRepoOpControlWithEmptyModels(testIO));
         testIO.openRepository("dummy/dummy").get();
         TestUtils.delay(2); // Wait 2 seconds for Gson to convert model to JSON and write
 
         RepoIO alternateIO = TestController.createTestingRepoIO(Optional.empty());
-        TestUtils.createTestRepoOpControl(alternateIO);
+        alternateIO.setRepoOpControl(TestUtils.createRepoOpControlWithEmptyModels(alternateIO));
         assertEquals(1, alternateIO.getStoredRepos().size());
     }
 
@@ -70,13 +71,13 @@ public class RepositorySelectorPopulationTests {
         File invalidJson2 = new File("store/test/dummy2-dummy2.json");
         assert invalidJson2.createNewFile();
         RepoIO testIO = TestController.createTestingRepoIO(Optional.empty());
-        TestUtils.createTestRepoOpControl(testIO);
+        testIO.setRepoOpControl(TestUtils.createRepoOpControlWithEmptyModels(testIO));
         testIO.openRepository("dummy3/dummy3").get();
         testIO.openRepository("dummy4/dummy4").get();
         TestUtils.delay(2); // Wait 2 seconds for Gson to convert model to JSON and write
 
         RepoIO alternateIO = TestController.createTestingRepoIO(Optional.empty());
-        TestUtils.createTestRepoOpControl(alternateIO);
+        alternateIO.setRepoOpControl(TestUtils.createRepoOpControlWithEmptyModels(alternateIO));
         assertEquals(2, alternateIO.getStoredRepos().size());
     }
 

@@ -31,6 +31,7 @@ public class RepoIO {
 
     private final RepoSource repoSource;
     private final JSONStore jsonStore;
+    private RepoOpControl repoOpControl;
 
     private final List<String> storedRepos;
 
@@ -49,6 +50,21 @@ public class RepoIO {
         storeDirectory.ifPresent((dir) -> RepoStore.changeDirectory(dir));
         this.jsonStore = jsonStore.orElseGet(() -> new JSONStore());
         storedRepos = new ArrayList<>(this.jsonStore.getStoredRepos());
+    }
+
+    /**
+     * Sets the RepoOpControl instance that this RepoIO can use to execute repo level mutually exclusive operations
+     * @param repoOpControl
+     */
+    public void setRepoOpControl(RepoOpControl repoOpControl) {
+        this.repoOpControl = repoOpControl;
+    }
+
+    /**
+     * Gets the RepoOpControl instance that this RepoIO uses to execute repo level mutually exclusive operations
+     */
+    public RepoOpControl getRepoOpControl() {
+        return this.repoOpControl;
     }
 
     public List<String> getStoredRepos() {
@@ -145,7 +161,7 @@ public class RepoIO {
 
     public CompletableFuture<Model> updateModel(Model model, boolean syncOperation, int remainingTries) {
         return downloadModelUpdates(model)
-            .thenCompose((updates) -> RepoOpControl.getRepoOpControl().updateLocalModel(updates, syncOperation))
+            .thenCompose((updates) -> getRepoOpControl().updateLocalModel(updates, syncOperation))
             .thenApply(newModel -> {
                 boolean corruptedJson = false;
                 if (!model.equals(newModel)) {

@@ -163,15 +163,14 @@ public final class TestUtils {
     }
 
     /**
-     * Creates a RepoOpControl singleton instance that RepoIO requires for some operations but often
-     * not yet created e.g. when RepoIO is tested alone without any Logic instance. The RepoOpControl
-     * also includes an empty MultiModel.
+     * Creates a RepoOpControl instance with a mocked MultiModel which contains no Model i.e.
+     * the models return an empty Optional when its getModelById method is called.
      * @param repoIO
      */
-    public static RepoOpControl createTestRepoOpControl(RepoIO repoIO) {
+    public static RepoOpControl createRepoOpControlWithEmptyModels(RepoIO repoIO) {
         MultiModel models = mock(MultiModel.class);
         when(models.getModelById(anyString())).thenReturn(Optional.empty());
-        return RepoOpControl.createRepoOpControl(repoIO, models);
+        return new RepoOpControl(repoIO, models);
     }
 
 }

@@ -50,7 +50,9 @@ public class RepoOpControlTest {
         // Operations on different repositories can execute concurrently
 
         AtomicMaxInteger counter = new AtomicMaxInteger(0);
-        RepoOpControl control = TestUtils.createTestRepoOpControl(stubbedRepoIO(counter));
+        RepoIO repoIO = stubbedRepoIO(counter);
+        RepoOpControl control = TestUtils.createRepoOpControlWithEmptyModels(repoIO);
+        repoIO.setRepoOpControl(control);
 
         List<CompletableFuture<Model>> futures = new ArrayList<>();
 
@@ -72,7 +74,9 @@ public class RepoOpControlTest {
         // Operations on the same repository cannot execute concurrently
 
         AtomicMaxInteger counter = new AtomicMaxInteger(0);
-        RepoOpControl control = TestUtils.createTestRepoOpControl(stubbedRepoIO(counter));
+        RepoIO repoIO = stubbedRepoIO(counter);
+        RepoOpControl control = TestUtils.createRepoOpControlWithEmptyModels(repoIO);
+        repoIO.setRepoOpControl(control);
 
         List<CompletableFuture<Model>> futures = new ArrayList<>();
 
@@ -94,7 +98,7 @@ public class RepoOpControlTest {
         // We cannot open the same repository concurrently
 
         AtomicMaxInteger counter = new AtomicMaxInteger(0);
-        RepoOpControl control = RepoOpControl.createRepoOpControl(stubbedRepoIO(counter), mock(MultiModel.class));
+        RepoOpControl control = new RepoOpControl(stubbedRepoIO(counter), mock(MultiModel.class));
 
         List<CompletableFuture<Model>> futures = new ArrayList<>();
 
@@ -112,7 +116,7 @@ public class RepoOpControlTest {
         // We can open different repositories concurrently
 
         AtomicMaxInteger counter = new AtomicMaxInteger(0);
-        RepoOpControl control = RepoOpControl.createRepoOpControl(stubbedRepoIO(counter), mock(MultiModel.class));
+        RepoOpControl control = new RepoOpControl(stubbedRepoIO(counter), mock(MultiModel.class));
 
         List<CompletableFuture<Model>> futures = new ArrayList<>();
 
@@ -133,7 +137,7 @@ public class RepoOpControlTest {
         TurboIssue returnedIssue = new TurboIssue("testrepo/testrepo", 1, "Issue title");
         when(models.replaceIssueLabels("testrepo/testrepo", 1, new ArrayList<>()))
         .thenReturn(Optional.of(returnedIssue));
-        RepoOpControl repoOpControl = RepoOpControl.createRepoOpControl(mock(RepoIO.class), models);
+        RepoOpControl repoOpControl = new RepoOpControl(mock(RepoIO.class), models);
         TurboIssue result = repoOpControl.replaceIssueLabelsLocally(returnedIssue, new ArrayList<>()).join().get();
         assertEquals(returnedIssue, result);
     }
