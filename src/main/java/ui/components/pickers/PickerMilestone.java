@@ -10,6 +10,8 @@ import javafx.scene.text.Font;
 public class PickerMilestone extends TurboMilestone implements Comparable<PickerMilestone> {
     public static final String OPEN_COLOUR = "#84BE54";
     public static final String CLOSE_COLOUR = "#AD3E27";
+    private static final int SMALL_LABEL_FONT = 12;
+    private static final int BIG_LABEL_FONT = 16;
     boolean isSelected = false;
     boolean isHighlighted = false;
     boolean isFaded = false;
@@ -33,7 +35,7 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
     }
 
     public Node getSimpleNode() {
-        Label milestone = createSmallLabel();
+        Label milestone = createCustomLabel(SMALL_LABEL_FONT);
         setOpenStatusColour(milestone);
         setRemovedInUI(milestone);
         return milestone;
@@ -59,24 +61,10 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
         return milestone;
     }
 
-    private Label createSmallLabel() {
-        Label milestone = new Label(getTitle());
-        milestone.setFont(new Font(12));
-        FontLoader fontLoader = Toolkit.getToolkit().getFontLoader();
-        double width = fontLoader.computeStringWidth(milestone.getText(), milestone.getFont());
-        milestone.setPrefWidth(width + 30);
-        milestone.getStyleClass().add("labels");
-        return milestone;
-    }
-
-    private Label createBigLabel() {
-        Label milestone = new Label(getTitle());
-        milestone.setFont(new Font(16));
-        FontLoader fontLoader = Toolkit.getToolkit().getFontLoader();
-        double width = fontLoader.computeStringWidth(milestone.getText(), milestone.getFont());
-        milestone.setPrefWidth(width + 30);
-        milestone.getStyleClass().add("labels");
-        return milestone;
+    private Label createCustomLabel(int fontSize) {
+        Label defaultLabel = createLabel();
+        defaultLabel.setFont(new Font(fontSize));
+        return defaultLabel;
     }
 
     private void setOpenStatusColour(Label milestone) {
@@ -100,7 +88,7 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
     }
 
     public Node getNewlyAssignedMilestoneNode(boolean hasSuggestion) {
-        Label milestone = createBigLabel();
+        Label milestone = createCustomLabel(BIG_LABEL_FONT);
         setOpenStatusColour(milestone);
 
         if (hasSuggestion) {
