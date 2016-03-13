@@ -51,8 +51,10 @@ public class UI extends Application implements EventDispatcher {
     public static final int VERSION_MINOR = 22;
     public static final int VERSION_PATCH = 0;
 
-    // HT Required Java Version
-    public static final String REQUIRED_VERSION = "1.8.0_60";
+    /**
+     * HT Required Java Version
+     */
+    public static final String REQUIRED_JAVA_VERSION = "1.8.0_60";
 
     public static final String WINDOW_TITLE = "HubTurbo %s (%s)";
 
@@ -549,22 +551,37 @@ public class UI extends Application implements EventDispatcher {
      * Warns user if the Java runtime version is lower than HT's requirement
      */
     private void warnIfJavaVersionOutdated() {
-        try {
-            JavaVersion runtimeVersion = JavaVersion.fromString(System.getProperty("java.runtime.version"));
-            JavaVersion requiredVersion = JavaVersion.fromString(REQUIRED_VERSION);
+        JavaVersion requiredVersion, runtimeVersion;
+        String javaRuntimeVersionString = System.getProperty("java.runtime.version");
 
-            if (JavaVersion.isJavaVersionTooLow(runtimeVersion, requiredVersion)) {
-                showJavaVersionOutdatedWarning(runtimeVersion, requiredVersion);
-            }
+        try {
+            requiredVersion = JavaVersion.fromString(REQUIRED_JAVA_VERSION);
         } catch (IllegalArgumentException e) {
-            logger.error("Java Version string failed to be parsed.", e);
+            logger.error("Required Java Version string cannot be parsed. This should have been covered by test.");
+            return;
+        }
+
+        try {
+            runtimeVersion = JavaVersion.fromString(javaRuntimeVersionString);
+        } catch (IllegalArgumentException e) {
+            logger.error("Runtime Java Version string cannot be parsed. Look at Java Doc about other version format.");
+            showJavaRuntimeVersionNotCompatible(System.getProperty("java.runtime.version"));
+            return;
+        }
+
+        if (JavaVersion.isJavaVersionLower(runtimeVersion, requiredVersion)) {
+            showJavaVersionOutdatedWarning(runtimeVersion, requiredVersion);
         }
     }
 
     private void showJavaVersionOutdatedWarning(JavaVersion runtimeVersion, JavaVersion requiredVersion) {
-        String message = String.format(JavaVersion.OUTDATED_JAVA_VERSION_MESSAGE,
-                requiredVersion.toString(), runtimeVersion.toString());
-        DialogMessage.showInformationDialog("Update your Java version",
-                message);
+        String message = String.format(JavaVersion.WARNING_MSG_OUTDATED_JAVA_VERSION,
+                                       requiredVersion.toString(), runtimeVersion.toString());
+        DialogMessage.showInformationDialog("Update your Java version", message);
+    }
+
+    private void showJavaRuntimeVersionNotCompatible(String javaRuntimeVersionString) {
+        String message = String.format(JavaVersion.ERROR_MSG_JAVA_RUNTIME_VERSION_PARSING, javaRuntimeVersionString);
+        DialogMessage.showInformationDialog("Java version unknown", message);
     }
 }
