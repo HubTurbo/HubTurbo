@@ -5,9 +5,7 @@ import org.eclipse.egit.github.core.Milestone;
 import org.junit.Test;
 
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 
@@ -31,6 +29,30 @@ public class TurboMilestoneTest {
         assertEquals(0, turboMilestone.getOpenIssues());
         turboMilestone.setClosedIssues(0);
         assertEquals(0, turboMilestone.getClosedIssues());
+    }
+
+    @Test
+    public void getDueDateComparator_milestoneOrdering() {
+        // expects : closed milestones without due date - milestones with due date ordered by due date - open
+        // milestone with due date
+        TurboMilestone milestoneWithDueDate1 = new TurboMilestone("1", 11, "milestone21");
+        milestoneWithDueDate1.setDueDate(Optional.of(LocalDate.now().plusDays(2)));
+        TurboMilestone milestoneWithDueDate2 = new TurboMilestone("1", 12, "milestone22");
+        milestoneWithDueDate2.setDueDate(Optional.of(LocalDate.now().plusDays(3)));
+        TurboMilestone milestoneWithoutDueDateOpen1 = new TurboMilestone("1", 21, "milestone31");
+        TurboMilestone milestoneWithoutDueDateOpen2 = new TurboMilestone("2", 21, "milestone32");
+        TurboMilestone milestoneWithoutDueDateClosed1 = new TurboMilestone("1", 31, "milestone11");
+        milestoneWithoutDueDateClosed1.setOpen(false);
+        TurboMilestone milestoneWithoutDueDateClosed2 = new TurboMilestone("1", 32, "milestone12");
+        milestoneWithoutDueDateClosed2.setOpen(false);
+        Comparator<TurboMilestone> comparator = TurboMilestone.getDueDateComparator();
+        List<TurboMilestone> milestones = Arrays.asList(milestoneWithDueDate1, milestoneWithDueDate2,
+                                                        milestoneWithoutDueDateOpen1, milestoneWithoutDueDateOpen2,
+                                                        milestoneWithoutDueDateClosed1, milestoneWithoutDueDateClosed2);
+        Collections.sort(milestones, comparator);
+        assertEquals(milestones, Arrays.asList(milestoneWithoutDueDateClosed1, milestoneWithoutDueDateClosed2,
+                                                milestoneWithDueDate1, milestoneWithDueDate2,
+                                                milestoneWithoutDueDateOpen1, milestoneWithoutDueDateOpen2));
     }
 
     @Test
