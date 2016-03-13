@@ -34,14 +34,13 @@ public class JarUpdater extends Application {
     private static final int MAX_RETRY = 10;
     private static final int WAIT_TIME = 2000;
     private static final String BACKUP_FILENAME_SUFFIX = "_backup";
-    private static final String ERROR_ON_UPDATING =
+    private static final String ERROR_ON_UPDATING_MESSAGE =
             "Update cannot be applied. Update will be aborted. Please close this window.";
 
     private Label updatingLabel;
 
-    @SuppressWarnings("PMD")
-    // PMD - "Consider using varargs for methods or constructors which take an array the last parameter."
-    public static void main(String[] args) {
+
+    public static void main(String[] args) { // NOPMD
         Application.launch(args);
     }
 
@@ -49,7 +48,15 @@ public class JarUpdater extends Application {
     public void start(Stage stage) {
         initLogger();
         showWaitingWindow(stage);
-        pool.execute(() -> run());
+        pool.execute(() -> {
+            try {
+                run();
+            } catch (IOException | IllegalArgumentException e) {
+                log(e.getMessage());
+            }
+
+            quit();
+        });
     }
 
     private void showWaitingWindow(Stage stage) {
@@ -69,7 +76,7 @@ public class JarUpdater extends Application {
         stage.show();
     }
 
-    private void run() {
+    private void run() throws IllegalArgumentException, IOException {
         HashMap<String, String> commandLineArgs = new HashMap<>(getParameters().getNamed());
 
         String sourceJarPath = commandLineArgs.get("source");
@@ -77,8 +84,7 @@ public class JarUpdater extends Application {
         String executeJarOption = commandLineArgs.get("execute-jar");
 
         if (sourceJarPath == null || targetJarPath == null) {
-            log("Please specify source and target files.");
-            quit();
+            throw new IllegalArgumentException("Please specify source and target files.");
         } else {
             log("source: " + sourceJarPath);
             log("target: " + targetJarPath);
@@ -88,8 +94,7 @@ public class JarUpdater extends Application {
         File targetJarFile = new File(targetJarPath);
 
         if (!sourceJarFile.exists()) {
-            log("Such source file does not exist, aborting.");
-            quit();
+            throw new IOException("Such source file does not exist, aborting.");
         }
 
         if (!prepareTargetJarFile(targetJarFile)) {
@@ -99,9 +104,9 @@ public class JarUpdater extends Application {
 
         log("Moving source to target");
         if (!moveFile(sourceJarFile.toPath(), targetJarFile.toPath())) {
-            log("Failed to move update.");
             restoreBackup(targetJarFile);
-            quit();
+            showCriticalErrorOnUpdating();
+            return;
         }
 
         // Optionally start target jar file
@@ -115,11 +120,9 @@ public class JarUpdater extends Application {
         } else {
             removeBackup(targetJarFile);
         }
-
-        quit();
     }
 
-    private boolean moveFile(Path source, Path dest) {
+    private static boolean moveFile(Path source, Path dest) {
         log("Moving file from:" + source.toString() + " to:" + dest.toString());
         try {
             if (!dest.toFile().exists() && !dest.toFile().createNewFile()) {
@@ -184,6 +187,7 @@ public class JarUpdater extends Application {
             }
         }
 
+        log("Jar file cannot be backed up. Most likely is in use by another process.");
         return false;
     }
 
@@ -247,9 +251,8 @@ public class JarUpdater extends Application {
 
     private void showCriticalErrorOnUpdating() {
         String header = "Failed to update";
-        String message = "Update cannot be applied. Update will be aborted.";
         Platform.runLater(() -> {
-            DialogMessage.showErrorDialog(header, message);
+            DialogMessage.showErrorDialog(header, ERROR_ON_UPDATING_MESSAGE);
             quit();
         });
     }

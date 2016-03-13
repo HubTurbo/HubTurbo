@@ -184,9 +184,9 @@ tasks.coveralls {
     onlyIf { System.env.'CI' }
 }
 
-task createJarReplaceAndExecuteJar(type: Jar) {
+task compileJarUpdater(type: Jar) {
     manifest{
-        attributes 'Implementation-Title': 'Jar replace and execute',
+        attributes 'Implementation-Title': 'Jar Updater',
                 'Implementation-Version': '1.0',
                 'Main-Class': 'updater.JarUpdater'
     }
