@@ -39,7 +39,7 @@ public class WrongLastViewedTest extends UITest {
         globalConfig.setLastViewedRepository("test/test");
         configFileHandler.saveGlobalConfig(globalConfig);
         RepoIO testIO = TestController.createTestingRepoIO(Optional.empty());
-        TestUtils.createTestRepoOpControl(testIO);
+        testIO.setRepoOpControl(TestUtils.createRepoOpControlWithEmptyModels(testIO));
         try {
             testIO.openRepository("test2/test2").get();
         } catch (InterruptedException | ExecutionException e) {
