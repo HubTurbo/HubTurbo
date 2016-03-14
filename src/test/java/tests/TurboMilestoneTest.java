@@ -34,25 +34,44 @@ public class TurboMilestoneTest {
     @Test
     public void getDueDateComparator_milestoneOrdering() {
         // expects : closed milestones without due date - milestones with due date ordered by due date - open
-        // milestone with due date
-        TurboMilestone milestoneWithDueDate1 = new TurboMilestone("1", 11, "milestone21");
-        milestoneWithDueDate1.setDueDate(Optional.of(LocalDate.now().plusDays(2)));
-        TurboMilestone milestoneWithDueDate2 = new TurboMilestone("1", 12, "milestone22");
-        milestoneWithDueDate2.setDueDate(Optional.of(LocalDate.now().plusDays(3)));
+        // milestone without due date
+        TurboMilestone milestoneWithDueDateClosed1 = new TurboMilestone("1", 1, "milestone01");
+        milestoneWithDueDateClosed1.setDueDate(Optional.of(LocalDate.now().plusDays(5)));
+        milestoneWithDueDateClosed1.setOpen(false);
+        TurboMilestone milestoneWithDueDateClosed2 = new TurboMilestone("2", 2, "milestone02");
+        milestoneWithDueDateClosed2.setDueDate(Optional.of(LocalDate.now().plusDays(3)));
+        milestoneWithDueDateClosed2.setOpen(false);
+
+        TurboMilestone milestoneWithDueDateOpen1 = new TurboMilestone("1", 11, "milestone21");
+        milestoneWithDueDateOpen1.setDueDate(Optional.of(LocalDate.now().plusDays(2)));
+        milestoneWithDueDateOpen1.setOpen(true);
+        TurboMilestone milestoneWithDueDateOpen2 = new TurboMilestone("1", 12, "milestone22");
+        milestoneWithDueDateOpen2.setDueDate(Optional.of(LocalDate.now().plusDays(4)));
+        milestoneWithDueDateOpen2.setOpen(true);
+
         TurboMilestone milestoneWithoutDueDateOpen1 = new TurboMilestone("1", 21, "milestone31");
         TurboMilestone milestoneWithoutDueDateOpen2 = new TurboMilestone("2", 21, "milestone32");
+
         TurboMilestone milestoneWithoutDueDateClosed1 = new TurboMilestone("1", 31, "milestone11");
         milestoneWithoutDueDateClosed1.setOpen(false);
         TurboMilestone milestoneWithoutDueDateClosed2 = new TurboMilestone("1", 32, "milestone12");
         milestoneWithoutDueDateClosed2.setOpen(false);
+
         Comparator<TurboMilestone> comparator = TurboMilestone.getDueDateComparator();
-        List<TurboMilestone> milestones = Arrays.asList(milestoneWithDueDate1, milestoneWithDueDate2,
+        List<TurboMilestone> milestones = Arrays.asList(milestoneWithDueDateOpen1, milestoneWithDueDateOpen2,
+                                                        milestoneWithDueDateClosed1, milestoneWithDueDateClosed2,
                                                         milestoneWithoutDueDateOpen1, milestoneWithoutDueDateOpen2,
                                                         milestoneWithoutDueDateClosed1, milestoneWithoutDueDateClosed2);
         Collections.sort(milestones, comparator);
-        assertEquals(milestones, Arrays.asList(milestoneWithoutDueDateClosed1, milestoneWithoutDueDateClosed2,
-                                                milestoneWithDueDate1, milestoneWithDueDate2,
-                                                milestoneWithoutDueDateOpen1, milestoneWithoutDueDateOpen2));
+        List<TurboMilestone> expectedMilestoneList = Arrays.asList(milestoneWithoutDueDateClosed1,
+                                                                    milestoneWithoutDueDateClosed2,
+                                                                    milestoneWithDueDateOpen1,
+                                                                    milestoneWithDueDateClosed2,
+                                                                    milestoneWithDueDateOpen2,
+                                                                    milestoneWithDueDateClosed1,
+                                                                    milestoneWithoutDueDateOpen1,
+                                                                    milestoneWithoutDueDateOpen2);
+        assertEquals(expectedMilestoneList, milestones);
     }
 
     @Test
