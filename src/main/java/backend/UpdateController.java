@@ -49,7 +49,7 @@ public class UpdateController {
 
         // Filter and sort the issues first even if the metadata is not yet available so that criteria not
         // based on metadata can have immediate effect.
-        logic.updateUI(processFilter(filterExprs));
+        logic.updateUI(processFilters(filterExprs));
 
         // Open specified repos
         openRepositoriesInFilters(filterPanels)

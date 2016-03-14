@@ -45,6 +45,20 @@ public class FilterTests extends UITest{
     }
 
     @Test
+    public void filterTextField_tallyMetadataUpdateSemanticException_emptyFilter() {
+        ListPanel issuePanel = find("#dummy/dummy_col0");
+
+        // test semantic exception dummy/dummy_col0_filterTextField");
+        click("#dummy/dummy_col0_filterTextField");
+        selectAll();
+        type("id:buggy u:<24");
+        push(KeyCode.ENTER);
+        PlatformEx.waitOnFxThread();
+
+        assertEquals(DummyRepoState.noOfDummyIssues, issuePanel.getIssueCount());
+    }
+
+    @Test
     public void filterTextField_multiplePanels_correctPanelFiltered() {
         ListPanel issuePanel = find("#dummy/dummy_col0");
 
