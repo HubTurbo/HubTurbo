@@ -110,9 +110,6 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         assignedLabels.getChildren().clear();
         populateInitialLabels(initialLabels, removedLabels, suggestion);
         populateToBeAddedLabels(addedLabels, suggestion);
-        if (initialLabels.isEmpty()) {
-            assignedLabels.getChildren().add(createTextLabel("No currently selected labels. "));
-        }
     }
 
     private final void populateInitialLabels(List<TurboLabel> initialLabels, List<TurboLabel> removedLabels,
@@ -295,13 +292,6 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         title.setText((issue.isPullRequest() ? "PR #" : "Issue #")
                 + issue.getId() + ": " + issue.getTitle());
     }
-
-    private Label createTextLabel(String input) {
-        Label label = new Label(input);
-        label.setPadding(new Insets(2, 5, 2, 5));
-        return label;
-    }
-
 
     private Label createGroupTitle(String name) {
         Label groupName = new Label(name);
