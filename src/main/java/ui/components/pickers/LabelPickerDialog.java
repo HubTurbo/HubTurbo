@@ -252,7 +252,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
      * @param stage
      */
     private final void positionDialog(Stage stage) {
-        setX(stage.getX() + stage.getWidth() / 2 - getWidth() / 2);
+        setX(stage.getX() + stage.getWidth() / 2);
         setY(stage.getY() + stage.getHeight() / 2 - getHeight() / 2);
     }
 
