@@ -58,7 +58,7 @@ public class UI extends Application implements EventDispatcher {
     private static final int REFRESH_PERIOD = 60;
 
     /**
-     * HT Required Java Version
+     * Minimum Java Version Required by HT
      */
     public static final String REQUIRED_JAVA_VERSION = "1.8.0_60";
 
@@ -561,16 +561,17 @@ public class UI extends Application implements EventDispatcher {
      * Warns user if the Java runtime version is lower than HT's requirement
      */
     private void warnIfJavaVersionOutdated() {
-        JavaVersion requiredVersion, runtimeVersion;
-        String javaRuntimeVersionString = System.getProperty("java.runtime.version");
-
+        JavaVersion requiredVersion;
         try {
             requiredVersion = JavaVersion.fromString(REQUIRED_JAVA_VERSION);
         } catch (IllegalArgumentException e) {
             logger.error("Required Java Version string cannot be parsed. This should have been covered by test.");
+            assert false;
             return;
         }
 
+        JavaVersion runtimeVersion;
+        String javaRuntimeVersionString = System.getProperty("java.runtime.version");
         try {
             runtimeVersion = JavaVersion.fromString(javaRuntimeVersionString);
         } catch (IllegalArgumentException e) {
