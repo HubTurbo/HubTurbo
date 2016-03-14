@@ -77,12 +77,10 @@ public class FilterTextField extends TextField {
             }
             char typed = e.getCharacter().charAt(0);
 
-            if (typed == '\t') {
-                if (!suggestion.isShowing() && shouldStartCompletion()) {
-                    suggestion.show(this, Side.BOTTOM, 0, 0);
-                } else {
-                    suggestion.hide();
-                }
+            if (shouldStartCompletion()) suggestion.show(this, Side.BOTTOM, 0, 0);
+
+            if (typed == '\t' && suggestion.isShowing()) {
+                suggestion.hide();
                 e.consume();
             }
             
@@ -101,8 +99,10 @@ public class FilterTextField extends TextField {
             }
 
             if (e.getCode() == KeyCode.ENTER) {
+                suggestion.hide();
                 confirmEdit();
             } else if (e.getCode() == KeyCode.ESCAPE) {
+                suggestion.hide();
                 cancel.run();
             }
         });
@@ -216,8 +216,8 @@ public class FilterTextField extends TextField {
     
     private final SuggestionMenu setupSuggestion() {
         SuggestionMenu suggestion = new SuggestionMenu(MAX_SUGGESTIONS);
-        suggestion.loadSuggestions(keywords);
         suggestion.setOnHidden(e -> completeWord());
+        suggestion.loadSuggestions(keywords);
         return suggestion;
     }
 

@@ -16,6 +16,7 @@ public class UIComponentsTest extends UITest {
         clickFilterTextFieldAtPanel(0);
         selectAll();
         push(KeyCode.BACK_SPACE);
+        push(KeyCode.TAB);
         type("ass");
         push(KeyCode.TAB);
         FilterTextField filterTextField = getFilterTextFieldAtPanel(0);

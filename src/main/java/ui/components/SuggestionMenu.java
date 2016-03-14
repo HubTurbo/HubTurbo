@@ -36,7 +36,7 @@ public class SuggestionMenu extends ContextMenu {
         // Sets focus on first item and select it as default suggestion
         if (isShowing() && !searchResult.isEmpty()) {
             getSkin().getNode().lookup(".menu-item").requestFocus();
-            selected = Optional.ofNullable(searchResult.get(0));
+            selected = searchResult.stream().findFirst();
         }
     }
 
