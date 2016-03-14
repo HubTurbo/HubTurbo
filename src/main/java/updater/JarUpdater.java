@@ -111,11 +111,11 @@ public class JarUpdater extends Application {
 
         // Optionally start target jar file
         if (executeJarOption != null && executeJarOption.equalsIgnoreCase("y")) {
-            if (executeJar(targetJarPath, "")) {
+            if (executeJar(targetJarPath)) {
                 removeBackup(targetJarFile);
             } else { // if target can't be started, rollback backup
                 restoreBackup(targetJarFile);
-                executeJar(targetJarPath, "");
+                executeJar(targetJarPath);
             }
         } else {
             removeBackup(targetJarFile);
@@ -153,7 +153,9 @@ public class JarUpdater extends Application {
                 !createDirectories(targetJarFile.getParentFile().getAbsoluteFile())) {
             log("Failed to make directories of target file.");
             return false;
-        } else if (targetJarFile.exists() && !makeJarBackup(targetJarFile)) {
+        }
+
+        if (targetJarFile.exists() && !makeJarBackup(targetJarFile)) {
             log("Failed to make backup.");
             return false;
         }
@@ -225,6 +227,10 @@ public class JarUpdater extends Application {
         }
 
         return true;
+    }
+
+    private static boolean executeJar(String jarPath) {
+        return executeJar(jarPath, "");
     }
 
     /**
