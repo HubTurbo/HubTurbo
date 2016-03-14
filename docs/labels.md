@@ -19,15 +19,16 @@ Pressing <kbd>L</kbd> after selecting an issue card brings up the Label Picker.
 
 ![](images/labels/main.png?raw=true)
 
-The Label Picker is split into 2 parts, the part above the text field shows the labels that are currently applied to the particular item. The part below the text field shows all the labels that current exist in the repository. 
-
-Clicking on labels in either part toggles their state. 
-
-![](images/labels/demo.gif?raw=true)
-
 Typing in the text field highlights the labels that contain the query. 
 
 ![](images/labels/highlight.png?raw=true)
+
+The Label Picker is split into 2 parts, the part above the text field shows the labels that are currently applied to the particular item. The part below the text field shows all the labels that currently exist in the repository. 
+
+Clicking on labels in either part toggles their state and the text field will be disabled. A label will be assigned if it is 
+not associated to the issue, or will be removed otherwise. 
+
+![](images/labels/demo.gif?raw=true)
 
 Press <kbd>Space</kbd> to toggle the highlighted label and then you can move on to add/remove other labels. 
 
