@@ -42,6 +42,11 @@ public class UpdateController {
      */
     public void processAndRefresh(List<FilterPanel> filterPanels) {
         List<FilterExpression> filterExprs = getFilterExpressions(filterPanels);
+
+        // Filter and sort the issues first even if the metadata is not yet available so that criteria not
+        // based on metadata can have immediate effect.
+        logic.updateUI(processFilter(filterExprs));
+
         // Open specified repos
         openRepositoriesInFilters(filterPanels)
         .thenRun(() -> {
