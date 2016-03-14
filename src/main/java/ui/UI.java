@@ -51,17 +51,32 @@ public class UI extends Application implements EventDispatcher {
     public static final int VERSION_MINOR = 22;
     public static final int VERSION_PATCH = 0;
 
+    private static final Logger logger = LogManager.getLogger(UI.class.getName());
+    private static HWND mainWindowHandle;
+    private final GlobalHotkey globalHotkey = new GlobalHotkey(this);
+
+    private static final int REFRESH_PERIOD = 60;
+
+    /**
+     * Minimum Java Version Required by HT
+     */
+    public static final String REQUIRED_JAVA_VERSION = "1.8.0_60";
+
     public static final String WINDOW_TITLE = "HubTurbo %s (%s)";
 
     public static final String ARG_UPDATED_TO = "--updated-to";
 
     private static final String APPLICATION_LOGO_FILENAME = "logo.png";
 
-    private static final Logger logger = LogManager.getLogger(UI.class.getName());
-    private static HWND mainWindowHandle;
-    private final GlobalHotkey globalHotkey = new GlobalHotkey(this);
+    public static final String WARNING_MSG_OUTDATED_JAVA_VERSION =
+            "Your Java version is older than HubTurbo's requirement. " +
+                    "Use it at your own risk.%n%n" +
+                    "Required version\t: %s%n" +
+                    "Installed version\t: %s";
+    public static final String ERROR_MSG_JAVA_RUNTIME_VERSION_PARSING =
+            "Java runtime version is not known and may not be compatible with HubTurbo.%n%n" +
+                    "Use it at your own risk.%n%nRuntime version: %s";
 
-    private static final int REFRESH_PERIOD = 60;
 
     // Application-level state
 
@@ -99,6 +114,7 @@ public class UI extends Application implements EventDispatcher {
         initPreApplicationState();
         initUI(stage);
         initApplicationState();
+        warnIfJavaVersionOutdated();
         login(TestController.isBypassLogin());
     }
 
@@ -539,5 +555,44 @@ public class UI extends Application implements EventDispatcher {
 
     public boolean isWindowFocused() {
         return mainStage.isFocused();
+    }
+
+    /**
+     * Warns user if the Java runtime version is lower than HT's requirement
+     */
+    private void warnIfJavaVersionOutdated() {
+        JavaVersion requiredVersion;
+        try {
+            requiredVersion = JavaVersion.fromString(REQUIRED_JAVA_VERSION);
+        } catch (IllegalArgumentException e) {
+            logger.error("Required Java Version string cannot be parsed. This should have been covered by test.");
+            assert false;
+            return;
+        }
+
+        JavaVersion runtimeVersion;
+        String javaRuntimeVersionString = System.getProperty("java.runtime.version");
+        try {
+            runtimeVersion = JavaVersion.fromString(javaRuntimeVersionString);
+        } catch (IllegalArgumentException e) {
+            logger.error("Runtime Java Version string cannot be parsed. Look at Java Doc about other version format.");
+            showJavaRuntimeVersionNotCompatible(System.getProperty("java.runtime.version"));
+            return;
+        }
+
+        if (JavaVersion.isJavaVersionLower(runtimeVersion, requiredVersion)) {
+            showJavaVersionOutdatedWarning(runtimeVersion, requiredVersion);
+        }
+    }
+
+    private void showJavaVersionOutdatedWarning(JavaVersion runtimeVersion, JavaVersion requiredVersion) {
+        String message = String.format(WARNING_MSG_OUTDATED_JAVA_VERSION,
+                                       requiredVersion.toString(), runtimeVersion.toString());
+        DialogMessage.showInformationDialog("Update your Java version", message);
+    }
+
+    private void showJavaRuntimeVersionNotCompatible(String javaRuntimeVersionString) {
+        String message = String.format(ERROR_MSG_JAVA_RUNTIME_VERSION_PARSING, javaRuntimeVersionString);
+        DialogMessage.showInformationDialog("Java version unknown", message);
     }
 }
