@@ -37,9 +37,12 @@ public class PickerLabel extends TurboLabel {
         // actual name for labels at the top, add tick for selected labels
         Label label = new Label((canDisplayFullName ? getFullName() : getShortName()));
         label.getStyleClass().add("labels");
-        if (isRemoved) label.getStyleClass().add("labels-removed"); // add strikethrough
-        String style = getStyle() + (isHighlighted ? " -fx-border-color: black;" : ""); // add highlight border
-        style += (isFaded ? " -fx-opacity: 40%;" : ""); // change opacity if needed
+        // add strikethrough
+        if (isRemoved) label.getStyleClass().add("labels-removed"); 
+        // add highlight border
+        String style = getStyle() + (isHighlighted ? " -fx-border-color: black; -fx-border-width: 2px;" : ""); 
+        // change opacity if needed
+        style += (isFaded ? " -fx-opacity: 60%;" : ""); 
         label.setStyle(style);
         label.setText(label.getText() + (!canDisplayFullName && isSelected ? " ✓" : ""));
 
