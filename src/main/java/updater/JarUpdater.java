@@ -37,8 +37,6 @@ public class JarUpdater extends Application {
     private static final String ERROR_ON_UPDATING_MESSAGE =
             "Update cannot be applied. Update will be aborted. Please close this window.";
 
-    private Label updatingLabel;
-
 
     public static void main(String[] args) { // NOPMD
         Application.launch(args);
@@ -67,7 +65,7 @@ public class JarUpdater extends Application {
         stage.setScene(scene);
         scene.setRoot(windowMainLayout);
 
-        updatingLabel = new Label();
+        Label updatingLabel = new Label();
         updatingLabel.setText("Please wait. HubTurbo is being updated...");
         updatingLabel.setPadding(new Insets(50));
 
@@ -98,14 +96,14 @@ public class JarUpdater extends Application {
         }
 
         if (!prepareTargetJarFile(targetJarFile)) {
-            showCriticalErrorOnUpdating();
+            showErrorOnUpdatingDialog();
             return;
         }
 
         log("Moving source to target");
         if (!moveFile(sourceJarFile.toPath(), targetJarFile.toPath())) {
             restoreBackup(targetJarFile);
-            showCriticalErrorOnUpdating();
+            showErrorOnUpdatingDialog();
             return;
         }
 
@@ -122,6 +120,12 @@ public class JarUpdater extends Application {
         }
     }
 
+    /**
+     * Moves a file from source to destination. Replaces destination file if it exists.
+     * @param source source file to move from
+     * @param dest destination file to move to
+     * @return true if move is successful, false otherwise
+     */
     private static boolean moveFile(Path source, Path dest) {
         log("Moving file from:" + source.toString() + " to:" + dest.toString());
         try {
@@ -144,8 +148,7 @@ public class JarUpdater extends Application {
     }
 
     /**
-     * Creates directories for target file if they do not exist.
-     * Otherwise, makes backup if target file exists.
+     * Creates directories for target file and makes backup of target file if it exists.
      * @return true if preparation successful, false otherwise
      */
     private boolean prepareTargetJarFile(File targetJarFile) {
@@ -176,7 +179,7 @@ public class JarUpdater extends Application {
         log("Making JAR backup");
 
         for (int i = 0; i < MAX_RETRY; i++) {
-            if (moveFileAsBackup(jarFile)) {
+            if (moveFileToBackup(jarFile)) {
                 return true;
             }
 
@@ -193,13 +196,23 @@ public class JarUpdater extends Application {
         return false;
     }
 
-    private boolean moveFileAsBackup(File file) {
+    /**
+     * Moves file to its backup file (the original file will be removed)
+     * @param file file to be moved to its backup
+     * @return true if move is successful, false otherwise
+     */
+    private boolean moveFileToBackup(File file) {
         log("Moving file as backup");
         String backupFilename = getBackupFilename(file.getName());
         File backup = new File(file.getParent(), backupFilename);
         return moveFile(file.toPath(), backup.toPath());
     }
 
+    /**
+     * Moves a backup file to its original file
+     * @param file the original file to be recovered
+     * @return true if backup is restored, false otherwise
+     */
     private boolean restoreBackup(File file) {
         log("Restoring backup");
         String backupFilename = getBackupFilename(file.getName());
@@ -207,6 +220,10 @@ public class JarUpdater extends Application {
         return moveFile(backup.toPath(), file.toPath());
     }
 
+    /**
+     * Removes the backup of a file
+     * @param file the file which backup should be removed
+     */
     private void removeBackup(File file) {
         log("Removing backup");
         String backupFilename = getBackupFilename(file.getName());
@@ -255,7 +272,7 @@ public class JarUpdater extends Application {
         return process.isAlive();
     }
 
-    private void showCriticalErrorOnUpdating() {
+    private void showErrorOnUpdatingDialog() {
         String header = "Failed to update";
         Platform.runLater(() -> {
             DialogMessage.showErrorDialog(header, ERROR_ON_UPDATING_MESSAGE);
@@ -264,7 +281,8 @@ public class JarUpdater extends Application {
     }
 
     /**
-     * Not using Apache Logger since it will require another initialization
+     * Not using Apache Logger since the library can't be included inside JAR
+     * TODO include Apache Logger into jarUpdater
      */
     private void initLogger() {
         try {
