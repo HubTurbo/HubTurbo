@@ -7,6 +7,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -44,7 +45,7 @@ public class BoardPickerDialog extends Dialog<String> {
     private VBox boardList;
 
     @FXML
-    private FlowPane boardNames;
+    private VBox boardNames;
 
     BoardPickerDialog(List<String> boards, Stage stage) {
         this.boards = boards;
@@ -101,10 +102,9 @@ public class BoardPickerDialog extends Dialog<String> {
 
     private void populateBoards(BoardPickerState state) {
         boardNames.getChildren().clear();
-        boards.stream()
+        state.getMatchedBoards().stream()
                     .map(boardName -> {
                         PickerBoard pb = new PickerBoard(boardName);
-                        pb.faded(!state.getMatchedBoards().contains(boardName));
                         pb.highlighted(suggestion.isPresent() && suggestion.get().equals(boardName));
                         return pb;
                     })

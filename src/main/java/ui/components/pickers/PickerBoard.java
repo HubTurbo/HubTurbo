@@ -27,11 +27,21 @@ public class PickerBoard {
         isFaded = false;
     }
 
+    public String getStyle() {
+        String colour = "b1cfeb";
+        int r = Integer.parseInt(colour.substring(0, 2), 16);
+        int g = Integer.parseInt(colour.substring(2, 4), 16);
+        int b = Integer.parseInt(colour.substring(4, 6), 16);
+        double luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+        boolean bright = luminance > 128;
+        return "-fx-background-color: #" + colour + "; -fx-text-fill: " + (bright ? "black;" : "white;");
+    }
+
     public Node getNode() {
         // actual name for labels at the top, add tick for selected labels
         Label label = new Label(boardName);
         label.getStyleClass().add("labels");
-        String style = (isHighlighted ? " -fx-border-color: black;" : ""); // add highlight border
+        String style = getStyle() + (isHighlighted ? " -fx-border-color: black;" : ""); // add highlight border
         style += (isFaded ? " -fx-opacity: 40%;" : ""); // change opacity if needed
         label.setStyle(style);
 

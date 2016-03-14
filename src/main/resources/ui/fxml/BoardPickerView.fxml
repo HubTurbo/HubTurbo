@@ -4,6 +4,7 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.layout.*?>
 
+<?import ui.listpanel.ListPanel?>
 <VBox fx:id="mainLayout" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
     <padding>
         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
@@ -18,11 +19,11 @@
             <padding>
                 <Insets top="10.0" />
             </padding>
-            <FlowPane fx:id="boardNames" hgap="5.0" vgap="5.0">
+            <VBox fx:id="boardNames" spacing="5.0">
                 <padding>
                     <Insets bottom="5.0" left="0.0" right="0.0" top="0.0" />
                 </padding>
-            </FlowPane>
+            </VBox>
         </VBox>
     </children>
 </VBox>

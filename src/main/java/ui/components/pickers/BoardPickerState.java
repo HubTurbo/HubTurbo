@@ -36,10 +36,14 @@ public class BoardPickerState {
 
     private final void update() {
         if (keyword.isEmpty()) {
-            return;
+            matchAllBoards();
         }
         updateMatchedBoards();
         updateSuggestion();
+    }
+
+    private final void matchAllBoards() {
+        matchedBoards = boards.stream().collect(Collectors.toList());
     }
 
     private final void updateMatchedBoards() {
@@ -58,12 +62,22 @@ public class BoardPickerState {
                         return true;
                     })
                     .collect(Collectors.toList());
+        matchedBoards.sort((left, right) -> left.compareToIgnoreCase(right));
     }
 
     private final void updateSuggestion() {
-        if (matchedBoards.size() == 1) {
+        if (!matchedBoards.isEmpty()) {
             suggestion = Optional.of(matchedBoards.get(0));
+        } else {
+            suggestion = Optional.empty();
         }
+//        if (matchedBoards.size() == 1) {
+//            suggestion = Optional.of(matchedBoards.get(0));
+//        } else if (matchedBoards.size() > 1) {
+//            matchedBoards.stream()
+//                        .filter(board -> board.equalsIgnoreCase(keyword))
+//                        .forEach(board -> suggestion = Optional.of(board));
+//        }
     }
 
 }
