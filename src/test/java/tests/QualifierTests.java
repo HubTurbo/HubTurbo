@@ -130,12 +130,15 @@ public class QualifierTests {
         TurboMilestone milestone3 = new TurboMilestone("testrepo/testrepo", 3, "V3");
         milestone3.setDueDate(Optional.of(LocalDate.of(2015, 2, 14)));
         TurboMilestone milestone4 = new TurboMilestone("testrepo/testrepo", 4, "V4");
+        TurboMilestone milestone5 = new TurboMilestone("testrepo/testrepo", 5, "V5");
+        milestone5.setOpen(false);
 
         List<TurboMilestone> sampleMilestones = new ArrayList<>();
         sampleMilestones.add(milestone1);
         sampleMilestones.add(milestone2);
         sampleMilestones.add(milestone3);
         sampleMilestones.add(milestone4);
+        sampleMilestones.add(milestone5);
 
         return sampleMilestones;
     }
@@ -301,7 +304,7 @@ public class QualifierTests {
         Collections.sort(issues, comparator);
 
 
-        List<Integer> expected = Arrays.asList(3, 2, 1, 4, 7, 5, 6);
+        List<Integer> expected = Arrays.asList(4, 7, 3, 2, 1, 5, 6);
         List<Integer> actual = issues.stream().map(TurboIssue::getId).collect(Collectors.toList());
         assertEquals(expected, actual);
     }
@@ -322,7 +325,28 @@ public class QualifierTests {
         Collections.shuffle(issues);
         Collections.sort(issues, comparator);
 
-        List<Integer> expected = Arrays.asList(5, 6, 4, 7, 1, 2, 3);
+        List<Integer> expected = Arrays.asList(5, 6, 1, 2, 3, 4, 7);
+        List<Integer> actual = issues.stream().map(TurboIssue::getId).collect(Collectors.toList());
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void milestoneSorting_closedMilestoneWithoutDueDate_prioritizeRecentMilestone() {
+        List<TurboIssue> issues = testModel.getIssues();
+        Comparator<TurboIssue> comparator = getComparatorForSortQualifier("sort:milestone,id");
+        TurboIssue issue6 = new TurboIssue("testrepo/testrepo", 6, "Issue6");
+        TurboIssue issue7 = new TurboIssue("testrepo/testrepo", 7, "Issue7");
+        issue7.setMilestone(testModel.getMilestones().get(3));
+        issue6.setMilestone(testModel.getMilestones().get(4));
+        issues.add(issue6);
+        issues.add(issue7);
+
+        Collections.shuffle(issues);
+        Collections.sort(issues, comparator);
+
+        // milestone 6 and 5 should be at the end of the sorted list since closed milestone without
+        // due date is considered to have one in the future past
+        List<Integer> expected = Arrays.asList(4, 7, 3, 2, 1, 6, 5);
         List<Integer> actual = issues.stream().map(TurboIssue::getId).collect(Collectors.toList());
         assertEquals(expected, actual);
     }
