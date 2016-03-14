@@ -1,6 +1,13 @@
 
 # Changelog
 
+# V3.22.0
+
+- Improved visual feedback for filter syntax errors
+- Added qualified issue ids
+- Rewrote label picker, fixing long-standing bugs and and making it more robust
+- Fixed bugs with panel loading indicator
+
 # V3.21.0
 
 - Added aliases for lots of qualifiers and keywords
