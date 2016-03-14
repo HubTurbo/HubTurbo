@@ -215,10 +215,10 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
             milestoneDetailsBox.getChildren().add(dueDate);
         }
         int totalIssues = milestone.getOpenIssues() + milestone.getClosedIssues();
-        double progressValue = (totalIssues > 0)
-                ? milestone.getClosedIssues() / (milestone.getOpenIssues() + milestone.getClosedIssues()) : 0;
+        double progressValue = totalIssues > 0
+                ? (double) milestone.getClosedIssues() / (milestone.getOpenIssues() + milestone.getClosedIssues()) : 0;
         MilestoneProgressBar progressBar = new MilestoneProgressBar(progressValue);
-        Label progressLabel = new Label(String.format("%3.0f%%", progressValue*100));
+        Label progressLabel = new Label(String.format("%3.0f%%", progressValue * 100));
         progressLabel.setPrefWidth(50);
         milestoneDetailsBox.getChildren().addAll(progressBar, progressLabel);
         return milestoneDetailsBox;

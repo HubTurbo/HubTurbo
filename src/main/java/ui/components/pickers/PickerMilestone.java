@@ -27,7 +27,7 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
     }
 
     public PickerMilestone(PickerMilestone milestone) {
-        this((TurboMilestone)milestone);
+        this((TurboMilestone) milestone);
         setFaded(milestone.isFaded());
         setHighlighted(milestone.isHighlighted());
         setSelected(milestone.isSelected());

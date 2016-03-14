@@ -31,6 +31,8 @@ public class RepoOpControlTest {
     private static final Logger logger = LogManager.getLogger(RepoOpControlTest.class.getName());
 
     private static final String REPO = "test/test";
+    private static final TurboIssue issue = new TurboIssue(REPO, 1, "Issue 1");
+    private static final int milestone = 1;
 
     private final Executor executor = Executors.newCachedThreadPool();
 
@@ -128,6 +130,19 @@ public class RepoOpControlTest {
         assertEquals(3, counter.getMax());
     }
 
+    @Test
+    public void replacingIssueMilestone() throws ExecutionException, InterruptedException {
+        AtomicMaxInteger counter = new AtomicMaxInteger(0);
+        RepoOpControl control = new RepoOpControl(stubbedRepoIO(counter), mock(MultiModel.class));
+
+        List<CompletableFuture<Boolean>> futures = new ArrayList<>();
+
+        futures.add(control.replaceIssueMilestone(issue, milestone));
+        Futures.sequence(futures).get();
+
+        assertEquals(1, counter.getMax());
+    }
+
     /**
      * Tests that replaceIssueLabelsLocally calls replaceIssueLabels method from models and return corresponding result
      */
@@ -149,6 +164,9 @@ public class RepoOpControlTest {
     private RepoIO stubbedRepoIO(AtomicMaxInteger counter) {
 
         RepoIO stub = mock(RepoIO.class);
+
+        when(stub.replaceIssueMilestone(issue, milestone))
+                .then(invocation -> createResult(counter, true));
 
         when(stub.openRepository(REPO))
             .then(invocation -> createResult(counter, new Model(REPO)));
@@ -173,7 +191,6 @@ public class RepoOpControlTest {
      * Creates a result value which completes after a short delay, to simulate an async task.
      */
     private <T> CompletableFuture<T> createResult(AtomicMaxInteger counter, T value) {
-
         CompletableFuture<T> result = new CompletableFuture<>();
 
         executor.execute(() -> {
