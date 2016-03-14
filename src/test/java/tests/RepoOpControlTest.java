@@ -11,6 +11,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import backend.resource.TurboIssue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;
@@ -26,8 +27,11 @@ public class RepoOpControlTest {
     private static final Logger logger = LogManager.getLogger(RepoOpControlTest.class.getName());
 
     private static final String REPO = "test/test";
+    private static final TurboIssue issue = new TurboIssue(REPO, 1, "Issue 1");
+    private static final int milestone = 1;
 
     private final Executor executor = Executors.newCachedThreadPool();
+
 
     @Test
     public void opsWithinMultipleRepos() throws ExecutionException, InterruptedException {
@@ -109,6 +113,19 @@ public class RepoOpControlTest {
         assertEquals(3, counter.getMax());
     }
 
+    @Test
+    public void replacingIssueMilestone() throws ExecutionException, InterruptedException {
+        AtomicMaxInteger counter = new AtomicMaxInteger(0);
+        RepoOpControl control = new RepoOpControl(stubbedRepoIO(counter));
+
+        List<CompletableFuture<Boolean>> futures = new ArrayList<>();
+
+        futures.add(control.replaceIssueMilestone(issue, milestone));
+        Futures.sequence(futures).get();
+
+        assertEquals(1, counter.getMax());
+    }
+
     /**
      * Creates a stub RepoIO with artificial delay for various operations, and
      * which increments a value for purposes of verifying behaviour.
@@ -116,6 +133,9 @@ public class RepoOpControlTest {
     private RepoIO stubbedRepoIO(AtomicMaxInteger counter) {
 
         RepoIO stub = mock(RepoIO.class);
+
+        when(stub.replaceIssueMilestone(issue, milestone))
+                .then(invocation -> createResult(counter, true));
 
         when(stub.openRepository(REPO))
             .then(invocation -> createResult(counter, new Model(REPO)));
@@ -140,7 +160,6 @@ public class RepoOpControlTest {
      * Creates a result value which completes after a short delay, to simulate an async task.
      */
     private <T> CompletableFuture<T> createResult(AtomicMaxInteger counter, T value) {
-
         CompletableFuture<T> result = new CompletableFuture<>();
 
         executor.execute(() -> {
