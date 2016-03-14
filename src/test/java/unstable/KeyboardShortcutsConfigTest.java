@@ -105,7 +105,7 @@ public class KeyboardShortcutsConfigTest extends UITest {
     }
 
     private static void reloadPrefs(Preferences prefs) {
-        prefs.saveSessionConfig();
+        prefs.save();
         String loadSessionConfig = "loadSessionConfig";
         try {
             Method method = Preferences.class.getDeclaredMethod(loadSessionConfig);

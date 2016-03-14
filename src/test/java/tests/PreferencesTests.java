@@ -4,6 +4,7 @@ import org.junit.Test;
 import prefs.SessionConfig;
 import prefs.PanelInfo;
 import prefs.Preferences;
+import ui.TestController;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -19,7 +20,8 @@ public class PreferencesTests {
     @Test
     public void testClearLastOpenBoard() {
         SessionConfig sessionConfig = mock(SessionConfig.class);
-        Preferences prefs = Preferences.load(Preferences.TEST_SESSION_CONFIG_FILENAME);
+        Preferences prefs =
+                Preferences.load(TestController.TEST_SESSION_CONFIG_FILENAME, TestController.TEST_USER_CONFIG_FILENAME);
 
         try {
             setSessionConfigField(prefs, sessionConfig);
@@ -43,7 +45,8 @@ public class PreferencesTests {
         List<PanelInfo> expected = new ArrayList<>();
         when(sessionConfig.getBoardPanels("board")).thenReturn(expected);
 
-        Preferences prefs = Preferences.load(Preferences.TEST_SESSION_CONFIG_FILENAME);
+        Preferences prefs =
+                Preferences.load(TestController.TEST_SESSION_CONFIG_FILENAME, TestController.TEST_USER_CONFIG_FILENAME);
         try {
             setSessionConfigField(prefs, sessionConfig);
             prefs.clearLastOpenBoard();

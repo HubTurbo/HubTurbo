@@ -7,6 +7,7 @@ import prefs.Config;
 import prefs.ConfigFile;
 import prefs.SessionConfig;
 import prefs.Preferences;
+import ui.TestController;
 
 
 import java.io.*;
@@ -34,7 +35,7 @@ public class ConfigFileTest {
     private static final String DUMMY_CONFIG_DIRECTORY = Preferences.DIRECTORY;
     private static final String DUMMY_CONFIG_FILENAME = "dummyConfig.json";
     private static final String SESSION_CONFIG_DIRECTORY = Preferences.DIRECTORY;
-    private static final String TEST_SESSION_CONFIG_FILENAME = Preferences.TEST_SESSION_CONFIG_FILENAME;
+    private static final String TEST_SESSION_CONFIG_FILENAME = TestController.TEST_SESSION_CONFIG_FILENAME;
 
     private static final String DUMMY_CONFIG_FILE_CONTENTS_NO_WHITESPACE =
             String.format("{\"repoAliases\":{\"%s\":\"%s\",\"%s\":\"%s\",\"%s\":\"%s\"}}",

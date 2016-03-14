@@ -1,7 +1,13 @@
 package prefs;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.RepositoryId;
+import util.FileHelper;
+import util.HTLog;
+import util.JsonHelper;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,68 +22,116 @@ import java.util.Optional;
  */
 public class Preferences { // NOPMD
 
+    private static final Logger logger = LogManager.getLogger(Preferences.class.getName());
+
     public static final String DIRECTORY = "settings";
 
-    // Standard config filenames used for application and testing
     public static final String SESSION_CONFIG_FILENAME = "global.json";
-    public static final String TEST_SESSION_CONFIG_FILENAME = "test.json";
+    public static final String USER_CONFIG_FILENAME = "user.json";
 
-    private final ConfigFile sessionConfigFile;
+    private final String sessionConfigFileName;
+    private final String userConfigFileName;
 
-    private SessionConfig sessionConfig;
+    private final SessionConfig sessionConfig;
+    private final UserConfig userConfig;
 
     /**
-     * Private constructor that prevents external instantiation
-     * @param configFileName The name of the preferences file
-     * @param createUnconditionally True if the Preferences are to be initialised regardless of previous
-     *                              saved preferences
+     * Initialises a Preferences instance that contain the configurations in the config files specified
+     * @param sessionConfigFileName The file name of the session config file which stores session config values.
+     * @param userConfigFileName The file name of the user config file which stores user config values.
+     * @return The initialised Preferences instance
      */
-    private Preferences(String configFileName, boolean createUnconditionally) {
-        this.sessionConfigFile = new ConfigFile(DIRECTORY, configFileName);
+    public static Preferences load(String sessionConfigFileName, String userConfigFileName) {
+        return new Preferences(sessionConfigFileName, userConfigFileName, false);
+    }
 
-        if (createUnconditionally) {
-            initSessionConfig();
+    /**
+     * Initialises a Preferences instance that contain a clean slate of configuration values in the config files
+     * specified
+     * @param sessionConfigFileName The file name of the session config file which stores session config values.
+     * @param userConfigFileName The file name of the user config file which stores user config values.
+     * @return The initialised Preferences instance
+     */
+    public static Preferences create(String sessionConfigFileName, String userConfigFileName) {
+        return new Preferences(sessionConfigFileName, userConfigFileName, true);
+    }
+
+    /**
+     * @param sessionConfigFileName The name of the session config file
+     * @param ignoreExisting True if existing config file is to be ignored.
+     */
+    private Preferences(String sessionConfigFileName, String userConfigFileName, boolean ignoreExisting) {
+        this.sessionConfigFileName = sessionConfigFileName;
+        this.userConfigFileName = userConfigFileName;
+
+        this.sessionConfig = loadConfig(sessionConfigFileName, SessionConfig.class, ignoreExisting);
+        this.userConfig = loadConfig(userConfigFileName, UserConfig.class, ignoreExisting);
+    }
+
+    /**
+     * Loads a Config instance from a file on disk
+     * @param configFileName The filename of the config file on disk
+     * @param configClass The class of the config to load
+     * @param ignoreExisting True if ignore the config file already
+     * @return The loaded Config instance
+     */
+    private <T extends Config> T loadConfig(String configFileName, Class<T> configClass, boolean ignoreExisting) {
+        FileHelper configFileHelper = new FileHelper(DIRECTORY, configFileName);
+        String fileContents;
+        if (ignoreExisting) {
+            fileContents = configFileHelper.loadNewFile();
         } else {
-            loadSessionConfig();
+            try {
+                fileContents = configFileHelper.loadFileContents();
+            } catch (IOException e) {
+                // if we can't read the file, just ignore the existing file
+                fileContents = configFileHelper.loadNewFile();
+            }
+        }
+
+        try {
+            return new JsonHelper().createConfigFromJson(fileContents, configClass);
+
+        } catch (IllegalAccessException | InstantiationException e) {
+            HTLog.error(logger, e);
+            assert false;
+            // If we cannot instantiate, it is a programmer error.
+            // Since we have to return something even after assert false, we return a null config.
+            return null;
         }
     }
 
     /**
-     * Initialises a Preferences instance which creates its config file, or loads
-     * from it if it already exists.
+     * Saves the session and user configs to file
      */
-    public static Preferences load(String configFileName) {
-        return new Preferences(configFileName, false);
+    public void save() {
+        try {
+            saveConfig(sessionConfig, sessionConfigFileName);
+
+        } catch (IOException e) {
+            HTLog.error(logger, e);
+            logger.error("Could not save session config");
+        }
+
+        try {
+            saveConfig(userConfig, userConfigFileName);
+
+        } catch (IOException e) {
+            HTLog.error(logger, e);
+            logger.error("Could not save user config");
+        }
     }
 
     /**
-     * Initialises a Preferences instance which always creates its config file.
-     * This will overwrite it with a default configuration if it already exists.
+     * Saves a Config to file
+     * @param config The config object to save
+     * @param configFileName The file name of the config file on disk
      */
-    public static Preferences create(String configFileName) {
-        return new Preferences(configFileName, true);
-    }
-
-    /**
-     * Saves the session config
-     */
-    public void saveSessionConfig() {
-        sessionConfigFile.saveConfig(sessionConfig);
-    }
-
-    /**
-     * Intiialises the session config
-     */
-    private void initSessionConfig() {
-        sessionConfig = new SessionConfig();
-        sessionConfigFile.saveConfig(sessionConfig);
-    }
-
-    /**
-     * Loads the session config.
-     */
-    private void loadSessionConfig() {
-        sessionConfig = (SessionConfig) sessionConfigFile.loadConfig(SessionConfig.class).orElse(new SessionConfig());
+    private void saveConfig(Config config, String configFileName) throws IOException {
+        JsonHelper jsonHelper = new JsonHelper();
+        String jsonString = jsonHelper.createJsonFromConfig(config);
+        FileHelper fileHelper = new FileHelper(DIRECTORY, configFileName);
+        fileHelper.writeFileContents(jsonString);
     }
 
     // Last login credentials. While the main UI is running (i.e. logged in successfully), last login

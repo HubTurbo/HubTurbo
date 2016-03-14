@@ -25,6 +25,11 @@ import java.util.Optional;
  * instance which can be called from tests that need to access the UI class directly.
  */
 public final class TestController {
+
+    public static final String TEST_DIRECTORY = "settings";
+    public static final String TEST_SESSION_CONFIG_FILENAME = "test.json";
+    public static final String TEST_USER_CONFIG_FILENAME = "test_user.json";
+
     private static UI ui;
     private static HashMap<String, String> commandLineArgs;
 
@@ -115,7 +120,7 @@ public final class TestController {
             return loadTestPreferences();
         }
 
-        return Preferences.load(Preferences.SESSION_CONFIG_FILENAME);
+        return Preferences.load(Preferences.SESSION_CONFIG_FILENAME, Preferences.USER_CONFIG_FILENAME);
     }
 
     /**
@@ -125,7 +130,7 @@ public final class TestController {
      * @return
      */
     public static Preferences loadTestPreferences() {
-        return Preferences.load(Preferences.TEST_SESSION_CONFIG_FILENAME);
+        return Preferences.load(TEST_SESSION_CONFIG_FILENAME, TEST_USER_CONFIG_FILENAME);
     }
 
     /**
@@ -135,7 +140,7 @@ public final class TestController {
      * @return
      */
     public static Preferences createTestPreferences() {
-        return Preferences.create(Preferences.TEST_SESSION_CONFIG_FILENAME);
+        return Preferences.create(TEST_SESSION_CONFIG_FILENAME, TEST_USER_CONFIG_FILENAME);
     }
 
     /**

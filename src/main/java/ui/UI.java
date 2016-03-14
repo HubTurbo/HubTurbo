@@ -303,7 +303,7 @@ public class UI extends Application implements EventDispatcher {
         }
         if (!TestController.isTestMode() || TestController.isTestGlobalConfig()) {
             panels.saveSession();
-            prefs.saveSessionConfig();
+            prefs.save();
         }
         if (!TestController.isTestMode() || TestController.isCloseOnQuit()) {
             Platform.exit();

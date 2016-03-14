@@ -130,7 +130,7 @@ public class UseSessionConfigsTest extends UITest {
         click("Quit");
 
         // ...and check if the test JSON is still there...
-        File testConfig = new File(Preferences.DIRECTORY, Preferences.TEST_SESSION_CONFIG_FILENAME);
+        File testConfig = new File(Preferences.DIRECTORY, TestController.TEST_SESSION_CONFIG_FILENAME);
         if (!(testConfig.exists() && testConfig.isFile())) {
             fail();
         }
