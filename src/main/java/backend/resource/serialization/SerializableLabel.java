@@ -9,16 +9,16 @@ import backend.resource.TurboLabel;
 @SuppressWarnings("PMD")
 public class SerializableLabel {
 
-    private String actualName = "";
+    private String fullName = "";
     private String colour = "";
 
     public SerializableLabel(TurboLabel label) {
-        this.actualName = label.getActualName();
+        this.fullName = label.getFullName();
         this.colour = label.getColour();
     }
 
-    public String getActualName() {
-        return actualName;
+    public String getFullName() {
+        return fullName;
     }
 
     public String getColour() {

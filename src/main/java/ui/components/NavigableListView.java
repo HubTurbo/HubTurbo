@@ -1,6 +1,7 @@
 package ui.components;
 
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -8,7 +9,7 @@ import static ui.components.KeyboardShortcuts.FIRST_ISSUE;
 import static ui.components.KeyboardShortcuts.LAST_ISSUE;
 
 import java.util.Optional;
-import java.util.function.IntConsumer;
+import java.util.function.BiConsumer;
 
 /**
  * A very specialized ListView subclass that:
@@ -45,7 +46,9 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
     // (when nothing is selected, both should be no-ops)
     private boolean saveSelectionCalled = false;
 
-    private IntConsumer onItemSelected = i -> {};
+    public static final boolean IS_RIGHT_CLICK = true;
+
+    private BiConsumer<Integer, Boolean> onItemSelected = (index, rightKey) -> {};
 
     public NavigableListView() {
         setupKeyEvents();
@@ -111,9 +114,23 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
                 selectedIndex = Optional.of(nextIndex);
 
                 // The next item will be considered selected
-                onItemSelected.accept(nextIndex);
+                triggerItemSelected(nextIndex);
             }
         }
+    }
+
+    /**
+     * Triggers the selected item on the card at the specified index for actions that are not right clicks
+     */
+    private void triggerItemSelected(int index){
+        onItemSelected.accept(index, !IS_RIGHT_CLICK);
+    }
+
+    /**
+     * Triggers the selected item on the card at the specified index for actions that are right clicks
+     */
+    private void triggerItemSelectedRightClick(int index){
+        onItemSelected.accept(index, IS_RIGHT_CLICK);
     }
 
     public abstract boolean areItemsEqual(T item1, T item2);
@@ -121,15 +138,17 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
     private void setupMouseEvents() {
         setOnMouseClicked(e -> {
             int currentlySelected = getSelectionModel().getSelectedIndex();
-
             // The currently-selected index is sometimes -1 when an issue is clicked.
             // When this happens we ignore this event.
-
             if (currentlySelected != -1) {
                 selectedIndex = Optional.of(currentlySelected);
 
                 logger.info("Mouse click on item index " + selectedIndex.get());
-                onItemSelected.accept(selectedIndex.get());
+                if (e.getButton().equals(MouseButton.SECONDARY)){
+                    triggerItemSelectedRightClick(currentlySelected);
+                } else {
+                    triggerItemSelected(currentlySelected);
+                }
             }
         });
     }
@@ -143,7 +162,7 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
                 e.consume();
                 if (selectedIndex.isPresent()) {
                     logger.info("Enter key selection on item " + selectedIndex.get());
-                    onItemSelected.accept(selectedIndex.get());
+                    triggerItemSelected(selectedIndex.get());
                 }
             }
             if (e.getCode() == KeyCode.UP || e.getCode() == KeyCode.DOWN ||
@@ -153,7 +172,7 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
                 assert selectedIndex.isPresent() : "handleUpDownKeys doesn't set selectedIndex!";
                 if (!e.isShiftDown()) {
                     logger.info("Enter key selection on item index " + selectedIndex.get());
-                    onItemSelected.accept(selectedIndex.get());
+                    triggerItemSelected(selectedIndex.get());
                 }
             }
             if (FIRST_ISSUE.match(e)) {
@@ -184,7 +203,7 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
         scrollAndShow(newIndex);
     }
 
-    public void setOnItemSelected(IntConsumer callback) {
+    public void setOnItemSelected(BiConsumer<Integer, Boolean> callback) {
         onItemSelected = callback;
     }
 
@@ -199,7 +218,7 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
         getSelectionModel().clearAndSelect(n - 1);
         scrollAndShow(n - 1);
         selectedIndex = Optional.of(n - 1);
-        onItemSelected.accept(selectedIndex.get());
+        triggerItemSelected(selectedIndex.get());
     }
     
    public void selectNextItem() {
@@ -208,12 +227,19 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
            getSelectionModel().clearAndSelect(selectedIndex.get() + 1);
            scrollAndShow(selectedIndex.get() + 1);
            selectedIndex = Optional.of(selectedIndex.get() + 1);
-           onItemSelected.accept(selectedIndex.get());
+           triggerItemSelected(selectedIndex.get());
        }
    }
 
     public Optional<T> getSelectedItem() {
         return selectedIndex.map(getItems()::get);
+    }
+
+    /**
+     * @return The selected index in the list panel
+     */
+    public Optional<Integer> getSelectedIndex() {
+        return selectedIndex;
     }
 
 }
