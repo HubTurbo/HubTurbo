@@ -5,11 +5,8 @@ import org.junit.Test;
 import backend.resource.TurboLabel;
 import ui.components.pickers.LabelPickerState;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
@@ -42,10 +39,10 @@ public class LabelPickerStateTests {
     public void determineState_exclusiveLabels_removeConflictingLabels() {
         LabelPickerState state = setupState("p.medium ", "priority.low");
         assertEquals(1, state.getInitialLabels().size());
-        assertEquals("priority.medium", state.getAddedLabels().get(0));
+        assertEquals(new TurboLabel("", "priority.medium"), state.getAddedLabels().get(0));
         assertEquals(1, state.getAddedLabels().size());
         assertEquals(1, state.getRemovedLabels().size());
-        assertTrue(state.getRemovedLabels().contains("priority.low"));
+        assertTrue(state.getRemovedLabels().contains(new TurboLabel("", "priority.low")));
     }
 
     @Test
@@ -57,22 +54,15 @@ public class LabelPickerStateTests {
 
 
     private LabelPickerState setupState(String userInput, String... labelNames) {
-        return new LabelPickerState(getHashSet(labelNames), getTestRepoLabels(), userInput);
+        return new LabelPickerState(getLabelsFromNames(labelNames), getTestRepoLabels(), userInput);
     }
 
     private List<TurboLabel> getTestRepoLabels() {
-        List<String> labelNames = getArrayList("priority.high", "priority.medium", "priority.low", 
-                                               "highest", "Problem.Heavy", "f-aaa", "f-bbb");
-
-        return labelNames.stream().map(name -> new TurboLabel("", name)).collect(Collectors.toList());
+        return getLabelsFromNames("priority.high", "priority.medium", "priority.low", "highest", 
+                                  "Problem.Heavy", "f-aaa", "f-bbb");
     }
 
-    private Set<String> getHashSet(String... labelNames) {
-        return new HashSet<>(Arrays.asList(labelNames));
+    private List<TurboLabel> getLabelsFromNames(String... names) {
+        return Arrays.asList(names).stream().map(name -> new TurboLabel("", name)).collect(Collectors.toList());
     }
-
-    private List<String> getArrayList(String... labelNames) {
-        return Arrays.asList(labelNames);
-    }
-
 }
