@@ -137,7 +137,7 @@ public class RepoOpControlTest {
 
         List<CompletableFuture<Boolean>> futures = new ArrayList<>();
 
-        futures.add(control.replaceIssueMilestone(issue, milestone));
+        futures.add(control.replaceIssueMilestoneOnServer(issue, milestone));
         Futures.sequence(futures).get();
 
         assertEquals(1, counter.getMax());

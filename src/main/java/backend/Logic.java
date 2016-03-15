@@ -10,7 +10,6 @@ import filter.expression.QualifierType;
 import javafx.application.Platform;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.Issue;
 import prefs.Preferences;
 import ui.GuiElement;
 import ui.TestController;
@@ -281,18 +280,16 @@ public class Logic {
      */
     public CompletableFuture<Boolean> replaceIssueMilestone(TurboIssue issue, Integer newMilestone) {
         Optional<Integer> originalMilestone = issue.getMilestone();
-        logger.info("Changing milestone for " + issue + " on UI");
 
-        /* Calls models to replace the issue's milestone locally since the the reference to the issue here
-           could be invalidated by changes to the models elsewhere */
-        Optional<TurboIssue> localReplaceResult =
-                models.replaceIssueMilestone(issue.getRepoId(), issue.getId(), newMilestone);
-        if (!localReplaceResult.isPresent()) return CompletableFuture.completedFuture(false);
-        refreshUI();
+        logger.info("Changing milestone for " + issue + " on UI");
+        CompletableFuture<Optional<TurboIssue>> localMilestoneReplaceFuture =
+                repoOpControl.replaceIssueMilestoneLocally(issue, newMilestone);
+        localMilestoneReplaceFuture.thenRun(this::refreshUI);
 
         return updateIssueMilestonesOnServer(issue, newMilestone)
-                .thenApply((isUpdateSuccessful) -> handleIssueMilestoneUpdateOnServerResult(
-                        isUpdateSuccessful, localReplaceResult.get(), originalMilestone.orElseGet(() -> null)));
+                .thenCombine(localMilestoneReplaceFuture,
+                        (isUpdateSuccessful, locallyModifiedIssue) -> handleIssueMilestoneUpdateOnServerResult(
+                        isUpdateSuccessful, locallyModifiedIssue, originalMilestone.orElseGet(() -> null)));
     }
 
     /**
@@ -315,7 +312,7 @@ public class Logic {
 
     private CompletableFuture<Boolean> updateIssueMilestonesOnServer(TurboIssue issue, Integer milestone) {
         logger.info("Changing milestone for " + issue + " on GitHub");
-        return repoOpControl.replaceIssueMilestone(issue, milestone);
+        return repoOpControl.replaceIssueMilestoneOnServer(issue, milestone);
     }
 
     /**
@@ -350,11 +347,16 @@ public class Logic {
      * @return true if the server update is successful
      */
     private boolean handleIssueMilestoneUpdateOnServerResult(boolean isUpdateSuccessful,
-                                                          TurboIssue localModifiedIssue,
+                                                          Optional<TurboIssue> localModifiedIssue,
                                                           Integer originalMilestone) {
+        if (!localModifiedIssue.isPresent()) {
+            logger.error("Unable to replace issue milestone locally");
+            return false;
+        }
         if (isUpdateSuccessful) return true;
+
         logger.error("Unable to update model on server");
-        revertLocalMilestoneReplace(localModifiedIssue, originalMilestone);
+        revertLocalMilestoneReplace(localModifiedIssue.get(), originalMilestone);
         return false;
     }
 

@@ -9,14 +9,14 @@ import java.util.concurrent.CompletableFuture;
 
 import static util.Futures.chain;
 
-public class ReplaceIssueMilestoneOp implements RepoOp<Boolean> {
+public class ReplaceIssueMilestoneOnServerOp implements RepoOp<Boolean> {
     private final RepoIO repoIO;
     private final TurboIssue issue;
     private final Integer milestone;
     private final CompletableFuture<Boolean> result;
 
-    public ReplaceIssueMilestoneOp(RepoIO repoIO, CompletableFuture<Boolean> result,
-                                TurboIssue issue, Integer milestone) {
+    public ReplaceIssueMilestoneOnServerOp(RepoIO repoIO, CompletableFuture<Boolean> result,
+                                           TurboIssue issue, Integer milestone) {
         this.repoIO = repoIO;
         this.result = result;
 

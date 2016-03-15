@@ -52,7 +52,7 @@ public class LogicTests {
     }
 
     /**
-     * Tests that replaceIssueMilestone succeeds when both models and repoIO succeed
+     * Tests that replaceIssueMilestoneOnServer succeeds when both models and repoIO succeed
      */
     @Test
     public void replaceIssueMilestone_successful() throws ExecutionException, InterruptedException {
@@ -64,7 +64,7 @@ public class LogicTests {
     }
 
     /**
-     * Tests that replaceIssueMilestone fails when models return empty result
+     * Tests that replaceIssueMilestoneOnServer fails when models return empty result
      */
     @Test
     public void replaceIssueMilestone_repoIOFailed() throws ExecutionException, InterruptedException {
