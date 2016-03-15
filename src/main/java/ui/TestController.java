@@ -148,7 +148,7 @@ public final class TestController {
     }
 
     /**
-     * Creates a partially stubbed RepoIO used for testing
+     * Creates a partially stubbed RepoIO used for testing.
      * @param jsonStoreToBeUsed store to be used with RepoIO,
      *                          defaults to a new instance of JSONStore if this value is empty
      * @return
