@@ -118,7 +118,7 @@ public class TurboMilestone {
      * Returns a stable TurboMilestone comparator by due date.
      *
      * Open milestones without due date are considered to have a due date very far in the future. On the contrary,
-     * Closed milestones without due date are considered to have a due date very far in the past.
+     * closed milestones without due date are considered to have a due date very far in the past.
      *
      * Milestones with due dates are considered in between, considered according to their due dates.
      */

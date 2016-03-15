@@ -32,7 +32,7 @@ public class TurboMilestoneTest {
     }
 
     @Test
-    public void getDueDateComparator_milestoneOrdering() {
+    public void getDueDateComparator_combinationOfDifferentMilestones_correctMilestoneOrdering() {
         // expects : closed milestones without due date - milestones with due date ordered by due date - open
         // milestone without due date
         TurboMilestone milestoneWithDueDateClosed1 = new TurboMilestone("1", 1, "milestone01");
@@ -63,15 +63,11 @@ public class TurboMilestoneTest {
                                                         milestoneWithoutDueDateOpen1, milestoneWithoutDueDateOpen2,
                                                         milestoneWithoutDueDateClosed1, milestoneWithoutDueDateClosed2);
         Collections.sort(milestones, comparator);
-        List<TurboMilestone> expectedMilestoneList = Arrays.asList(milestoneWithoutDueDateClosed1,
-                                                                    milestoneWithoutDueDateClosed2,
-                                                                    milestoneWithDueDateOpen1,
-                                                                    milestoneWithDueDateClosed2,
-                                                                    milestoneWithDueDateOpen2,
-                                                                    milestoneWithDueDateClosed1,
-                                                                    milestoneWithoutDueDateOpen1,
-                                                                    milestoneWithoutDueDateOpen2);
-        assertEquals(expectedMilestoneList, milestones);
+        List<TurboMilestone> expected = Arrays.asList(milestoneWithoutDueDateClosed1, milestoneWithoutDueDateClosed2,
+                                                        milestoneWithDueDateOpen1, milestoneWithDueDateClosed2,
+                                                        milestoneWithDueDateOpen2, milestoneWithDueDateClosed1,
+                                                        milestoneWithoutDueDateOpen1, milestoneWithoutDueDateOpen2);
+        assertEquals(expected, milestones);
     }
 
     @Test
