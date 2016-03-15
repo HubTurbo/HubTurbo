@@ -54,21 +54,15 @@ public class LabelPickerStateTests {
 
 
     private LabelPickerState setupState(String userInput, String... labelNames) {
-        return new LabelPickerState(getLabelsFromNames(Arrays.asList(labelNames)), getTestRepoLabels(), userInput);
+        return new LabelPickerState(getLabelsFromNames(labelNames), getTestRepoLabels(), userInput);
     }
 
     private List<TurboLabel> getTestRepoLabels() {
-        List<String> labelNames = getArrayList("priority.high", "priority.medium", "priority.low", 
-                                               "highest", "Problem.Heavy", "f-aaa", "f-bbb");
-        return getLabelsFromNames(labelNames);
+        return getLabelsFromNames("priority.high", "priority.medium", "priority.low", "highest", 
+                                  "Problem.Heavy", "f-aaa", "f-bbb");
     }
 
-    private List<TurboLabel> getLabelsFromNames(List<String> names) {
-        return names.stream().map(name -> new TurboLabel("", name)).collect(Collectors.toList());
+    private List<TurboLabel> getLabelsFromNames(String... names) {
+        return Arrays.asList(names).stream().map(name -> new TurboLabel("", name)).collect(Collectors.toList());
     }
-
-    private List<String> getArrayList(String... labelNames) {
-        return Arrays.asList(labelNames);
-    }
-
 }

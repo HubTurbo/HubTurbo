@@ -42,7 +42,8 @@ public class LabelPickerState {
     private final void update(String userInput) {
         List<String> confirmedKeywords = getConfirmedKeywords(userInput);
         for (String confirmedKeyword : confirmedKeywords) {
-            updateAssignedLabels(Optional.ofNullable(TurboLabel.getMatchedLabels(allLabels, confirmedKeyword).get(0)));
+            TurboLabel.getMatchedLabels(allLabels, confirmedKeyword)
+                .stream().findFirst().ifPresent(this::updateAssignedLabels);
         }
 
         Optional<String> keywordInProgess = getKeywordInProgress(userInput);
@@ -56,10 +57,7 @@ public class LabelPickerState {
      * Updates assignedLabels based on properties of a label 
      * @param label
      */
-    public final void updateAssignedLabels(Optional<TurboLabel> label) {
-        if (!label.isPresent()) return;
-
-        TurboLabel selectedLabel = label.get();
+    public final void updateAssignedLabels(TurboLabel selectedLabel) {
         if (isAnInitialLabel(selectedLabel)) {
             if (isARemovedLabel(selectedLabel)) {
                 removeConflictingLabels(selectedLabel);

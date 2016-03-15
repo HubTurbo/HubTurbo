@@ -71,7 +71,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
         title.setTooltip(createTitleTooltip(issue));
         createButtons();
 
-        state = new LabelPickerState(TurboLabel.generateLabels(allLabels, issue.getLabels()), allLabels, "");
+        state = new LabelPickerState(TurboLabel.getMatchedLabels(allLabels, issue.getLabels()), allLabels, "");
         populatePanes(state);
     }
 
@@ -183,7 +183,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
     private final boolean hasNewSuggestion(List<TurboLabel> addedLabels, Optional<TurboLabel> suggestion) {
         return suggestion.isPresent() 
-            && !(TurboLabel.generateLabels(allLabels, issue.getLabels())).contains(suggestion.get()) 
+            && !(TurboLabel.getMatchedLabels(allLabels, issue.getLabels())).contains(suggestion.get()) 
             && !addedLabels.contains(suggestion.get());
     }
 
@@ -248,7 +248,8 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     }
 
     /**
-     * Positions dialog based on width and height of stage
+     * Positions dialog based on width and height of stage to avoid dialog appearing off-screen on certain computers
+     * if default position is used
      * @param stage
      */
     private final void positionDialog(Stage stage) {
@@ -276,7 +277,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
             if (dialogButton == confirmButtonType) {
                 // Ensures the last keyword in the query is toggled after confirmation
                 if (!queryField.isDisabled()) queryField.appendText(" ");
-                return TurboLabel.getLabelsNameList(state.getAssignedLabels());
+                return TurboLabel.getLabelNames(state.getAssignedLabels());
             }
             return null;
         });
@@ -325,14 +326,14 @@ public class LabelPickerDialog extends Dialog<List<String>> {
      */
     private final void handleUserInput(String query) {
         state = new LabelPickerState(
-            TurboLabel.generateLabels(allLabels, issue.getLabels()), allLabels, query.toLowerCase());
+            TurboLabel.getMatchedLabels(allLabels, issue.getLabels()), allLabels, query.toLowerCase());
         populatePanes(state);
     }
 
     private void handleLabelClick(String labelName) {
         queryField.setDisable(true);
-        state.updateAssignedLabels(
-            Optional.of(TurboLabel.getMatchedLabels(allLabels, labelName).get(0)));
+        TurboLabel.getMatchedLabels(allLabels, labelName)
+            .stream().findFirst().ifPresent(state::updateAssignedLabels);
         populatePanes(state);
     }
 }
