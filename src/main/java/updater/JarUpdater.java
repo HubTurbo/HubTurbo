@@ -12,8 +12,6 @@ import util.DialogMessage;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -49,11 +47,12 @@ public class JarUpdater extends Application {
         pool.execute(() -> {
             try {
                 run();
-            } catch (IOException | IllegalArgumentException e) {
+            } catch (IllegalArgumentException e) {
                 log(e.getMessage());
+            } catch (IOException e) {
+                log(e.getMessage());
+                showErrorOnUpdatingDialog();
             }
-
-            quit();
         });
     }
 
@@ -92,54 +91,34 @@ public class JarUpdater extends Application {
         File targetJarFile = new File(targetJarPath);
 
         if (!sourceJarFile.exists()) {
-            throw new IOException("Such source file does not exist, aborting.");
+            throw new IOException(String.format("Source file %s does not exist. Aborting...",
+                                                sourceJarFile.toString()));
         }
 
-        if (!prepareTargetJarFile(targetJarFile)) {
-            showErrorOnUpdatingDialog();
-            return;
+        if (targetJarFile.exists() && targetJarFile.isFile()) {
+            makeJarBackup(targetJarFile);
+        } else {
+            JarUpdaterFileHandler.createParentDirectoriesOfFile(targetJarFile);
         }
 
         log("Moving source to target");
-        if (!moveFile(sourceJarFile.toPath(), targetJarFile.toPath())) {
-            restoreBackup(targetJarFile);
-            showErrorOnUpdatingDialog();
-            return;
+        try {
+            JarUpdaterFileHandler.moveFileWithReplaceExisting(sourceJarFile.toPath(), targetJarFile.toPath());
+        } catch (IOException e) {
+            restoreBackupOfFile(targetJarFile);
+            throw e;
         }
 
         // Optionally start target jar file
-        if (executeJarOption != null && executeJarOption.equalsIgnoreCase("y")) {
-            if (executeJar(targetJarPath)) {
-                removeBackup(targetJarFile);
-            } else { // if target can't be started, rollback backup
-                restoreBackup(targetJarFile);
-                executeJar(targetJarPath);
-            }
+        if (executeJarOption != null && executeJarOption.equalsIgnoreCase("y") && !executeJar(targetJarPath)) {
+            // if target can't be started, rollback backup
+            restoreBackupOfFile(targetJarFile);
+            executeJar(targetJarPath);
         } else {
-            removeBackup(targetJarFile);
-        }
-    }
-
-    /**
-     * Moves a file from source to destination. Replaces destination file if it exists.
-     * @param source source file to move from
-     * @param dest destination file to move to
-     * @return true if move is successful, false otherwise
-     */
-    private static boolean moveFile(Path source, Path dest) {
-        log("Moving file from:" + source.toString() + " to:" + dest.toString());
-        try {
-            if (!dest.toFile().exists() && !dest.toFile().createNewFile()) {
-                return false;
-            }
-            Files.move(source, dest, StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            log("Failed to move file");
-            log(e.toString());
-            return false;
+            removeBackupOfFileIfExists(targetJarFile);
         }
 
-        return true;
+        quit();
     }
 
     public void quit() {
@@ -148,42 +127,26 @@ public class JarUpdater extends Application {
     }
 
     /**
-     * Creates directories for target file and makes backup of target file if it exists.
-     * @return true if preparation successful, false otherwise
-     */
-    private boolean prepareTargetJarFile(File targetJarFile) {
-        if (targetJarFile.getParentFile() != null &&
-                !createDirectories(targetJarFile.getParentFile().getAbsoluteFile())) {
-            log("Failed to make directories of target file.");
-            return false;
-        }
-
-        if (targetJarFile.exists() && !makeJarBackup(targetJarFile)) {
-            log("Failed to make backup.");
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
      * Makes back up of a JAR file.
      *
-     * In some platforms (Windows in particular), JAR file cannot be modified if it was executeded and
+     * In some platforms (Windows in particular), JAR file cannot be modified if it was executed and
      * the process has not ended yet. As such, we will make several tries with wait in making backup.
      *
      * @param jarFile Jar file to be backed up
-     * @return true if backup is created, false otherwise
+     * @throws IOException if making JAR backup fails
      */
-    private boolean makeJarBackup(File jarFile) {
+    private void makeJarBackup(File jarFile) throws IOException {
         log("Making JAR backup");
 
         for (int i = 0; i < MAX_RETRY; i++) {
-            if (moveFileToBackup(jarFile)) {
-                return true;
+            try {
+                moveFileToBackup(jarFile);
+                return;
+            } catch (IOException e) {
+                log(String.format("Failed to move file %s to backup. Might be due to original JAR still in use.",
+                                  jarFile.getName()));
             }
 
-            log("Failed to make backup. Might be due to original JAR still in use.");
             try {
                 log("Wait for a while before trying again.");
                 Thread.sleep(WAIT_TIME);
@@ -192,58 +155,49 @@ public class JarUpdater extends Application {
             }
         }
 
-        log("Jar file cannot be backed up. Most likely is in use by another process.");
-        return false;
+        throw new IOException("Jar file cannot be backed up. Most likely is in use by another process.");
     }
 
     /**
      * Moves file to its backup file (the original file will be removed)
      * @param file file to be moved to its backup
-     * @return true if move is successful, false otherwise
+     * @throws IOException if failed to move file to backup
      */
-    private boolean moveFileToBackup(File file) {
+    private void moveFileToBackup(File file) throws IOException {
         log("Moving file as backup");
         String backupFilename = getBackupFilename(file.getName());
         File backup = new File(file.getParent(), backupFilename);
-        return moveFile(file.toPath(), backup.toPath());
+        JarUpdaterFileHandler.moveFileWithReplaceExisting(file.toPath(), backup.toPath());
     }
 
     /**
      * Moves a backup file to its original file
      * @param file the original file to be recovered
-     * @return true if backup is restored, false otherwise
+     * @throws IOException if failed to move backup file
      */
-    private boolean restoreBackup(File file) {
+    private void restoreBackupOfFile(File file) throws IOException {
         log("Restoring backup");
         String backupFilename = getBackupFilename(file.getName());
         File backup = new File(file.getParent(), backupFilename);
-        return moveFile(backup.toPath(), file.toPath());
+        JarUpdaterFileHandler.moveFileWithReplaceExisting(backup.toPath(), file.toPath());
     }
 
     /**
-     * Removes the backup of a file
+     * Removes the backup file of a given filename
      * @param file the file which backup should be removed
+     * @throws IOException if failed to remove backup file
      */
-    private void removeBackup(File file) {
+    private void removeBackupOfFileIfExists(File file) throws IOException {
         log("Removing backup");
         String backupFilename = getBackupFilename(file.getName());
         File backup = new File(file.getParent(), backupFilename);
-        if (backup.exists() && !backup.delete()) {
-            log("Failed to remove backup");
+        if (!Files.deleteIfExists(backup.toPath())) {
+            log(String.format("No backup file %s", file.getName()));
         }
     }
 
     private String getBackupFilename(String filename) {
         return filename + BACKUP_FILENAME_SUFFIX;
-    }
-
-    private boolean createDirectories(File dir) {
-        if (!dir.exists() && !dir.mkdirs()) {
-            log("Failed to create directories for file " + dir.getName());
-            return false;
-        }
-
-        return true;
     }
 
     private static boolean executeJar(String jarPath) {
@@ -296,7 +250,7 @@ public class JarUpdater extends Application {
         }
     }
 
-    private static void log(String message) {
+    public static void log(String message) {
         System.out.println(message);
     }
 }

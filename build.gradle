@@ -197,6 +197,7 @@ task compileJarUpdater(type: Jar) {
 
     from sourceSets.main.output
     include('updater/JarUpdater.class')
+    include('updater/JarUpdaterFileHandler.class')
     include('util/DialogMessage.class')
 }
 

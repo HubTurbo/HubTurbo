@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 import ui.UI;
 import ui.UpdateProgressWindow;
 import util.DialogMessage;
+import util.Utility;
 
 import java.io.*;
 import java.net.URI;
@@ -32,7 +33,7 @@ public class UpdateManager {
             "https://raw.githubusercontent.com/HubTurbo/AutoUpdater/master/HubTurbo.xml";
     private static final String UPDATE_LOCAL_DATA_NAME = "HubTurbo.json";
     private static final String UPDATE_APP_NAME = "HubTurbo.jar";
-    private static final String UPDATE_RESTARTER_APP_NAME = "replaceAndExecute.jar";
+    private static final String UPDATE_JAR_UPDATER_APP_PATH = UPDATE_DIRECTORY + File.separator + "jarUpdater.jar";
 
     // Class member variables
     private final UpdateProgressWindow updateProgressWindow;
@@ -85,7 +86,7 @@ public class UpdateManager {
     /**
      * Initializes system for updates
      * - Creates directory(ies) for updates
-     * - Copy replace-and-execute JAR if it doesn't exist yet
+     * - Extract jarUpdater
      */
     private boolean initUpdate() {
         logger.info("Initiating updater");
@@ -96,27 +97,25 @@ public class UpdateManager {
             return false;
         }
 
-        return extractReplaceAndExecuteJar();
+        return extractJarUpdater();
     }
 
-    private boolean extractReplaceAndExecuteJar() {
-        logger.info("Extracting restarter JAR");
-        File replaceAndExecuteJar = new File(UPDATE_DIRECTORY + File.separator + UPDATE_RESTARTER_APP_NAME);
+    private boolean extractJarUpdater() {
+        logger.info("Extracting jarUpdater");
+        File jarUpdaterFile = new File(UPDATE_JAR_UPDATER_APP_PATH);
 
-        if (!replaceAndExecuteJar.exists()) {
-            try {
-                replaceAndExecuteJar.createNewFile();
-            } catch (IOException e) {
-                logger.error("Can't create replacer-and-executor JAR");
-                return false;
-            }
+        try {
+            jarUpdaterFile.createNewFile();
+        } catch (IOException e) {
+            logger.error("Can't create empty file for jarUpdater");
+            return false;
         }
 
-        try (InputStream in = UpdateManager.class.getClassLoader().getResourceAsStream("updater/replaceAndExecute");
-             OutputStream out = new FileOutputStream(replaceAndExecuteJar)) {
+        try (InputStream in = UpdateManager.class.getClassLoader().getResourceAsStream("updater/jarUpdater");
+             OutputStream out = new FileOutputStream(jarUpdaterFile)) {
             IOUtils.copy(in, out);
         } catch (IOException e) {
-            logger.error("Can't copy replacer-and-executor JAR", e);
+            logger.error("Can't extract jarUpdater", e);
             return false;
         }
 
@@ -187,11 +186,11 @@ public class UpdateManager {
         return runJarUpdater(true);
     }
 
-    private boolean runJarUpdater(boolean executeJar) {
-        String restarterAppPath = UPDATE_DIRECTORY + File.separator + UPDATE_RESTARTER_APP_NAME;
+    private boolean runJarUpdater(boolean shouldExecuteJar) {
+        String restarterAppPath = UPDATE_JAR_UPDATER_APP_PATH;
         String replaceSourcePath = UPDATE_DIRECTORY + File.separator + UPDATE_APP_NAME;
         String cmdArg = String.format("--source=%1$s --target=%2$s --execute-jar=%3$s",
-                replaceSourcePath, UPDATE_APP_NAME, executeJar ? "y" : "n");
+                replaceSourcePath, UPDATE_APP_NAME, shouldExecuteJar ? "y" : "n");
 
         String command = String.format("java -jar %1$s %2$s", restarterAppPath, cmdArg);
         logger.info("Executing JAR of restarter with command: " + command);
