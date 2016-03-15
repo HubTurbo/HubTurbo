@@ -1,4 +1,4 @@
-package backend.results;
+package backend.tupleresults;
 
 public class IntegerLongResult {
 

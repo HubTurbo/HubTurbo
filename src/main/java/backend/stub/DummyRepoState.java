@@ -5,6 +5,8 @@ import backend.resource.TurboIssue;
 import backend.resource.TurboLabel;
 import backend.resource.TurboMilestone;
 import backend.resource.TurboUser;
+import backend.tupleresults.ListStringDateResult;
+import backend.tupleresults.ListStringResult;
 import github.IssueEventType;
 import github.TurboIssueEvent;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -168,47 +170,46 @@ public class DummyRepoState {
         labels.remove("Deleted"); // Then remove this label. The labeling events should still display the color.
     }
 
-    protected ImmutableTriple<List<TurboIssue>, String, Date>
-        getUpdatedIssues(String eTag, Date lastCheckTime) {
+    protected ListStringDateResult getUpdatedIssues(String eTag, Date lastCheckTime) {
 
         String currETag = eTag;
         if (!updatedIssues.isEmpty() || eTag == null) currETag = UUID.randomUUID().toString();
 
-        ImmutableTriple<List<TurboIssue>, String, Date> toReturn = new ImmutableTriple<>(
+        ListStringDateResult toReturn = new ListStringDateResult(
             deepCopyIssues(updatedIssues), currETag, lastCheckTime);
 
         updatedIssues = new TreeMap<>();
         return toReturn;
     }
 
-    protected ImmutablePair<List<TurboLabel>, String> getUpdatedLabels(String eTag) {
+    protected ListStringResult getUpdatedLabels(String eTag) {
         String currETag = eTag;
         if (!updatedLabels.isEmpty() || eTag == null) currETag = UUID.randomUUID().toString();
 
-        ImmutablePair<List<TurboLabel>, String> toReturn
-            = new ImmutablePair<>(deepCopyLabels(updatedLabels), currETag);
+        ListStringResult toReturn
+            = new ListStringResult(deepCopyLabels(updatedLabels), currETag);
 
         updatedLabels = new TreeMap<>();
         return toReturn;
     }
 
-    protected ImmutablePair<List<TurboMilestone>, String> getUpdatedMilestones(String eTag) {
+    protected ListStringResult getUpdatedMilestones(String eTag) {
         String currETag = eTag;
         if (!updatedMilestones.isEmpty() || eTag == null) currETag = UUID.randomUUID().toString();
 
-        ImmutablePair<List<TurboMilestone>, String> toReturn
-            = new ImmutablePair<>(deepCopyMilestones(updatedMilestones), currETag);
+        ListStringResult toReturn
+            = new ListStringResult(deepCopyMilestones(updatedMilestones), currETag);
 
         updatedMilestones = new TreeMap<>();
         return toReturn;
     }
 
-    protected ImmutablePair<List<TurboUser>, String> getUpdatedCollaborators(String eTag) {
+    protected ListStringResult getUpdatedCollaborators(String eTag) {
         String currETag = eTag;
         if (!updatedUsers.isEmpty() || eTag == null) currETag = UUID.randomUUID().toString();
 
-        ImmutablePair<List<TurboUser>, String> toReturn
-            = new ImmutablePair<>(deepCopyUsers(updatedUsers), currETag);
+        ListStringResult toReturn
+            = new ListStringResult(deepCopyUsers(updatedUsers), currETag);
 
         updatedUsers = new TreeMap<>();
         return toReturn;
@@ -260,7 +261,7 @@ public class DummyRepoState {
         return new TurboUser(dummyRepoId, "User " + (users.size() + 1));
     }
 
-    protected ImmutablePair<List<TurboIssueEvent>, String> getEvents(int issueId, String currentETag) {
+    protected ListStringResult getEvents(int issueId, String currentETag) {
         if (updatedEvents.contains(issueId)) {
             IssueMetadata metadataOfIssue = issueMetadata.get(issueId);
 
@@ -272,9 +273,9 @@ public class DummyRepoState {
             updatedEvents.remove(issueId);
 
             // Finally, return events as a proper array.
-            return new ImmutablePair<>(metadataOfIssue.getEvents(), UUID.randomUUID().toString());
+            return new ListStringResult(metadataOfIssue.getEvents(), UUID.randomUUID().toString());
         }
-        return new ImmutablePair<>(new ArrayList<>(), currentETag);
+        return new ListStringResult(new ArrayList<>(), currentETag);
     }
 
     protected List<Comment> getComments(int issueId) {

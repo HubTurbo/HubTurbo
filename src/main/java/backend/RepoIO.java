@@ -9,7 +9,7 @@ import backend.json.JSONStore;
 import backend.resource.Model;
 import backend.resource.TurboIssue;
 import backend.resource.serialization.SerializableModel;
-import org.apache.commons.lang3.tuple.ImmutablePair;
+import backend.tupleresults.IntegerLongResult;
 import org.apache.logging.log4j.Logger;
 import ui.UI;
 import util.HTLog;
@@ -88,7 +88,7 @@ public class RepoIO {
             // TODO avoid CI deadlock in the .exceptionally call. Explanation:
             /* loadRepoFromStoreAsync will execute in jsonStore's single thread pool, and if
              it has an exception then downloadRepoFromSourceBlocking will also run there. Eventually,
-             this results in jsonStore.saveRepository in updateModel being placed as another Task on the
+             this tupleresults in jsonStore.saveRepository in updateModel being placed as another Task on the
              same thread pool. However, since the current task is still carrying out and waiting for the second
              task to complete, the program gets deadlocked on the CI.
              One example of how this can happen is when storedRepos contains the repo name but the json was
@@ -201,7 +201,7 @@ public class RepoIO {
         return repoSource.replaceIssueLabels(issue, labels);
     }
 
-    public CompletableFuture<ImmutablePair<Integer, Long>> getRateLimitResetTime() {
+    public CompletableFuture<IntegerLongResult> getRateLimitResetTime() {
         return repoSource.getRateLimitResetTime();
     }
 

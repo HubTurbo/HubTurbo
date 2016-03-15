@@ -4,8 +4,8 @@ import backend.IssueMetadata;
 import backend.interfaces.Repo;
 import backend.interfaces.TaskRunner;
 import backend.resource.TurboIssue;
+import backend.tupleresults.ListStringResult;
 import github.TurboIssueEvent;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Comment;
 import util.HTLog;
@@ -38,10 +38,10 @@ public class DownloadMetadataTask extends GitHubRepoTask<Map<Integer, IssueMetad
             String currCommentsETag = issue.getMetadata().getCommentsETag();
             int id = issue.getId();
 
-            ImmutablePair<List<TurboIssueEvent>, String> changes = repo.getUpdatedEvents(repoId, id, currEventsETag);
+            ListStringResult changes = repo.getUpdatedEvents(repoId, id, currEventsETag);
 
-            List<TurboIssueEvent> events = changes.getLeft();
-            String updatedEventsETag = changes.getRight();
+            List<TurboIssueEvent> events = changes.getList();
+            String updatedEventsETag = changes.getString();
 
             List<Comment> comments = repo.getAllComments(repoId, issue);
 

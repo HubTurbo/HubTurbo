@@ -12,7 +12,7 @@ import java.util.concurrent.CompletableFuture;
  * (explicit command line argument required for proper JSON Store to
  * activate during test mode)
  *
- * The JSONStoreStub mimicks a successful write all the time, which results in a completedFuture(false).
+ * The JSONStoreStub mimicks a successful write all the time, which tupleresults in a completedFuture(false).
  */
 public class JSONStoreStub extends JSONStore {
 

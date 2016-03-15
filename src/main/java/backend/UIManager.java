@@ -1,6 +1,7 @@
 package backend;
 
 import backend.resource.TurboUser;
+import backend.tupleresults.IntegerLongResult;
 import filter.expression.FilterExpression;
 import javafx.application.Platform;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -27,8 +28,8 @@ public class UIManager {
                 ui.triggerEvent(new ModelUpdatedEvent(elementsToShow, users)));
     }
 
-    public void updateRateLimits(ImmutablePair<Integer, Long> rateLimits) {
-        ui.triggerEvent(new UpdateRateLimitsEvent(rateLimits.left, rateLimits.right));
+    public void updateRateLimits(IntegerLongResult rateLimits) {
+        ui.triggerEvent(new UpdateRateLimitsEvent(rateLimits.getInt(), rateLimits.getLong()));
     }
 
     /**

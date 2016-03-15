@@ -1,18 +1,15 @@
-package backend.results;
+package backend.tupleresults;
 
-import java.util.Date;
 import java.util.List;
 
-public class ListStringDateResult<T> {
+public class ListStringResult<T> {
 
     private List<T> list;
     private String string;
-    private Date date;
 
-    public ListStringDateResult(List<T> list, String string, Date date){
+    public ListStringResult(List<T> list, String string){
         this.list = list;
         this.string = string;
-        this.date = date;
     }
 
     public List<T> getList() {
@@ -21,9 +18,5 @@ public class ListStringDateResult<T> {
 
     public String getString() {
         return this.string;
-    }
-
-    public Date getDate() {
-        return this.date;
     }
 }

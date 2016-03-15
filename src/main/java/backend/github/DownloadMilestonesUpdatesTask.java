@@ -4,7 +4,7 @@ import backend.interfaces.Repo;
 import backend.interfaces.TaskRunner;
 import backend.resource.Model;
 import backend.resource.TurboMilestone;
-import org.apache.commons.lang3.tuple.ImmutablePair;
+import backend.tupleresults.ListStringResult;
 import org.apache.logging.log4j.Logger;
 import util.HTLog;
 
@@ -26,14 +26,14 @@ public class DownloadMilestonesUpdatesTask extends GitHubRepoTask<GitHubRepoTask
 
     @Override
     public void run() {
-        ImmutablePair<List<TurboMilestone>, String> changes = repo.getUpdatedMilestones(model.getRepoId(),
+        ListStringResult changes = repo.getUpdatedMilestones(model.getRepoId(),
             model.getUpdateSignature().milestonesETag);
 
-        List<TurboMilestone> changedMilestones = changes.left;
+        List<TurboMilestone> changedMilestones = changes.getList();
 
         logger.info(HTLog.format(model.getRepoId(), "%s milestone(s)) changed%s",
             changedMilestones.size(), changedMilestones.isEmpty() ? "" : ": " + changedMilestones));
 
-        response.complete(new Result<>(changedMilestones, changes.right));
+        response.complete(new Result<>(changedMilestones, changes.getString()));
     }
 }

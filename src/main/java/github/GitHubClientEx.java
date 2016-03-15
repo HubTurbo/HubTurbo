@@ -1,5 +1,6 @@
 package github;
 
+import backend.tupleresults.IntegerLongResult;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.apache.commons.io.input.NullInputStream;
@@ -141,7 +142,7 @@ public class GitHubClientEx extends GitHubClient {
      * @throws IOException
      */
     @SuppressWarnings("unchecked")
-    public ImmutablePair<Integer, Long> getRateLimitResetTime() throws IOException {
+    public IntegerLongResult getRateLimitResetTime() throws IOException {
         HttpURLConnection httpRequest = createGet("/rate_limit");
         if (isOk(httpRequest.getResponseCode())) {
             // We extract from rate, which is similar to resources.core
@@ -155,7 +156,7 @@ public class GitHubClientEx extends GitHubClient {
             long reset = mapRate.get("reset").longValue() * 1000; // seconds to milliseconds
             int remaining = mapRate.get("remaining").intValue();
 
-            return new ImmutablePair<>(remaining, reset);
+            return new IntegerLongResult(remaining, reset);
         } else {
             throw new IOException(httpRequest.getResponseCode() + " " + httpRequest.getResponseMessage());
         }

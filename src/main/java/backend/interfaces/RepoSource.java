@@ -5,6 +5,7 @@ import backend.UserCredentials;
 import backend.github.GitHubModelUpdatesData;
 import backend.resource.Model;
 import backend.resource.TurboIssue;
+import backend.tupleresults.IntegerLongResult;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import java.util.List;
@@ -43,6 +44,6 @@ public abstract class RepoSource implements TaskRunner {
 
     public abstract CompletableFuture<Boolean> replaceIssueLabels(TurboIssue issue, List<String> labels);
 
-    public abstract CompletableFuture<ImmutablePair<Integer, Long>> getRateLimitResetTime();
+    public abstract CompletableFuture<IntegerLongResult> getRateLimitResetTime();
 
 }

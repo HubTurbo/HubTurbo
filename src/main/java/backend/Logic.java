@@ -4,6 +4,7 @@ import backend.control.RepoOpControl;
 import backend.resource.Model;
 import backend.resource.MultiModel;
 import backend.resource.TurboIssue;
+import backend.tupleresults.IntegerLongResult;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
 import filter.expression.QualifierType;
@@ -230,8 +231,8 @@ public class Logic {
                 .forEach(models::removeRepoModelById);
     }
 
-    public ImmutablePair<Integer, Long> updateRemainingRate
-            (ImmutablePair<Integer, Long> rateLimits) {
+    public IntegerLongResult updateRemainingRate
+            (IntegerLongResult rateLimits) {
         uiManager.updateRateLimits(rateLimits);
         return rateLimits;
     }
@@ -244,7 +245,7 @@ public class Logic {
         return models.get(repoId);
     }
 
-    public CompletableFuture<ImmutablePair<Integer, Long>> getRateLimitResetTime() {
+    public CompletableFuture<IntegerLongResult> getRateLimitResetTime() {
         return repoIO.getRateLimitResetTime();
     }
 

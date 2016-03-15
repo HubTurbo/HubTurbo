@@ -74,7 +74,7 @@ public final class Futures {
 
     /**
      * Turns a List<Future<T>> into a Future<List<T>>. In other words, ensures that all
-     * futures in a collection complete and gathers their results.
+     * futures in a collection complete and gathers their tupleresults.
      */
     public static <T> CompletableFuture<List<T>> sequence(List<CompletableFuture<T>> futures) {
         CompletableFuture<Void> allDoneFuture =
