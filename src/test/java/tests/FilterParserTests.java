@@ -13,9 +13,13 @@ import static org.junit.Assert.*;
 
 public class FilterParserTests {
 
+    @Test(expected = NullPointerException.class)
+    public void testIndexOutOfBoundsException() {
+        Parser.parse(null);
+    }
+
     @Test
     public void basics() {
-        assertEquals(Parser.parse(null), Qualifier.EMPTY);
         assertEquals(Parser.parse(""), Qualifier.EMPTY);
     }
 
@@ -444,5 +448,24 @@ public class FilterParserTests {
             assertEquals(a, b);
             assertEquals(a.hashCode(), b.hashCode());
         }
+    }
+
+
+    @Test
+    public void parsing_commonIncompleteInputs() {
+
+        // Incomplete but valid inputs are accepted when the parser checks syntax
+        assertTrue(Parser.check(""));
+        assertTrue(Parser.check("id:"));
+        assertTrue(Parser.check("id: a ||"));
+        assertTrue(Parser.check("("));
+        assertTrue(Parser.check("id: a ("));
+
+        // Valid inputs are still accepted
+        assertTrue(Parser.check("id:c && (id:a || id:b)"));
+
+        // Ill-formed inputs are still rejected
+        assertFalse(Parser.check("id: id:"));
+        assertFalse(Parser.check("id: ("));
     }
 }

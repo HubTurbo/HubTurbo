@@ -17,24 +17,62 @@ import util.Utility;
 
 public final class Parser {
 
-    private Parser(ArrayList<Token> input) {
-        this.input = input;
-    }
-    public static FilterExpression parse(String input) {
-        if (input == null || input.isEmpty()) return Qualifier.EMPTY;
-        return new Parser(new Lexer(input).lex()).parseExpression(0);
-    }
+    private final List<Token> input;
 
-    private final ArrayList<Token> input;
+    /**
+     * Determines if the parser should fail gracefully if it finds the input
+     * in a incomplete state. See {@link #check}.
+     */
+    private final boolean isCheckingSyntax;
+
     private int position = 0;
     private int sourcePosition = 0;
 
+    private Parser(List<Token> input, boolean isCheckingSyntax) {
+        this.input = input;
+        this.isCheckingSyntax = isCheckingSyntax;
+    }
+
+    /**
+     * Parses an input string, returning an abstract syntax tree.
+     * Throws a {@link ParseException} on syntax error.
+     */
+    public static FilterExpression parse(String input) {
+        if (input.isEmpty()) {
+            return Qualifier.EMPTY;
+        }
+        return new Parser(new Lexer(input).lex(), false).parseExpression(0);
+    }
+
+    /**
+     * Checks an input string for errors. Returns true if the string is at
+     * least partially valid, i.e. perfectly valid, or valid but incomplete.
+     */
+    public static boolean check(String input) {
+        if (input.isEmpty()) {
+            return true;
+        }
+
+        try {
+            new Parser(new Lexer(input).lex(), true).parseExpression(0);
+            return true;
+        } catch (IncompleteInputException ignored) {
+            return true;
+        } catch (ParseException ignored) {
+            return false;
+        }
+    }
+
+    private static class IncompleteInputException extends RuntimeException {}
+
     private Token consume(TokenType type) {
-        if (input.get(position).getType() == type) {
-            return input.get(position++);
+        Token token = consume();
+
+        if (token.getType() == type) {
+            return token;
         } else {
-            throw new ParseException("Invalid token " + input.get(position)
-                + " where " + type + " expected");
+            throw new ParseException(String.format(
+                "Expected %s but got %s", type, input.get(position)));
         }
     }
 
@@ -50,12 +88,18 @@ public final class Parser {
 
     private FilterExpression parseExpression(int precedence) {
         Token token = consume();
+
         if (token.getType() == TokenType.EOF) {
-            throw new ParseException("Unexpected EOF while parsing at "
-                + sourcePosition + " (token " + position + ")");
+            // Input has ended at the beginning of an expression
+            if (isCheckingSyntax) {
+                throw new IncompleteInputException();
+            } else {
+                throw new ParseException(String.format(
+                    "Input unexpectedly ended at position %d", sourcePosition));
+            }
         }
 
-        // Prefix
+        // Handle prefix operators
 
         FilterExpression left;
         switch (token.getType()) {
@@ -75,12 +119,15 @@ public final class Parser {
             left = parseKeyword(token);
             break;
         default:
-            throw new ParseException("Invalid prefix token " + token);
+            throw new ParseException(String.format(
+                "Encountered %s, which cannot start an expression", token));
         }
 
-        if (lookAhead().getType() == TokenType.EOF) return left;
+        if (lookAhead().getType() == TokenType.EOF) {
+            return left;
+        }
 
-        // Infix
+        // Handle infix operators
 
         while (precedence < getInfixPrecedence(token = lookAhead())) {
             switch (token.getType()) {
@@ -194,13 +241,21 @@ public final class Parser {
             return parseNumberOrNumberRange(type);
         } else if (isQuotedContentToken(lookAhead())) {
             // " [content] "
-            Token quotedContent = consume();
-            return parseQuotedContent(type, quotedContent);
+            return parseQuotedContent(type, consume());
         } else if (isKeywordToken(lookAhead())) {
+            // Arbitrary string contents
             return new Qualifier(type, consume().getValue());
+        } else if (lookAhead().getType() == TokenType.EOF) {
+            // Input has ended after a qualifier
+            if (isCheckingSyntax) {
+                throw new IncompleteInputException();
+            } else {
+                throw new ParseException(String.format(
+                    "Qualifier %s must be given an input", type));
+            }
         } else {
-            throw new ParseException(String.format("Invalid content for qualifier %s: %s",
-                type, lookAhead()));
+            throw new ParseException(String.format(
+                "Invalid content for qualifier %s: %s", type, lookAhead()));
         }
     }
 
