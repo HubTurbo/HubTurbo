@@ -6,10 +6,11 @@ import backend.resource.TurboIssue;
 import backend.resource.TurboLabel;
 import backend.resource.TurboMilestone;
 import backend.resource.TurboUser;
+import backend.tupleresults.IntegerLongResult;
+import backend.tupleresults.ListStringDateResult;
+import backend.tupleresults.ListStringResult;
 import github.*;
 import github.update.*;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.*;
 import org.eclipse.egit.github.core.client.*;
@@ -56,15 +57,15 @@ public class GitHubRepo implements Repo {
     }
 
     @Override
-    public ImmutableTriple<List<TurboIssue>, String, Date> getUpdatedIssues(String repoId,
-                                                                            String eTag, Date lastCheckTime) {
+    public ListStringDateResult getUpdatedIssues(String repoId,
+                                                 String eTag, Date lastCheckTime) {
 
         IssueUpdateService issueUpdateService = new IssueUpdateService(client, eTag, lastCheckTime);
         List<Issue> updatedItems = issueUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
         List<TurboIssue> items = updatedItems.stream()
             .map(i -> new TurboIssue(repoId, i))
             .collect(Collectors.toList());
-        return new ImmutableTriple<>(items, issueUpdateService.getUpdatedETags(),
+        return new ListStringDateResult(items, issueUpdateService.getUpdatedETags(),
             issueUpdateService.getUpdatedCheckTime());
     }
 
@@ -75,21 +76,21 @@ public class GitHubRepo implements Repo {
     }
 
     @Override
-    public ImmutablePair<List<TurboLabel>, String> getUpdatedLabels(String repoId, String eTag) {
+    public ListStringResult getUpdatedLabels(String repoId, String eTag) {
         return getUpdatedResource(repoId, eTag, LabelUpdateService::new, TurboLabel::new);
     }
 
     @Override
-    public ImmutablePair<List<TurboMilestone>, String> getUpdatedMilestones(String repoId, String eTag) {
+    public ListStringResult getUpdatedMilestones(String repoId, String eTag) {
         return getUpdatedResource(repoId, eTag, MilestoneUpdateService::new, TurboMilestone::new);
     }
 
     @Override
-    public ImmutablePair<List<TurboUser>, String> getUpdatedCollaborators(String repoId, String eTag) {
+    public ListStringResult getUpdatedCollaborators(String repoId, String eTag) {
         return getUpdatedResource(repoId, eTag, UserUpdateService::new, TurboUser::new);
     }
 
-    private <TR, R, S extends UpdateService<R>> ImmutablePair<List<TR>, String> getUpdatedResource(
+    private <TR, R, S extends UpdateService<R>> ListStringResult getUpdatedResource(
         String repoId, String eTag, BiFunction<GitHubClientEx, String, S> constructService,
         BiFunction<String, R, TR> resourceConstructor) {
 
@@ -98,7 +99,7 @@ public class GitHubRepo implements Repo {
         List<TR> items = updatedItems.stream()
             .map(i -> resourceConstructor.apply(repoId, i))
             .collect(Collectors.toList());
-        return new ImmutablePair<>(items,
+        return new ListStringResult(items,
             updateService.getUpdatedETags());
     }
 
@@ -195,16 +196,16 @@ public class GitHubRepo implements Repo {
     }
 
     @Override
-    public ImmutablePair<List<TurboIssueEvent>, String> getUpdatedEvents(String repoId,
+    public ListStringResult getUpdatedEvents(String repoId,
                                                                          int issueId,
                                                                          String currentETag) {
         try {
             GitHubEventsResponse eventsResponse = issueService.getIssueEvents(
                     RepositoryId.createFromId(repoId), issueId, currentETag);
-            return new ImmutablePair<>(eventsResponse.getTurboIssueEvents(), eventsResponse.getUpdatedETag());
+            return new ListStringResult(eventsResponse.getTurboIssueEvents(), eventsResponse.getUpdatedETag());
         } catch (IOException e) {
             HTLog.error(logger, e);
-            return new ImmutablePair<>(new ArrayList<>(), currentETag);
+            return new ListStringResult(new ArrayList<>(), currentETag);
         }
     }
 
@@ -279,7 +280,7 @@ public class GitHubRepo implements Repo {
     }
 
     @Override
-    public ImmutablePair<Integer, Long> getRateLimitResetTime() throws IOException {
+    public IntegerLongResult getRateLimitResetTime() throws IOException {
         return client.getRateLimitResetTime();
     }
 }

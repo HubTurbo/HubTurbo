@@ -4,7 +4,7 @@ import backend.interfaces.Repo;
 import backend.interfaces.TaskRunner;
 import backend.resource.Model;
 import backend.resource.TurboLabel;
-import org.apache.commons.lang3.tuple.ImmutablePair;
+import backend.tupleresults.ListStringResult;
 import org.apache.logging.log4j.Logger;
 import util.HTLog;
 
@@ -26,14 +26,14 @@ public class DownloadLabelsUpdatesTask extends GitHubRepoTask<GitHubRepoTask.Res
 
     @Override
     public void run() {
-        ImmutablePair<List<TurboLabel>, String> changes = repo.getUpdatedLabels(model.getRepoId(),
+        ListStringResult changes = repo.getUpdatedLabels(model.getRepoId(),
             model.getUpdateSignature().labelsETag);
 
-        List<TurboLabel> changedLabels = changes.left;
+        List<TurboLabel> changedLabels = changes.getList();
 
         logger.info(HTLog.format(model.getRepoId(), "%s label(s)) changed%s",
             changedLabels.size(), changedLabels.isEmpty() ? "" : ": " + changedLabels));
 
-        response.complete(new Result<>(changedLabels, changes.right));
+        response.complete(new Result<>(changedLabels, changes.getString()));
     }
 }

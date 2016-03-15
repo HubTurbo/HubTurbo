@@ -4,11 +4,10 @@ import backend.interfaces.Repo;
 import backend.interfaces.TaskRunner;
 import backend.resource.Model;
 import backend.resource.TurboIssue;
-import org.apache.commons.lang3.tuple.ImmutableTriple;
+import backend.tupleresults.ListStringDateResult;
 import org.apache.logging.log4j.Logger;
 import util.HTLog;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -27,11 +26,11 @@ public class DownloadIssuesUpdatesTask extends GitHubRepoTask<GitHubRepoTask.Res
 
     @Override
     public void run() {
-        ImmutableTriple<List<TurboIssue>, String, Date> changes = repo.getUpdatedIssues(model.getRepoId(),
+        ListStringDateResult changes = repo.getUpdatedIssues(model.getRepoId(),
             model.getUpdateSignature().issuesETag, model.getUpdateSignature().lastCheckTime);
-        List<TurboIssue> updatedIssues = changes.left;
+        List<TurboIssue> updatedIssues = changes.getList();
         logger.info(HTLog.format(model.getRepoId(), "%s issue(s)) changed%s",
                 updatedIssues.size(), updatedIssues.isEmpty() ? "" : ": " + updatedIssues));
-        response.complete(new Result<>(updatedIssues, changes.middle, changes.right));
+        response.complete(new Result<>(updatedIssues, changes.getString(), changes.getDate()));
     }
 }

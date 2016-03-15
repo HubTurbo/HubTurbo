@@ -24,7 +24,7 @@ import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS
 
 /**
  * Given a type of item and the current ETag, fetches a list of updated items.
- * Returns auxillary results in the form of an updated ETag and the time of response,
+ * Returns auxillary tupleresults in the form of an updated ETag and the time of response,
  * which may be retrieved via the provided getters.
  * Only provides the basic framework for fetching updates. Subclasses fill in the details.
  *
@@ -37,11 +37,11 @@ public class UpdateService<T> extends GitHubService {
     protected final String apiSuffix;
     protected final String lastETags;
 
-    // Auxillary results of calling getUpdatedItems
+    // Auxillary tupleresults of calling getUpdatedItems
     protected Optional<String> updatedETags = Optional.empty();
     protected Date updatedCheckTime = new Date();
 
-    // Cached results of calling getUpdatedItems
+    // Cached tupleresults of calling getUpdatedItems
     protected ArrayList<T> updatedItems = null;
 
     /**
@@ -60,7 +60,7 @@ public class UpdateService<T> extends GitHubService {
 
     /**
      * To be overridden by subclasses to specify additional information required by
-     * the EGit API, such as the types of the results expected (for deserialisation
+     * the EGit API, such as the types of the tupleresults expected (for deserialisation
      * purposes). Should be called by overriding implementations.
      * Will be called by getUpdatedItems.
      * @param repoId the repository to make the request for
@@ -80,7 +80,7 @@ public class UpdateService<T> extends GitHubService {
      * @return a list of requested items
      */
     public ArrayList<T> getUpdatedItems(IRepositoryIdProvider repoId) {
-        // Return cached results if available
+        // Return cached tupleresults if available
         if (updatedItems != null)  {
             return updatedItems;
         }
