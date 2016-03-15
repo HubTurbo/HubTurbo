@@ -106,6 +106,7 @@ public abstract class FilterPanel extends AbstractPanel {
         ui.registerEvent((PrimaryRepoOpenedEventHandler) this::stopLoadingAnimationIfApplicable);
         ui.registerEvent((ApplyingFilterEventHandler) this::startLoadingAnimationIfApplicable);
         ui.registerEvent((AppliedFilterEventHandler) this::stopLoadingAnimationIfApplicable);
+        ui.registerEvent((FilterExceptionEventHandler) this::handleFilterException);
     }
 
     private final ModelUpdatedEventHandler onModelUpdate = e -> {
@@ -182,11 +183,7 @@ public abstract class FilterPanel extends AbstractPanel {
                 this.applyFilterExpression(Qualifier.EMPTY);
             }
         } catch (FilterException ex) {
-            this.applyFilterExpression(Qualifier.EMPTY);
-            filterTextField.setStyleForInvalidFilter();
-            // Overrides message in status bar
-            UI.status.displayMessage(getUniquePanelName(
-                panelMenuBar.getPanelName()) + ": " + ex.getMessage());
+            emptyFilterAndShowError(ex.getMessage());
         }
     }
 
@@ -229,6 +226,17 @@ public abstract class FilterPanel extends AbstractPanel {
     protected abstract void startLoadingAnimationIfApplicable(ApplyingFilterEvent e);
 
     protected abstract void stopLoadingAnimationIfApplicable(AppliedFilterEvent e);
+
+    private void handleFilterException(FilterExceptionEvent e) {
+        if (!e.filterExpr.equals(getCurrentFilterExpression())) return;
+        emptyFilterAndShowError(e.exceptionMessage);
+    }
+
+    private void emptyFilterAndShowError(String exceptionMessage) {
+        this.applyFilterExpression(Qualifier.EMPTY);
+        filterTextField.setStyleForInvalidFilter();
+        UI.status.displayMessage(getUniquePanelName(panelMenuBar.getPanelName()) + ": " + exceptionMessage);
+    }
 
     public void setFilterByString(String filterString) {
         filterTextField.setFilterText(filterString);
