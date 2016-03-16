@@ -69,7 +69,7 @@ public class MultiModelTest {
     }
 
     /**
-     * Tests that replaceIssueLabelsOnServer returns Optional.empty() if the model for the
+     * Tests that replaceIssueLabels returns Optional.empty() if the model for the
      * issue given in the argument can't be found
      */
     @Test
@@ -123,8 +123,18 @@ public class MultiModelTest {
     }
 
     /**
-     * Tests that replaceIssueLabelsOnServer called the Model with the same id as the argument
-     * repoId and invoke replaceIssueLabelsOnServer on that Model
+     * Tests that replaceIssueMilestone returns Optional.empty() if the model for the
+     * issue given in the argument can't be found
+     */
+    @Test
+    public void replaceIssueMilestone_modelNotFound() {
+        MultiModel models = new MultiModel(mock(Preferences.class));
+        assertEquals(Optional.empty(), models.replaceIssueMilestone("nonexistentrepo", 1, 1));
+    }
+
+    /**
+     * Tests that replaceIssueLabels called the Model with the same id as the argument
+     * repoId and invoke replaceIssueLabels on that Model
      */
     @Test
     public void replaceIssueLabels_successful() {
@@ -142,5 +152,26 @@ public class MultiModelTest {
 
         models.replaceIssueLabels(repoId, issueId, labels);
         verify(mockedModel).replaceIssueLabels(issueId, labels);
+    }
+
+    /**
+     * Tests that replaceIssueMilestone called the Model with the same id as the argument
+     * repoId and invoke replaceIssueMilestone on that Model
+     */
+    @Test
+    public void replaceIssueMilestone_successful() {
+        String repoId = "testowner/testrepo";
+        int issueId = 1, milestoneId = 1;
+
+        Model mockedModel = mock(Model.class);
+        when(mockedModel.getRepoId()).thenReturn(repoId);
+        when(mockedModel.getIssues()).thenReturn(new ArrayList<>());
+
+        MultiModel models = new MultiModel(mock(Preferences.class));
+        models.queuePendingRepository(repoId);
+        models.addPending(mockedModel);
+
+        models.replaceIssueMilestone(repoId, issueId, milestoneId);
+        verify(mockedModel).replaceIssueMilestone(issueId, milestoneId);
     }
 }
