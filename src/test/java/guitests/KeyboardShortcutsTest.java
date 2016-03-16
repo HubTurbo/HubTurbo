@@ -130,7 +130,7 @@ public class KeyboardShortcutsTest extends UITest {
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
         assertEquals(2, repoSelectorComboBox.getItems().size());
-        assertEquals(repoSelectorComboBox.getValue(), "dummy1/dummy1");
+        assertEquals("dummy1/dummy1", repoSelectorComboBox.getValue());
         // test shortcut on repo dropdown
         doubleClick(repoSelectorComboBox);
         pushKeys(SWITCH_DEFAULT_REPO);
@@ -138,17 +138,17 @@ public class KeyboardShortcutsTest extends UITest {
         // issue 9 is chosen instead of issue 10
         // as there is a problem with finding issue 10's node due to it being the first card in the panel
         waitUntilNodeAppears("#dummy/dummy_col1_" + (DummyRepoState.noOfDummyIssues - 1));
-        assertEquals(repoSelectorComboBox.getValue(), "dummy/dummy");
+        assertEquals("dummy/dummy", repoSelectorComboBox.getValue());
         // test shortcut when focus is on panel
         click("#dummy/dummy_col1_" + (DummyRepoState.noOfDummyIssues - 1));
         press(SWITCH_DEFAULT_REPO);
         PlatformEx.waitOnFxThread();
-        assertEquals(repoSelectorComboBox.getValue(), "dummy1/dummy1");
+        assertEquals("dummy1/dummy1", repoSelectorComboBox.getValue());
         // test shortcut when focus is on issue list
         press(JUMP_TO_NTH_ISSUE_KEYS.get(1));
         press(SWITCH_DEFAULT_REPO);
         PlatformEx.waitOnFxThread();
-        assertEquals(repoSelectorComboBox.getValue(), "dummy/dummy");
+        assertEquals("dummy/dummy", repoSelectorComboBox.getValue());
 
         // mark as read
         ListPanel issuePanel = find("#dummy/dummy_col1");
