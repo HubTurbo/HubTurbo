@@ -36,17 +36,20 @@ public class Logic {
     private final MultiModel models;
     private final UIManager uiManager;
     protected final Preferences prefs;
-    private final RepoIO repoIO = TestController.createApplicationRepoIO();
-    private final RepoOpControl repoOpControl = new RepoOpControl(repoIO);
+    private final RepoIO repoIO;
 
+    private final RepoOpControl repoOpControl;
     public LoginController loginController;
     public UpdateController updateController;
 
-    public Logic(UIManager uiManager, Preferences prefs, Optional<MultiModel> models) {
+    public Logic(UIManager uiManager, Preferences prefs, Optional<RepoIO> repoIO, Optional<MultiModel> models) {
         this.uiManager = uiManager;
         this.prefs = prefs;
         this.models = models.orElse(new MultiModel(prefs));
+        this.repoIO = repoIO.orElseGet(TestController::createApplicationRepoIO);
 
+        repoOpControl = new RepoOpControl(this.repoIO, this.models);
+        this.repoIO.setRepoOpControl(repoOpControl);
         loginController = new LoginController(this);
         updateController = new UpdateController(this);
 
@@ -86,9 +89,8 @@ public class Logic {
         UI.status.displayMessage(message);
 
         Futures.sequence(models.toModels().stream()
-                .map(repoOpControl::updateModel)
+                .map((model) -> repoIO.updateModel(model, true))
                 .collect(Collectors.toList()))
-                .thenApply(models::replace)
                 .thenRun(this::refreshUI)
                 .thenCompose(n -> getRateLimitResetTime())
                 .thenApply(this::updateRemainingRate)
@@ -258,18 +260,14 @@ public class Logic {
         List<String> originalLabels = issue.getLabels();
 
         logger.info("Changing labels for " + issue + " on UI");
-        /* Calls models to replace the issue's labels locally since the the reference to the issue here
-           could be invalidated by changes to the models elsewhere */
-        Optional<TurboIssue> localReplaceResult =
-                models.replaceIssueLabels(issue.getRepoId(), issue.getId(), newLabels);
-        if (!localReplaceResult.isPresent()) {
-            return CompletableFuture.completedFuture(false);
-        }
-        refreshUI();
+        CompletableFuture<Optional<TurboIssue>> localLabelsReplaceFuture =
+                repoOpControl.replaceIssueLabelsLocally(issue, newLabels);
+        localLabelsReplaceFuture.thenRun(this::refreshUI);
 
         return updateIssueLabelsOnServer(issue, newLabels)
-                .thenApply((isUpdateSuccessful) -> handleIssueLabelsUpdateOnServerResult(
-                            isUpdateSuccessful, localReplaceResult.get(), originalLabels));
+                .thenCombine(localLabelsReplaceFuture,
+                             (isUpdateSuccessful, locallyModifiedIssue) -> handleIssueLabelsUpdateResult(
+                                     isUpdateSuccessful, locallyModifiedIssue, originalLabels));
     }
 
     /**
@@ -287,25 +285,29 @@ public class Logic {
 
     private CompletableFuture<Boolean> updateIssueLabelsOnServer(TurboIssue issue, List<String> newLabels) {
         logger.info("Changing labels for " + issue + " on GitHub");
-        return repoOpControl.replaceIssueLabels(issue, newLabels);
+        return repoOpControl.replaceIssueLabelsOnServer(issue, newLabels);
     }
 
     /**
      * Handles the result of updating an issue's labels on server. Current implementation includes
      * reverting back to the original labels locally if the server update failed.
      * @param isUpdateSuccessful
-     * @param localModifiedIssue
+     * @param locallyModifiedIssue
      * @param originalLabels
      * @return true if the server update is successful
      */
-    private boolean handleIssueLabelsUpdateOnServerResult(boolean isUpdateSuccessful,
-                                                          TurboIssue localModifiedIssue,
-                                                          List<String> originalLabels) {
+    private boolean handleIssueLabelsUpdateResult(boolean isUpdateSuccessful,
+                                                  Optional<TurboIssue> locallyModifiedIssue,
+                                                  List<String> originalLabels) {
+        if (!locallyModifiedIssue.isPresent()) {
+            logger.error("Unable to replace issue labels locally");
+            return false;
+        }
         if (isUpdateSuccessful) {
             return true;
         }
         logger.error("Unable to update model on server");
-        revertLocalLabelsReplace(localModifiedIssue, originalLabels);
+        revertLocalLabelsReplace(locallyModifiedIssue.get(), originalLabels);
         return false;
     }
 

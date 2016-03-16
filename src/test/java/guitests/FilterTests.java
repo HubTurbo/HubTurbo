@@ -5,8 +5,11 @@ import static org.junit.Assert.assertEquals;
 
 import backend.stub.DummyRepoState;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import org.junit.Test;
 import ui.listpanel.ListPanel;
+import util.PlatformEx;
 
 import java.util.Optional;
 
@@ -21,8 +24,73 @@ public class FilterTests extends UITest{
         selectAll();
         type("milestone:");
         push(KeyCode.ENTER);
+        PlatformEx.waitOnFxThread();
 
-        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES, issuePanel.getIssueCount());
+        assertEquals(DummyRepoState.noOfDummyIssues, issuePanel.getIssueCount());
+    }
+
+    @Test
+    public void filterTextField_semanticException_emptyFilter() {
+        ListPanel issuePanel = find("#dummy/dummy_col0");
+
+        // test semantic exception dummy/dummy_col0_filterTextField");
+        click("#dummy/dummy_col0_filterTextField");
+        selectAll();
+        type("id:buggy");
+        push(KeyCode.ENTER);
+        PlatformEx.waitOnFxThread();
+
+        assertEquals(DummyRepoState.noOfDummyIssues, issuePanel.getIssueCount());
+    }
+
+    @Test
+    public void filterTextField_tallyMetadataUpdateSemanticException_emptyFilter() {
+        ListPanel issuePanel = find("#dummy/dummy_col0");
+
+        // test semantic exception dummy/dummy_col0_filterTextField");
+        click("#dummy/dummy_col0_filterTextField");
+        selectAll();
+        type("id:buggy u:<24");
+        push(KeyCode.ENTER);
+        PlatformEx.waitOnFxThread();
+
+        assertEquals(DummyRepoState.noOfDummyIssues, issuePanel.getIssueCount());
+    }
+
+    @Test
+    public void filterTextField_multiplePanels_correctPanelFiltered() {
+        ListPanel issuePanel = find("#dummy/dummy_col0");
+
+        // filter panel 1
+        click("#dummy/dummy_col0_filterTextField");
+        selectAll();
+        type("id:4");
+        push(KeyCode.ENTER);
+        PlatformEx.waitOnFxThread();
+        assertEquals(1, issuePanel.getIssueCount());
+
+        // create new panel 2
+        pushKeys(new KeyCodeCombination(KeyCode.P, KeyCombination.SHORTCUT_DOWN));
+        PlatformEx.waitOnFxThread();
+        ListPanel issuePanel2 = find("#dummy/dummy_col1");
+
+        // filter once
+        click("#dummy/dummy_col1_filterTextField");
+        type("id:3");
+        push(KeyCode.ENTER);
+        PlatformEx.waitOnFxThread();
+        assertEquals(1, issuePanel2.getIssueCount());
+
+        // filter again and check if the correct panel is filtered (and the other panel is untouched)
+        click("#dummy/dummy_col1_filterTextField");
+        selectAll();
+        push(KeyCode.BACK_SPACE);
+        push(KeyCode.ENTER);
+        PlatformEx.waitOnFxThread();
+        assertEquals(DummyRepoState.noOfDummyIssues, issuePanel2.getIssueCount());
+        assertEquals(1, issuePanel.getIssueCount());
+
+        pushKeys(new KeyCodeCombination(KeyCode.W, KeyCombination.SHORTCUT_DOWN));
     }
 
     @Test
@@ -99,7 +167,7 @@ public class FilterTests extends UITest{
         type("count:15");
         push(KeyCode.ENTER);
 
-        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES, issuePanel.getIssueCount());
+        assertEquals(DummyRepoState.noOfDummyIssues, issuePanel.getIssueCount());
 
         //multiple count qualifiers
         click("#dummy/dummy_col0_filterTextField");
@@ -107,7 +175,7 @@ public class FilterTests extends UITest{
         type("count:6 count:9");
         push(KeyCode.ENTER);
 
-        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES, issuePanel.getIssueCount());
+        assertEquals(DummyRepoState.noOfDummyIssues, issuePanel.getIssueCount());
 
         // Not-a-number
 
@@ -116,7 +184,7 @@ public class FilterTests extends UITest{
         type("count:abcd");
         push(KeyCode.ENTER);
 
-        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES, issuePanel.getIssueCount());
+        assertEquals(DummyRepoState.noOfDummyIssues, issuePanel.getIssueCount());
 
         // Test with sort qualifier as the second qualifier
 
@@ -145,7 +213,7 @@ public class FilterTests extends UITest{
         type("count:-1");
         push(KeyCode.ENTER);
 
-        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES, issuePanel.getIssueCount());
+        assertEquals(DummyRepoState.noOfDummyIssues, issuePanel.getIssueCount());
     }
 
     private void checkCurrWithResult(String milestoneAlias, String currString, ListPanel issuePanel,
@@ -154,6 +222,7 @@ public class FilterTests extends UITest{
         selectAll();
         type(milestoneAlias + ":" + currString);
         push(KeyCode.ENTER);
+        PlatformEx.waitOnFxThread();
 
         assertEquals(1, issuePanel.getIssueCount());
         assertTrue(issuePanel.getElementsList().get(0).getIssue().getMilestone().isPresent());
