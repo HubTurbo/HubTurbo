@@ -5,9 +5,13 @@ import com.sun.javafx.tk.FontLoader;
 import com.sun.javafx.tk.Toolkit;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 public class PickerAssignee extends TurboUser implements Comparable<PickerAssignee> {
+
+    private static final int AVATAR_SIZE = 30;
+    private static final int LABEL_HEIGHT = 40;
 
     boolean isExisting = false;
     boolean isFaded = false;
@@ -20,10 +24,11 @@ public class PickerAssignee extends TurboUser implements Comparable<PickerAssign
 
     public Node getNode() {
         Label assignee = new Label(getLoginName());
-        assignee.setGraphic(new ImageView(getAvatarImage()));
+        assignee.setGraphic(getAvatarImageView());
         FontLoader fontLoader = Toolkit.getToolkit().getFontLoader();
         double width = fontLoader.computeStringWidth(assignee.getText(), assignee.getFont());
-        assignee.setPrefWidth(width + 50);
+        assignee.setPrefWidth(width + 50 + AVATAR_SIZE);
+        assignee.setPrefHeight(LABEL_HEIGHT);
         assignee.getStyleClass().add("labels");
         assignee.setStyle("-fx-background-color: yellow;");
 
@@ -44,10 +49,11 @@ public class PickerAssignee extends TurboUser implements Comparable<PickerAssign
 
     public Node getNewlyAssignedAssigneeNode(boolean hasSuggestion) {
         Label assignee = new Label(getLoginName());
-        assignee.setGraphic(new ImageView(getAvatarImage()));
+        assignee.setGraphic(getAvatarImageView());
         FontLoader fontLoader = Toolkit.getToolkit().getFontLoader();
         double width = fontLoader.computeStringWidth(assignee.getText(), assignee.getFont());
-        assignee.setPrefWidth(width + 35);
+        assignee.setPrefWidth(width + 35 + AVATAR_SIZE);
+        assignee.setPrefHeight(LABEL_HEIGHT);
         assignee.getStyleClass().add("labels");
         assignee.setStyle("-fx-background-color: yellow;");
 
@@ -64,10 +70,11 @@ public class PickerAssignee extends TurboUser implements Comparable<PickerAssign
 
     public Node getExistingAssigneeNode(boolean hasSuggestion) {
         Label assignee = new Label(getLoginName());
-        assignee.setGraphic(new ImageView(getAvatarImage()));
+        assignee.setGraphic(getAvatarImageView());
         FontLoader fontLoader = Toolkit.getToolkit().getFontLoader();
         double width = fontLoader.computeStringWidth(assignee.getText(), assignee.getFont());
-        assignee.setPrefWidth(width + 35);
+        assignee.setPrefWidth(width + 35 + AVATAR_SIZE);
+        assignee.setPrefHeight(LABEL_HEIGHT);
         assignee.getStyleClass().add("labels");
         assignee.setStyle("-fx-background-color: yellow;");
 
@@ -119,6 +126,10 @@ public class PickerAssignee extends TurboUser implements Comparable<PickerAssign
         String thisLoginName = this.getLoginName().toLowerCase();
         String otherLoginName = other.getLoginName().toLowerCase();
         return thisLoginName.compareTo(otherLoginName);
+    }
+
+    private ImageView getAvatarImageView(){
+        return new ImageView(new Image(getAvatarURL(), AVATAR_SIZE, AVATAR_SIZE, true, true, true));
     }
 
     /**

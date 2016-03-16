@@ -36,16 +36,6 @@ public class AssigneePickerDialog extends Dialog<Pair<ButtonType, String>> {
         setupKeyEvents();
     }
 
-    private void handleMouseClick(String assigneeName) {
-        // required since clearing inputField will change the reference to the state
-        AssigneePickerState curState = state;
-        textField.clear();
-        textField.setDisable(true);
-        curState.toggleAssignee(assigneeName);
-        state = curState;
-        refreshUI(state);
-    }
-
     private void setupKeyEvents() {
         textField.textProperty().addListener((observable, oldValue, newValue) -> {
             handleUpdatedInput(newValue);
@@ -54,6 +44,16 @@ public class AssigneePickerDialog extends Dialog<Pair<ButtonType, String>> {
 
     private void handleUpdatedInput(String userInput) {
         state = new AssigneePickerState(originalAssignees, userInput);
+        refreshUI(state);
+    }
+
+    private void handleMouseClick(String assigneeName) {
+        // required since clearing inputField will change the reference to the state
+        AssigneePickerState curState = state;
+        textField.clear();
+        textField.setDisable(true);
+        curState.toggleAssignee(assigneeName);
+        state = curState;
         refreshUI(state);
     }
 
@@ -118,9 +118,10 @@ public class AssigneePickerDialog extends Dialog<Pair<ButtonType, String>> {
 
         assigneeBox.getChildren().add(new Label(ASSIGNED_ASSIGNEE));
         assigneeBox.getChildren().add(assignedAssigneePane);
+        assigneeBox.getChildren().add(textField);
         assigneeBox.getChildren().add(new Label(ALL_ASSIGNEES));
         assigneeBox.getChildren().add(allAssigneesPane);
-        assigneeBox.getChildren().add(textField);
+
 
         getDialogPane().setContent(assigneeBox);
         Platform.runLater(textField::requestFocus);
@@ -206,10 +207,10 @@ public class AssigneePickerDialog extends Dialog<Pair<ButtonType, String>> {
 
     private FlowPane createAssigneeGroup() {
         FlowPane assigneeGroup = new FlowPane();
-        assigneeGroup.setPadding(new Insets(3));
+        assigneeGroup.setPadding(new Insets(5, 5, 5, 5));
         assigneeGroup.setHgap(3);
-        assigneeGroup.setVgap(3);
-        assigneeGroup.setStyle("-fx-border-radius: 3;-fx-background-color: white;-fx-border-color: black;");
+        assigneeGroup.setVgap(5);
+        assigneeGroup.setStyle("-fx-border-radius: 3;");
         return assigneeGroup;
     }
 

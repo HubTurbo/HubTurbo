@@ -4,6 +4,8 @@ import util.Utility;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class AssigneePickerState {
     private List<PickerAssignee> currentAssigneesList;
@@ -34,11 +36,11 @@ public class AssigneePickerState {
     }
 
     public final void toggleAssignee(String assigneeQuery) {
-        String assigneeName = getAssigneeName(assigneeQuery);
-        if (assigneeName == null) return;
+        Optional<PickerAssignee> onlyMatchingAssignee = getOnlyMatchingAssignee(assigneeQuery);
+        if (!onlyMatchingAssignee.isPresent()) return;
         currentAssigneesList.stream()
                 .forEach(assignee -> {
-                    assignee.setSelected(assignee.getLoginName().equals(assigneeName)
+                    assignee.setSelected(assignee.equals(onlyMatchingAssignee.get())
                         && !assignee.isSelected());
                 });
     }
@@ -54,6 +56,12 @@ public class AssigneePickerState {
 
     public List<PickerAssignee> getCurrentAssigneesList() {
         return this.currentAssigneesList;
+    }
+
+    public List<PickerAssignee> getMatchingAssigneeList() {
+        return currentAssigneesList.stream()
+                .filter(assignee -> !assignee.isFaded())
+                .collect(Collectors.toList());
     }
 
     private void highlightFirstMatchingAssignee() {
@@ -73,11 +81,11 @@ public class AssigneePickerState {
                 .isPresent();
     }
 
-    private String getAssigneeName(String query) {
-        if (hasExactlyOneMatchingAssignee(currentAssigneesList, query)) {
-            return getMatchingAssigneeName(currentAssigneesList, query);
+    private Optional<PickerAssignee> getOnlyMatchingAssignee(String query) {
+        if (!hasExactlyOneMatchingAssignee(currentAssigneesList, query)) {
+            return Optional.empty();
         }
-        return null;
+        return Optional.of(getMatchingAssigneeName(currentAssigneesList, query));
     }
 
     private boolean hasExactlyOneMatchingAssignee(List<PickerAssignee> assigneeList, String query) {
@@ -86,11 +94,10 @@ public class AssigneePickerState {
                 .count() == 1;
     }
 
-    private String getMatchingAssigneeName(List<PickerAssignee> assigneeList, String query) {
+    private PickerAssignee getMatchingAssigneeName(List<PickerAssignee> assigneeList, String query) {
         return assigneeList.stream()
                 .filter(assignee -> Utility.containsIgnoreCase(assignee.getLoginName(), query))
                 .findFirst()
-                .get()
-                .getLoginName();
+                .get();
     }
 }
