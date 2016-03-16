@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import static org.junit.Assert.assertEquals;
 
-public class MilestonePickerTests {
+public class MilestonePickerStateTests {
     public MilestonePickerState prepareUnassignedState() {
         List<PickerMilestone> labelList = new ArrayList<>();
         PickerMilestone label = new PickerMilestone(new TurboMilestone("testrepo", 1, "milestone1"));

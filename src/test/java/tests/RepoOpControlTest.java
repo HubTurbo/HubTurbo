@@ -23,6 +23,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -131,16 +132,21 @@ public class RepoOpControlTest {
     }
 
     @Test
-    public void replacingIssueMilestone() throws ExecutionException, InterruptedException {
-        AtomicMaxInteger counter = new AtomicMaxInteger(0);
-        RepoOpControl control = new RepoOpControl(stubbedRepoIO(counter), mock(MultiModel.class));
+    public void replaceIssueMilestoneLocally() throws ExecutionException, InterruptedException {
+        int issueId = 1, milestoneId = 1;
+        MultiModel models = mock(MultiModel.class);
 
-        List<CompletableFuture<Boolean>> futures = new ArrayList<>();
+        TurboIssue returnedIssue = new TurboIssue("testrepo/testrepo", issueId, "Issue title");
+        returnedIssue.setMilestoneById(milestoneId);
 
-        futures.add(control.replaceIssueMilestoneOnServer(issue, milestone));
-        Futures.sequence(futures).get();
+        when(models.replaceIssueMilestone("testrepo/testrepo", issueId, milestoneId))
+                .thenReturn(Optional.of(returnedIssue));
 
-        assertEquals(1, counter.getMax());
+        RepoOpControl repoOpControl = new RepoOpControl(mock(RepoIO.class), models);
+        Optional<TurboIssue> result = repoOpControl.replaceIssueMilestoneLocally(returnedIssue, milestoneId).join();
+        
+        assertTrue(result.isPresent());
+        assertEquals(returnedIssue, result.get());
     }
 
     /**
@@ -166,7 +172,7 @@ public class RepoOpControlTest {
         RepoIO stub = mock(RepoIO.class);
 
         when(stub.replaceIssueMilestone(issue, milestone))
-                .then(invocation -> createResult(counter, true));
+                .then(invocation -> createResult(counter, new TurboIssue("dummy/dummy", 1, "Issue title")));
 
         when(stub.openRepository(REPO))
             .then(invocation -> createResult(counter, new Model(REPO)));
