@@ -514,7 +514,21 @@ public class BrowserComponent {
 
     public void switchToTab(String tabName) {
         if (GitHubURL.isPullRequestLoaded(getCurrentUrl())) {
-            driver.findElement(By.xpath("//a[@data-container-id='" + tabName + "_bucket']")).click();
+            String xpath = "";
+
+            switch(tabName) {
+                case GithubPageElements.DISCUSSION_TAB:
+                    xpath = "//*[@id=\"js-repo-pjax-container\"]/div[2]/div[1]/div/div[2]/div[2]/nav/a[1]";
+                    break;
+                case GithubPageElements.COMMITS_TAB:
+                    xpath = "//*[@id=\"js-repo-pjax-container\"]/div[2]/div[1]/div/div[2]/div[2]/nav/a[2]";
+                    break;
+                case GithubPageElements.FILES_TAB:
+                    xpath = "//*[@id=\"js-repo-pjax-container\"]/div[2]/div[1]/div/div[2]/div[2]/nav/a[3]";
+                    break;
+            }
+
+            driver.findElement(By.xpath(xpath)).click();
         }
     }
 
