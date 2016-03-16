@@ -15,6 +15,7 @@ Don't worry, there isn't much syntax to learn!
 - [Application](#application)
 - [Qualifiers](#qualifiers)
 - [Incompatibilities](#incompatibilities)
+- [Cheatsheet](#cheatsheet)
 
 ## Basics
 
@@ -321,3 +322,27 @@ HubTurbo's filter system is incompatible with GitHub's in a number of ways.
     + `closed:[date range]`
     + `mentions:[string]`
     + `commenter:[string]`
+
+## Cheatsheet
+|Qualifiers                    |Aliases               |Keywords                                                                                                                              |
+|------------------------------|----------------------|--------------------------------------------------------------------------------------------------------------------------------------|
+|[`assignee`](#assignee)       |`as`                  |                                                                                                                                      |
+|[`author`](#author)           |`au`, `creator`       |                                                                                                                                      |
+|[`count`](#count)             |`cn`                  |                                                                                                                                      |
+|[`created`](#created)         |`cr`                  |                                                                                                                                      |
+|[`description`](#description) |`body`, `de`, `desc`  |                                                                                                                                      |
+|[`has`](#has)                 |`h`                   |`label` (`l`), `milestones` (`m`), `assignee` (`as`)                                                                                  |
+|[`id`](#id)                   |                      |                                                                                                                                      |
+|[`in`](#in)                   |                      |                                                                                                                                      |
+|[`involves`](#involves)       |`user`                |                                                                                                                                      |
+|[`is`](#is)                   |                      |`open` (`o`), `closed` (`c`), `pr`, `merged` (`mg`), `unmerged` (`um`), `read` (`rd`), `unread` (`ur`)                                |
+|[`keyword`](#keyword)         |                      |                                                                                                                                      |
+|[`label`](#label)             |`l`                   |                                                                                                                                      |
+|[`milestone`](#milestone)     |`m`                   |`current` (`curr`)                                                                                                                    |
+|[`no`](#no)                   |`n`                   |                                                                                                                                      |
+|[`repo`](#repo)               |`r`                   |                                                                                                                                      |
+|[`sort`](#sort)               |`s`                   |`comments` (`cm`), `repo` (`r`), `updated` (`u`), `date` (`d`), `id`, `assignee` (`as`), `state` (`status`, `st`), `milestones` (`m`) |
+|[`state`](#state)             |`status`, `st`        |`open` (`o`), `closed` (`c`)                                                                                                          |
+|[`title`](#title)             |`t`                   |                                                                                                                                      |
+|[`type`](#type)               |`ty`                  |`issue` (`i`), `pullrequest` (`pr`, `p`)                                                                                              |
+|[`updated`](#updated)         |`u`                   |                                                                                                                                      |
