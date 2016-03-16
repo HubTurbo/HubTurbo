@@ -98,4 +98,21 @@ public class ContextMenuTests extends UITest {
         sleep(EVENT_DELAY);
     }
 
+    /**
+     * Tests selecting "Change milestone" context menu item
+     */
+    @Test
+    public void contextMenu_selectChangeMilestoneMenu_successful() {
+        click("#dummy/dummy_col0_9");
+        rightClick("#dummy/dummy_col0_9");
+        sleep(EVENT_DELAY);
+        click("Change milestone (M)");
+        sleep(DIALOG_DELAY);
+
+        assertNotNull(find("#milestonePickerTextField"));
+
+        push(KeyCode.ESCAPE);
+        sleep(EVENT_DELAY);
+    }
+
 }
