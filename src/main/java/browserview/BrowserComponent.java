@@ -512,6 +512,11 @@ public class BrowserComponent {
         return driver.getCurrentUrl();
     }
 
+    /**
+     * Switch to the tabs in GitHub PR page
+     * @param tabName Either GithubPageElements.DISCUSSION_TAB, GithubPageElements.COMMITS_TAB
+     *                or GithubPageElements.FILES_TAB
+     */
     public void switchToTab(String tabName) {
         if (GitHubURL.isPullRequestLoaded(getCurrentUrl())) {
             String xpath = "";
