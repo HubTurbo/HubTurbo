@@ -101,6 +101,7 @@ public class RemovableRepoListAndModelsTest extends UITest {
         selectAll();
         type("repo:dummY/Dummy");
         push(KeyCode.ENTER);
+        PlatformEx.waitOnFxThread();
         assertEquals(ui.getCurrentlyUsedRepos().size(), noOfUsedRepo);
         assertEquals(ui.logic.getOpenRepositories().size(), noOfUsedRepo);
         assertEquals(removeRepoMenu.getItems().size(), totalRepoInSystem + 1);
@@ -114,6 +115,7 @@ public class RemovableRepoListAndModelsTest extends UITest {
         selectAll();
         type("repo:dummy2/dummy2");
         push(KeyCode.ENTER);
+        PlatformEx.waitOnFxThread();
         assertEquals(ui.getCurrentlyUsedRepos().size(), noOfUsedRepo);
         assertEquals(ui.logic.getOpenRepositories().size(), noOfUsedRepo);
         assertEquals(removeRepoMenu.getItems().size(), totalRepoInSystem + 1);
@@ -128,6 +130,7 @@ public class RemovableRepoListAndModelsTest extends UITest {
         press(KeyCode.SHIFT).press(KeyCode.BACK_SLASH).release(KeyCode.BACK_SLASH).release(KeyCode.SHIFT);
         type(" repo:dummy3/dummy3)");
         push(KeyCode.ENTER);
+        PlatformEx.waitOnFxThread();
         assertEquals(ui.getCurrentlyUsedRepos().size(), noOfUsedRepo);
         assertEquals(ui.logic.getOpenRepositories().size(), noOfUsedRepo);
         assertEquals(removeRepoMenu.getItems().size(), totalRepoInSystem + 1);
@@ -143,6 +146,7 @@ public class RemovableRepoListAndModelsTest extends UITest {
         selectAll();
         type("repo:dummy4/dummy4");
         push(KeyCode.ENTER);
+        PlatformEx.waitOnFxThread();
         assertEquals(ui.getCurrentlyUsedRepos().size(), noOfUsedRepo);
         assertEquals(ui.logic.getOpenRepositories().size(), noOfUsedRepo);
         assertEquals(removeRepoMenu.getItems().size(), totalRepoInSystem + 1);
@@ -155,6 +159,7 @@ public class RemovableRepoListAndModelsTest extends UITest {
         selectAll();
         type("repo:duMMY/duMMY");
         push(KeyCode.ENTER);
+        PlatformEx.waitOnFxThread();
         assertEquals(ui.getCurrentlyUsedRepos().size(), noOfUsedRepo);
         assertEquals(ui.logic.getOpenRepositories().size(), noOfUsedRepo);
         assertEquals(removeRepoMenu.getItems().size(), totalRepoInSystem + 1); // remove would not decrease

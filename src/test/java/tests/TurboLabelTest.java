@@ -8,6 +8,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -64,7 +65,7 @@ public class TurboLabelTest {
         labels.add(test2);
 
         // Ensures result matches each label actual name even with delimiter
-        assertEquals(Arrays.asList("test.a", "dummy-a"), TurboLabel.getLabelsNameList(labels));
+        assertEquals(Arrays.asList("test.a", "dummy-a"), TurboLabel.getLabelNames(labels));
     }
 
     @Test
@@ -73,6 +74,15 @@ public class TurboLabelTest {
         assertFalse(test.isInGroup());
     }
 
+
+    @Test
+    public void getMatchedLabels_withLabelNames() {
+        List<String> labelNames = Arrays.asList("homework", "lab");
+        List<TurboLabel> labels = labelNames.stream()
+            .map(name -> new TurboLabel("", name)).collect(Collectors.toList());
+        
+        assertEquals(labels, TurboLabel.getMatchedLabels(labels, labelNames));
+    }
 
     private void testWithDelimiter(String delimiter, boolean shouldBeExclusive) {
         // label format: group.name
