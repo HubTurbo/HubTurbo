@@ -345,7 +345,7 @@ public class QualifierTests {
         Collections.sort(issues, comparator);
 
         // milestone 6 and 5 should be at the end of the sorted list since closed milestone without
-        // due date is considered to have one in the future past
+        // due date is considered to have a due date very far in the past
         List<Integer> expected = Arrays.asList(4, 7, 3, 2, 1, 6, 5);
         List<Integer> actual = issues.stream().map(TurboIssue::getId).collect(Collectors.toList());
         assertEquals(expected, actual);
