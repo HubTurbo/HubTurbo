@@ -519,21 +519,24 @@ public class BrowserComponent {
      */
     public void switchToTab(String tabName) {
         if (GitHubURL.isPullRequestLoaded(getCurrentUrl())) {
-            String xpath = "";
+            int tabIndex = 0;
 
             switch(tabName) {
                 case GithubPageElements.DISCUSSION_TAB:
-                    xpath = "//*[@id=\"js-repo-pjax-container\"]/div[2]/div[1]/div/div[2]/div[2]/nav/a[1]";
+                    tabIndex = 1;
                     break;
                 case GithubPageElements.COMMITS_TAB:
-                    xpath = "//*[@id=\"js-repo-pjax-container\"]/div[2]/div[1]/div/div[2]/div[2]/nav/a[2]";
+                    tabIndex = 2;
                     break;
                 case GithubPageElements.FILES_TAB:
-                    xpath = "//*[@id=\"js-repo-pjax-container\"]/div[2]/div[1]/div/div[2]/div[2]/nav/a[3]";
+                    tabIndex = 3;
                     break;
+                default:
+                    return;
             }
 
-            driver.findElement(By.xpath(xpath)).click();
+            String xpath = "//*[@id=\"js-repo-pjax-container\"]/div[2]/div[1]/div/div[2]/div[2]/nav/a[%d]";
+            driver.findElement(By.xpath(String.format(xpath, tabIndex))).click();
         }
     }
 
