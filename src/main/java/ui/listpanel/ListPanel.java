@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import filter.expression.QualifierType;
-import github.TurboIssueEvent;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
@@ -72,14 +71,14 @@ public class ListPanel extends FilterPanel {
         listView = new IssueListView();
         setupListView();
         getChildren().add(listView);
-        getChildren().add(createPanelStats());
+        getChildren().add(createPanelFooter());
     }
 
     /**
-     * Create an Graphic element(HBox) containing a label that show the total no of issues in the ListPanel.
+     * Creates an Graphic element(HBox) containing a label that show the total no of issues in the ListPanel.
      * @return HBox Instance to be added to the ListPanel.
      */
-    private HBox createPanelStats() {
+    private HBox createPanelFooter() {
         HBox bottomDisplay = new HBox();
         bottomDisplay.getChildren().add(totalLabel);
         return bottomDisplay;
