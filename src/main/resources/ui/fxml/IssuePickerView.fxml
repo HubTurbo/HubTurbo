@@ -17,12 +17,12 @@
          </padding>
       </VBox>
       <TextField fx:id="issuepickerQueryField" prefColumnCount="30" />
-      <ScrollPane fx:id="issuepickerScrollPane" fitToWidth="true" maxHeight="500.0" prefHeight="500.0">
+      <ScrollPane fx:id="issuepickerScrollPane" fitToWidth="true" maxHeight="500.0" prefHeight="500.0" style="-fx-background: white;">
          <VBox.margin>
             <Insets bottom="10.0" top="10.0" />
          </VBox.margin>
          <content>
-            <VBox fx:id="suggestedIssues" spacing="10.0">
+            <VBox fx:id="suggestedIssues">
                <padding>
                   <Insets bottom="10.0" top="10.0" />
                </padding>

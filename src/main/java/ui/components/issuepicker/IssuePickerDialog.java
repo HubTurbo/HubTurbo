@@ -155,8 +155,9 @@ public class IssuePickerDialog extends Dialog<List<String>> {
     
     private void handleIssueClick(TurboIssue issue, IssueCard card) {
         issuepickerQueryField.setDisable(true);
+        Platform.runLater(card::requestFocus);
         state.updateSelectedIssues(issue);
-        populatePanes(state);
+        populateSelectedIssues(state.getSelectedIssues(), state.getCurrentSuggestion());
     }
 
     // UI helper methods
