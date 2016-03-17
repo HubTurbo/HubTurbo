@@ -291,7 +291,7 @@ public class UITest extends GuiTest {
 
     private <T extends Node> Optional<T> findQuiet(Matcher<Object> matcher) {
         try {
-            return Optional.of(find(matcher));
+            return Optional.ofNullable(find(matcher));
         } catch (NoNodesFoundException | NoNodesVisibleException e) {
             return Optional.empty();
         }
