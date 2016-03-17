@@ -3,7 +3,6 @@ package tests;
 import backend.Logic;
 import backend.RepoIO;
 import backend.UIManager;
-import backend.control.RepoOpControl;
 import backend.resource.Model;
 import backend.resource.MultiModel;
 import backend.resource.TurboIssue;
@@ -14,7 +13,6 @@ import prefs.Preferences;
 import ui.UI;
 import util.events.EventDispatcher;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -43,10 +41,8 @@ public class LogicTests {
         mockedRepoIO = mock(RepoIO.class);
         mockedMultiModel = mock(MultiModel.class);
 
-        logic = new Logic(mock(UIManager.class), mockedPreferences, Optional.of(mockedMultiModel));
-        Field repoOpControlField = logic.getClass().getDeclaredField("repoOpControl");
-        repoOpControlField.setAccessible(true);
-        repoOpControlField.set(logic, new RepoOpControl(mockedRepoIO));
+        logic = new Logic(mock(UIManager.class), mockedPreferences,
+                          Optional.of(mockedRepoIO), Optional.of(mockedMultiModel));
     }
 
     @Before
@@ -56,7 +52,7 @@ public class LogicTests {
     }
 
     /**
-     * Tests that replaceIssueLabels succeed when both models and repoIO succeeded
+     * Tests that replaceIssueLabelsOnServer succeed when both models and repoIO succeeded
      */
     @Test
     public void replaceIssueLabels_successful() throws ExecutionException, InterruptedException {
@@ -68,10 +64,10 @@ public class LogicTests {
     }
 
     /**
-     * Tests that replaceIssueLabels failed when models return empty result
+     * Tests that replaceIssueLabelsOnServer failed when models return empty result
      */
     @Test
-    public void replaceIssueLabels_repoIOFailed() throws ExecutionException, InterruptedException {
+    public void replaceIssueLabels_modelsEmpty() throws ExecutionException, InterruptedException {
         TurboIssue issue = createIssueWithLabels(1, Arrays.asList("label1", "label2"));
         mockRepoIOReplaceIssueLabelsResult(true);
         mockMultiModelReplaceIssueLabels(Optional.empty(), Optional.empty());
@@ -80,10 +76,10 @@ public class LogicTests {
     }
 
     /**
-     * Tests that replaceIssueLabels failed when repoIO failed to update labels
+     * Tests that replaceIssueLabelsOnServer failed when repoIO failed to update labels
      */
     @Test
-    public void replaceIssueLabels_modelsFailed() throws ExecutionException, InterruptedException {
+    public void replaceIssueLabels_repoIOUnsuccessful() throws ExecutionException, InterruptedException {
         TurboIssue issue = createIssueWithLabels(1, Arrays.asList("label1", "label2"));
         mockRepoIOReplaceIssueLabelsResult(false);
         mockMultiModelReplaceIssueLabels(Optional.of(issue), Optional.empty());
@@ -96,7 +92,7 @@ public class LogicTests {
      * new labels then revert back to original labels when repoIO failed to update labels
      */
     @Test
-    public void replaceIssueLabels_modelsFailed_revert() throws ExecutionException, InterruptedException {
+    public void replaceIssueLabels_repoIOUnsuccessful_revert() throws ExecutionException, InterruptedException {
         List<String> originalLabels = Arrays.asList("label1", "label2");
         List<String> newLabels = Arrays.asList("label3", "label4");
 

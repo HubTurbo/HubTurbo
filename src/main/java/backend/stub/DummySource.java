@@ -2,10 +2,7 @@ package backend.stub;
 
 import backend.IssueMetadata;
 import backend.UserCredentials;
-import backend.github.CheckRateLimitTask;
-import backend.github.DownloadRepoTask;
-import backend.github.ReplaceIssueLabelsTask;
-import backend.github.UpdateModelTask;
+import backend.github.*;
 import backend.interfaces.RepoSource;
 import backend.resource.Model;
 import backend.resource.TurboIssue;
@@ -38,8 +35,8 @@ public class DummySource extends RepoSource {
     }
 
     @Override
-    public CompletableFuture<Model> updateModel(Model model) {
-        return addTask(new UpdateModelTask(this, dummy, model)).response;
+    public CompletableFuture<GitHubModelUpdatesData> downloadModelUpdates(Model model) {
+        return addTask(new DownloadModelUpdatesTask(this, dummy, model)).response;
     }
 
     @Override

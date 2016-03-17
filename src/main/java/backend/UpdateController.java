@@ -3,14 +3,18 @@ package backend;
 import backend.resource.Model;
 import backend.resource.MultiModel;
 import backend.resource.TurboIssue;
+import filter.FilterException;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
+import javafx.application.Platform;
 import org.apache.logging.log4j.Logger;
 import filter.expression.QualifierType;
 import ui.GuiElement;
+import ui.UI;
 import ui.issuepanel.FilterPanel;
 import util.Futures;
 import util.HTLog;
+import util.events.FilterExceptionEvent;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -42,6 +46,11 @@ public class UpdateController {
      */
     public void processAndRefresh(List<FilterPanel> filterPanels) {
         List<FilterExpression> filterExprs = getFilterExpressions(filterPanels);
+
+        // Filter and sort the issues first even if the metadata is not yet available so that criteria not
+        // based on metadata can have immediate effect.
+        logic.updateUI(processFilters(filterExprs));
+
         // Open specified repos
         openRepositoriesInFilters(filterPanels)
         .thenRun(() -> {
@@ -50,7 +59,7 @@ public class UpdateController {
 
             if (toUpdate.isEmpty()) {
                 // If no issues requiring metadata update, just run the filter and sort.
-                logic.updateUI(processFilter(filterExprs));
+                logic.updateUI(processFilters(filterExprs));
                 return;
             }
 
@@ -65,7 +74,7 @@ public class UpdateController {
                             + results.size() + " repos"))
                     .thenCompose(n -> logic.getRateLimitResetTime())
                     .thenApply(logic::updateRemainingRate)
-                    .thenRun(() -> logic.updateUI(processFilter(filterExprs))); // Then filter the second time.
+                    .thenRun(() -> logic.updateUI(processFilters(filterExprs))); // Then filter the second time.
         });
     }
 
@@ -101,19 +110,27 @@ public class UpdateController {
         return filterExprs.stream()
                 .filter(Qualifier::hasUpdatedQualifier)
                 .flatMap(filterExpr -> allModelIssues.stream()
-                        .filter(issue -> Qualifier.process(models, filterExpr, issue)))
+                        .filter(issue -> {
+                            try {
+                                return Qualifier.process(models, filterExpr, issue);
+                            } catch (FilterException e) {
+                                Platform.runLater(() -> UI.events.triggerEvent(
+                                        new FilterExceptionEvent(filterExpr, e.getMessage())));
+                                return false;
+                            }
+                        }))
                 .distinct()
                 .collect(Collectors.groupingBy(TurboIssue::getRepoId));
     }
 
     /**
-     * Filters, sorts and counts issues within the model according to the given filter expressions.
+     * Filters, sorts and counts issues within the model according to the given filter expressions
      * In here, "processed" is equivalent to "filtered, sorted and counted".
      *
-     * @param filterExprs Filter expressions to process.
+     * @param filterExprs Filter expressions
      * @return Filter expressions and their corresponding issues after filtering, sorting and counting.
      */
-    private Map<FilterExpression, List<GuiElement>> processFilter(List<FilterExpression> filterExprs) {
+    private Map<FilterExpression, List<GuiElement>> processFilters(List<FilterExpression> filterExprs) {
         MultiModel models = logic.getModels();
         List<TurboIssue> allModelIssues = models.getIssues();
 
@@ -122,17 +139,21 @@ public class UpdateController {
         filterExprs.stream().distinct().forEach(filterExpr -> {
             boolean hasUpdatedQualifier = Qualifier.hasUpdatedQualifier(filterExpr);
 
-            FilterExpression filterExprNoAlias = Qualifier.replaceMilestoneAliases(models, filterExpr);
+            try {
+                FilterExpression filterExprNoAlias = Qualifier.replaceMilestoneAliases(models, filterExpr);
 
-            List<TurboIssue> processedIssues = allModelIssues.stream()
-                    .filter(issue -> Qualifier.process(models, filterExprNoAlias, issue))
-                    .sorted(determineComparator(filterExprNoAlias, hasUpdatedQualifier))
-                    .limit(Qualifier.determineCount(allModelIssues, filterExprNoAlias))
-                    .collect(Collectors.toList());
+                List<TurboIssue> processedIssues = allModelIssues.stream()
+                        .filter(issue -> Qualifier.process(models, filterExprNoAlias, issue))
+                        .sorted(determineComparator(filterExprNoAlias, hasUpdatedQualifier))
+                        .limit(Qualifier.determineCount(allModelIssues, filterExprNoAlias))
+                        .collect(Collectors.toList());
 
-            List<GuiElement> processedElements = produceGuiElements(models, processedIssues);
+                List<GuiElement> processedElements = produceGuiElements(models, processedIssues);
 
-            processed.put(filterExpr, processedElements);
+                processed.put(filterExpr, processedElements);
+            } catch (FilterException e) {
+                Platform.runLater(() -> UI.events.triggerEvent(new FilterExceptionEvent(filterExpr, e.getMessage())));
+            }
         });
 
         return processed;

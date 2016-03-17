@@ -659,19 +659,7 @@ public class Qualifier implements FilterExpression {
                 } else if (!bMilestone.isPresent()) {
                     return -1;
                 } else {
-                    Optional<LocalDate> aDueDate = aMilestone.get().getDueDate();
-                    Optional<LocalDate> bDueDate = bMilestone.get().getDueDate();
-
-                    if (!aDueDate.isPresent() && !bDueDate.isPresent()) {
-                        return 0;
-                    } else if (!aDueDate.isPresent()) {
-                        return 1;
-                    } else if (!bDueDate.isPresent()) {
-                        return -1;
-                    } else {
-                        return -(TurboMilestone.getDueDateComparator()
-                            .compare(aMilestone.get(), bMilestone.get()));
-                    }
+                    return -(TurboMilestone.getDueDateComparator().compare(aMilestone.get(), bMilestone.get()));
                 }
             };
             break;
