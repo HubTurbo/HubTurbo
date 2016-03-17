@@ -54,17 +54,22 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
 
     private Label createLabel() {
         Label milestone = new Label(getTitle());
+        adjustWidthToFont(milestone);
+        return milestone;
+    }
+
+    private void adjustWidthToFont(Label milestone) {
         FontLoader fontLoader = Toolkit.getToolkit().getFontLoader();
         double width = fontLoader.computeStringWidth(milestone.getText(), milestone.getFont());
         milestone.setPrefWidth(width + 30);
         milestone.getStyleClass().add("labels");
-        return milestone;
     }
 
     private Label createCustomLabel(int fontSize) {
-        Label defaultLabel = createLabel();
-        defaultLabel.setFont(new Font(fontSize));
-        return defaultLabel;
+        Label milestone = new Label(getTitle());
+        milestone.setFont(new Font(fontSize));
+        adjustWidthToFont(milestone);
+        return milestone;
     }
 
     private void setOpenStatusColour(Label milestone) {
