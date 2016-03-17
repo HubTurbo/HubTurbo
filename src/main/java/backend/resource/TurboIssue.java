@@ -2,7 +2,6 @@ package backend.resource;
 
 import backend.IssueMetadata;
 import backend.resource.serialization.SerializableIssue;
-import net.sf.cglib.core.Local;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
@@ -224,6 +223,7 @@ public class TurboIssue {
     private void reconcile(TurboIssue otherIssue) {
         logger.info(String.format("Reconciling issue %s in %s", this, this.getRepoId()));
         this.reconcileLabels(otherIssue);
+        this.reconcileAssignee(otherIssue);
     }
 
     /**
@@ -240,6 +240,22 @@ public class TurboIssue {
             this.labels = otherIssue.getLabels();
             this.labelsLastModifiedAt = Optional.of(otherIssue.getLabelsLastModifiedAt());
         }
+    }
+
+    /**
+     * See also {@link #reconcile(TurboIssue)}
+     * @param otherIssue
+     */
+    private void reconcileAssignee(TurboIssue otherIssue) {
+        LocalDateTime thisIssueAssigneeModifiedAt = this.getAssigneeLastModifiedAt();
+        LocalDateTime otherIssueAssigneeModifiedAt = otherIssue.getAssigneeLastModifiedAt();
+        if (thisIssueAssigneeModifiedAt.isBefore(otherIssueAssigneeModifiedAt)) {
+            logger.info(String.format("Issue %s's assignee %s is stale, replacing with %s",
+                        this, this.getAssignee(), otherIssue.getAssignee()));
+            this.assignee = otherIssue.getAssignee();
+            this.assigneeLastModifiedAt = Optional.of(otherIssueAssigneeModifiedAt);
+        }
+
     }
 
     /**

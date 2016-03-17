@@ -92,7 +92,7 @@ public class RepoIOTests {
     }
 
     /**
-     * Tests that RepoIO's replaceIssueAssignee calls RepoSource's replaceIssueAssignee
+     * Tests that RepoIO's replaceIssueAssigneeOnServer calls RepoSource's replaceIssueAssigneeOnServer
      * and receives a corresponding CompletableFuture response
      */
     @Test

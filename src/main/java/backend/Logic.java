@@ -299,16 +299,15 @@ public class Logic {
         Optional<String> originalAssigneeLoginName = issue.getAssignee();
 
         logger.info("Changing assignee for " + issue + " on UI");
-        Optional<TurboIssue> localReplaceResult =
-                models.replaceIssueAssignee(issue.getRepoId(), issue.getId(), newAssigneeLoginName);
-        if (!localReplaceResult.isPresent()) {
-            return CompletableFuture.completedFuture(false);
-        }
-        refreshUI();
+        CompletableFuture<Optional<TurboIssue>> localAssigneeReplaceFuture =
+                repoOpControl.replaceIssueAssigneeLocally(issue, newAssigneeLoginName);
+        localAssigneeReplaceFuture.thenRun(this::refreshUI);
 
         return updateIssueAssigneesOnServer(issue, newAssigneeLoginName)
-                .thenApply((isUpdateSuccessful) -> handleIssueAssigneeUpdateOnServerResult(
-                        isUpdateSuccessful, localReplaceResult.get(), originalAssigneeLoginName.orElseGet(() -> null)));
+                .thenCombine(localAssigneeReplaceFuture,
+                        (isUpdateSuccessful, locallyModifiedIssue) -> handleIssueAssigneeUpdateResult(
+                                isUpdateSuccessful, locallyModifiedIssue,
+                                originalAssigneeLoginName.orElseGet(() -> null)));
     }
 
     /**
@@ -338,7 +337,7 @@ public class Logic {
 
     private CompletableFuture<Boolean> updateIssueAssigneesOnServer(TurboIssue issue, String newAssigneeLoginName) {
         logger.info("Changing assignee for " + issue + " on GitHub");
-        return repoOpControl.replaceIssueAssignee(issue, newAssigneeLoginName);
+        return repoOpControl.replaceIssueAssigneeOnServer(issue, newAssigneeLoginName);
     }
 
     /**
@@ -389,18 +388,22 @@ public class Logic {
      * Handles the result of updating an issue's assignee on server. Current implementation includes
      * reverting back to the original assignee locally if the server update failed.
      * @param isUpdateSuccessful
-     * @param localModifiedIssue
+     * @param locallyModifiedIssue
      * @param originalAssigneeLoginName
      * @return true if the server update is successful
      */
-    private boolean handleIssueAssigneeUpdateOnServerResult(boolean isUpdateSuccessful,
-                                                             TurboIssue localModifiedIssue,
-                                                             String originalAssigneeLoginName) {
+    private boolean handleIssueAssigneeUpdateResult(boolean isUpdateSuccessful,
+                                                    Optional<TurboIssue> locallyModifiedIssue,
+                                                    String originalAssigneeLoginName) {
+        if (!locallyModifiedIssue.isPresent()) {
+            logger.error("Unable to replace issue assignee locally");
+            return false;
+        }
         if (isUpdateSuccessful) {
             return true;
         }
-        logger.error("Unable to update model on server ASSIGNEE");
-        revertLocalAssigneeReplace(localModifiedIssue, originalAssigneeLoginName);
+        logger.error("Unable to update model on server");
+        revertLocalAssigneeReplace(locallyModifiedIssue.get(), originalAssigneeLoginName);
         return false;
     }
 

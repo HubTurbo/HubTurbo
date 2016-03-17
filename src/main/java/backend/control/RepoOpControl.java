@@ -113,10 +113,18 @@ public final class RepoOpControl {
         return result;
     }
 
-    public CompletableFuture<Boolean> replaceIssueAssignee(TurboIssue issue, String assigneeLoginName) {
+    public CompletableFuture<Boolean> replaceIssueAssigneeOnServer(TurboIssue issue, String assigneeLoginName) {
         init(issue.getRepoId());
         CompletableFuture<Boolean> result = new CompletableFuture<>();
-        enqueue(new ReplaceIssueAssigneeOp(repoIO, result, issue, assigneeLoginName));
+        enqueue(new ReplaceIssueAssigneeOnServerOp(repoIO, result, issue, assigneeLoginName));
+        return result;
+    }
+
+    public CompletableFuture<Optional<TurboIssue>> replaceIssueAssigneeLocally(TurboIssue issue,
+                                                                               String assigneeLoginName) {
+        init(issue.getRepoId());
+        CompletableFuture<Optional<TurboIssue>> result = new CompletableFuture<>();
+        enqueue(new ReplaceIssueAssigneeLocallyOp(models, issue, assigneeLoginName, result));
         return result;
     }
 

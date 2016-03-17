@@ -145,7 +145,7 @@ public class LogicTests {
     }
 
     /**
-     * Tests that replaceIssueAssignee succeed when both models and repoIO succeeded
+     * Tests that replaceIssueAssigneeOnServer succeed when both models and repoIO succeeded
      */
     @Test
     public void replaceIssueAssignee_successful() throws ExecutionException, InterruptedException {
@@ -172,7 +172,7 @@ public class LogicTests {
      * Tests that replaceIssueAssignee failed when models return empty result
      */
     @Test
-    public void replaceIssueAssignee_repoIOFailed() throws ExecutionException, InterruptedException {
+    public void replaceIssueAssignee_modelsEmpty() throws ExecutionException, InterruptedException {
         TurboIssue issue = createIssueWithAssignee(1, "testAssignee");
         mockRepoIOReplaceIssueAssigneeResult(true);
         mockMultiModelReplaceIssueAssignee(Optional.empty(), Optional.empty());
@@ -196,7 +196,7 @@ public class LogicTests {
      * Tests that replaceIssueAssignee failed when repoIO failed to update assignee
      */
     @Test
-    public void replaceIssueAssignee_modelsFailed() throws ExecutionException, InterruptedException {
+    public void replaceIssueAssignee_repoIOUnsuccessful() throws ExecutionException, InterruptedException {
         TurboIssue issue = createIssueWithAssignee(1, "testAssignee");
         mockRepoIOReplaceIssueAssigneeResult(false);
         mockMultiModelReplaceIssueAssignee(Optional.of(issue), Optional.empty());
@@ -229,7 +229,7 @@ public class LogicTests {
      * new assignee then revert back to original assignee when repoIO failed to update assignee
      */
     @Test
-    public void replaceIssueAssignee_modelsFailed_revert() throws ExecutionException, InterruptedException {
+    public void replaceIssueAssignee_repoIOUnsuccessful_revert() throws ExecutionException, InterruptedException {
         String originalAssignee = "user1";
         String newAssignee = "user2";
 

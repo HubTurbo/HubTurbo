@@ -7,14 +7,18 @@ import java.util.concurrent.CompletableFuture;
 
 import static util.Futures.chain;
 
-public class ReplaceIssueAssigneeOp implements RepoOp<Boolean> {
+/**
+ * This class represents a repository operation that replaces an assignee assigned to an issue
+ */
+public class ReplaceIssueAssigneeOnServerOp implements RepoOp<Boolean> {
+
     private final RepoIO repoIO;
     private final TurboIssue issue;
     private final String assigneeLoginName;
     private final CompletableFuture<Boolean> result;
 
-    public ReplaceIssueAssigneeOp(RepoIO repoIO, CompletableFuture<Boolean> result,
-                                   TurboIssue issue, String assigneeLoginName) {
+    public ReplaceIssueAssigneeOnServerOp(RepoIO repoIO, CompletableFuture<Boolean> result,
+                                        TurboIssue issue, String assigneeLoginName) {
         this.repoIO = repoIO;
         this.result = result;
 
@@ -32,4 +36,5 @@ public class ReplaceIssueAssigneeOp implements RepoOp<Boolean> {
         return repoIO.replaceIssueAssignee(issue, assigneeLoginName)
                 .thenApply(chain(result));
     }
+
 }

@@ -81,7 +81,7 @@ public class MultiModelTest {
     }
     
      /**
-     * Tests that replaceIssueAssignee returns Optional.empty if the model for the
+     * Tests that replaceIssueAssigneeOnServer returns Optional.empty if the model for the
      * issue given in the argument can't be found
      */
     @Test
@@ -152,8 +152,8 @@ public class MultiModelTest {
     }
 
     /**
-     * Tests that replaceIssueLabels called the Model with the same id as the argument
-     * repoId and invoke replaceIssueLabels on that Model
+     * Tests that replaceIssueLabelsOnServer called the Model with the same id as the argument
+     * repoId and invoke replaceIssueLabelsOnServer on that Model
      */
     @Test
     public void replaceIssueLabels_successful() {
@@ -220,8 +220,8 @@ public class MultiModelTest {
     }
 
     /**
-     * Tests that replaceIssueAssignee called the Model with the same id as the argument
-     * repoId and invoke replaceIssueAssignee on that Model
+     * Tests that replaceIssueAssigneeOnServer called the Model with the same id as the argument
+     * repoId and invoke replaceIssueAssigneeOnServer on that Model
      */
     @Test
     public void replaceIssueAssignee_successful() {
