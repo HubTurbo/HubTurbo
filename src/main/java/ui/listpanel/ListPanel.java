@@ -217,10 +217,13 @@ public class ListPanel extends FilterPanel {
                         ui.getBrowserComponent().switchToTab(DISCUSSION_TAB);
                     }
 
-                    while (!ui.getBrowserComponent().isCurrentUrlPrDiscussion()) {
+                    Thread jumpToCommentOncePageLoaded = new Thread(() -> {
+                        while (!ui.getBrowserComponent().isCurrentUrlPrDiscussion()) {
                         // wait
-                    }
-                    ui.getBrowserComponent().jumpToComment();
+                        }
+                        ui.getBrowserComponent().jumpToComment();
+                    });
+                    jumpToCommentOncePageLoaded.start();
                 }
 
             }

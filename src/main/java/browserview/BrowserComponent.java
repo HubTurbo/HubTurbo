@@ -517,7 +517,7 @@ public class BrowserComponent {
     }
 
     /**
-     * Switch to the specified tab in GitHub PR page
+     * Switches to the specified tab in GitHub PR page
      * @param tabName Either GithubPageElements.DISCUSSION_TAB, GithubPageElements.COMMITS_TAB
      *                or GithubPageElements.FILES_TAB
      */
