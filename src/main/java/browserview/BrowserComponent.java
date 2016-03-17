@@ -508,12 +508,16 @@ public class BrowserComponent {
         return driver != null && GitHubURL.isUrlIssue(driver.getCurrentUrl());
     }
 
+    public boolean isCurrentUrlPrDiscussion() {
+        return driver != null && GitHubURL.isPullRequestDiscussionPageLoaded(driver.getCurrentUrl());
+    }
+
     public String getCurrentUrl() {
         return driver.getCurrentUrl();
     }
 
     /**
-     * Switch to the tabs in GitHub PR page
+     * Switch to the specified tab in GitHub PR page
      * @param tabName Either GithubPageElements.DISCUSSION_TAB, GithubPageElements.COMMITS_TAB
      *                or GithubPageElements.FILES_TAB
      */
@@ -532,12 +536,17 @@ public class BrowserComponent {
                     tabIndex = 3;
                     break;
                 default:
+                    assert false;
                     return;
             }
 
             String xpath = "//*[@id=\"js-repo-pjax-container\"]/div[2]/div[1]/div/div[2]/div[2]/nav/a[%d]";
-            driver.findElement(By.xpath(String.format(xpath, tabIndex))).click();
+            clickElementByXpath(String.format(xpath, tabIndex));
         }
+    }
+
+    private void clickElementByXpath(String xpath) {
+        driver.findElement(By.xpath(xpath)).click();
     }
 
     public Optional<Integer> getPRNumberFromIssue() {

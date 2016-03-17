@@ -145,7 +145,7 @@ public class ListPanel extends FilterPanel {
             TurboIssue issue = listView.getItems().get(index).getIssue();
             if (!rightKey) {
                 ui.triggerEvent(
-                    new IssueSelectedEvent(issue.getRepoId(), issue.getId(), panelIndex, issue.isPullRequest())
+                        new IssueSelectedEvent(issue.getRepoId(), issue.getId(), panelIndex, issue.isPullRequest())
                 );
             }
             // Save the stored comment count as its own comment count.
@@ -212,10 +212,17 @@ public class ListPanel extends FilterPanel {
             if (NEW_COMMENT.match(event)) {
                 if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
                     ui.getBrowserComponent().switchToTab(DISCUSSION_TAB);
-                } else if (ui.getBrowserComponent().isCurrentUrlIssue()) {
-                    ui.getBrowserComponent().switchToTab(DISCUSSION_TAB);
+                } else {
+                    if (!ui.getBrowserComponent().isCurrentUrlPrDiscussion()) {
+                        ui.getBrowserComponent().switchToTab(DISCUSSION_TAB);
+                    }
+
+                    while (!ui.getBrowserComponent().isCurrentUrlPrDiscussion()) {
+                        // wait
+                    }
                     ui.getBrowserComponent().jumpToComment();
                 }
+
             }
             if (PR_FILES_CHANGED.match(event)
                 && KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
