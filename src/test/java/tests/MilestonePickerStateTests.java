@@ -30,14 +30,14 @@ public class MilestonePickerStateTests {
     @Test
     public void toggleMilestone_noMilestone_milestoneAssigned() {
         MilestonePickerState state = prepareUnassignedState();
-        state.toggleMilestone("milestone1");
+        state.toggleExactMatchMilestone("milestone1");
         assertEquals(true, state.getCurrentMilestonesList().get(0).isSelected());
     }
 
     @Test
     public void toggleMilestone_hasMilestone_milestoneReplaced() {
         MilestonePickerState state = prepareAssignedState();
-        state.toggleMilestone("milestone1");
+        state.toggleExactMatchMilestone("milestone1");
         assertEquals(true, state.getCurrentMilestonesList().get(0).isSelected());
         assertEquals(false, state.getCurrentMilestonesList().get(1).isSelected());
     }
@@ -45,7 +45,7 @@ public class MilestonePickerStateTests {
     @Test
     public void toggleMilestone_hasMilestone_milestoneUnassigned() {
         MilestonePickerState state = prepareAssignedState();
-        state.toggleMilestone("milestone2");
+        state.toggleExactMatchMilestone("milestone2");
         assertEquals(false, state.getCurrentMilestonesList().get(0).isSelected());
         assertEquals(false, state.getCurrentMilestonesList().get(1).isSelected());
     }

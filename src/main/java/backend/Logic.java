@@ -339,8 +339,8 @@ public class Logic {
     }
 
     /**
-     * Handles the result of updating an issue's milestone on server. Current implementation includes
-     * reverting back to the original labels locally if the server update failed.
+     * Handles the result of updating an issue's milestone on server.
+     * Locally reverts back to the original labels if the server update fails.
      * @param isUpdateSuccessful
      * @param localModifiedIssue
      * @param originalMilestone

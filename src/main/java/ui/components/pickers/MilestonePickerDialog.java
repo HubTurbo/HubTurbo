@@ -29,12 +29,7 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
     private MilestonePickerState state;
 
     /**
-     * Constructor to create a MilestonePickerDialog
-     *
      * The issue and the originalMilestones list provided should come from the same repository
-     * @param stage
-     * @param issue
-     * @param milestones
      */
     public MilestonePickerDialog(Stage stage, TurboIssue issue, List<TurboMilestone> milestones) {
         initOwner(stage);
@@ -105,12 +100,16 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Integer>> {
         return node;
     }
 
+    /**
+     * This will cause
+     * @param milestoneName
+     */
     private void handleMouseClick(String milestoneName) {
         // required since clearing inputField will change the reference to the state
         MilestonePickerState curState = state;
         inputField.clear();
         inputField.setDisable(true);
-        curState.toggleMilestone(milestoneName);
+        curState.toggleExactMatchMilestone(milestoneName);
         state = curState;
         refreshUI(state);
     }
