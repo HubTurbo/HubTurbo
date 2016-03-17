@@ -8,8 +8,7 @@ import static ui.components.KeyboardShortcuts.SWITCH_BOARD;
 
 import filter.expression.QualifierType;
 import javafx.application.Platform;
-import ui.GUIController;
-import ui.GuiElement;
+import ui.*;
 import ui.components.PanelMenuBar;
 import backend.resource.TurboUser;
 import filter.FilterException;
@@ -24,8 +23,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.control.Label;
 import javafx.scene.text.Text;
 import javafx.scene.input.KeyEvent;
-import ui.TestController;
-import ui.UI;
 import ui.components.FilterTextField;
 import util.events.*;
 import util.events.testevents.UIComponentFocusEvent;
@@ -133,7 +130,7 @@ public abstract class FilterPanel extends AbstractPanel {
                     applyStringFilter(text);
                     return text;
                 });
-        filterTextField.setId(guiController.getDefaultRepo() + "_col" + panelIndex + "_filterTextField");
+        filterTextField.setId(IdGenerator.getPanelFilterTextFieldId(guiController.getDefaultRepo(), panelIndex));
         filterTextField.setMinWidth(388);
         filterTextField.setMaxWidth(388);
 

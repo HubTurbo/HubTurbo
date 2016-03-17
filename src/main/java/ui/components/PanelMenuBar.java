@@ -17,6 +17,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import ui.GUIController;
+import ui.IdGenerator;
 import ui.UI;
 import ui.issuepanel.FilterPanel;
 import util.events.ShowRenamePanelEvent;
@@ -74,7 +75,7 @@ public class PanelMenuBar extends HBox {
         HBox nameArea = new HBox();
 
         nameText = new Text(panelName);
-        nameText.setId(guiController.getDefaultRepo() + "_col" + panel.panelIndex + "_nameText");
+        nameText.setId(IdGenerator.getPanelNameAreaId(guiController.getDefaultRepo(), panel.panelIndex));
         nameText.setWrappingWidth(NAME_DISPLAY_WIDTH);
 
         nameBox = new HBox();
