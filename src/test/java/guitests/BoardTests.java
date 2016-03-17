@@ -1,24 +1,14 @@
 package guitests;
 
-
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
-import javafx.stage.Stage;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 import prefs.Preferences;
 import ui.TestController;
 import ui.UI;
 import ui.issuepanel.PanelControl;
-import util.PlatformEx;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.loadui.testfx.Assertions.assertNodeExists;
 import static org.loadui.testfx.controls.Commons.hasText;
 
 public class BoardTests extends UITest {
