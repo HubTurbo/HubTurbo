@@ -11,11 +11,11 @@
    </padding>
    <children>
       <Label fx:id="issuepickerTitle" maxWidth="400.0" style="-fx-font-size: 125%;" text="Selected Issue(s)" />
-      <FlowPane fx:id="selectedIssues" hgap="5.0" vgap="5.0">
+      <VBox fx:id="selectedIssues" prefHeight="100.0" spacing="10.0" VBox.vgrow="NEVER">
          <padding>
             <Insets bottom="10.0" top="20.0" />
          </padding>
-      </FlowPane>
+      </VBox>
       <TextField fx:id="issuepickerQueryField" prefColumnCount="30" />
       <ScrollPane fx:id="issuepickerScrollPane" fitToWidth="true" maxHeight="500.0" prefHeight="500.0">
          <VBox.margin>

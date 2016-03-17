@@ -13,6 +13,7 @@ public class IssuePickerState {
 
     private List<TurboIssue> selectedIssues;
     private List<TurboIssue> suggestedIssues;
+    private Optional<TurboIssue> currentSuggestion = Optional.empty();
 
     private final List<TurboIssue> allIssues;
 
@@ -36,9 +37,11 @@ public class IssuePickerState {
         return suggestedIssues;
     }
 
+    /**
+     * @return current suggestion if there are matches
+     */
     public Optional<TurboIssue> getCurrentSuggestion() {
-        if (suggestedIssues.isEmpty()) return Optional.empty();
-        return Optional.of(suggestedIssues.get(0));
+        return currentSuggestion;
     }
 
     /**
@@ -46,17 +49,19 @@ public class IssuePickerState {
      * @param userInput 
      */
     private final void update(String userInput) {
-        if (userInput.isEmpty()) return;
-
         List<String> confirmedKeywords = getConfirmedKeywords(userInput);
+
         for (String confirmedKeyword : confirmedKeywords) {
             // Update selected issues with first match of query with all issues
-            updateSelectedIssues(Optional.ofNullable(TurboIssue.getMatchedIssues(allIssues, confirmedKeyword).get(0)));
+            TurboIssue.getMatchedIssues(allIssues, confirmedKeyword)
+                .stream().findFirst().ifPresent(this::updateSelectedIssues);
         }
 
         Optional<String> keywordInProgress = getKeywordInProgress(userInput);
         if (keywordInProgress.isPresent()) {
             updateSuggestedIssues(allIssues, keywordInProgress.get());
+            // Update suggestion only if the user input is not empty
+            if (!userInput.isEmpty()) currentSuggestion = suggestedIssues.stream().findFirst();
         }
     }
 
@@ -65,10 +70,8 @@ public class IssuePickerState {
      * Updates selected issues if issue is present
      * @param issue
      */
-    private void updateSelectedIssues(Optional<TurboIssue> issue) {
-        if (!issue.isPresent()) return;
+    public void updateSelectedIssues(TurboIssue selectedIssue) {
        
-        TurboIssue selectedIssue = issue.get();
         if (selectedIssues.contains(selectedIssue)) {
             selectedIssues.remove(selectedIssue);
         } else {

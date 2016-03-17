@@ -39,7 +39,6 @@ public class IssuePickerDialog extends Dialog<List<String>> {
     private static final Insets GROUP_PAD = new Insets(0, 0, 10, 10);
     private static final String TITLE = "Issue Picker";
     private static final String FXML_PATH = "fxml/IssuePickerView.fxml";
-    private static final String NO_SELECTED_ISSUES = "No currently selected issues. ";
     private static final Logger logger = HTLog.get(IssuePickerDialog.class);
 
     private final MultiModel models;
@@ -52,7 +51,7 @@ public class IssuePickerDialog extends Dialog<List<String>> {
     @FXML
     private Label issuepickerTitle;
     @FXML
-    private FlowPane selectedIssues;
+    private VBox selectedIssues;
     @FXML
     private TextField issuepickerQueryField;
     @FXML
@@ -115,13 +114,9 @@ public class IssuePickerDialog extends Dialog<List<String>> {
         Map<String, FlowPane> repoContent = getRepoContent(chosenIssues, currentSuggestion);
 
         repoContent.entrySet().forEach(entry -> {
-            selectedIssues.getChildren().addAll(
-                    createRepoTitle(entry.getKey()), entry.getValue());
+            entry.getValue().getChildren().add(0, createRepoTitle(entry.getKey()));
+            selectedIssues.getChildren().addAll(entry.getValue());
         });
-
-        if (selectedIssues.getChildren().isEmpty()) {
-            selectedIssues.getChildren().add(createTextLabel(NO_SELECTED_ISSUES));
-        }
     }
 
     private void populateSuggestedIssues(List<TurboIssue> matchedIssues) {
@@ -142,7 +137,9 @@ public class IssuePickerDialog extends Dialog<List<String>> {
     private Node processSuggestedIssue(TurboIssue issue) {
         GuiElement element = new GuiElement(issue, models.getLabelsOfIssue(issue), models.getMilestoneOfIssue(issue),
                                             models.getAssigneeOfIssue(issue), models.getAuthorOfIssue(issue));
-        return new IssueCard(element);
+        IssueCard card = new IssueCard(element);
+        card.setOnMouseClicked(e -> handleIssueClick(issue, card));
+        return card;
     }
 
 
@@ -156,6 +153,12 @@ public class IssuePickerDialog extends Dialog<List<String>> {
         populatePanes(state);
     }
     
+    private void handleIssueClick(TurboIssue issue, IssueCard card) {
+        issuepickerQueryField.setDisable(true);
+        state.updateSelectedIssues(issue);
+        populatePanes(state);
+    }
+
     // UI helper methods
 
     private void createMainLayout() {
@@ -176,16 +179,12 @@ public class IssuePickerDialog extends Dialog<List<String>> {
         // defines what happens when user confirms/presses enter
         setResultConverter(dialogButton -> {
             if (dialogButton == confirmButtonType) {
+                // Confirms final issue that is suggested to user upon confirmation
+                if (!issuepickerQueryField.isDisabled()) issuepickerQueryField.appendText(";");
                 return state.getSelectedIssues().stream().map(TurboIssue::toString).collect(Collectors.toList());
             }
             return null;
         });
-    }
-
-    private Label createTextLabel(String input) {
-        Label label = new Label(input);
-        label.setPadding(new Insets(2, 5, 2, 5));
-        return label;
     }
 
     private FlowPane createRepoPane(Insets padding) {
@@ -197,7 +196,7 @@ public class IssuePickerDialog extends Dialog<List<String>> {
     }
 
     private Label createRepoTitle(String name) {
-        Label repoName = new Label(name);
+        Label repoName = new Label(name + ": ");
         repoName.setPadding(new Insets(0, 5, 5, 0));
         repoName.setMaxWidth(ELEMENT_MAX_WIDTH - 10);
         repoName.setStyle("-fx-font-size: 110%; -fx-font-weight: bold; ");
@@ -216,10 +215,7 @@ public class IssuePickerDialog extends Dialog<List<String>> {
             });
         
         // adds suggested issue if not present in selected issues
-        if (suggestion.isPresent() && !chosenIssues.contains(suggestion.get())) {
-            addCurrentSuggestion(repoContent, suggestion.get());
-        }
-
+        if (canAddSuggestion(chosenIssues, suggestion)) addCurrentSuggestion(repoContent, suggestion.get());
         return repoContent;
     }
 
@@ -239,5 +235,16 @@ public class IssuePickerDialog extends Dialog<List<String>> {
             return;
         }
         repoContent.get(issue.getRepoId()).getChildren().add(styledIssue);
+    }
+    
+    /**
+     * Suggestion not added if text field is disabled because user has not confirmed addition of the issue
+     * @param chosenIssues
+     * @param suggestion
+     * @return
+     */
+    private boolean canAddSuggestion(List<TurboIssue> chosenIssues, Optional<TurboIssue> suggestion) {
+        return !issuepickerQueryField.isDisabled() 
+            && suggestion.isPresent() && !chosenIssues.contains(suggestion.get());
     }
 }

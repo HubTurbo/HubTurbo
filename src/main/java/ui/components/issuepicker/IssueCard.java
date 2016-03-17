@@ -37,6 +37,7 @@ public class IssueCard extends VBox {
     }
 
     private void setup() {
+        setupMainIssueCard();
         TurboIssue issue = guiElement.getIssue();
         Text issueTitle = new Text("#" + issue.getId() + " " + issue.getTitle());
         issueTitle.setWrappingWidth(CARD_WIDTH);
@@ -58,6 +59,10 @@ public class IssueCard extends VBox {
         setSpacing(1);
 
         getChildren().addAll(issueTitle, issueDetails, authorAssigneeBox);
+    }
+
+    private void setupMainIssueCard() {
+        return;
     }
 
     private void setupIssueDetailsBox() {
@@ -156,5 +161,4 @@ public class IssueCard extends VBox {
         }
         return userAvatar;
     }
-
 }
