@@ -131,7 +131,7 @@ public class TurboMilestone {
     }
 
     /**
-     * Sort a List<TurboMilestone> by due date. The sorting algorithm used is stable
+     * Sorts a List<TurboMilestone> by due date. The sorting algorithm used is stable
      * (i.e. relative ordering of 2 milestones with the same due date will be retained)
      */
     public static List<TurboMilestone> sortByDueDate(List<TurboMilestone> milestones) {
