@@ -1,6 +1,8 @@
 package ui;
 
-public class IdGenerator {
+public final class IdGenerator {
+    private IdGenerator() {}
+
     public static String getPanelCellId(String repoId, int panelIndex, int issueId) {
         return repoId + "_col" + panelIndex + "_" + issueId;
     }
