@@ -75,7 +75,7 @@ public class ListPanel extends FilterPanel {
     }
 
     /**
-     * Creates an Graphic element(HBox) containing a label that show the total no of issues in the ListPanel.
+     * Creates a Graphic element(HBox) containing a label that show the total no of issues in the ListPanel.
      * @return HBox Instance to be added to the ListPanel.
      */
     private HBox createPanelFooter() {
