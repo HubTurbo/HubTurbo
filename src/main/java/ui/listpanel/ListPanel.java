@@ -213,28 +213,35 @@ public class ListPanel extends FilterPanel {
                 if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
                     ui.getBrowserComponent().switchToTab(DISCUSSION_TAB);
                 } else {
-                    if (!ui.getBrowserComponent().isCurrentUrlPrDiscussion()) {
+                    if (!ui.getBrowserComponent().isCurrentUrlIssue()) {
+                        openPageOfCurrentlySelectedIssue();
+                    } else if (!ui.getBrowserComponent().isCurrentUrlDiscussion()) {
                         ui.getBrowserComponent().switchToTab(DISCUSSION_TAB);
                     }
 
-                    Thread jumpToCommentOncePageLoaded = new Thread(() -> {
-                        while (!ui.getBrowserComponent().isCurrentUrlPrDiscussion()) {
-                        // wait
-                        }
-                        ui.getBrowserComponent().jumpToComment();
-                    });
-                    jumpToCommentOncePageLoaded.start();
+                    ui.getBrowserComponent().waitUntilDiscussionPageLoaded();
+                    ui.getBrowserComponent().jumpToComment();
                 }
 
             }
             if (PR_FILES_CHANGED.match(event)
                 && KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
 
+                if (!ui.getBrowserComponent().isCurrentUrlIssue()) {
+                    openPageOfCurrentlySelectedIssue();
+                    ui.getBrowserComponent().waitUntilDiscussionPageLoaded();
+                }
+
                 ui.getBrowserComponent().switchToTab(FILES_TAB);
                 event.consume();
             }
             if (PR_COMMITS.match(event)
                 && KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
+
+                if (!ui.getBrowserComponent().isCurrentUrlIssue()) {
+                    openPageOfCurrentlySelectedIssue();
+                    ui.getBrowserComponent().waitUntilDiscussionPageLoaded();
+                }
 
                 ui.getBrowserComponent().switchToTab(COMMITS_TAB);
                 event.consume();
@@ -492,5 +499,10 @@ public class ListPanel extends FilterPanel {
         HashSet<String> allReposInFilterExpr =
                 Qualifier.getMetaQualifierContent(getCurrentFilterExpression(), QualifierType.REPO);
         return allReposInFilterExpr.isEmpty();
+    }
+
+    private void openPageOfCurrentlySelectedIssue() {
+        TurboIssue issue = getSelectedElement().get().getIssue();
+        ui.getBrowserComponent().showIssue(issue.getRepoId(), issue.getId(), issue.isPullRequest(), false);
     }
 }
