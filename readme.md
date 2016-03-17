@@ -1,4 +1,4 @@
-# HubTurbo [![Build Status](https://img.shields.io/travis/HubTurbo/HubTurbo.svg?style=flat)](https://travis-ci.org/HubTurbo/HubTurbo) [![Code Coverage](https://img.shields.io/coveralls/HubTurbo/HubTurbo.svg?style=flat)](https://coveralls.io/r/HubTurbo/HubTurbo)
+# HubTurbo [![Build Status](https://travis-ci.org/HubTurbo/HubTurbo.svg?branch=master)](https://travis-ci.org/HubTurbo/HubTurbo) [![Code Coverage](https://coveralls.io/repos/github/HubTurbo/HubTurbo/badge.svg?branch=master)](https://coveralls.io/r/HubTurbo/HubTurbo)
 
 ### A desktop companion for GitHub issue tracker.
 

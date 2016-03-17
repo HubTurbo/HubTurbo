@@ -15,6 +15,7 @@ Don't worry, there isn't much syntax to learn!
 - [Application](#application)
 - [Qualifiers](#qualifiers)
 - [Incompatibilities](#incompatibilities)
+- [Cheatsheet](#cheatsheet)
 
 ## Basics
 
@@ -290,7 +291,7 @@ Available sorting criteria:
 - `id`: sorts by issue id (in ascending order)
 - `assignee`: sorts by assignee (in alphabetical order of assignees' names). Aliases: `a`
 - `state`: sorts by status (open issues followed by closed issues). Aliases: `status`, `st`
-- `milestone`: sorts by milestone (latest due date first). Aliases: `m`
+- `milestone`: sorts by milestone (latest due date first. In case of milestone without due date, open milestone without due date is considered to have a due date very far in the future, while closed milestone without due date is considered to have a due date very far in the past). Aliases: `m`
 - Anything else is interpreted as a *label group*: sorts by the label group specified in alphabetical order. Label groups can be disambiguated by appending a `.`, if there is a label group that clashes with one of the above names. For example, `sort:priority.` will sort issues by their priorities in alphabetical order (issues with `high` priority will come first, followed by `low` priority, then `medium` priority)
 
 ### count
@@ -321,3 +322,27 @@ HubTurbo's filter system is incompatible with GitHub's in a number of ways.
     + `closed:[date range]`
     + `mentions:[string]`
     + `commenter:[string]`
+
+## Cheatsheet
+|Qualifiers                    |Aliases               |Keywords                                                                                                                              |
+|------------------------------|----------------------|--------------------------------------------------------------------------------------------------------------------------------------|
+|[`assignee`](#assignee)       |`as`                  |                                                                                                                                      |
+|[`author`](#author)           |`au`, `creator`       |                                                                                                                                      |
+|[`count`](#count)             |`cn`                  |                                                                                                                                      |
+|[`created`](#created)         |`cr`                  |                                                                                                                                      |
+|[`description`](#description) |`body`, `de`, `desc`  |                                                                                                                                      |
+|[`has`](#has)                 |`h`                   |`label` (`l`), `milestones` (`m`), `assignee` (`as`)                                                                                  |
+|[`id`](#id)                   |                      |                                                                                                                                      |
+|[`in`](#in)                   |                      |                                                                                                                                      |
+|[`involves`](#involves)       |`user`                |                                                                                                                                      |
+|[`is`](#is)                   |                      |`open` (`o`), `closed` (`c`), `pr`, `merged` (`mg`), `unmerged` (`um`), `read` (`rd`), `unread` (`ur`)                                |
+|[`keyword`](#keyword)         |                      |                                                                                                                                      |
+|[`label`](#label)             |`l`                   |                                                                                                                                      |
+|[`milestone`](#milestone)     |`m`                   |`current` (`curr`)                                                                                                                    |
+|[`no`](#no)                   |`n`                   |                                                                                                                                      |
+|[`repo`](#repo)               |`r`                   |                                                                                                                                      |
+|[`sort`](#sort)               |`s`                   |`comments` (`cm`), `repo` (`r`), `updated` (`u`), `date` (`d`), `id`, `assignee` (`as`), `state` (`status`, `st`), `milestones` (`m`) |
+|[`state`](#state)             |`status`, `st`        |`open` (`o`), `closed` (`c`)                                                                                                          |
+|[`title`](#title)             |`t`                   |                                                                                                                                      |
+|[`type`](#type)               |`ty`                  |`issue` (`i`), `pullrequest` (`pr`, `p`)                                                                                              |
+|[`updated`](#updated)         |`u`                   |                                                                                                                                      |
