@@ -46,7 +46,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static ui.components.KeyboardShortcuts.SWITCH_DEFAULT_REPO;
-import static ui.components.KeyboardShortcuts.SHOW_ISSUES;
+import static ui.components.KeyboardShortcuts.SHOW_ISSUE_PICKER;
 
 public class UI extends Application implements EventDispatcher {
 
@@ -360,7 +360,7 @@ public class UI extends Application implements EventDispatcher {
             if (SWITCH_DEFAULT_REPO.match(event)) {
                 switchDefaultRepo();
             }
-            if (SHOW_ISSUES.match(event)) {
+            if (SHOW_ISSUE_PICKER.match(event)) {
                 triggerEvent(new ShowIssuePickerEvent(logic.getModels().getIssues(), true));
             }
         });

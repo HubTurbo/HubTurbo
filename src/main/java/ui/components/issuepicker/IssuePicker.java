@@ -16,11 +16,11 @@ public class IssuePicker {
     public IssuePicker(UI ui, Stage stage) {
         this.stage = stage;
         ui.registerEvent((ShowIssuePickerEventHandler) e -> 
-            Platform.runLater(() -> showIssuePicker(ui.logic.getModels(), e.isStandalone)));
+            Platform.runLater(() -> showIssuePicker(ui.logic.getModels())));
     }
 
-    private Optional<List<String>> showIssuePicker(MultiModel models, boolean isStandalone) {
-        IssuePickerDialog issuePickerDialog = new IssuePickerDialog(stage, models, isStandalone);
+    private Optional<List<String>> showIssuePicker(MultiModel models) {
+        IssuePickerDialog issuePickerDialog = new IssuePickerDialog(stage, models);
         // show IssuePickerDialog and wait for result
         return issuePickerDialog.showAndWait();
 

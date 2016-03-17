@@ -70,6 +70,8 @@ public final class KeyboardShortcuts {
     public static final KeyCodeCombination SWITCH_DEFAULT_REPO =
             new KeyCodeCombination(KeyCode.R, KeyCombination.SHORTCUT_DOWN);
     public static final KeyCodeCombination SHOW_ISSUES =
+            new KeyCodeCombination(KeyCode.I);
+    public static final KeyCodeCombination SHOW_ISSUE_PICKER =
             new KeyCodeCombination(KeyCode.I, KeyCombination.SHORTCUT_DOWN);
     public static final KeyCodeCombination SWITCH_BOARD = 
             new KeyCodeCombination(KeyCode.B, KeyCombination.SHORTCUT_DOWN);

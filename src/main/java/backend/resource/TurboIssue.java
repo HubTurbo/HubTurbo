@@ -12,6 +12,7 @@ import util.Utility;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -340,14 +341,25 @@ public class TurboIssue {
     }
 
     /**
+     * Matching is done by matching all words separated by space in query
      * @param issues
      * @param query
-     * @return list of issues that contain given query 
+     * @return list of issues that contains the query
      */
     public static List<TurboIssue> getMatchedIssues(List<TurboIssue> issues, String query){
+        List<String> queries = Arrays.asList(query.split("\\s"));
         return issues.stream()
-            .filter(issue -> issue.toString().contains(query) || issue.getTitle().contains(query))
+            .filter(i -> Utility.containsIgnoreCaseMultipleWords(i.getTitle(), queries))
             .collect(Collectors.toList());
+    }
+
+    /**
+     * @param issues
+     * @param query
+     * @return first issue that matches the given query 
+     */
+    public static Optional<TurboIssue> getFirstMatchingIssue(List<TurboIssue> issues, String query) {
+        return getMatchedIssues(issues, query).stream().findFirst();
     }
 
     @SuppressWarnings("unused")

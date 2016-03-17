@@ -316,6 +316,16 @@ public final class Utility {
         ifEmpty.run();
         return Optional.empty();
     }
+    
+    /**
+     * Checks that the source contains all words in queries
+     * @param source
+     * @param queries
+     * @return
+     */
+    public static boolean containsIgnoreCaseMultipleWords(String source, List<String> queries) {
+        return queries.stream().allMatch(query -> Utility.containsIgnoreCase(source, query));
+    }
 
     private Utility() {}
 }

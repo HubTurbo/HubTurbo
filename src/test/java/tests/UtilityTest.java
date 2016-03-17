@@ -1,6 +1,7 @@
 package tests;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static util.Utility.dateToLocalDateTime;
@@ -171,5 +172,15 @@ public class UtilityTest {
         assertEquals(true, convertedSet.contains(entry5.toLowerCase()));
 
 
+    }
+    
+    @Test
+    public void containsIgnoreCaseMultipleWords_partialMatchingQueries() {
+        assertFalse(Utility.containsIgnoreCaseMultipleWords("this is", Arrays.asList("is", "me")));
+    }
+
+    @Test
+    public void containsIgnoreCaseMultipleWords_allMatchingQueries() {
+        assertTrue(Utility.containsIgnoreCaseMultipleWords("this is me", Arrays.asList("is", "me")));
     }
 }

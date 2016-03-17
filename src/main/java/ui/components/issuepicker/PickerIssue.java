@@ -50,7 +50,27 @@ public class PickerIssue extends TurboIssue {
     private String getStyle() {
         String style =  String.format("-fx-background-color: #%s; ", DEFAULT_COLOR);
 
-        if (isFaded) style+= String.format("-fx-opacity: %s; ", FADED_OPACITY);
+        if (isFaded) style += String.format("-fx-opacity: %s; ", FADED_OPACITY);
         return style;
+    }
+
+    /**
+     * This isn't unnecessary as fields are added, but are not taken into account for equality.
+     * @return
+     */
+    @Override
+    @SuppressWarnings("PMD")
+    public boolean equals(Object o) {
+        return super.equals(o);
+    }
+
+    /**
+     * This isn't unnecessary as fields are added, but are not taken into account for equality.
+     * @return
+     */
+    @Override
+    @SuppressWarnings("PMD")
+    public int hashCode() {
+        return super.hashCode();
     }
 }

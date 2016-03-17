@@ -20,7 +20,6 @@ import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
@@ -49,18 +48,14 @@ public class IssuePickerDialog extends Dialog<List<String>> {
     @FXML
     private VBox issuepickerLayout;
     @FXML
-    private Label issuepickerTitle;
-    @FXML
     private VBox selectedIssues;
     @FXML
     private TextField issuepickerQueryField;
     @FXML
-    private ScrollPane issuepickerScrollPane;
-    @FXML
     private VBox suggestedIssues;
 
 
-    public IssuePickerDialog(Stage stage, MultiModel models, boolean isStandalone) {
+    public IssuePickerDialog(Stage stage, MultiModel models) {
         this.models = models;
         this.allIssues = models.getIssues();
 
@@ -82,7 +77,7 @@ public class IssuePickerDialog extends Dialog<List<String>> {
         createButtons();
 
         state = new IssuePickerState(issues, "");
-        populatePanes(state);
+        populateSuggestedIssues(allIssues);
     }
 
     private void initialiseDialog(Stage stage) {
