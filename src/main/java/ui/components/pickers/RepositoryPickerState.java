@@ -19,10 +19,20 @@ public class RepositoryPickerState {
 
     public List<String> getMatchingRepositories(String query, MatchingMode matchingMode) {
         return repositories.stream()
-                .filter(repo -> repo.isMatching(query, matchingMode))
+                .filter(repo -> isMatching(repo, query, matchingMode))
                 .sorted((a, b) -> a.getRepositoryId().compareTo(b.getRepositoryId()))
                 .map(repo -> repo.getRepositoryId())
                 .collect(Collectors.toList());
+    }
+
+    private boolean isMatching(PickerRepository repo, String query, MatchingMode matchingMode) {
+        if (matchingMode == MatchingMode.PREFIX_MATCHING) {
+            return repo.getRepositoryId().toLowerCase().startsWith(query.toLowerCase());
+        } else if (matchingMode == MatchingMode.SUBSTRING_MATCHING) {
+            return repo.getRepositoryId().toLowerCase().contains(query.toLowerCase());
+        }
+        assert false : "MatchingMode not supported";
+        return false;
     }
 
 }

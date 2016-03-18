@@ -1,9 +1,13 @@
 package ui.components.pickers;
 
+import javafx.scene.Node;
+import javafx.scene.control.Label;
+
 /**
- * A class used to store a repo with a capability of deciding whether
- * a particular query suits this repo or not based on the mode of
- * matching.
+ * This class is used to represent a repo in RepositoryPicker.
+ *
+ * It contains selected attribute to indicate whether the repo is selected.
+ * These attributes are used in order to produce appropriate label through getNode()
  */
 public class PickerRepository {
 
@@ -17,13 +21,8 @@ public class PickerRepository {
         return repositoryId;
     }
 
-    public boolean isMatching(String query, MatchingMode matchingMode) {
-        if (matchingMode == MatchingMode.PREFIX_MATCHING) {
-            return repositoryId.startsWith(query);
-        } else if (matchingMode == MatchingMode.SUBSTRING_MATCHING) {
-            return repositoryId.contains(query);
-        }
-        assert false : "MatchingMode is not supported.";
-        return false;
+    public Node getNode() {
+        Label repoLabel = new Label(repositoryId);
+        return repoLabel;
     }
 }
