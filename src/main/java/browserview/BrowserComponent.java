@@ -568,16 +568,15 @@ public class BrowserComponent {
         return Optional.empty();
     }
 
+    /**
+     * Wait for discussion page (for issue or PR) to be loaded.
+     */
     public void waitUntilDiscussionPageLoaded() {
-        for (int i = 0; i < WAIT_PAGE_LOAD_MAX_RETRY; i++) {
-            if (!isCurrentUrlDiscussion()) {
-                try {
-                    Thread.sleep(WAIT_PAGE_LOAD_SLEEP_TIME);
-                } catch (IllegalArgumentException | InterruptedException e) {
-                    logger.warn(e);
-                }
-            } else {
-                return;
+        for (int i = 0; i < WAIT_PAGE_LOAD_MAX_RETRY && !isCurrentUrlDiscussion(); i++) {
+            try {
+                Thread.sleep(WAIT_PAGE_LOAD_SLEEP_TIME);
+            } catch (IllegalArgumentException | InterruptedException e) {
+                logger.warn(e);
             }
         }
     }
