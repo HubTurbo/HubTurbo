@@ -4,7 +4,6 @@ import com.google.common.eventbus.EventBus;
 import org.junit.Test;
 import util.events.*;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 

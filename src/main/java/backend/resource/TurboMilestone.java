@@ -115,34 +115,29 @@ public class TurboMilestone {
     }
 
     /**
-     * Condition: milestone must have due dates
+     * Returns a stable TurboMilestone comparator by due date.
+     *
+     * Open milestones without due date are considered to have a due date very far in the future. On the contrary,
+     * closed milestones without due date are considered to have a due date very far in the past.
+     *
+     * Milestones with due dates are considered in between, considered according to their due dates.
      */
     public static Comparator<TurboMilestone> getDueDateComparator() {
         return (a, b) -> {
-            assert a.getDueDate().isPresent();
-            assert b.getDueDate().isPresent();
-            LocalDate aDueDate = a.getDueDate().get();
-            LocalDate bDueDate = b.getDueDate().get();
+            LocalDate aDueDate = a.getDueDate().orElse(a.isOpen() ? LocalDate.MAX : LocalDate.MIN);
+            LocalDate bDueDate = b.getDueDate().orElse(b.isOpen() ? LocalDate.MAX : LocalDate.MIN);
             return aDueDate.compareTo(bDueDate);
         };
     }
 
     /**
-     * Sort a List<TurboMilestone> by due date. Milestones without due date are considered to
-     * have an imaginary due date in the far future. The sorting algorithm used is stable
+     * Sorts a List<TurboMilestone> by due date. The sorting algorithm used is stable
      * (i.e. relative ordering of 2 milestones with the same due date will be retained)
      */
     public static List<TurboMilestone> sortByDueDate(List<TurboMilestone> milestones) {
-        List<TurboMilestone> milestonesWithDueDate = milestones.stream()
-                .filter(ms -> ms.getDueDate().isPresent())
-                .sorted(getDueDateComparator())
+        return milestones.stream()
+                .sorted(TurboMilestone.getDueDateComparator())
                 .collect(Collectors.toList());
-        List<TurboMilestone> milestonesWithoutDueDate = milestones.stream()
-                .filter(ms -> !ms.getDueDate().isPresent())
-                .collect(Collectors.toList());
-        List<TurboMilestone> result = milestonesWithDueDate;
-        result.addAll(milestonesWithoutDueDate);
-        return result;
     }
 
     @Override
