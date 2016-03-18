@@ -12,9 +12,11 @@ import java.util.Optional;
 
 import filter.expression.QualifierType;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
 import org.apache.logging.log4j.Logger;
@@ -45,6 +47,8 @@ public class ListPanel extends FilterPanel {
     private final HashMap<Integer, Integer> issueCommentCounts = new HashMap<>();
     private final HashMap<Integer, Integer> issueNonSelfCommentCounts = new HashMap<>();
 
+    private Label totalLabel;
+
     // Context Menu
     private final ContextMenu contextMenu = new ContextMenu();
 
@@ -63,10 +67,21 @@ public class ListPanel extends FilterPanel {
         super(ui, guiController, parentPanelControl, panelIndex);
         this.ui = ui;
         this.guiController = guiController;
-
         listView = new IssueListView();
         setupListView();
         getChildren().add(listView);
+        getChildren().add(createPanelFooter());
+    }
+
+    /**
+     * Creates a Graphic element(HBox) containing a label that show the total no of issues in the ListPanel.
+     * @return HBox Instance to be added to the ListPanel.
+     */
+    private HBox createPanelFooter() {
+        HBox bottomDisplay = new HBox();
+        totalLabel = new Label("Total : - ");
+        bottomDisplay.getChildren().add(totalLabel);
+        return bottomDisplay;
     }
 
     /**
@@ -132,6 +147,16 @@ public class ListPanel extends FilterPanel {
 
         listView.restoreSelection();
         this.setId(guiController.getDefaultRepo() + "_col" + panelIndex);
+        updateFooter();
+
+
+    }
+
+    /**
+     * This function updates the information in the panel footer.
+     */
+    private void updateFooter() {
+        totalLabel.setText(String.format("Total: %d ", issueCount));
     }
 
     private void setupListView() {
@@ -145,7 +170,7 @@ public class ListPanel extends FilterPanel {
             TurboIssue issue = listView.getItems().get(index).getIssue();
             if (!rightKey) {
                 ui.triggerEvent(
-                    new IssueSelectedEvent(issue.getRepoId(), issue.getId(), panelIndex, issue.isPullRequest())
+                        new IssueSelectedEvent(issue.getRepoId(), issue.getId(), panelIndex, issue.isPullRequest())
                 );
             }
             // Save the stored comment count as its own comment count.
@@ -212,19 +237,36 @@ public class ListPanel extends FilterPanel {
             if (NEW_COMMENT.match(event)) {
                 if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
                     ui.getBrowserComponent().switchToTab(DISCUSSION_TAB);
-                } else if (ui.getBrowserComponent().isCurrentUrlIssue()) {
-                    ui.getBrowserComponent().switchToTab(DISCUSSION_TAB);
+                } else {
+                    if (!ui.getBrowserComponent().isCurrentUrlIssue()) {
+                        openPageOfCurrentlySelectedIssue();
+                    } else if (!ui.getBrowserComponent().isCurrentUrlDiscussion()) {
+                        ui.getBrowserComponent().switchToTab(DISCUSSION_TAB);
+                    }
+
+                    ui.getBrowserComponent().waitUntilDiscussionPageLoaded();
                     ui.getBrowserComponent().jumpToComment();
                 }
+
             }
             if (PR_FILES_CHANGED.match(event)
                 && KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
+
+                if (!ui.getBrowserComponent().isCurrentUrlIssue()) {
+                    openPageOfCurrentlySelectedIssue();
+                    ui.getBrowserComponent().waitUntilDiscussionPageLoaded();
+                }
 
                 ui.getBrowserComponent().switchToTab(FILES_TAB);
                 event.consume();
             }
             if (PR_COMMITS.match(event)
                 && KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
+
+                if (!ui.getBrowserComponent().isCurrentUrlIssue()) {
+                    openPageOfCurrentlySelectedIssue();
+                    ui.getBrowserComponent().waitUntilDiscussionPageLoaded();
+                }
 
                 ui.getBrowserComponent().switchToTab(COMMITS_TAB);
                 event.consume();
@@ -482,5 +524,10 @@ public class ListPanel extends FilterPanel {
         HashSet<String> allReposInFilterExpr =
                 Qualifier.getMetaQualifierContent(getCurrentFilterExpression(), QualifierType.REPO);
         return allReposInFilterExpr.isEmpty();
+    }
+
+    private void openPageOfCurrentlySelectedIssue() {
+        TurboIssue issue = getSelectedElement().get().getIssue();
+        ui.getBrowserComponent().showIssue(issue.getRepoId(), issue.getId(), issue.isPullRequest(), false);
     }
 }

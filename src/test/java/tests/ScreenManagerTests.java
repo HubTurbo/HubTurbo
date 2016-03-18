@@ -7,7 +7,6 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
 import ui.ScreenManager;
-import ui.UI;
 
 import java.awt.Rectangle;
 import javafx.geometry.Rectangle2D;
@@ -17,7 +16,6 @@ import java.util.List;
 import static org.mockito.Mockito.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
 
 public class ScreenManagerTests {
 
