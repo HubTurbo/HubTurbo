@@ -51,10 +51,12 @@ public class BrowserComponent {
     private static final int SWP_NOACTIVATE = 0x0010;
 
     /**
-     * The two variables below are used to wait for a webpage to load, where a wait consist of
-     * Thead.sleep() by sleep time, repeated until the webpage is loaded or max retry is reached.
+     * Specifies how many tries to wait for a web page to load
      */
     private static final int WAIT_PAGE_LOAD_MAX_RETRY = 20;
+    /**
+     * Specifies the duration between tries to wait for a web page to load
+     */
     private static final int WAIT_PAGE_LOAD_SLEEP_TIME = 10;
 
     private static HWND browserWindowHandle;
