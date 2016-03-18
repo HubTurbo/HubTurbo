@@ -2,7 +2,9 @@ package backend.control;
 
 import backend.RepoIO;
 import backend.control.operations.*;
+import backend.github.GitHubModelUpdatesData;
 import backend.resource.Model;
+import backend.resource.MultiModel;
 import backend.resource.TurboIssue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -10,35 +12,54 @@ import org.apache.logging.log4j.Logger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.*;
 
 
 /**
- * A means of repo-level synchronisation for select RepoIO operations.
+ * A means of repo-level synchronisation for select RepoIO operations. Only one instance of this class
+ * is available at any time availabel through {@code getRepoOpControl}. A new instance can be created with
+ * {@code createRepoOpControl} and will replace any existing instance
  */
-public class RepoOpControl {
+public final class RepoOpControl {
 
     private static final Logger logger = LogManager.getLogger(RepoOpControl.class.getName());
 
     private final RepoIO repoIO;
+    private final MultiModel models;
 
     private final ExecutorService pool = Executors.newCachedThreadPool();
     private final Map<String, BlockingQueue<RepoOp>> queues = new HashMap<>();
 
-    public RepoOpControl(RepoIO repoIO) {
+    public RepoOpControl(RepoIO repoIO, MultiModel models) {
         this.repoIO = repoIO;
+        this.models = models;
     }
-
-    /**
-     * Wrapped operations. These methods correspond to RepoIO operations
-     * which should not be executed concurrently. For example, we don't want
-     * a model that is being updated to be deleted until the update is complete.
-     */
 
     public CompletableFuture<Model> openRepository(String repoId) {
         init(repoId);
         CompletableFuture<Model> result = new CompletableFuture<>();
         enqueue(new OpenRepoOp(repoId, repoIO, result));
+        return result;
+    }
+
+    /**
+     * Updates repository stored locally with data from a GitHubModelUpdatesData object.
+     * Set syncOperation to queue this operation in the blocking queue for the updating repository
+     * @param updates
+     * @param syncOperation
+     * @return
+     */
+    public CompletableFuture<Model> updateLocalModel(GitHubModelUpdatesData updates,
+                                                     boolean syncOperation) {
+        init(updates.getRepoId());
+        CompletableFuture<Model> result = new CompletableFuture<>();
+        UpdateLocalModelOp op = new UpdateLocalModelOp(models, updates, result);
+        if (syncOperation) {
+            enqueue(new UpdateLocalModelOp(models, updates, result));
+        } else {
+            op.perform();
+        }
         return result;
     }
 
@@ -49,17 +70,17 @@ public class RepoOpControl {
         return result;
     }
 
-    public CompletableFuture<Model> updateModel(Model oldModel) {
-        init(oldModel.getRepoId());
-        CompletableFuture<Model> result = new CompletableFuture<>();
-        enqueue(new UpdateModelOp(oldModel, repoIO, result));
+    public CompletableFuture<Boolean> replaceIssueLabelsOnServer(TurboIssue issue, List<String> labels) {
+        init(issue.getRepoId());
+        CompletableFuture<Boolean> result = new CompletableFuture<>();
+        enqueue(new ReplaceIssueLabelsOnServerOp(repoIO, result, issue, labels));
         return result;
     }
 
-    public CompletableFuture<Boolean> replaceIssueLabels(TurboIssue issue, List<String> labels) {
+    public CompletableFuture<Optional<TurboIssue>> replaceIssueLabelsLocally(TurboIssue issue, List<String> labels) {
         init(issue.getRepoId());
-        CompletableFuture<Boolean> result = new CompletableFuture<>();
-        enqueue(new ReplaceIssueLabelsOp(repoIO, result, issue, labels));
+        CompletableFuture<Optional<TurboIssue>> result = new CompletableFuture<>();
+        enqueue(new ReplaceIssueLabelsLocallyOp(models, issue, labels, result));
         return result;
     }
 

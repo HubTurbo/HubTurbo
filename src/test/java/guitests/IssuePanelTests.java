@@ -30,6 +30,7 @@ import ui.GuiElement;
 import ui.UI;
 import ui.listpanel.ListPanel;
 import ui.listpanel.ListPanelCard;
+import util.PlatformEx;
 import util.Utility;
 import util.events.testevents.UILogicRefreshEvent;
 import util.events.testevents.UpdateDummyRepoEvent;
@@ -49,6 +50,7 @@ public class IssuePanelTests extends UITest {
         selectAll();
         type("sort:date");
         push(KeyCode.ENTER);
+        PlatformEx.waitOnFxThread();
         press(JUMP_TO_FIRST_ISSUE);
         push(KeyCode.DOWN).push(KeyCode.DOWN);
         sleep(EVENT_DELAY);
@@ -68,6 +70,7 @@ public class IssuePanelTests extends UITest {
         selectAll();
         type("id:8");
         push(KeyCode.ENTER);
+        PlatformEx.waitOnFxThread();
         // Issue #8 was assigned label 11, but it was removed
         try {
             GuiTest.exists("Label 11");
@@ -86,6 +89,7 @@ public class IssuePanelTests extends UITest {
         click("#dummy/dummy_col0_filterTextField");
         selectAll();
         type("id:9 updated:5");
+        PlatformEx.waitOnFxThread();
         push(KeyCode.ENTER);
         waitUntilNodeAppears("Deleted");
         // We should see the "Deleted" label with the proper color despite the label having been deleted.
@@ -170,6 +174,7 @@ public class IssuePanelTests extends UITest {
         selectAll();
         type("id:11");
         push(KeyCode.ENTER);
+        PlatformEx.waitOnFxThread();
         assertEquals(true, GuiTest.exists("User 11"));
         // arrow to indicate assignment i.e. author -> assignee
         assertEquals(true, GuiTest.exists("\uf03e"));
@@ -182,6 +187,7 @@ public class IssuePanelTests extends UITest {
         selectAll();
         type("id:12");
         push(KeyCode.ENTER);
+        PlatformEx.waitOnFxThread();
         // author should not show since it is an issue
         try {
             GuiTest.exists("User 12");

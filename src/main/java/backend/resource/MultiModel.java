@@ -13,6 +13,9 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
+ * This represents the true state of local repositories data. Operations meant to change the state
+ * of local repositories data but do not go through the methods in this class i.e. operating on
+ * dangling references its sub-components are considered unsafe
  * Thread-safe. The only top-level state in the application.
  */
 @SuppressWarnings("unused")
@@ -60,7 +63,7 @@ public class MultiModel implements IModel {
         if (!repoIdCorrectCase.isPresent()) {
             logger.error("RepoId specified does not have a model.");
         }
-        
+
         Optional<Model> repoModelToBeDeleted = getModelById(repoIdCorrectCase.get());
         if (repoModelToBeDeleted.isPresent()) {
             this.models.remove(repoModelToBeDeleted.get().getRepoId());
@@ -81,6 +84,11 @@ public class MultiModel implements IModel {
     public synchronized MultiModel replace(List<Model> newModels) {
         this.models.clear();
         newModels.forEach(this::add);
+        return this;
+    }
+
+    public synchronized MultiModel replace(Model newModel) {
+        this.add(newModel);
         return this;
     }
 

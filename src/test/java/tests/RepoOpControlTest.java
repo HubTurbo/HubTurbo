@@ -1,25 +1,30 @@
 package tests;
 
-import static junit.framework.TestCase.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import backend.RepoIO;
+import backend.control.RepoOpControl;
+import backend.github.GitHubModelUpdatesData;
+import backend.github.GitHubRepoTask;
+import backend.resource.Model;
+import backend.resource.MultiModel;
+import backend.resource.TurboIssue;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.junit.Test;
+import util.AtomicMaxInteger;
+import util.Futures;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.junit.Test;
-
-import backend.RepoIO;
-import backend.control.RepoOpControl;
-import backend.resource.Model;
-import util.AtomicMaxInteger;
-import util.Futures;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class RepoOpControlTest {
 
@@ -29,26 +34,38 @@ public class RepoOpControlTest {
 
     private final Executor executor = Executors.newCachedThreadPool();
 
+    private <T> GitHubRepoTask.Result<T> createEmptyUpdatesResult() {
+        return new GitHubRepoTask.Result<>(new ArrayList<>(), "", new Date());
+    }
+
+    private GitHubModelUpdatesData createEmptyModelUpdatesData(Model model) {
+        return new GitHubModelUpdatesData(model, createEmptyUpdatesResult(), new ArrayList<>(),
+                                          createEmptyUpdatesResult(), createEmptyUpdatesResult(),
+                                          createEmptyUpdatesResult());
+    }
+
     @Test
     public void opsWithinMultipleRepos() throws ExecutionException, InterruptedException {
 
         // Operations on different repositories can execute concurrently
 
         AtomicMaxInteger counter = new AtomicMaxInteger(0);
-        RepoOpControl control = new RepoOpControl(stubbedRepoIO(counter));
+        RepoIO repoIO = stubbedRepoIO(counter);
+        RepoOpControl control = TestUtils.createRepoOpControlWithEmptyModels(repoIO);
+        repoIO.setRepoOpControl(control);
 
         List<CompletableFuture<Model>> futures = new ArrayList<>();
 
         futures.add(control.openRepository(REPO));
-        futures.add(control.updateModel(new Model(REPO + 1)));
+        futures.add(control.updateLocalModel(createEmptyModelUpdatesData(new Model(REPO + 1)), true));
         futures.add(control.openRepository(REPO));
-        futures.add(control.updateModel(new Model(REPO + 1)));
+        futures.add(control.updateLocalModel(createEmptyModelUpdatesData(new Model(REPO + 1)), true));
         control.removeRepository(REPO + 2).get();
         control.removeRepository(REPO + 2).get();
 
         Futures.sequence(futures).get();
 
-        assertEquals(3, counter.getMax());
+        assertEquals(2, counter.getMax());
     }
 
     @Test
@@ -57,16 +74,18 @@ public class RepoOpControlTest {
         // Operations on the same repository cannot execute concurrently
 
         AtomicMaxInteger counter = new AtomicMaxInteger(0);
-        RepoOpControl control = new RepoOpControl(stubbedRepoIO(counter));
+        RepoIO repoIO = stubbedRepoIO(counter);
+        RepoOpControl control = TestUtils.createRepoOpControlWithEmptyModels(repoIO);
+        repoIO.setRepoOpControl(control);
 
         List<CompletableFuture<Model>> futures = new ArrayList<>();
 
         futures.add(control.openRepository(REPO));
         control.removeRepository(REPO).get();
-        futures.add(control.updateModel(new Model(REPO)));
+        futures.add(control.updateLocalModel(createEmptyModelUpdatesData(new Model(REPO)), true));
         control.removeRepository(REPO).get();
         futures.add(control.openRepository(REPO));
-        futures.add(control.updateModel(new Model(REPO)));
+        futures.add(control.updateLocalModel(createEmptyModelUpdatesData(new Model(REPO)), true));
 
         Futures.sequence(futures).get();
 
@@ -79,7 +98,7 @@ public class RepoOpControlTest {
         // We cannot open the same repository concurrently
 
         AtomicMaxInteger counter = new AtomicMaxInteger(0);
-        RepoOpControl control = new RepoOpControl(stubbedRepoIO(counter));
+        RepoOpControl control = new RepoOpControl(stubbedRepoIO(counter), mock(MultiModel.class));
 
         List<CompletableFuture<Model>> futures = new ArrayList<>();
 
@@ -97,7 +116,7 @@ public class RepoOpControlTest {
         // We can open different repositories concurrently
 
         AtomicMaxInteger counter = new AtomicMaxInteger(0);
-        RepoOpControl control = new RepoOpControl(stubbedRepoIO(counter));
+        RepoOpControl control = new RepoOpControl(stubbedRepoIO(counter), mock(MultiModel.class));
 
         List<CompletableFuture<Model>> futures = new ArrayList<>();
 
@@ -107,6 +126,20 @@ public class RepoOpControlTest {
         Futures.sequence(futures).get();
 
         assertEquals(3, counter.getMax());
+    }
+
+    /**
+     * Tests that replaceIssueLabelsLocally calls replaceIssueLabels method from models and return corresponding result
+     */
+    @Test
+    public void replaceIssueLabelsLocally() throws ExecutionException, InterruptedException {
+        MultiModel models = mock(MultiModel.class);
+        TurboIssue returnedIssue = new TurboIssue("testrepo/testrepo", 1, "Issue title");
+        when(models.replaceIssueLabels("testrepo/testrepo", 1, new ArrayList<>()))
+        .thenReturn(Optional.of(returnedIssue));
+        RepoOpControl repoOpControl = new RepoOpControl(mock(RepoIO.class), models);
+        TurboIssue result = repoOpControl.replaceIssueLabelsLocally(returnedIssue, new ArrayList<>()).join().get();
+        assertEquals(returnedIssue, result);
     }
 
     /**
@@ -121,7 +154,7 @@ public class RepoOpControlTest {
             .then(invocation -> createResult(counter, new Model(REPO)));
         when(stub.removeRepository(REPO))
             .then(invocation -> createResult(counter, true));
-        when(stub.updateModel(new Model(REPO)))
+        when(stub.updateModel(new Model(REPO), false))
             .then(invocation -> createResult(counter, new Model(REPO)));
 
         for (int i = 0; i < 3; i++) {
@@ -129,7 +162,7 @@ public class RepoOpControlTest {
                 .then(invocation -> createResult(counter, new Model(REPO)));
             when(stub.removeRepository(REPO + i))
                 .then(invocation -> createResult(counter, true));
-            when(stub.updateModel(new Model(REPO + i)))
+            when(stub.updateModel(new Model(REPO + i), false))
                 .then(invocation -> createResult(counter, new Model(REPO)));
         }
 

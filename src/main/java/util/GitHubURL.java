@@ -52,5 +52,13 @@ public final class GitHubURL {
         return url.matches("https://github.com/([^/]+)/([^/]+)/pull/([0-9]+)(/|/commits|/files)?");
     }
 
+    /**
+     * Checks if current URL is GitHub issue or PR discussion page
+     * @param url url to be checked
+     */
+    public static boolean isUrlIssueOrPrDiscussionPage(String url) {
+        return url.matches("https://github.com/([^/]+)/([^/]+)/(issues|pull)/([0-9]+)$");
+    }
+
     private GitHubURL() {}
 }
