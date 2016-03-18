@@ -3,7 +3,6 @@ package browserview;
 import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef.HWND;
 import com.sun.jna.platform.win32.WinUser;
-import javafx.geometry.Rectangle2D;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.logging.log4j.LogManager;
@@ -47,17 +46,27 @@ public class BrowserComponent {
     private static final String CHROME_DRIVER_LOCATION = "browserview/";
     private static final String CHROME_DRIVER_BINARY_NAME = determineChromeDriverBinaryName();
 
-    private String pageContentOnLoad = "";
-
     private static final int SWP_NOSIZE = 0x0001;
     private static final int SWP_NOMOVE = 0x0002;
     private static final int SWP_NOACTIVATE = 0x0010;
+
+    /**
+     * Specifies how many tries to wait for a web page to load
+     */
+    private static final int WAIT_PAGE_LOAD_MAX_RETRY = 20;
+    /**
+     * Specifies the duration between tries to wait for a web page to load
+     */
+    private static final int WAIT_PAGE_LOAD_SLEEP_TIME = 10;
+
     private static HWND browserWindowHandle;
     private static User32 user32;
 
     private final UI ui;
     private final ScreenManager screenManager;
     private ChromeDriverEx driver = null;
+
+    private String pageContentOnLoad = "";
 
     // We want browser commands to be run on a separate thread, but not to
     // interfere with each other. This executor is limited to a single instance,
@@ -508,14 +517,48 @@ public class BrowserComponent {
         return driver != null && GitHubURL.isUrlIssue(driver.getCurrentUrl());
     }
 
+    /**
+     * Checks if current URL is GitHub issue or PR discussion page
+     */
+    public boolean isCurrentUrlDiscussion() {
+        return driver != null && GitHubURL.isUrlIssueOrPrDiscussionPage(driver.getCurrentUrl());
+    }
+
     public String getCurrentUrl() {
         return driver.getCurrentUrl();
     }
 
+    /**
+     * Switches to the specified tab in GitHub PR page
+     * @param tabName Either GithubPageElements.DISCUSSION_TAB, GithubPageElements.COMMITS_TAB
+     *                or GithubPageElements.FILES_TAB
+     */
     public void switchToTab(String tabName) {
         if (GitHubURL.isPullRequestLoaded(getCurrentUrl())) {
-            driver.findElement(By.xpath("//a[@data-container-id='" + tabName + "_bucket']")).click();
+            int tabIndex = 0;
+
+            switch(tabName) {
+                case GithubPageElements.DISCUSSION_TAB:
+                    tabIndex = 1;
+                    break;
+                case GithubPageElements.COMMITS_TAB:
+                    tabIndex = 2;
+                    break;
+                case GithubPageElements.FILES_TAB:
+                    tabIndex = 3;
+                    break;
+                default:
+                    assert false;
+                    return;
+            }
+
+            String xpath = "//*[@id=\"js-repo-pjax-container\"]/div[2]/div[1]/div/div[2]/div[2]/nav/a[%d]";
+            clickElementByXpath(String.format(xpath, tabIndex));
         }
+    }
+
+    private void clickElementByXpath(String xpath) {
+        driver.findElement(By.xpath(xpath)).click();
     }
 
     public Optional<Integer> getPRNumberFromIssue() {
@@ -529,6 +572,19 @@ public class BrowserComponent {
             logger.info("no PR mention found");
         }
         return Optional.empty();
+    }
+
+    /**
+     * Wait for discussion page (for issue or PR) to be loaded.
+     */
+    public void waitUntilDiscussionPageLoaded() {
+        for (int i = 0; i < WAIT_PAGE_LOAD_MAX_RETRY && !isCurrentUrlDiscussion(); i++) {
+            try {
+                Thread.sleep(WAIT_PAGE_LOAD_SLEEP_TIME);
+            } catch (IllegalArgumentException | InterruptedException e) {
+                logger.warn(e);
+            }
+        }
     }
     
     public void minimizeWindow() {
