@@ -5,6 +5,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCode;
 import org.junit.Before;
 import org.junit.Test;
+import ui.IdGenerator;
 import ui.UI;
 import ui.listpanel.ListPanel;
 import util.events.IssueSelectedEventHandler;
@@ -16,16 +17,17 @@ import static org.junit.Assert.assertTrue;
 
 public class IssueSelectedEventTest extends UITest {
 
-    private static final String PANEL_IDENTIFIER = "#dummy/dummy_col0";
-
     @Test
     public void eventTriggerOnIssueSelection_byRightClick_selectionEventNotTriggered() {
+        String panelId = IdGenerator.getPanelIdForTest("dummy/dummy", 0);
+        String cellId = IdGenerator.getPanelCellIdForTest("dummy/dummy", 0, 9);
+
         AtomicInteger eventCount = new AtomicInteger(0);
         UI.events.registerEvent((IssueSelectedEventHandler) e -> eventCount.incrementAndGet());
-        ListPanel issuePanel = find(PANEL_IDENTIFIER);
+        ListPanel issuePanel = find(panelId);
 
         //testing whether right click occurred by checking the presence of context menu items
-        rightClick(PANEL_IDENTIFIER + "_9");
+        rightClick(cellId);
         ContextMenu contextMenu = issuePanel.getContextMenu();
         for (MenuItem menuItem : contextMenu.getItems()) {
             assertTrue(!menuItem.isDisable());
@@ -40,10 +42,12 @@ public class IssueSelectedEventTest extends UITest {
      */
     @Test
     public void triggerIssueSelectedOnLeftClickAndKey_IssueInPanelLeftClickedAndKeyed_IssueSelectedTriggered() {
+        String cellId = IdGenerator.getPanelCellIdForTest("dummy/dummy", 0, 10);
+
         AtomicInteger eventCount = new AtomicInteger(0);
         UI.events.registerEvent((IssueSelectedEventHandler) e -> eventCount.incrementAndGet());
 
-        click(PANEL_IDENTIFIER + "_10");
+        click(cellId);
 
         // testing IssueSelectedEvent is triggered on left click
         assertEquals(1, eventCount.get());
