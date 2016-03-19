@@ -11,10 +11,11 @@ import javafx.scene.control.Label;
  */
 public class PickerRepository implements Comparable<PickerRepository> {
 
+    private static final String BALLOT_BOX = "☐";
+    private static final String BALLOT_BOX_WITH_CHECK = "☑";
+
     private final String repositoryId;
     private boolean isSelected = false;
-    private String BALLOT_BOX = "☐";
-    private String BALLOT_BOX_WITH_CHECK = "☑";
 
     public PickerRepository(String repositoryId) {
         this.repositoryId = repositoryId;
@@ -27,8 +28,11 @@ public class PickerRepository implements Comparable<PickerRepository> {
     public Node getNode() {
         Label repoLabel = new Label();
 
-        if (isSelected) repoLabel.setText(BALLOT_BOX_WITH_CHECK + " " + repositoryId);
-        else repoLabel.setText(BALLOT_BOX + " " + repositoryId);
+        if (isSelected) {
+            repoLabel.setText(BALLOT_BOX_WITH_CHECK + " " + repositoryId);
+        } else {
+            repoLabel.setText(BALLOT_BOX + " " + repositoryId);
+        }
 
         return repoLabel;
     }

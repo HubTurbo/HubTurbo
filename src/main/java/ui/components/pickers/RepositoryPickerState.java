@@ -9,7 +9,7 @@ import java.util.stream.IntStream;
 public class RepositoryPickerState {
 
     private final List<PickerRepository> repositories = new ArrayList<>();
-    private List<PickerRepository> matchingRepositories = new ArrayList<>();
+    private final List<PickerRepository> matchingRepositories = new ArrayList<>();
     private String selectedRepositoryId = "";
 
     public RepositoryPickerState(Set<String> storedRepositories) {
