@@ -179,7 +179,7 @@ public class ListPanel extends FilterPanel {
     private int getClosedIssueSize() {
         int count = 0;
         for (GuiElement element: getElementsList()){
-            if(!element.getIssue().isOpen()){
+            if (!element.getIssue().isOpen()){
                 count++;
             }
         }
