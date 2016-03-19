@@ -14,7 +14,7 @@ import util.Utility;
 import java.util.*;
 
 /**
- * Serves as a presenter that helps the user by suggesting repositories stored in the disk
+ * Serves as a presenter that also helps the user by suggesting repositories stored in the disk
  * which are related to user input.
  */
 public class RepositoryPickerDialog extends Dialog<String> {

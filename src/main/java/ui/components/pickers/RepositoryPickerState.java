@@ -20,7 +20,7 @@ public class RepositoryPickerState {
 
     public void updateUserQuery(String query) {
         updateMatchingRepositories(query);
-        updateSelection(query);
+        updateSelectedRepository(query);
     }
 
     public String getSelectedRepositoryId() {
@@ -33,7 +33,7 @@ public class RepositoryPickerState {
      * it will then select the first matching repository instead.
      */
     public void selectNextMatchingRepository() {
-        OptionalInt selectedPositionInMatching = getSelectedPositionInMatching();
+        OptionalInt selectedPositionInMatching = getSelectedRepositoryPositionInMatching();
         if (!selectedPositionInMatching.isPresent()) {
             // if there is no previous selection, select the first matching repository if it exists
             if (!matchingRepositories.isEmpty()) {
@@ -42,11 +42,11 @@ public class RepositoryPickerState {
                 setSelectedRepositoryId(toSelect.getRepositoryId());
             }
         } else {
-            int currentSelectedPosition = selectedPositionInMatching.getAsInt();
-            int nextSelectedPosition = (currentSelectedPosition + 1) % matchingRepositories.size();
-            matchingRepositories.get(currentSelectedPosition).setSelected(false);
-            matchingRepositories.get(nextSelectedPosition).setSelected(true);
-            setSelectedRepositoryId(matchingRepositories.get(nextSelectedPosition).getRepositoryId());
+            int currentPosition = selectedPositionInMatching.getAsInt();
+            int nextPosition = currentPosition == matchingRepositories.size() - 1 ? 0 : currentPosition + 1;
+            matchingRepositories.get(currentPosition).setSelected(false);
+            matchingRepositories.get(nextPosition).setSelected(true);
+            setSelectedRepositoryId(matchingRepositories.get(nextPosition).getRepositoryId());
         }
     }
 
@@ -56,7 +56,7 @@ public class RepositoryPickerState {
      * it will then select the last matching repository instead.
      */
     public void selectPreviousMatchingRepository() {
-        OptionalInt selectedPositionInMatching = getSelectedPositionInMatching();
+        OptionalInt selectedPositionInMatching = getSelectedRepositoryPositionInMatching();
         if (!selectedPositionInMatching.isPresent()) {
             // if there is no previous selection, select the last matching repository if it exists
             if (!matchingRepositories.isEmpty()) {
@@ -65,16 +65,15 @@ public class RepositoryPickerState {
                 setSelectedRepositoryId(toSelect.getRepositoryId());
             }
         } else {
-            int currentSelectedPosition = selectedPositionInMatching.getAsInt();
-            int nextSelectedPosition = currentSelectedPosition == 0 ? matchingRepositories.size() - 1
-                                                                    : currentSelectedPosition - 1;
-            matchingRepositories.get(currentSelectedPosition).setSelected(false);
-            matchingRepositories.get(nextSelectedPosition).setSelected(true);
-            setSelectedRepositoryId(matchingRepositories.get(nextSelectedPosition).getRepositoryId());
+            int currentPosition = selectedPositionInMatching.getAsInt();
+            int nextPosition = currentPosition == 0 ? matchingRepositories.size() - 1 : currentPosition - 1;
+            matchingRepositories.get(currentPosition).setSelected(false);
+            matchingRepositories.get(nextPosition).setSelected(true);
+            setSelectedRepositoryId(matchingRepositories.get(nextPosition).getRepositoryId());
         }
     }
 
-    private OptionalInt getSelectedPositionInMatching() {
+    private OptionalInt getSelectedRepositoryPositionInMatching() {
         return IntStream.range(0, matchingRepositories.size())
                 .filter(index -> matchingRepositories.get(index).isSelected())
                 .findFirst();
@@ -94,12 +93,12 @@ public class RepositoryPickerState {
     }
 
     /**
-     * Clears previous selection and select user input as selected repository id.
+     * Clears previous selection and select user input as selected repository id since
+     * there can only be at most one selected repository at any given time in the list
+     * of stored repositories.
      */
-    private void updateSelection(String query) {
-        repositories.stream().forEach(repo -> {
-            repo.setSelected(false);
-        });
+    private void updateSelectedRepository(String query) {
+        repositories.stream().forEach(repo -> repo.setSelected(false));
         setSelectedRepositoryId(query);
     }
 
