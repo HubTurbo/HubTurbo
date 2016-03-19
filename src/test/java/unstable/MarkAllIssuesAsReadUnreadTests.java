@@ -1,13 +1,11 @@
 package unstable;
 
 import guitests.UITest;
-import javafx.application.Platform;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCode;
 import org.junit.Before;
 import org.junit.Test;
-import org.loadui.testfx.GuiTest;
 import ui.components.FilterTextField;
 import ui.components.IssueListView;
 import ui.listpanel.ListPanel;
@@ -46,7 +44,7 @@ public class MarkAllIssuesAsReadUnreadTests extends UITest {
         IssueListView listViewValue = (IssueListView) listViewField.get(issuePanel);
 
         // scrolls to the end of the panel
-        listViewValue.scrollAndShow(issuePanel.getIssueCount());
+        listViewValue.scrollAndShow(issuePanel.getIssuesCount());
 
 
         //checking for issue #7 and below as marked read

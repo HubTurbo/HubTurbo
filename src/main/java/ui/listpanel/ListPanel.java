@@ -46,15 +46,13 @@ public class ListPanel extends FilterPanel {
 
     private final UI ui;
     private final GUIController guiController;
-    private int issueCount = 0;
-    private int closedIssueCount = 0;
-    private int openIssueCount = 0;
+    private int issuesCount = 0;
+    private int closedIssuesCount = 0;
+    private int openIssuesCount = 0;
 
     private final IssueListView listView;
     private final HashMap<Integer, Integer> issueCommentCounts = new HashMap<>();
     private final HashMap<Integer, Integer> issueNonSelfCommentCounts = new HashMap<>();
-
-
 
     Text openIssueText;
     Text closedIssueText;
@@ -98,9 +96,9 @@ public class ListPanel extends FilterPanel {
     }
 
     private TextFlow createFooterIssueStats() {
-        openIssueText = new Text(String.valueOf(openIssueCount));
-        closedIssueText = new Text(String.valueOf(closedIssueCount));
-        totalIssueText = new Text(String.valueOf(issueCount));
+        openIssueText = new Text(String.valueOf(openIssuesCount));
+        closedIssueText = new Text(String.valueOf(closedIssuesCount));
+        totalIssueText = new Text(String.valueOf(issuesCount));
         bracketOpenText = new Text(" (");
         bracketCloseText = new Text(")");
         plusText = new Text(" + ");
@@ -171,9 +169,9 @@ public class ListPanel extends FilterPanel {
         // if it actually does on platforms other than Linux...
         listView.setItems(null);
         listView.setItems(getElementsList());
-        issueCount = getElementsList().size();
-        closedIssueCount = getClosedIssueSize();
-        openIssueCount = issueCount - closedIssueCount;
+        issuesCount = getElementsList().size();
+        closedIssuesCount = getClosedIssuesCount();
+        openIssuesCount = issuesCount - closedIssuesCount;
         listView.restoreSelection();
         this.setId(guiController.getDefaultRepo() + "_col" + panelIndex);
         updateFooter();
@@ -181,14 +179,8 @@ public class ListPanel extends FilterPanel {
 
     }
 
-    private int getClosedIssueSize() {
-        int count = 0;
-        for (GuiElement element: getElementsList()){
-            if (!element.getIssue().isOpen()){
-                count++;
-            }
-        }
-        return count;
+    private int getClosedIssuesCount() {
+        return (int) getElementsList().stream().filter((element) -> !element.getIssue().isOpen()).count();
     }
 
     /**
@@ -196,13 +188,13 @@ public class ListPanel extends FilterPanel {
      */
     private void updateFooter() {
 
-        if (issueCount == 0){
+        if (issuesCount == 0){
             totalIssueText.setText(String.valueOf(0));
             hideFooterPanelStatsDetails(true);
         } else {
-            openIssueText.setText(String.valueOf(openIssueCount));
-            closedIssueText.setText(String.valueOf(closedIssueCount));
-            totalIssueText.setText(String.valueOf(issueCount));
+            openIssueText.setText(String.valueOf(openIssuesCount));
+            closedIssueText.setText(String.valueOf(closedIssuesCount));
+            totalIssueText.setText(String.valueOf(issuesCount));
             hideFooterPanelStatsDetails(false);
         }
 
@@ -461,8 +453,8 @@ public class ListPanel extends FilterPanel {
         return markAsReadUnreadMenuItem;
     }
 
-    public int getIssueCount() {
-        return issueCount;
+    public int getIssuesCount() {
+        return issuesCount;
     }
 
     public Optional<GuiElement> getSelectedElement() {
