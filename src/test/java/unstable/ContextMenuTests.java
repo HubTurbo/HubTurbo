@@ -13,6 +13,7 @@ import javafx.scene.input.KeyCode;
 import org.junit.Before;
 import org.junit.Test;
 
+import ui.IdGenerator;
 import ui.components.FilterTextField;
 import ui.listpanel.ListPanel;
 import ui.listpanel.ListPanelCell;
@@ -25,14 +26,16 @@ public class ContextMenuTests extends UITest {
 
     @Before
     public void setup() {
+        String panelFilterTextFieldId = IdGenerator.getPanelFilterTextFieldIdForTest("dummy/dummy", 0);
+
         Platform.runLater(stage::show);
         Platform.runLater(stage::requestFocus);
 
-        FilterTextField filterTextField = find("#dummy/dummy_col0_filterTextField");
+        FilterTextField filterTextField = find(panelFilterTextFieldId);
         filterTextField.setText("");
         Platform.runLater(filterTextField::requestFocus);
 
-        click("#dummy/dummy_col0_filterTextField");
+        click(panelFilterTextFieldId);
         push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
     }
@@ -43,13 +46,16 @@ public class ContextMenuTests extends UITest {
      */
     @Test
     public void contextMenuDisabling_noIssueInListView_contextMenuItemsDisabled() {
-        ListPanel issuePanel = find("#dummy/dummy_col0");
+        String panelId = IdGenerator.getPanelIdForTest("dummy/dummy", 0);
+        String panelFilterTextFieldId = IdGenerator.getPanelFilterTextFieldIdForTest("dummy/dummy", 0);
 
-        click("#dummy/dummy_col0_filterTextField");
+        ListPanel issuePanel = find(panelId);
+
+        click(panelFilterTextFieldId);
         type("asdf");
         push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
-        rightClick("#dummy/dummy_col0");
+        rightClick(panelId);
         sleep(EVENT_DELAY);
 
         ContextMenu contextMenu = issuePanel.getContextMenu();
@@ -64,17 +70,19 @@ public class ContextMenuTests extends UITest {
      */
     @Test
     public void testMarkAsReadUnread() {
-        ListPanelCell listPanelCell = find("#dummy/dummy_col0_9");
+        String cellId = IdGenerator.getPanelCellIdForTest("dummy/dummy", 0, 9);
 
-        click("#dummy/dummy_col0_9");
-        rightClick("#dummy/dummy_col0_9");
+        ListPanelCell listPanelCell = find(cellId);
+
+        click(cellId);
+        rightClick(cellId);
         sleep(EVENT_DELAY);
         click("Mark as read (E)");
         sleep(EVENT_DELAY);
         assertTrue(listPanelCell.getIssue().isCurrentlyRead());
 
-        click("#dummy/dummy_col0_9");
-        rightClick("#dummy/dummy_col0_9");
+        click(cellId);
+        rightClick(cellId);
         sleep(EVENT_DELAY);
         click("Mark as unread (U)");
         sleep(EVENT_DELAY);
@@ -86,13 +94,16 @@ public class ContextMenuTests extends UITest {
      */
     @Test
     public void testChangeLabels() {
-        click("#dummy/dummy_col0_9");
-        rightClick("#dummy/dummy_col0_9");
+        String cellId = IdGenerator.getPanelCellId("dummy/dummy", 0, 9);
+        String labelTextFieldId = IdGenerator.getLabelPickerTextFieldIdForTest();
+
+        click(cellId);
+        rightClick(cellId);
         sleep(EVENT_DELAY);
         click("Change labels (L)");
         sleep(DIALOG_DELAY);
 
-        assertNotNull(find("#queryField"));
+        assertNotNull(find(labelTextFieldId));
 
         push(KeyCode.ESCAPE);
         sleep(EVENT_DELAY);
