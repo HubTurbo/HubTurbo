@@ -1,10 +1,11 @@
 package ui.components.pickers;
 
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
+import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -19,9 +20,17 @@ import java.util.*;
 public class RepositoryPickerDialog extends Dialog<String> {
 
     private static final String REPO_PICKER_TITLE = "Pick another repository";
-    private static final MatchingMode DEFAULT_MATCHING_MODE = MatchingMode.SUBSTRING_MATCHING;
+    private static final String DEFAULT_SELECTED_REPO_MESSAGE = "Selected repository: ";
+    private static final int DEFAULT_MATCHING_REPO_LIST_HEIGHT = 350;
+    private static final int DEFAULT_MATCHING_REPO_LIST_WIDTH = 350;
+    private static final int SPACING_BETWEEN_NODES = 10;
+    private static final Insets DEFAULT_PADDING = new Insets(10);
+    private static final Insets DEFAULT_MARGIN = new Insets(5);
 
-    private ComboBox<String> comboBox;
+    private VBox mainLayout;
+    private VBox matchingRepositoryList;
+    private HBox chosenRepository;
+    private TextField userInputTextField;
     private RepositoryPickerState state;
 
     public RepositoryPickerDialog(Set<String> storedRepos, Stage stage) {
@@ -32,79 +41,104 @@ public class RepositoryPickerDialog extends Dialog<String> {
         state = new RepositoryPickerState(storedRepos);
 
         initialiseDialog(stage);
-        createComboBox();
         createButtons();
 
-        getDialogPane().setContent(comboBox);
-        Platform.runLater(() -> {
-            comboBox.getEditor().requestFocus();
-            comboBox.show();
-        });
+        Platform.runLater(() -> userInputTextField.requestFocus());
     }
 
     private void initialiseDialog(Stage stage) {
         initOwner(stage);
         initModality(Modality.APPLICATION_MODAL);
         setTitle(REPO_PICKER_TITLE);
+
+        createMainLayout();
+        getDialogPane().setContent(mainLayout);
     }
 
-    private void createComboBox() {
-        comboBox = new ComboBox<>();
-        comboBox.setId("repositoryPicker");
-        comboBox.setEditable(true);
-        comboBox.getItems().addAll(state.getMatchingRepositories("", DEFAULT_MATCHING_MODE));
-        comboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue == null) {
-                return;
+    private void createMainLayout() {
+        mainLayout = new VBox(SPACING_BETWEEN_NODES);
+        mainLayout.setPadding(DEFAULT_PADDING);
+
+        createMatchingRepositoriesList();
+        createUserInputTextField();
+        createHandlers();
+        createChosenRepository();
+
+        initialiseDefaultValues();
+
+        ScrollPane scrollPane = new ScrollPane(matchingRepositoryList);
+        scrollPane.setFitToHeight(true);
+        scrollPane.setFitToWidth(true);
+        mainLayout.getChildren().addAll(userInputTextField, scrollPane, chosenRepository);
+    }
+
+    private void createHandlers() {
+        userInputTextField.setOnKeyReleased(e -> {
+            if (e.getCode() == KeyCode.DOWN) {
+                state.selectNextMatchingRepository();
+            } else if (e.getCode() == KeyCode.UP) {
+                state.selectPreviousMatchingRepository();
             }
-            String repoId = Utility.removeAllWhitespace(newValue);
-            if (!repoId.equals(newValue)) {
-                comboBox.setValue(repoId);
-                return;
-            }
+            refreshUi();
         });
-        comboBox.setOnKeyReleased(event -> {
-            if (isComboBoxTraversalEvent(event)) {
-                handleComboBoxItemsTraversal();
-            } else {
-                handlePossibleUserQueryUpdate();
-            }
+    }
+
+    private void refreshUi() {
+        updateMatchingRepositoryList();
+        updateSelectedRepository();
+    }
+
+    private void updateMatchingRepositoryList() {
+        matchingRepositoryList.getChildren().clear();
+        List<PickerRepository> matchingRepositories = state.getMatchingRepositories();
+        matchingRepositories.stream()
+                .sorted()
+                .forEach(repo -> {
+                    Node repoLabel = repo.getNode();
+                    VBox.setMargin(repoLabel, DEFAULT_MARGIN);
+                    matchingRepositoryList.getChildren().add(repoLabel);
+                    repoLabel.setOnMouseClicked(e -> handleMouseClick(repo.getRepositoryId()));
+                });
+    }
+
+    private void updateSelectedRepository() {
+        chosenRepository.getChildren().clear();
+        chosenRepository.getChildren().add(new Label(DEFAULT_SELECTED_REPO_MESSAGE + state.getSelectedRepositoryId()));
+    }
+
+    private void initialiseDefaultValues() {
+        updateUserQuery("");
+    }
+
+    private void createMatchingRepositoriesList() {
+        matchingRepositoryList = new VBox();
+        matchingRepositoryList.setId("matchingRepositoryList");
+        matchingRepositoryList.setPadding(DEFAULT_PADDING);
+        matchingRepositoryList.setPrefHeight(DEFAULT_MATCHING_REPO_LIST_HEIGHT);
+        matchingRepositoryList.setPrefWidth(DEFAULT_MATCHING_REPO_LIST_WIDTH);
+    }
+
+    private void createChosenRepository() {
+        chosenRepository = new HBox();
+    }
+
+    private void handleMouseClick(String repositoryId) {
+        userInputTextField.setDisable(true);
+        updateUserQuery(repositoryId);
+    }
+
+    private void updateUserQuery(String query) {
+        matchingRepositoryList.getChildren().clear();
+        state.updateUserQuery(query);
+        refreshUi();
+    }
+
+    private void createUserInputTextField() {
+        userInputTextField = new TextField();
+        userInputTextField.setId("repositoryPickerUserInput");
+        userInputTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            updateUserQuery(newValue);
         });
-    }
-
-    private boolean isComboBoxTraversalEvent(KeyEvent event) {
-        return event.getCode() == KeyCode.UP || event.getCode() == KeyCode.DOWN;
-    }
-
-    private void handleComboBoxItemsTraversal() {
-        if (!comboBox.isShowing()) {
-            comboBox.show();
-        }
-        comboBox.getEditor().positionCaret(comboBox.getEditor().getText().length());
-    }
-
-    private void handlePossibleUserQueryUpdate() {
-        List<String> matchingRepositories = state.getMatchingRepositories(comboBox.getEditor().getText(),
-                                                                            DEFAULT_MATCHING_MODE);
-        if (!matchingRepositories.equals(comboBox.getItems())) {
-            // hide and show is needed so that the combo box will readjust its row count
-            comboBox.hide();
-            updateRepositoryList(matchingRepositories);
-            if (matchingRepositories.size() > 0) comboBox.show();
-        }
-    }
-
-    /**
-     * Replaces the items of ComboBox but still retain user input.
-     */
-    private void updateRepositoryList(List<String> matchingRepositories) {
-        String originalQuery = comboBox.getEditor().getText();
-        int originalCaretPosition = comboBox.getEditor().getCaretPosition();
-
-        comboBox.setItems(FXCollections.observableArrayList(matchingRepositories));
-
-        comboBox.getEditor().setText(originalQuery);
-        comboBox.getEditor().positionCaret(originalCaretPosition);
     }
 
     private void createButtons() {
@@ -112,14 +146,12 @@ public class RepositoryPickerDialog extends Dialog<String> {
         getDialogPane().getButtonTypes().addAll(confirmButtonType, ButtonType.CANCEL);
 
         setResultConverter(dialogButton -> {
-            if (dialogButton == confirmButtonType) {
-                String chosenRepo = comboBox.getValue();
-                assert chosenRepo != null;
-                if (Utility.isWellFormedRepoId(chosenRepo)) {
-                    return chosenRepo;
-                }
+            if (dialogButton != confirmButtonType) {
+                return null;
             }
-            return null;
+
+            String selectedRepositoryId = state.getSelectedRepositoryId();
+            return Utility.isWellFormedRepoId(selectedRepositoryId) ? selectedRepositoryId : null;
         });
     }
 
