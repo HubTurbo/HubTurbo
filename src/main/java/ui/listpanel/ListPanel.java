@@ -188,16 +188,19 @@ public class ListPanel extends FilterPanel {
      */
     private void updateFooter() {
 
+        updateFooterPanelStatsDetails();
         if (issuesCount == 0){
-            totalIssueText.setText(String.valueOf(0));
             hideFooterPanelStatsDetails(true);
         } else {
-            openIssueText.setText(String.valueOf(openIssuesCount));
-            closedIssueText.setText(String.valueOf(closedIssuesCount));
-            totalIssueText.setText(String.valueOf(issuesCount));
             hideFooterPanelStatsDetails(false);
         }
 
+    }
+
+    private void updateFooterPanelStatsDetails() {
+        openIssueText.setText(String.valueOf(openIssuesCount));
+        closedIssueText.setText(String.valueOf(closedIssuesCount));
+        totalIssueText.setText(String.valueOf(issuesCount));
     }
 
     private void hideFooterPanelStatsDetails(boolean hide) {
