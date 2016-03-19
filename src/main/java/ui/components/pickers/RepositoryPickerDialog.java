@@ -135,8 +135,14 @@ public class RepositoryPickerDialog extends Dialog<String> {
 
     private void createUserInputTextField() {
         userInputTextField = new TextField();
-        userInputTextField.setId("repositoryPickerUserInput");
+        userInputTextField.setId("repositoryPickerUserInputField");
         userInputTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            String repositoryId = Utility.removeAllWhitespace(newValue);
+            if (!repositoryId.equals(newValue)) {
+                userInputTextField.setText(repositoryId);
+                return;
+            }
+
             updateUserQuery(newValue);
         });
     }

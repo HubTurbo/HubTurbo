@@ -7,6 +7,8 @@ import static org.loadui.testfx.Assertions.assertNodeExists;
 import java.io.File;
 
 import javafx.application.Platform;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
@@ -69,14 +71,16 @@ public class RepositoryPickerTest extends UITest {
             fail();
         }
 
+        VBox matchingRepositoryList;
+        TextField userInputField;
+
         // now we check if the login dialog pops up because the "dummy/dummy" json
         // doesn't exist and there are no other valid repo json files
-        assertNodeExists("#repoOwnerField");
         type("dummy").push(KeyCode.TAB);
         type("dummy").push(KeyCode.ENTER);
         push(KeyCode.CONTROL, KeyCode.R);
-        ComboBox<String> comboBox = find("#repositoryPicker");
-        assertEquals(1, comboBox.getItems().size());
+        matchingRepositoryList = find("#matchingRepositoryList");
+        assertEquals(1, matchingRepositoryList.getChildren().size());
         assertEquals("dummy/dummy", primaryRepo);
         push(KeyCode.ESCAPE);
 
@@ -87,35 +91,35 @@ public class RepositoryPickerTest extends UITest {
         type("repo:dummy2/dummy2");
         push(KeyCode.ENTER);
         push(KeyCode.CONTROL, KeyCode.R);
-        comboBox = find("#repositoryPicker");
-        assertEquals(2, comboBox.getItems().size());
+        matchingRepositoryList = find("#matchingRepositoryList");
+        assertEquals(2, matchingRepositoryList.getChildren().size());
         assertEquals("dummy/dummy", primaryRepo);
         push(KeyCode.ESCAPE);
 
         // we check if "dummy3/dummy3" is added to the repository selector
         // and that the primary repo is also changed
         push(KeyCode.CONTROL, KeyCode.R);
-        comboBox = find("#repositoryPicker");
-        doubleClick(comboBox);
+        userInputField = find("#repositoryPickerUserInputField");
+        doubleClick(userInputField);
         doubleClick();
         type("dummy3/dummy3");
         push(KeyCode.ENTER);
         push(KeyCode.CONTROL, KeyCode.R);
-        comboBox = find("#repositoryPicker");
-        assertEquals(3, comboBox.getItems().size());
+        matchingRepositoryList = find("#matchingRepositoryList");
+        assertEquals(3, matchingRepositoryList.getChildren().size());
         assertEquals("dummy3/dummy3", primaryRepo);
         push(KeyCode.ESCAPE);
 
         // we check if repo's id with white spaces are handled correctly
         push(KeyCode.CONTROL, KeyCode.R);
-        comboBox = find("#repositoryPicker");
-        doubleClick(comboBox);
+        userInputField = find("#repositoryPickerUserInputField");
+        doubleClick(userInputField);
         doubleClick();
         type(" dummy4 / dummy4 ");
         push(KeyCode.ENTER);
         push(KeyCode.CONTROL, KeyCode.R);
-        comboBox = find("#repositoryPicker");
-        assertEquals(4, comboBox.getItems().size());
+        matchingRepositoryList = find("#matchingRepositoryList");
+        assertEquals(4, matchingRepositoryList.getChildren().size());
         assertEquals("dummy4/dummy4", primaryRepo);
         push(KeyCode.ESCAPE);
 
@@ -124,8 +128,8 @@ public class RepositoryPickerTest extends UITest {
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
         push(KeyCode.CONTROL, KeyCode.R);
-        comboBox = find("#repositoryPicker");
-        assertEquals(4, comboBox.getItems().size());
+        matchingRepositoryList = find("#matchingRepositoryList");
+        assertEquals(4, matchingRepositoryList.getChildren().size());
         push(KeyCode.ESCAPE);
 
         // we check if delete repo works
@@ -133,8 +137,8 @@ public class RepositoryPickerTest extends UITest {
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
         push(KeyCode.CONTROL, KeyCode.R);
-        comboBox = find("#repositoryPicker");
-        assertEquals(3, comboBox.getItems().size());
+        matchingRepositoryList = find("#matchingRepositoryList");
+        assertEquals(3, matchingRepositoryList.getChildren().size());
         push(KeyCode.ESCAPE);
 
         // we check again if deleting used repo does not remove it
@@ -142,8 +146,8 @@ public class RepositoryPickerTest extends UITest {
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
         push(KeyCode.CONTROL, KeyCode.R);
-        comboBox = find("#repositoryPicker");
-        assertEquals(3, comboBox.getItems().size());
+        matchingRepositoryList = find("#matchingRepositoryList");
+        assertEquals(3, matchingRepositoryList.getChildren().size());
         push(KeyCode.ESCAPE);
 
         // exit program
