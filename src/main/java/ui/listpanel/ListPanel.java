@@ -5,6 +5,7 @@ import static util.GithubPageElements.DISCUSSION_TAB;
 import static util.GithubPageElements.COMMITS_TAB;
 import static util.GithubPageElements.FILES_TAB;
 
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -12,13 +13,16 @@ import java.util.Optional;
 
 import filter.expression.QualifierType;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.text.Text;
+import javafx.scene.paint.Color;
 
+
+import javafx.scene.text.TextFlow;
 import org.apache.logging.log4j.Logger;
 
 import ui.GUIController;
@@ -35,19 +39,26 @@ import util.events.*;
 import backend.resource.TurboIssue;
 import filter.expression.Qualifier;
 
+
 public class ListPanel extends FilterPanel {
 
     private static final Logger logger = HTLog.get(ListPanel.class);
 
     private final UI ui;
     private final GUIController guiController;
-    private int issueCount;
+    private int issueCount = 0;
+    private int closedIssueCount = 0;
+    private int openIssueCount = 0;
 
     private final IssueListView listView;
     private final HashMap<Integer, Integer> issueCommentCounts = new HashMap<>();
     private final HashMap<Integer, Integer> issueNonSelfCommentCounts = new HashMap<>();
 
-    private Label totalLabel;
+
+    private TextFlow bottomPanelText;
+    Text openIssueText;
+    Text closedIssueText;
+    Text totalIssueText;
 
     // Context Menu
     private final ContextMenu contextMenu = new ContextMenu();
@@ -79,9 +90,19 @@ public class ListPanel extends FilterPanel {
      */
     private HBox createPanelFooter() {
         HBox bottomDisplay = new HBox();
-        totalLabel = new Label("Total : - ");
-        bottomDisplay.getChildren().add(totalLabel);
+        bottomDisplay.getChildren().add(createFooterIssueStats());
         return bottomDisplay;
+    }
+
+    private TextFlow createFooterIssueStats() {
+        openIssueText = new Text(String.valueOf(openIssueCount));
+        closedIssueText = new Text(String.valueOf(closedIssueCount));
+        totalIssueText = new Text(String.valueOf(issueCount));
+        openIssueText.setFill(Color.GREEN);
+        closedIssueText.setFill(Color.RED);
+        totalIssueText.setFill(Color.BLACK);
+        bottomPanelText = new TextFlow(openIssueText, new Text("+"), closedIssueText, new Text("="), totalIssueText);
+        return bottomPanelText;
     }
 
     /**
@@ -144,6 +165,9 @@ public class ListPanel extends FilterPanel {
         listView.setItems(null);
         listView.setItems(getElementsList());
         issueCount = getElementsList().size();
+        closedIssueCount = getClosedIssueSize();
+        openIssueCount = issueCount - closedIssueCount;
+        System.out.println("closed = " + closedIssueCount + " open = " + openIssueCount);
 
         listView.restoreSelection();
         this.setId(guiController.getDefaultRepo() + "_col" + panelIndex);
@@ -152,11 +176,23 @@ public class ListPanel extends FilterPanel {
 
     }
 
+    private int getClosedIssueSize() {
+        int count = 0;
+        for (GuiElement element: getElementsList()){
+            if(!element.getIssue().isOpen()){
+                count++;
+            }
+        }
+        return count;
+    }
+
     /**
      * This function updates the information in the panel footer.
      */
     private void updateFooter() {
-        totalLabel.setText(String.format("Total: %d ", issueCount));
+        openIssueText.setText(String.valueOf(openIssueCount));
+        closedIssueText.setText(String.valueOf(closedIssueCount));
+        totalIssueText.setText(String.valueOf(issueCount));
     }
 
     private void setupListView() {
@@ -183,7 +219,7 @@ public class ListPanel extends FilterPanel {
         });
     }
 
-    private void setupKeyboardShortcuts() {        
+    private void setupKeyboardShortcuts() {
         addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             // Temporary fix for now since markAsRead and Show Related Issue/PR have same keys.
             // Will only work if the key for markAsRead is not the default key E.
