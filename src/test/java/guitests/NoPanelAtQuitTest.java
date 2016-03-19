@@ -22,7 +22,7 @@ public class NoPanelAtQuitTest extends UITest {
 
     @Test
     public void emptyPanelsInfoTest() {
-        String panelCloseButtonId = IdGenerator.getPanelCloseButtonForTest("dummy/dummy", 0);
+        String panelCloseButtonId = IdGenerator.getPanelCloseButtonIdForTest("dummy/dummy", 0);
 
         // Test for saving panel information when there are no panels at termination.
 

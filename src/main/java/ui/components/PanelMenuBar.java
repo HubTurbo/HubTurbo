@@ -110,7 +110,7 @@ public class PanelMenuBar extends HBox {
         renameButton = new Label(OCTICON_RENAME_PANEL);
 
         renameButton.getStyleClass().addAll("octicon", "label-button");
-        renameButton.setId(guiController.getDefaultRepo() + "_col" + panel.panelIndex + "_renameButton");
+        renameButton.setId(IdGenerator.getPanelRenameButtonId(guiController.getDefaultRepo(), panel.panelIndex));
         renameButton.setOnMouseClicked(e -> {
             e.consume();
             activateInplaceRename();
@@ -124,7 +124,7 @@ public class PanelMenuBar extends HBox {
     private HBox createCloseButton() {
         HBox closeArea = new HBox();
         closeButton = new Label(OCTICON_CLOSE_PANEL);
-        closeButton.setId(IdGenerator.getPanelCloseButton(guiController.getDefaultRepo(), panel.panelIndex));
+        closeButton.setId(IdGenerator.getPanelCloseButtonId(guiController.getDefaultRepo(), panel.panelIndex));
         closeButton.getStyleClass().addAll("octicon", "label-button");
         closeButton.setOnMouseClicked((e) -> {
             e.consume();
@@ -142,7 +142,7 @@ public class PanelMenuBar extends HBox {
 
         Label buttonType = new Label(octString);
         buttonType.getStyleClass().addAll("octicon", "label-button");
-        buttonType.setId(guiController.getDefaultRepo() + "_col" + panel.panelIndex + "_" + cssName);
+        buttonType.setId(IdGenerator.getOcticonButtonId(guiController.getDefaultRepo(), panel.panelIndex, cssName));
         buttonArea.getChildren().add(buttonType);
 
         return buttonArea;
@@ -154,7 +154,8 @@ public class PanelMenuBar extends HBox {
      */
     public void initRenameableTextFieldAndEvents() {
         renameableTextField = new TextField();
-        renameableTextField.setId(guiController.getDefaultRepo() + "_col" + panel.panelIndex + "_renameTextField");
+        renameableTextField.setId(IdGenerator.getPanelRenameTextFieldId(guiController.getDefaultRepo(),
+                                                                        panel.panelIndex));
         Platform.runLater(() -> {
             renameableTextField.requestFocus();
             renameableTextField.selectAll();

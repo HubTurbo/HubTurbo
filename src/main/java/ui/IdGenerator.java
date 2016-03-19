@@ -11,6 +11,10 @@ public final class IdGenerator {
         return repoId + "_col" + panelIndex + "_filterTextField";
     }
 
+    public static String getPanelRenameTextFieldId(String repoId, int panelIndex) {
+        return repoId + "_col" + panelIndex + "_renameTextField";
+    }
+
     public static String getRepositorySelectorId() {
         return "repositorySelector";
     }
@@ -27,9 +31,18 @@ public final class IdGenerator {
         return "queryField";
     }
 
-    public static String getPanelCloseButton(String repoId, int panelIndex) {
+    public static String getPanelCloseButtonId(String repoId, int panelIndex) {
         return repoId + "_col" + panelIndex + "_closeButton";
     }
+
+    public static String getPanelRenameButtonId(String repoId, int panelIndex) {
+        return repoId + "_col" + panelIndex + "_renameButton";
+    }
+
+    public static String getOcticonButtonId(String repoId, int panelIndex, String octiconCssName) {
+        return repoId + "_col" + panelIndex + "_" + octiconCssName;
+    }
+
 
 
     public static String getPanelCellIdForTest(String repoId, int panelIndex, int issueId) {
@@ -38,6 +51,10 @@ public final class IdGenerator {
 
     public static String getPanelFilterTextFieldIdForTest(String repoId, int panelIndex) {
         return "#" + getPanelFilterTextFieldId(repoId, panelIndex);
+    }
+
+    public static String getPanelRenameTextFieldIdForTest(String repoId, int panelIndex) {
+        return "#" + getPanelRenameTextFieldId(repoId, panelIndex);
     }
 
     public static String getRepositorySelectorIdForTest() {
@@ -56,7 +73,16 @@ public final class IdGenerator {
         return "#" + getLabelPickerTextFieldId();
     }
 
-    public static String getPanelCloseButtonForTest(String repoId, int panelIndex) {
-        return "#" + getPanelCloseButton(repoId, panelIndex);
+    public static String getPanelCloseButtonIdForTest(String repoId, int panelIndex) {
+        return "#" + getPanelCloseButtonId(repoId, panelIndex);
     }
+
+    public static String getPanelRenameButtonIdForTest(String repoId, int panelIndex) {
+        return "#" + getPanelRenameButtonId(repoId, panelIndex);
+    }
+
+    public static String getOcticonButtonIdForTest(String repoId, int panelIndex, String octiconCssName) {
+        return "#" + getOcticonButtonId(repoId, panelIndex, octiconCssName);
+    }
+
 }
