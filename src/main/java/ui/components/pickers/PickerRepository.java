@@ -51,16 +51,16 @@ public class PickerRepository implements Comparable<PickerRepository> {
             return false;
         }
         PickerRepository other = (PickerRepository) o;
-        return repositoryId.equals(other.getRepositoryId());
+        return repositoryId.equalsIgnoreCase(other.getRepositoryId());
     }
 
     @Override
     public int hashCode() {
-        return repositoryId.hashCode();
+        return repositoryId.toLowerCase().hashCode();
     }
 
     @Override
     public int compareTo(PickerRepository o) {
-        return repositoryId.compareTo(o.getRepositoryId());
+        return repositoryId.toLowerCase().compareTo(o.getRepositoryId().toLowerCase());
     }
 }
