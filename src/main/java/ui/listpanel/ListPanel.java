@@ -55,7 +55,7 @@ public class ListPanel extends FilterPanel {
     private final HashMap<Integer, Integer> issueNonSelfCommentCounts = new HashMap<>();
 
 
-    private TextFlow bottomPanelText;
+
     Text openIssueText;
     Text closedIssueText;
     Text totalIssueText;
@@ -101,7 +101,7 @@ public class ListPanel extends FilterPanel {
         openIssueText.setFill(Color.GREEN);
         closedIssueText.setFill(Color.RED);
         totalIssueText.setFill(Color.BLACK);
-        bottomPanelText = new TextFlow(openIssueText, new Text("+"), closedIssueText, new Text("="), totalIssueText);
+        TextFlow bottomPanelText = new TextFlow(openIssueText, new Text("+"), closedIssueText, new Text("="), totalIssueText);
         return bottomPanelText;
     }
 
