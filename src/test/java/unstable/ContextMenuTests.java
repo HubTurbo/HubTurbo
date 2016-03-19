@@ -94,7 +94,7 @@ public class ContextMenuTests extends UITest {
      */
     @Test
     public void testChangeLabels() {
-        String cellId = IdGenerator.getPanelCellId("dummy/dummy", 0, 9);
+        String cellId = IdGenerator.getPanelCellIdForTest("dummy/dummy", 0, 9);
         String labelTextFieldId = IdGenerator.getLabelPickerTextFieldIdForTest();
 
         click(cellId);
