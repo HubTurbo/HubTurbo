@@ -14,6 +14,7 @@ import java.util.function.Predicate;
 public interface IModel extends IBaseModel {
     String getDefaultRepo();
     void setDefaultRepo(String repoId);
+    boolean isUserInRepo(String repoId, String userName);
     Optional<Model> getModelById(String repoId);
     Optional<TurboUser> getAssigneeOfIssue(TurboIssue issue);
     Optional<TurboUser> getAuthorOfIssue(TurboIssue issue);

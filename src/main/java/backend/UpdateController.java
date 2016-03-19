@@ -4,7 +4,6 @@ import backend.resource.Model;
 import backend.resource.MultiModel;
 import backend.resource.TurboIssue;
 import filter.FilterException;
-import filter.SemanticException;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
 import javafx.application.Platform;

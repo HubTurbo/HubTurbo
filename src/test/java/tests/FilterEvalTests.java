@@ -23,6 +23,8 @@ import filter.expression.Qualifier;
 import filter.expression.QualifierType;
 import prefs.Preferences;
 
+import static filter.expression.Qualifier.USER_WARNING_ERROR_FORMAT;
+
 public class FilterEvalTests {
 
     @Rule
@@ -30,8 +32,6 @@ public class FilterEvalTests {
 
     private final IModel empty;
     public static final String REPO = "test/test";
-
-    private static final String USER_WARNING_ERROR_FORMAT = "Cannot find username containing %s in %s";
 
     public FilterEvalTests() {
         empty = new MultiModel(mock(Preferences.class));
@@ -826,20 +826,20 @@ public class FilterEvalTests {
     }
 
     @Test
-    public void QualifierProcess_useInvalidUsername_getUserWarning() {
+    public void processQualifier_useInvalidUsername_getUsernameWarning() {
         TurboUser user = new TurboUser(REPO, "fox", "charlie");
         IModel model = TestUtils.singletonModel(new Model(REPO,
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new ArrayList<>(Arrays.asList(user))));
+                                                            new ArrayList<>(),
+                                                            new ArrayList<>(),
+                                                            new ArrayList<>(),
+                                                            new ArrayList<>(Arrays.asList(user))));
         verifySemanticException(model, "involves:bob", String.format(USER_WARNING_ERROR_FORMAT, "bob", REPO));
         verifySemanticException(model, "involves:foxx", String.format(USER_WARNING_ERROR_FORMAT, "bob", REPO));
         verifySemanticException(model, "author:alice", String.format(USER_WARNING_ERROR_FORMAT, "alice", REPO));
     }
 
     @Test
-    public void QualifierProcess_useValidUsername() {
+    public void processQualifier() {
         TurboUser user1 = new TurboUser(REPO, "alice", "Alice");
         TurboUser user2 = new TurboUser(REPO, "bob", "Bob");
         TurboUser user3 = new TurboUser(REPO, "fox", "Charlie");

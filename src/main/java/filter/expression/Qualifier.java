@@ -20,7 +20,7 @@ public class Qualifier implements FilterExpression {
 
     public static final Qualifier EMPTY = new Qualifier(QualifierType.EMPTY, "");
     public static final Qualifier FALSE = new Qualifier(QualifierType.FALSE, "");
-
+    public static final String USER_WARNING_ERROR_FORMAT = "Cannot find username containing %s in %s%n";
 
     private final QualifierType type;
 
@@ -843,16 +843,7 @@ public class Qualifier implements FilterExpression {
 
         if (!assignee.isPresent()) return false;
 
-        List<TurboUser> usersOfRepo = model.getUsersOfRepo(issue.getRepoId());
-        boolean shouldWarnUser = !usersOfRepo.stream()
-                .filter(user -> user.getLoginName().contains(content.get().toLowerCase())
-                        || user.getRealName().contains(content.get().toLowerCase()))
-                .findAny()
-                .isPresent();
-        if (shouldWarnUser) {
-            throw new SemanticException(String.format("Cannot find username containing %s in %s%n", content.get(),
-                                                                                                    issue.getRepoId()));
-        }
+        enforceUserInRepoCondition(model, issue.getRepoId(), content.get());
 
         String content = this.content.get().toLowerCase();
         String login = assignee.get().getLoginName() == null ? "" : assignee.get().getLoginName().toLowerCase();
@@ -864,20 +855,17 @@ public class Qualifier implements FilterExpression {
     private boolean authorSatisfies(IModel model, TurboIssue issue) {
         if (!content.isPresent()) return false;
 
-        List<TurboUser> usersOfRepo = model.getUsersOfRepo(issue.getRepoId());
-        boolean shouldWarnUser = !usersOfRepo.stream()
-                .filter(user -> user.getLoginName().contains(content.get().toLowerCase())
-                                || user.getRealName().contains(content.get().toLowerCase()))
-                .findAny()
-                .isPresent();
-        if (shouldWarnUser) {
-            throw new SemanticException(String.format("Cannot find username containing %s in %s%n", content.get(),
-                    issue.getRepoId()));
-        }
+        enforceUserInRepoCondition(model, issue.getRepoId(), content.get());
 
         String creator = issue.getCreator();
-
         return creator.toLowerCase().contains(content.get().toLowerCase());
+    }
+
+    private void enforceUserInRepoCondition(IModel model, String repoId, String userName) {
+        boolean shouldWarnUser = !model.isUserInRepo(repoId, userName);
+        if (shouldWarnUser) {
+            throw new SemanticException(String.format(USER_WARNING_ERROR_FORMAT, userName, repoId));
+        }
     }
 
     private boolean involvesSatisfies(IModel model, TurboIssue issue) {

@@ -153,6 +153,16 @@ public class MultiModel implements IModel {
     }
 
     @Override
+    public boolean isUserInRepo(String repoId, String userName) {
+        List<TurboUser> usersOfRepo = getUsersOfRepo(repoId);
+        return usersOfRepo.stream()
+                .filter(userOfRepo -> userOfRepo.getRealName().toLowerCase().contains(userName.toLowerCase()) ||
+                                        userOfRepo.getLoginName().toLowerCase().contains(userName.toLowerCase()))
+                .findFirst()
+                .isPresent();
+    }
+
+    @Override
     public synchronized List<TurboIssue> getIssues() {
         List<TurboIssue> result = new ArrayList<>();
         models.values().forEach(m -> result.addAll(m.getIssues()));
