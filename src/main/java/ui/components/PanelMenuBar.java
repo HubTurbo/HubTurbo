@@ -124,7 +124,7 @@ public class PanelMenuBar extends HBox {
     private HBox createCloseButton() {
         HBox closeArea = new HBox();
         closeButton = new Label(OCTICON_CLOSE_PANEL);
-        closeButton.setId(guiController.getDefaultRepo() + "_col" + panel.panelIndex + "_closeButton");
+        closeButton.setId(IdGenerator.getPanelCloseButton(guiController.getDefaultRepo(), panel.panelIndex));
         closeButton.getStyleClass().addAll("octicon", "label-button");
         closeButton.setOnMouseClicked((e) -> {
             e.consume();

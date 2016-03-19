@@ -5,6 +5,7 @@ import org.loadui.testfx.utils.FXTestUtils;
 
 import prefs.Preferences;
 import prefs.PanelInfo;
+import ui.IdGenerator;
 import ui.TestController;
 
 import java.util.List;
@@ -21,11 +22,12 @@ public class NoPanelAtQuitTest extends UITest {
 
     @Test
     public void emptyPanelsInfoTest() {
+        String panelCloseButtonId = IdGenerator.getPanelCloseButtonForTest("dummy/dummy", 0);
 
         // Test for saving panel information when there are no panels at termination.
 
         // close open panel
-        click("#dummy/dummy_col0_closeButton");
+        click(panelCloseButtonId);
 
         // Quitting to update json
         click("File");

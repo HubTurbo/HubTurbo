@@ -27,6 +27,11 @@ public final class IdGenerator {
         return "queryField";
     }
 
+    public static String getPanelCloseButton(String repoId, int panelIndex) {
+        return repoId + "_col" + panelIndex + "_closeButton";
+    }
+
+
     public static String getPanelCellIdForTest(String repoId, int panelIndex, int issueId) {
         return "#" + getPanelCellId(repoId, panelIndex, issueId);
     }
@@ -49,5 +54,9 @@ public final class IdGenerator {
 
     public static String getLabelPickerTextFieldIdForTest() {
         return "#" + getLabelPickerTextFieldId();
+    }
+
+    public static String getPanelCloseButtonForTest(String repoId, int panelIndex) {
+        return "#" + getPanelCloseButton(repoId, panelIndex);
     }
 }
