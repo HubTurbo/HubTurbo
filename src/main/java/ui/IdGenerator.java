@@ -18,4 +18,28 @@ public final class IdGenerator {
     public static String getPanelNameAreaId(String repoId, int panelIndex) {
         return repoId + "_col" + panelIndex + "_nameText";
     }
+
+    public static String getPanelId(String repoId, int panelIndex) {
+        return repoId + "_col" + panelIndex;
+    }
+
+    public static String getPanelCellIdForTest(String repoId, int panelIndex, int issueId) {
+        return "#" + getPanelCellId(repoId, panelIndex, issueId);
+    }
+
+    public static String getPanelFilterTextFieldIdForTest(String repoId, int panelIndex) {
+        return "#" + getPanelFilterTextFieldId(repoId, panelIndex);
+    }
+
+    public static String getRepositorySelectorIdForTest() {
+        return "#" + getRepositorySelectorId();
+    }
+
+    public static String getPanelNameAreaIdForTest(String repoId, int panelIndex) {
+        return "#" + getPanelNameAreaId(repoId, panelIndex);
+    }
+
+    public static String getPanelIdForTest(String repoId, int panelIndex) {
+        return "#" + getPanelId(repoId, panelIndex);
+    }
 }
