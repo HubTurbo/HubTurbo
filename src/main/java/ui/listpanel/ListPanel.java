@@ -59,6 +59,9 @@ public class ListPanel extends FilterPanel {
     Text openIssueText;
     Text closedIssueText;
     Text totalIssueText;
+    Text bracketOpenText;
+    Text bracketCloseText;
+    Text plusText;
 
     // Context Menu
     private final ContextMenu contextMenu = new ContextMenu();
@@ -98,11 +101,14 @@ public class ListPanel extends FilterPanel {
         openIssueText = new Text(String.valueOf(openIssueCount));
         closedIssueText = new Text(String.valueOf(closedIssueCount));
         totalIssueText = new Text(String.valueOf(issueCount));
+        bracketOpenText = new Text(" (");
+        bracketCloseText = new Text(")");
+        plusText = new Text(" + ");
         openIssueText.setFill(Color.GREEN);
         closedIssueText.setFill(Color.RED);
         totalIssueText.setFill(Color.BLACK);
-        TextFlow bottomPanelText = new TextFlow(openIssueText, new Text("+"), closedIssueText,
-                new Text("="), totalIssueText);
+        TextFlow bottomPanelText = new TextFlow(totalIssueText, bracketOpenText,
+                openIssueText, plusText, closedIssueText, bracketCloseText);
         return bottomPanelText;
     }
 
@@ -168,8 +174,6 @@ public class ListPanel extends FilterPanel {
         issueCount = getElementsList().size();
         closedIssueCount = getClosedIssueSize();
         openIssueCount = issueCount - closedIssueCount;
-        System.out.println("closed = " + closedIssueCount + " open = " + openIssueCount);
-
         listView.restoreSelection();
         this.setId(guiController.getDefaultRepo() + "_col" + panelIndex);
         updateFooter();
@@ -191,9 +195,25 @@ public class ListPanel extends FilterPanel {
      * This function updates the information in the panel footer.
      */
     private void updateFooter() {
-        openIssueText.setText(String.valueOf(openIssueCount));
-        closedIssueText.setText(String.valueOf(closedIssueCount));
-        totalIssueText.setText(String.valueOf(issueCount));
+
+        if (issueCount == 0){
+            totalIssueText.setText(String.valueOf(0));
+            hideFooterPanelStatsDetails(true);
+        } else {
+            openIssueText.setText(String.valueOf(openIssueCount));
+            closedIssueText.setText(String.valueOf(closedIssueCount));
+            totalIssueText.setText(String.valueOf(issueCount));
+            hideFooterPanelStatsDetails(false);
+        }
+
+    }
+
+    private void hideFooterPanelStatsDetails(boolean hide) {
+        openIssueText.setVisible(!hide);
+        closedIssueText.setVisible(!hide);
+        plusText.setVisible(!hide);
+        bracketCloseText.setVisible(!hide);
+        bracketOpenText.setVisible(!hide);
     }
 
     private void setupListView() {
