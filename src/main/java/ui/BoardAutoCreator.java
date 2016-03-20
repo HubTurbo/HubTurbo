@@ -30,7 +30,7 @@ public class BoardAutoCreator {
 
     public static final Map<String, String> getSamplePanelDetails(){
         Map<String, String> panelMap = new LinkedHashMap<>();
-        panelMap.put("Useful tips!",
+        panelMap.put("Latest tips",
                 String.format("repo:%s is:open label:\"latest-tips\"", TIPS_REPO_NAME));
         panelMap.put("Seven latest updated issues in my two sample repos",
                 String.format("repo:%s;%s is:issue sort:!updated,comments count:7",
