@@ -29,6 +29,7 @@ import org.junit.BeforeClass;
 import org.loadui.testfx.GuiTest;
 import org.loadui.testfx.exceptions.NoNodesFoundException;
 import org.loadui.testfx.exceptions.NoNodesVisibleException;
+import org.loadui.testfx.utils.KeyCodeUtils;
 import org.testfx.api.FxRobot;
 import org.testfx.api.FxToolkit;
 
@@ -532,15 +533,7 @@ public class UITest extends FxRobot {
                         .release(specialCharsMap.get(text.charAt(i))).release(KeyCode.SHIFT);
 
             } else {
-                String typed = String.valueOf(text.charAt(i)).toUpperCase();
-                if (StringUtils.isNumeric(typed)) {
-                    typed = "DIGIT" + typed;
-                }
-                if ("/".equals(typed)) {
-                    type(KeyCode.SLASH);
-                } else {
-                    type(KeyCode.valueOf(typed));
-                }
+                type(KeyCodeUtils.findKeyCode(text.charAt(i)));
             }
         }
         return this;
