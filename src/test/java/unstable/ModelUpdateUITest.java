@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
 
 import guitests.UITest;
+import ui.IdGenerator;
 import ui.UI;
 import ui.listpanel.ListPanel;
 import util.PlatformEx;
@@ -19,6 +20,7 @@ import util.events.testevents.UpdateDummyRepoEvent;
 public class ModelUpdateUITest extends UITest {
 
     private static final int EVENT_DELAY = 1500;
+    private static final String PANEL_ID = IdGenerator.getPanelIdForTest("dummy/dummy", 0);
 
     @Override
     public void launchApp() {
@@ -30,7 +32,11 @@ public class ModelUpdateUITest extends UITest {
             throws InterruptedException, ExecutionException {
         resetRepo();
         addIssue();
+<<<<<<< d37a856d90e9fc0b7ff38cfd8ec48c11a7da88e7
         FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssuesCount);
+=======
+        FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find(PANEL_ID))::getIssueCount);
+>>>>>>> apiBox's id is now also gotten from IdGenerator. Finished refactoring other tests which uses cssquery to locate a node.
         PlatformEx.runAndWait(countIssues);
         assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES + 1, countIssues.get().intValue());
     }
@@ -42,7 +48,11 @@ public class ModelUpdateUITest extends UITest {
         addIssue();
         addIssue();
         addIssue();
+<<<<<<< d37a856d90e9fc0b7ff38cfd8ec48c11a7da88e7
         FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssuesCount);
+=======
+        FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find(PANEL_ID))::getIssueCount);
+>>>>>>> apiBox's id is now also gotten from IdGenerator. Finished refactoring other tests which uses cssquery to locate a node.
         PlatformEx.runAndWait(countIssues);
         assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES + 3, countIssues.get().intValue());
     }
@@ -52,7 +62,11 @@ public class ModelUpdateUITest extends UITest {
             throws InterruptedException, ExecutionException {
         addIssue();
         resetRepo();
+<<<<<<< d37a856d90e9fc0b7ff38cfd8ec48c11a7da88e7
         FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssuesCount);
+=======
+        FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find(PANEL_ID))::getIssueCount);
+>>>>>>> apiBox's id is now also gotten from IdGenerator. Finished refactoring other tests which uses cssquery to locate a node.
         PlatformEx.runAndWait(countIssues);
         assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES, countIssues.get().intValue());
     }
@@ -64,7 +78,11 @@ public class ModelUpdateUITest extends UITest {
         addIssue();
         addIssue();
         deleteIssue(1);
+<<<<<<< d37a856d90e9fc0b7ff38cfd8ec48c11a7da88e7
         FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssuesCount);
+=======
+        FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find(PANEL_ID))::getIssueCount);
+>>>>>>> apiBox's id is now also gotten from IdGenerator. Finished refactoring other tests which uses cssquery to locate a node.
         PlatformEx.runAndWait(countIssues);
         assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES + 1, countIssues.get().intValue());
     }
@@ -78,7 +96,11 @@ public class ModelUpdateUITest extends UITest {
         addIssue();
         deleteIssue(1);
         deleteIssue(2);
+<<<<<<< d37a856d90e9fc0b7ff38cfd8ec48c11a7da88e7
         FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssuesCount);
+=======
+        FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find(PANEL_ID))::getIssueCount);
+>>>>>>> apiBox's id is now also gotten from IdGenerator. Finished refactoring other tests which uses cssquery to locate a node.
         PlatformEx.runAndWait(countIssues);
         assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES + 1, countIssues.get().intValue());
     }

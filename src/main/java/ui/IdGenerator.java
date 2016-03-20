@@ -55,6 +55,9 @@ public final class IdGenerator {
         return "boardsavebutton";
     }
 
+    public static String getApiBoxId() {
+        return "apiBox";
+    }
 
     public static String getPanelCellIdForTest(String repoId, int panelIndex, int issueId) {
         return "#" + getPanelCellId(repoId, panelIndex, issueId);
@@ -114,5 +117,9 @@ public final class IdGenerator {
 
     public static String getLabelPickerQueryFieldIdForTest() {
         return "#queryField";
+    }
+
+    public static String getApiBoxIdForTest() {
+        return "#" + getApiBoxId();
     }
 }
