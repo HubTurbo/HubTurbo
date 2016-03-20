@@ -2,8 +2,11 @@ package ui.components.pickers;
 
 import backend.resource.TurboIssue;
 import backend.resource.TurboUser;
+import com.sun.javafx.tk.FontLoader;
+import com.sun.javafx.tk.Toolkit;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
@@ -21,7 +24,9 @@ public class AssigneePickerDialog extends Dialog<Pair<ButtonType, String>> {
     private static final String ALL_ASSIGNEES = "All Assignees";
 
     private final List<PickerAssignee> originalAssignees = new ArrayList<>();
-    FlowPane allAssigneesPane, assignedAssigneePane;
+    FlowPane assignedAssigneePane;
+    ScrollPane matchingAssigneePane;
+    VBox matchingAssigneesBox;
     private TextField textField;
     private AssigneePickerState state;
 
@@ -81,11 +86,8 @@ public class AssigneePickerDialog extends Dialog<Pair<ButtonType, String>> {
     }
 
     private boolean isExistingAssignee(TurboIssue issue, PickerAssignee assignee) {
-        if (issue.getAssignee().isPresent()) {
-            return issue.getAssignee().get().equals(assignee.getLoginName());
-        } else {
-            return false;
-        }
+        if (!issue.getAssignee().isPresent()) return false;
+        return issue.getAssignee().get().equals(assignee.getLoginName());
     }
 
     private void selectAssignedAssignee(List<PickerAssignee> assigneeList, TurboIssue issue) {
@@ -112,15 +114,16 @@ public class AssigneePickerDialog extends Dialog<Pair<ButtonType, String>> {
 
     private void initUI() {
         VBox assigneeBox = new VBox();
-        assignedAssigneePane = createAssigneeGroup();
-        allAssigneesPane = createAssigneeGroup();
+        assignedAssigneePane = createAssignedAssigneeGroup();
+        matchingAssigneesBox = createMatchingAssigneeBox();
+        matchingAssigneePane = createMatchingAssigneePane();
         textField = new TextField();
 
         assigneeBox.getChildren().add(new Label(ASSIGNED_ASSIGNEE));
         assigneeBox.getChildren().add(assignedAssigneePane);
         assigneeBox.getChildren().add(textField);
         assigneeBox.getChildren().add(new Label(ALL_ASSIGNEES));
-        assigneeBox.getChildren().add(allAssigneesPane);
+        assigneeBox.getChildren().add(matchingAssigneePane);
 
 
         getDialogPane().setContent(assigneeBox);
@@ -129,9 +132,8 @@ public class AssigneePickerDialog extends Dialog<Pair<ButtonType, String>> {
     }
 
     private void refreshUI(AssigneePickerState state) {
-        List<PickerAssignee> assigneesToDisplay = state.getCurrentAssigneesList();
-        populateAssignedAssignee(assigneesToDisplay, assignedAssigneePane);
-        populateAllAssignees(assigneesToDisplay, allAssigneesPane);
+        populateAssignedAssignee(state.getCurrentAssigneesList(), assignedAssigneePane);
+        populateMatchingAssignee(state.getMatchingAssigneeList(), matchingAssigneesBox);
     }
 
     private void populateAssignedAssignee(List<PickerAssignee> assigneeList, FlowPane assignedAssigneeStatus) {
@@ -142,6 +144,21 @@ public class AssigneePickerDialog extends Dialog<Pair<ButtonType, String>> {
         addSeparator(assignedAssigneeStatus);
         updateNewlyAddedAssignee(assigneeList, assignedAssigneeStatus, hasSuggestion);
         updateSuggestedAssignee(assigneeList, assignedAssigneeStatus, hasSuggestion);
+    }
+
+    private void populateMatchingAssignee(List<PickerAssignee> matchingAssigneeList, VBox matchingAssigneesBox) {
+        matchingAssigneesBox.getChildren().clear();
+
+        if (matchingAssigneeList.isEmpty()) {
+            Label noMatchAssigneeLabel = createNoMatchingAssigneeLabel();
+            matchingAssigneesBox.getChildren().add(noMatchAssigneeLabel);
+            return; 
+        }
+
+        matchingAssigneeList.stream()
+                .sorted()
+                .forEach(assignee -> matchingAssigneesBox.getChildren().add(setMouseClickForNode(assignee.getHNode(),
+                        assignee.getLoginName())));
     }
 
     private void addSeparator(FlowPane assignedAssigneeStatus) {
@@ -176,6 +193,9 @@ public class AssigneePickerDialog extends Dialog<Pair<ButtonType, String>> {
             Node existingAssigneeNode = setMouseClickForNode(existingAssignee.getExistingAssigneeNode(hasSuggestion),
                     existingAssignee.getLoginName());
             assignedAssigneeStatus.getChildren().add(existingAssigneeNode);
+        } else {
+            Label noExistingAssignee = createNoExistingAssigneeLabel();
+            assignedAssigneeStatus.getChildren().add(noExistingAssignee);
         }
     }
 
@@ -193,25 +213,48 @@ public class AssigneePickerDialog extends Dialog<Pair<ButtonType, String>> {
                 .get();
     }
 
-    private void populateAllAssignees(List<PickerAssignee> assigneeList, FlowPane allAssigneesPane) {
-        allAssigneesPane.getChildren().clear();
-        assigneeList.stream()
-                .forEach(assignee -> allAssigneesPane.getChildren().add(setMouseClickForNode(assignee.getNode(),
-                        assignee.getLoginName())));
-    }
-
     private Node setMouseClickForNode(Node node, String assigneeName) {
         node.setOnMouseClicked(e -> handleMouseClick(assigneeName));
         return node;
     }
 
-    private FlowPane createAssigneeGroup() {
+    private FlowPane createAssignedAssigneeGroup() {
         FlowPane assigneeGroup = new FlowPane();
         assigneeGroup.setPadding(new Insets(5, 5, 5, 5));
         assigneeGroup.setHgap(3);
         assigneeGroup.setVgap(5);
         assigneeGroup.setStyle("-fx-border-radius: 3;");
         return assigneeGroup;
+    }
+
+    private VBox createMatchingAssigneeBox() {
+        VBox milestoneGroup = new VBox();
+        milestoneGroup.setStyle("-fx-background-color: white;");
+        return milestoneGroup;
+    }
+
+    private ScrollPane createMatchingAssigneePane() {
+        ScrollPane matchingAssigneePane = new ScrollPane();
+        matchingAssigneePane.setMaxHeight(200);
+        matchingAssigneePane.setContent(matchingAssigneesBox);
+        return matchingAssigneePane;
+    }
+
+    private Label createNoMatchingAssigneeLabel() {
+        Label noMatchAssigneeLabel = new Label("No users matched your query.");
+        noMatchAssigneeLabel.setPrefHeight(40);
+        noMatchAssigneeLabel.setPrefWidth(398);
+        noMatchAssigneeLabel.setAlignment(Pos.CENTER);
+        return noMatchAssigneeLabel;
+    }
+
+    private Label createNoExistingAssigneeLabel() {
+        Label noExistingAssignee = new Label("No assignee");
+        noExistingAssignee.setPrefHeight(40);
+        FontLoader fontLoader = Toolkit.getToolkit().getFontLoader();
+        double width = fontLoader.computeStringWidth(noExistingAssignee.getText(), noExistingAssignee.getFont());
+        noExistingAssignee.setPrefWidth(width);
+        return noExistingAssignee;
     }
 
     private boolean hasSelectedAssignee(List<PickerAssignee> assigneeList) {

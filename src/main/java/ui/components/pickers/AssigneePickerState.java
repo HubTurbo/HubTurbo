@@ -11,12 +11,20 @@ public class AssigneePickerState {
     private List<PickerAssignee> currentAssigneesList;
 
     public AssigneePickerState(List<PickerAssignee> assignees) {
-        currentAssigneesList = new ArrayList<>(assignees);
+        currentAssigneesList = getResetList(assignees);
     }
 
     public AssigneePickerState(List<PickerAssignee> assignees, String userInput) {
         this(assignees);
         processInput(userInput);
+    }
+
+    // returns list with all boolean attributes of picker assignee set to false
+    private List<PickerAssignee> getResetList(List<PickerAssignee> sourceList) {
+        List<PickerAssignee> resetList = new ArrayList<>();
+        sourceList.stream()
+                .forEach(milestone -> resetList.add(new PickerAssignee(milestone)));
+        return resetList;
     }
 
     private void processInput(String userInput) {
