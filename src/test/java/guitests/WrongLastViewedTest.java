@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
 import prefs.Preferences;
 import tests.TestUtils;
+import ui.IdGenerator;
 import ui.TestController;
 import ui.UI;
 import ui.components.StatusUIStub;
@@ -45,7 +46,7 @@ public class WrongLastViewedTest extends UITest {
 
     @Test
     public void wrongLastViewedTest() throws InterruptedException {
-        ComboBox<String> repositorySelector = find("#repositorySelector");
+        ComboBox<String> repositorySelector = find(IdGenerator.getRepositorySelectorIdForTest());
         assertEquals("test2/test2", repositorySelector.getValue());
     }
 }

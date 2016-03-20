@@ -47,6 +47,13 @@ public final class IdGenerator {
         return "repoOwnerField";
     }
 
+    public static String getBoardNameInputFieldId() {
+        return "boardnameinput";
+    }
+
+    public static String getBoardNameSaveButtonId() {
+        return "boardsavebutton";
+    }
 
 
     public static String getPanelCellIdForTest(String repoId, int panelIndex, int issueId) {
@@ -91,5 +98,13 @@ public final class IdGenerator {
 
     public static String getLoginDialogOwnerFieldIdForTest() {
         return "#" + getLoginDialogOwnerFieldId();
+    }
+
+    public static String getBoardNameInputFieldIdForTest() {
+        return "#" + getBoardNameInputFieldId();
+    }
+
+    public static String getBoardNameSaveButtonIdForTest() {
+        return "#" + getBoardNameSaveButtonId();
     }
 }

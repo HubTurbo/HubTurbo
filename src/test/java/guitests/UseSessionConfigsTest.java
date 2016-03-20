@@ -63,7 +63,7 @@ public class UseSessionConfigsTest extends UITest {
 
         // Somehow the text field cannot be populated by typing on the CI, use setText instead.
         // TODO find out why
-        ((TextField) find("#boardnameinput")).setText("Empty Board");
+        ((TextField) find(IdGenerator.getBoardNameInputFieldIdForTest())).setText("Empty Board");
         click("OK");
 
         PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(0)));
@@ -124,7 +124,7 @@ public class UseSessionConfigsTest extends UITest {
         click("Save as");
 
         // Text field cannot be populated by typing on the CI, use setText instead
-        ((TextField) find("#boardnameinput")).setText("Dummy Board");
+        ((TextField) find(IdGenerator.getBoardNameInputFieldIdForTest())).setText("Dummy Board");
         click("OK");
 
         // Then exit program...
