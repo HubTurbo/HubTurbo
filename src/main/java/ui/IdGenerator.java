@@ -43,6 +43,10 @@ public final class IdGenerator {
         return repoId + "_col" + panelIndex + "_" + octiconCssName;
     }
 
+    public static String getLoginDialogOwnerFieldId() {
+        return "repoOwnerField";
+    }
+
 
 
     public static String getPanelCellIdForTest(String repoId, int panelIndex, int issueId) {
@@ -85,4 +89,7 @@ public final class IdGenerator {
         return "#" + getOcticonButtonId(repoId, panelIndex, octiconCssName);
     }
 
+    public static String getLoginDialogOwnerFieldIdForTest() {
+        return "#" + getLoginDialogOwnerFieldId();
+    }
 }

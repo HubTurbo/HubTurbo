@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
+import ui.IdGenerator;
 import ui.TestController;
 import ui.UI;
 import ui.issuepanel.FilterPanel;
@@ -43,14 +44,14 @@ public class PanelsTest extends UITest {
         waitUntilNodeDisappears(panel0);
 
         // Switch default repo
-        click("#repositorySelector");
+        click(IdGenerator.getRepositorySelectorIdForTest());
         selectAll();
         type("dummy2/dummy2");
         push(KeyCode.ENTER);
         pushKeys(CREATE_RIGHT_PANEL);
 
         // Ensure that new panels are associated with the current default repo
-        awaitCondition(() -> existsQuiet("#dummy2/dummy2_col2"));
+        awaitCondition(() -> existsQuiet(IdGenerator.getPanelId("dummy2/dummy2", 2)));
     }
 
     private void reorderPanelsByDragging(FilterPanel panel0, FilterPanel panel1, FilterPanel panel2) {

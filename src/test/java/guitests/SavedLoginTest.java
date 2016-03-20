@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
 import prefs.Preferences;
 import tests.TestUtils;
+import ui.IdGenerator;
 import ui.TestController;
 import ui.UI;
 import ui.components.StatusUI;
@@ -45,8 +46,8 @@ public class SavedLoginTest extends UITest {
 
     @Test
     public void savedLogin_lastSavedLoginCredentials_shouldAllowLoginWithoutPrompting()
-        throws InterruptedException {
-        ComboBox<String> repositorySelector = find("#repositorySelector");
+            throws InterruptedException {
+        ComboBox<String> repositorySelector = find(IdGenerator.getRepositorySelectorIdForTest());
         assertEquals("test/test", repositorySelector.getValue());
     }
 }
