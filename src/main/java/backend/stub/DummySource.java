@@ -6,6 +6,7 @@ import backend.github.*;
 import backend.interfaces.RepoSource;
 import backend.resource.Model;
 import backend.resource.TurboIssue;
+import backend.tupleresults.IntegerLongResult;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import util.Futures;
 
@@ -56,7 +57,7 @@ public class DummySource extends RepoSource {
     }
 
     @Override
-    public CompletableFuture<ImmutablePair<Integer, Long>> getRateLimitResetTime() {
+    public CompletableFuture<IntegerLongResult> getRateLimitResetTime() {
         return addTask(new CheckRateLimitTask(this, dummy)).response;
     }
 

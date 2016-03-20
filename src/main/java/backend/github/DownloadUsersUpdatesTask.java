@@ -4,7 +4,7 @@ import backend.interfaces.Repo;
 import backend.interfaces.TaskRunner;
 import backend.resource.Model;
 import backend.resource.TurboUser;
-import org.apache.commons.lang3.tuple.ImmutablePair;
+import backend.tupleresults.ListStringResult;
 import org.apache.logging.log4j.Logger;
 import util.HTLog;
 
@@ -26,14 +26,14 @@ public class DownloadUsersUpdatesTask extends GitHubRepoTask<GitHubRepoTask.Resu
 
     @Override
     public void run() {
-        ImmutablePair<List<TurboUser>, String> changes = repo.getUpdatedCollaborators(
+        ListStringResult changes = repo.getUpdatedCollaborators(
                 model.getRepoId(), model.getUpdateSignature().collaboratorsETag);
 
-        List<TurboUser> changedUsers = changes.left;
+        List<TurboUser> changedUsers = changes.getList();
 
         logger.info(HTLog.format(model.getRepoId(), "%s user(s)) changed%s",
             changedUsers.size(), changedUsers.isEmpty() ? "" : ": " + changedUsers));
 
-        response.complete(new Result<>(changedUsers, changes.right));
+        response.complete(new Result<>(changedUsers, changes.getString()));
     }
 }

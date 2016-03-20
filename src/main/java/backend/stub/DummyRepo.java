@@ -6,10 +6,10 @@ import backend.resource.TurboIssue;
 import backend.resource.TurboLabel;
 import backend.resource.TurboMilestone;
 import backend.resource.TurboUser;
+import backend.tupleresults.IntegerLongResult;
+import backend.tupleresults.ListStringDateResult;
+import backend.tupleresults.ListStringResult;
 import github.ReviewComment;
-import github.TurboIssueEvent;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.eclipse.egit.github.core.Comment;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.PullRequest;
@@ -104,7 +104,7 @@ public class DummyRepo implements Repo {
     }
 
     @Override
-    public ImmutableTriple<List<TurboIssue>, String, Date>
+    public ListStringDateResult
         getUpdatedIssues(String repoId, String eTag, Date lastCheckTime) {
         return getRepoState(repoId).getUpdatedIssues(eTag, lastCheckTime);
     }
@@ -115,17 +115,17 @@ public class DummyRepo implements Repo {
     }
 
     @Override
-    public ImmutablePair<List<TurboLabel>, String> getUpdatedLabels(String repoId, String eTag) {
+    public ListStringResult getUpdatedLabels(String repoId, String eTag) {
         return getRepoState(repoId).getUpdatedLabels(eTag);
     }
 
     @Override
-    public ImmutablePair<List<TurboMilestone>, String> getUpdatedMilestones(String repoId, String eTag) {
+    public ListStringResult getUpdatedMilestones(String repoId, String eTag) {
         return getRepoState(repoId).getUpdatedMilestones(eTag);
     }
 
     @Override
-    public ImmutablePair<List<TurboUser>, String> getUpdatedCollaborators(String repoId, String eTag) {
+    public ListStringResult getUpdatedCollaborators(String repoId, String eTag) {
         return getRepoState(repoId).getUpdatedCollaborators(eTag);
     }
 
@@ -150,11 +150,11 @@ public class DummyRepo implements Repo {
     }
 
     @Override
-    public ImmutablePair<List<TurboIssueEvent>, String> getUpdatedEvents
+    public ListStringResult getUpdatedEvents
             (String repoId, int issueId, String currentETag) {
-        ImmutablePair<List<TurboIssueEvent>, String> result = getRepoState(repoId).getEvents(issueId, currentETag);
+        ListStringResult result = getRepoState(repoId).getEvents(issueId, currentETag);
 
-        if (!result.getRight().equals(currentETag) || currentETag.length() == 0) apiQuota--;
+        if (!result.getString().equals(currentETag) || currentETag.length() == 0) apiQuota--;
 
         return result;
     }
@@ -194,8 +194,8 @@ public class DummyRepo implements Repo {
      * @return Remaining calls, reset time ~45 minutes (27000000 milliseconds) from call.
      */
     @Override
-    public ImmutablePair<Integer, Long> getRateLimitResetTime() {
-        return new ImmutablePair<>(apiQuota, new Date().getTime() + 2700000);
+    public IntegerLongResult getRateLimitResetTime() {
+        return new IntegerLongResult(apiQuota, new Date().getTime() + 2700000);
     }
 
 }
