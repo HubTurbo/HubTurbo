@@ -31,13 +31,18 @@ public class IssueCard extends VBox {
     private static final int CARD_WIDTH = 350;
     private static final String OCTICON_COMMENT = "\uf02b";
     private static final String OCTICON_ARROW_RIGHT = "\uf03e";
+    private static final Background FOCUSED_BACKGROUND = new Background(
+        new BackgroundFill(Color.CORNFLOWERBLUE, CornerRadii.EMPTY, Insets.EMPTY));
+    private static final Background DEFAULT_BACKGROUND = new Background(
+        new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY));
 
     private final GuiElement guiElement;
     private final FlowPane issueDetails = new FlowPane();
     private final HBox authorAssigneeBox = new HBox();
 
-    public IssueCard(GuiElement guiElement){
+    public IssueCard(GuiElement guiElement, boolean isFocus){
         this.guiElement = guiElement;
+        this.setFocused(isFocus);
         setup();
     }
 
@@ -68,8 +73,7 @@ public class IssueCard extends VBox {
 
     private void setupMainIssueCard() {
         this.backgroundProperty().bind(Bindings.when(this.focusedProperty())
-            .then(new Background(new BackgroundFill(Color.CORNFLOWERBLUE, CornerRadii.EMPTY, Insets.EMPTY)))
-            .otherwise(new Background(new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY))));
+            .then(FOCUSED_BACKGROUND).otherwise(DEFAULT_BACKGROUND));
         this.setStyle("-fx-border-color:black; -fx-border-style:hidden hidden solid hidden; ");
     }
 

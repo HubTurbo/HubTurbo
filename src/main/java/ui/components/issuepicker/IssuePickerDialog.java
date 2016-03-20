@@ -77,7 +77,7 @@ public class IssuePickerDialog extends Dialog<List<String>> {
         createButtons();
 
         state = new IssuePickerState(issues, "");
-        populateSuggestedIssues(allIssues);
+        populateSuggestedIssues(allIssues, state.getCurrentSuggestion());
     }
 
     private void initialiseDialog(Stage stage) {
@@ -98,7 +98,7 @@ public class IssuePickerDialog extends Dialog<List<String>> {
     private final void populatePanes(IssuePickerState state) {
         // Population of UI elements
         populateSelectedIssues(state.getSelectedIssues(), state.getCurrentSuggestion());
-        populateSuggestedIssues(state.getSuggestedIssues());
+        populateSuggestedIssues(state.getSuggestedIssues(), state.getCurrentSuggestion());
 
         // Ensures dialog pane resize according to content
         getDialogPane().getScene().getWindow().sizeToScene();
@@ -114,10 +114,10 @@ public class IssuePickerDialog extends Dialog<List<String>> {
         });
     }
 
-    private void populateSuggestedIssues(List<TurboIssue> matchedIssues) {
+    private void populateSuggestedIssues(List<TurboIssue> matchedIssues, Optional<TurboIssue> currentSuggestion) {
         suggestedIssues.getChildren().clear();
         matchedIssues.stream()
-            .forEach(issue -> suggestedIssues.getChildren().add(processSuggestedIssue(issue)));
+            .forEach(issue -> suggestedIssues.getChildren().add(processSuggestedIssue(issue, currentSuggestion)));
     }
 
     private Node processSelectedIssue(TurboIssue issue, Optional<TurboIssue> suggestion) {
@@ -129,10 +129,10 @@ public class IssuePickerDialog extends Dialog<List<String>> {
         return new PickerIssue(issue).getNode();
     }
 
-    private Node processSuggestedIssue(TurboIssue issue) {
+    private Node processSuggestedIssue(TurboIssue issue, Optional<TurboIssue> currentSuggestion) {
         GuiElement element = new GuiElement(issue, models.getLabelsOfIssue(issue), models.getMilestoneOfIssue(issue),
                                             models.getAssigneeOfIssue(issue), models.getAuthorOfIssue(issue));
-        IssueCard card = new IssueCard(element);
+        IssueCard card = new IssueCard(element, isSuggestedIssue(issue, currentSuggestion));
         card.setOnMouseClicked(e -> handleIssueClick(issue, card));
         return card;
     }
@@ -242,5 +242,9 @@ public class IssuePickerDialog extends Dialog<List<String>> {
     private boolean canAddSuggestion(List<TurboIssue> chosenIssues, Optional<TurboIssue> suggestion) {
         return !issuepickerQueryField.isDisabled() 
             && suggestion.isPresent() && !chosenIssues.contains(suggestion.get());
+    }
+    
+    private boolean isSuggestedIssue(TurboIssue issue, Optional<TurboIssue> currentSuggestion) {
+        return currentSuggestion.isPresent() && currentSuggestion.get().equals(issue);
     }
 }
