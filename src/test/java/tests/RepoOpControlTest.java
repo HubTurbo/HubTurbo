@@ -33,7 +33,7 @@ public class RepoOpControlTest {
 
     private static final String REPO = "test/test";
     private static final TurboIssue issue = new TurboIssue(REPO, 1, "Issue 1");
-    private static final int milestone = 1;
+    private static final Optional<Integer> milestone = Optional.of(1);
 
     private final Executor executor = Executors.newCachedThreadPool();
 
@@ -133,11 +133,12 @@ public class RepoOpControlTest {
 
     @Test
     public void replaceIssueMilestoneLocally() throws ExecutionException, InterruptedException {
-        int issueId = 1, milestoneId = 1;
+        int issueId = 1;
+        Optional<Integer> milestoneId = Optional.of(1);
         MultiModel models = mock(MultiModel.class);
 
         TurboIssue returnedIssue = new TurboIssue("testrepo/testrepo", issueId, "Issue title");
-        returnedIssue.setMilestoneById(milestoneId);
+        returnedIssue.setMilestoneById(1);
 
         when(models.replaceIssueMilestone("testrepo/testrepo", issueId, milestoneId))
                 .thenReturn(Optional.of(returnedIssue));

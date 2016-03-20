@@ -5,15 +5,16 @@ import backend.interfaces.TaskRunner;
 import org.eclipse.egit.github.core.Issue;
 
 import java.io.IOException;
+import java.util.Optional;
 
 public class ReplaceIssueMilestoneTask extends GitHubRepoTask<Boolean> {
     private final String repoId;
     private final int issueId;
     private final String issueTitle;
-    private final Integer issueMilestone;
+    private final Optional<Integer> issueMilestone;
 
     public ReplaceIssueMilestoneTask(TaskRunner taskRunner, Repo repo, String repoId, int issueId, String issueTitle,
-                                     Integer issueMilestone) {
+                                     Optional<Integer> issueMilestone) {
         super(taskRunner, repo);
         this.repoId = repoId;
         this.issueId = issueId;
@@ -23,16 +24,16 @@ public class ReplaceIssueMilestoneTask extends GitHubRepoTask<Boolean> {
 
     @Override
     public void run() {
+        Optional<Integer> result;
         try {
-            Issue result = repo.setMilestone(repoId, issueId, issueTitle, issueMilestone);
-
-            if (result.getMilestone() == null) {
-                response.complete(issueMilestone == null);
-            } else {
-                response.complete(result.getMilestone().getNumber() == issueMilestone);
-            }
+            result = repo.setMilestone(repoId, issueId, issueTitle, issueMilestone);
         } catch (IOException e) {
             response.completeExceptionally(e);
+            return;
         }
+
+        System.out.println("Request to set milestone: " + issueMilestone.toString());
+        System.out.println("Returned milestone is: " + result.toString());
+        response.complete(issueMilestone.equals(result));
     }
 }

@@ -113,7 +113,7 @@ public class MultiModel implements IModel {
      * @param milestone
      * @return the modified TurboIssue if successful
      */
-    public synchronized Optional<TurboIssue> replaceIssueMilestone(String repoId, int issueId, Integer milestone) {
+    public synchronized Optional<TurboIssue> replaceIssueMilestone(String repoId, int issueId, Optional<Integer> milestone) {
         Optional<Model> modelLookUpResult = getModelById(repoId);
         return Utility.safeFlatMapOptional(modelLookUpResult,
                 (model) -> model.replaceIssueMilestone(issueId, milestone),

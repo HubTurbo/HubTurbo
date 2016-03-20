@@ -11,6 +11,7 @@ import org.eclipse.egit.github.core.Issue;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -45,7 +46,7 @@ public abstract class RepoSource implements TaskRunner {
 
     public abstract CompletableFuture<Boolean> replaceIssueLabels(TurboIssue issue, List<String> labels);
 
-    public abstract CompletableFuture<Boolean> replaceIssueMilestone(TurboIssue issue, Integer milestone);
+    public abstract CompletableFuture<Boolean> replaceIssueMilestone(TurboIssue issue, Optional<Integer> milestone);
 
     public abstract CompletableFuture<ImmutablePair<Integer, Long>> getRateLimitResetTime();
 

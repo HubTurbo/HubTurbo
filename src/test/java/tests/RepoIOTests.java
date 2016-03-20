@@ -62,12 +62,12 @@ public class RepoIOTests {
         RepoSource source = mock(RepoSource.class);
         CompletableFuture<List<String>> response = new CompletableFuture<>();
         doReturn(response).when(source).replaceIssueMilestone(any(TurboIssue.class),
-                any(Integer.class));
+                any(Optional.class));
 
         RepoIO repoIO = new RepoIO(Optional.of(source), Optional.empty(), Optional.empty());
-        CompletableFuture result = repoIO.replaceIssueMilestone(mock(TurboIssue.class), 0);
+        CompletableFuture result = repoIO.replaceIssueMilestone(mock(TurboIssue.class), Optional.of(0));
 
-        verify(source, times(1)).replaceIssueMilestone(any(TurboIssue.class), any(Integer.class));
+        verify(source, times(1)).replaceIssueMilestone(any(TurboIssue.class), any(Optional.class));
         assertEquals(response, result);
     }
 }

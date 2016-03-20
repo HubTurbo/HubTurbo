@@ -13,6 +13,7 @@ import util.Futures;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 public class DummySource extends RepoSource {
@@ -53,7 +54,7 @@ public class DummySource extends RepoSource {
     }
 
     @Override
-    public CompletableFuture<Boolean> replaceIssueMilestone(TurboIssue issue, Integer milestone) {
+    public CompletableFuture<Boolean> replaceIssueMilestone(TurboIssue issue, Optional<Integer> milestone) {
         return addTask(new ReplaceIssueMilestoneTask(this, dummy, issue.getRepoId(), issue.getId(), issue.getTitle(),
                 milestone)).response;
     }

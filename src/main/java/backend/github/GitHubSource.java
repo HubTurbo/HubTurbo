@@ -14,6 +14,7 @@ import util.HTLog;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 public class GitHubSource extends RepoSource {
@@ -67,7 +68,7 @@ public class GitHubSource extends RepoSource {
     }
 
     @Override
-    public CompletableFuture<Boolean> replaceIssueMilestone(TurboIssue issue, Integer milestone) {
+    public CompletableFuture<Boolean> replaceIssueMilestone(TurboIssue issue, Optional<Integer> milestone) {
         return addTask(new ReplaceIssueMilestoneTask(this, gitHub, issue.getRepoId(), issue.getId(), issue.getTitle(),
                 milestone)).response;
     }

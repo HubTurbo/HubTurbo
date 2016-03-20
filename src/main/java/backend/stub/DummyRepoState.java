@@ -398,7 +398,7 @@ public class DummyRepoState {
         return newLabels.stream().map(new Label()::setName).collect(Collectors.toList());
     }
 
-    protected final Issue setMilestone(int issueId, Integer milestone) {
+    protected final Issue setMilestone(int issueId, Optional<Integer> milestone) {
         ImmutablePair<TurboIssue, IssueMetadata> mutables = produceMutables(issueId);
         TurboIssue toSet = mutables.getLeft();
         IssueMetadata metadataOfIssue = mutables.getRight();
@@ -414,13 +414,19 @@ public class DummyRepoState {
         eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test"),
                 IssueEventType.Milestoned,
                 new Date()).setMilestoneTitle(milestones.get(milestone).getTitle()));
-        toSet.setMilestoneById(milestone);
+        if (milestone.isPresent()) {
+            toSet.setMilestoneById(milestone.get());
+        } else {
+            toSet.removeMilestone();
+        }
         toSet.setUpdatedAt(LocalDateTime.now());
 
         markUpdatedEvents(toSet, IssueMetadata.intermediate(eventsOfIssue, metadataOfIssue.getComments(), "", ""));
 
         Issue newIssue = new Issue();
-        newIssue.setMilestone(new Milestone().setNumber(milestone));
+        if (milestone.isPresent()) {
+            newIssue.setMilestone(new Milestone().setNumber(milestone.get()));
+        }
         return newIssue;
     }
 

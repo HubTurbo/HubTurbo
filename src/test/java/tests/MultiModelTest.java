@@ -129,7 +129,7 @@ public class MultiModelTest {
     @Test
     public void replaceIssueMilestone_modelNotFound() {
         MultiModel models = new MultiModel(mock(Preferences.class));
-        assertEquals(Optional.empty(), models.replaceIssueMilestone("nonexistentrepo", 1, 1));
+        assertEquals(Optional.empty(), models.replaceIssueMilestone("nonexistentrepo", 1, Optional.of(1)));
     }
 
     /**
@@ -161,7 +161,8 @@ public class MultiModelTest {
     @Test
     public void replaceIssueMilestone_successful() {
         String repoId = "testowner/testrepo";
-        int issueId = 1, milestoneId = 1;
+        int issueId = 1;
+        Optional<Integer> milestoneId = Optional.of(1);
 
         Model mockedModel = mock(Model.class);
         when(mockedModel.getRepoId()).thenReturn(repoId);

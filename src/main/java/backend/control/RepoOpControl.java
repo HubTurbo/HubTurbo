@@ -84,14 +84,14 @@ public final class RepoOpControl {
         return result;
     }
 
-    public CompletableFuture<Boolean> replaceIssueMilestoneOnServer(TurboIssue issue, Integer milestone) {
+    public CompletableFuture<Boolean> replaceIssueMilestoneOnServer(TurboIssue issue, Optional<Integer> milestone) {
         init(issue.getRepoId());
         CompletableFuture<Boolean> result = new CompletableFuture<>();
         enqueue(new ReplaceIssueMilestoneOnServerOp(repoIO, result, issue, milestone));
         return result;
     }
 
-    public CompletableFuture<Optional<TurboIssue>> replaceIssueMilestoneLocally(TurboIssue issue, Integer milestone) {
+    public CompletableFuture<Optional<TurboIssue>> replaceIssueMilestoneLocally(TurboIssue issue, Optional<Integer> milestone) {
         init(issue.getRepoId());
         CompletableFuture<Optional<TurboIssue>> result = new CompletableFuture<>();
         enqueue(new ReplaceIssueMilestoneLocallyOp(models, result, issue, milestone));

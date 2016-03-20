@@ -59,7 +59,7 @@ public class MilestonePickerState {
      */
     public final void toggleExactMatchMilestone(String milestoneName) {
         Optional<PickerMilestone> onlyMatchingMilestone = getExactMatchMilestone(currentMilestonesList, milestoneName);
-        toggleMilestone(onlyMatchingMilestone);
+        onlyMatchingMilestone.ifPresent(milestone -> toggleMilestone(milestone));
     }
 
     /**
@@ -70,20 +70,18 @@ public class MilestonePickerState {
      */
     private final void toggleFirstMatchingMilestone(String query) {
         Optional<PickerMilestone> firstMatchingMilestone = getFirstMatchingMilestone(currentMilestonesList, query);
-        toggleMilestone(firstMatchingMilestone);
+        firstMatchingMilestone.ifPresent(milestone -> toggleMilestone(milestone));
     }
 
     /**
      * Changes the selection statuses of all milestones in the milestone list,
      * such that the new given milestone is toggled, and the rest are not selected
      *
-     * Does nothing if milestone is not present
      * @param milestone
      */
-    private void toggleMilestone(Optional<PickerMilestone> milestone) {
-        if (!milestone.isPresent()) return;
+    private void toggleMilestone(PickerMilestone milestone) {
         this.currentMilestonesList.stream()
-                .forEach(listMilestone -> listMilestone.setSelected(listMilestone.equals(milestone.get())
+                .forEach(listMilestone -> listMilestone.setSelected(listMilestone.equals(milestone)
                         && !listMilestone.isSelected()));
     }
 

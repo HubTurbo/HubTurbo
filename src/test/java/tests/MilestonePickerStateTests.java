@@ -7,7 +7,9 @@ import ui.components.pickers.PickerMilestone;
 
 import java.util.ArrayList;
 import java.util.List;
-import static org.junit.Assert.assertEquals;
+
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 public class MilestonePickerStateTests {
     public MilestonePickerState prepareUnassignedState() {
@@ -31,22 +33,22 @@ public class MilestonePickerStateTests {
     public void toggleMilestone_noMilestone_milestoneAssigned() {
         MilestonePickerState state = prepareUnassignedState();
         state.toggleExactMatchMilestone("milestone1");
-        assertEquals(true, state.getCurrentMilestonesList().get(0).isSelected());
+        assertTrue(state.getCurrentMilestonesList().get(0).isSelected());
     }
 
     @Test
     public void toggleMilestone_hasMilestone_milestoneReplaced() {
         MilestonePickerState state = prepareAssignedState();
         state.toggleExactMatchMilestone("milestone1");
-        assertEquals(true, state.getCurrentMilestonesList().get(0).isSelected());
-        assertEquals(false, state.getCurrentMilestonesList().get(1).isSelected());
+        assertTrue(state.getCurrentMilestonesList().get(0).isSelected());
+        assertFalse(state.getCurrentMilestonesList().get(1).isSelected());
     }
 
     @Test
     public void toggleMilestone_hasMilestone_milestoneUnassigned() {
         MilestonePickerState state = prepareAssignedState();
         state.toggleExactMatchMilestone("milestone2");
-        assertEquals(false, state.getCurrentMilestonesList().get(0).isSelected());
-        assertEquals(false, state.getCurrentMilestonesList().get(1).isSelected());
+        assertFalse(state.getCurrentMilestonesList().get(0).isSelected());
+        assertFalse(state.getCurrentMilestonesList().get(1).isSelected());
     }
 }

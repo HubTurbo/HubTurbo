@@ -217,11 +217,15 @@ public class Model implements IBaseModel {
      * @param milestone
      * @return the modified TurboIssue if successful
      */
-    public synchronized Optional<TurboIssue> replaceIssueMilestone(int issueId, Integer milestone) {
+    public synchronized Optional<TurboIssue> replaceIssueMilestone(int issueId, Optional<Integer> milestone) {
         Optional<TurboIssue> issueLookUpResult = getIssueById(issueId);
         return Utility.safeFlatMapOptional(issueLookUpResult,
                 (issue) -> {
-                    issue.setMilestoneById(milestone);
+                    if (!milestone.isPresent()) {
+                        issue.removeMilestone();
+                    } else {
+                        issue.setMilestoneById(milestone.get());
+                    }
                     return Optional.of(new TurboIssue(issue));
                 },
                 () -> logger.error("Issue " + issueId + " not found in model for " + repoId));

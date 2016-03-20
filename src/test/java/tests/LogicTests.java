@@ -56,11 +56,11 @@ public class LogicTests {
      */
     @Test
     public void replaceIssueMilestone_successful() throws ExecutionException, InterruptedException {
-        TurboIssue issue = createIssueWithMilestone(1, 0);
+        TurboIssue issue = createIssueWithMilestone(1, Optional.of(0));
         mockRepoIOReplaceIssueMilestoneResult(true);
         mockMultiModelReplaceIssueMilestone(Optional.of(issue), Optional.empty());
 
-        assertTrue(logic.replaceIssueMilestone(issue, 1).get());
+        assertTrue(logic.replaceIssueMilestone(issue, Optional.of(1)).get());
     }
 
     /**
@@ -68,11 +68,11 @@ public class LogicTests {
      */
     @Test
     public void replaceIssueMilestone_modelsEmpty_unsuccessful() throws ExecutionException, InterruptedException {
-        TurboIssue issue = createIssueWithMilestone(1, 0);
+        TurboIssue issue = createIssueWithMilestone(1, Optional.of(0));
         mockRepoIOReplaceIssueMilestoneResult(true);
         mockMultiModelReplaceIssueMilestone(Optional.empty(), Optional.empty());
 
-        assertFalse(logic.replaceIssueMilestone(issue, 1).get());
+        assertFalse(logic.replaceIssueMilestone(issue, Optional.of(1)).get());
     }
 
     /**
@@ -84,17 +84,17 @@ public class LogicTests {
         mockRepoIOReplaceIssueMilestoneResult(false);
         mockMultiModelReplaceIssueMilestone(Optional.of(issue), Optional.empty());
 
-        assertFalse(logic.replaceIssueMilestone(issue, 1).get());
+        assertFalse(logic.replaceIssueMilestone(issue, Optional.of(1)).get());
     }
 
     /**
-     * Tests that {@link MultiModel#replaceIssueMilestone(String, int, Integer)} is first called with the
+     * Tests that {@link MultiModel#replaceIssueMilestone(String, int, Optional<Integer>)} is first called with the
      * new milestone then reverted back to original milestone when repoIO fails to update milestone
      */
     @Test
     public void replaceIssueMilestone_repoIOFails_revert() throws ExecutionException, InterruptedException {
-        Integer originalMilestone = null;
-        Integer newMilestone = 1;
+        Optional<Integer> originalMilestone = Optional.empty();
+        Optional<Integer> newMilestone = Optional.of(1);
 
         TurboIssue issue = createIssueWithMilestone(1, originalMilestone);
         mockRepoIOReplaceIssueMilestoneResult(false);
@@ -109,12 +109,12 @@ public class LogicTests {
 
     /**
      * Tests that no revert is taken place if the issue's milestone is modified elsewhere after
-     * {@link Logic#replaceIssueMilestone(TurboIssue, Integer)} is called
+     * {@link Logic#replaceIssueMilestone(TurboIssue, Optional<Integer>)} is called
      */
     @Test
     public void replaceIssueMilestone_timeNotMatched_noRevert() throws ExecutionException, InterruptedException {
-        Integer originalMilestone = null;
-        Integer newMilestone = 1;
+        Optional<Integer> originalMilestone = Optional.empty();
+        Optional<Integer> newMilestone = Optional.of(1);
 
         TurboIssue issue = createIssueWithMilestone(1, originalMilestone);
         TurboIssue modifiedIssue = TestUtils.delayThenGet(
@@ -129,7 +129,7 @@ public class LogicTests {
         logic.replaceIssueMilestone(issue, newMilestone).get();
 
         verify(mockedMultiModel, atMost(1))
-                .replaceIssueMilestone(anyString(), anyInt(), anyInt());
+                .replaceIssueMilestone(anyString(), anyInt(), any(Optional.class));
     }
 
     /**
@@ -219,7 +219,7 @@ public class LogicTests {
     }
 
     private void mockRepoIOReplaceIssueMilestoneResult(boolean replaceResult) {
-        when(mockedRepoIO.replaceIssueMilestone(any(TurboIssue.class), any(Integer.class)))
+        when(mockedRepoIO.replaceIssueMilestone(any(TurboIssue.class), any(Optional.class)))
                 .thenReturn(CompletableFuture.completedFuture(replaceResult));
     }
 
@@ -232,7 +232,7 @@ public class LogicTests {
 
     private void mockMultiModelReplaceIssueMilestone(Optional<TurboIssue> replaceResult,
                                                   Optional<Model> modelLookUpResult) {
-        when(mockedMultiModel.replaceIssueMilestone(anyString(), anyInt(), any(Integer.class)))
+        when(mockedMultiModel.replaceIssueMilestone(anyString(), anyInt(), any(Optional.class)))
                 .thenReturn(replaceResult);
         when(mockedMultiModel.getModelById(anyString())).thenReturn(modelLookUpResult);
     }
@@ -243,9 +243,11 @@ public class LogicTests {
         return issue;
     }
 
-    public static TurboIssue createIssueWithMilestone(int issueId, Integer milestone) {
+    public static TurboIssue createIssueWithMilestone(int issueId, Optional<Integer> milestone) {
         TurboIssue issue = new TurboIssue("testowner/testrepo", issueId, "Issue title");
-        issue.setMilestoneById(milestone);
+        if (milestone.isPresent()) {
+            issue.setMilestoneById(milestone.get());
+        }
         return issue;
     }
 }

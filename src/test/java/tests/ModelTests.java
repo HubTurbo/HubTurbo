@@ -291,7 +291,7 @@ public class ModelTests {
     @Test
     public void replaceIssueMilestone_issueNotFound() {
         Model model = new Model("testrepo");
-        assertEquals(Optional.empty(), model.replaceIssueMilestone(1, 1));
+        assertEquals(Optional.empty(), model.replaceIssueMilestone(1, Optional.of(1)));
     }
 
     /**
@@ -299,12 +299,12 @@ public class ModelTests {
      */
     @Test
     public void replaceIssueMilestone_successful() {
-        Integer milestoneIdReplacement = 1;
+        Optional<Integer> milestoneIdReplacement = Optional.of(1);
         String repoId = "testowner/testrepo";
 
-        TurboIssue issue1 = LogicTests.createIssueWithMilestone(1, 0);
-        TurboIssue issue2 = LogicTests.createIssueWithMilestone(2, 1);
-        TurboIssue issue3 = LogicTests.createIssueWithMilestone(3, 1);
+        TurboIssue issue1 = LogicTests.createIssueWithMilestone(1, Optional.of(0));
+        TurboIssue issue2 = LogicTests.createIssueWithMilestone(2, Optional.of(1));
+        TurboIssue issue3 = LogicTests.createIssueWithMilestone(3, Optional.of(1));
         List<TurboIssue> issues = Arrays.asList(issue3, issue2, issue1);
 
         Model model = new Model(repoId, issues, new ArrayList<TurboLabel>(),

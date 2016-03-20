@@ -12,13 +12,13 @@ import java.util.concurrent.CompletableFuture;
 public class ReplaceIssueMilestoneLocallyOp implements RepoOp<Optional<TurboIssue>> {
     private final MultiModel models;
     private final TurboIssue issue;
-    private final Integer milestone;
+    private final Optional<Integer> milestone;
     private final CompletableFuture<Optional<TurboIssue>> result;
 
     private static final Logger logger = HTLog.get(UpdateLocalModelOp.class);
 
     public ReplaceIssueMilestoneLocallyOp(MultiModel models, CompletableFuture<Optional<TurboIssue>> result,
-                                          TurboIssue issue, Integer milestone) {
+                                          TurboIssue issue, Optional<Integer> milestone) {
         this.models = models;
         this.result = result;
 

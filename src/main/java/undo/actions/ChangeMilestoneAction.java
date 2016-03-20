@@ -9,13 +9,13 @@ import java.util.concurrent.CompletableFuture;
 public class ChangeMilestoneAction implements Action<TurboIssue> {
     public static final String DESCRIPTION = "Change milestone";
 
-    private final Integer oldMilestoneValue;
-    private final Integer newMilestoneValue;
+    private final Optional<Integer> oldMilestone;
+    private final Optional<Integer> newMilestone;
     private final Logic logic;
 
     public ChangeMilestoneAction(Logic logic, Optional<Integer> oldMilestone, Optional<Integer> newMilestone) {
-        this.oldMilestoneValue = oldMilestone.isPresent() ? oldMilestone.get() : null;
-        this.newMilestoneValue = newMilestone.isPresent() ? newMilestone.get() : null;
+        this.oldMilestone = oldMilestone;
+        this.newMilestone = newMilestone;
         this.logic = logic;
     }
 
@@ -24,11 +24,11 @@ public class ChangeMilestoneAction implements Action<TurboIssue> {
     }
 
     public CompletableFuture<Boolean> act(TurboIssue issue) {
-        return logic.replaceIssueMilestone(issue, newMilestoneValue);
+        return logic.replaceIssueMilestone(issue, newMilestone);
     }
 
     public CompletableFuture<Boolean> undo(TurboIssue issue) {
-        return logic.replaceIssueMilestone(issue, oldMilestoneValue);
+        return logic.replaceIssueMilestone(issue, oldMilestone);
     }
 
 }

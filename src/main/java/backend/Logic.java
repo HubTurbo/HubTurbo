@@ -278,18 +278,19 @@ public class Logic {
      * @param newMilestone The new milestone to be assigned to the issue
      * @return true if milestone replacement on GitHub was a success, false otherwise.
      */
-    public CompletableFuture<Boolean> replaceIssueMilestone(TurboIssue issue, Integer newMilestone) {
+    public CompletableFuture<Boolean> replaceIssueMilestone(TurboIssue issue, Optional<Integer> newMilestone) {
         Optional<Integer> originalMilestone = issue.getMilestone();
 
-        logger.info("Changing milestone for " + issue + " on UI");
+        logger.info("Changing milestone for " + issue + " in models");
         CompletableFuture<Optional<TurboIssue>> localMilestoneReplaceFuture =
                 repoOpControl.replaceIssueMilestoneLocally(issue, newMilestone);
         localMilestoneReplaceFuture.thenRun(this::refreshUI);
 
         return updateIssueMilestonesOnServer(issue, newMilestone)
                 .thenCombine(localMilestoneReplaceFuture,
-                        (isUpdateSuccessful, locallyModifiedIssue) -> handleIssueMilestoneUpdateOnServerResult(
-                        isUpdateSuccessful, locallyModifiedIssue, originalMilestone.orElseGet(() -> null)));
+                        (isUpdateSuccessful, locallyModifiedIssue) ->
+                                handleIssueMilestoneUpdateOnServerResult(isUpdateSuccessful, locallyModifiedIssue,
+                                        originalMilestone));
     }
 
     /**
@@ -310,7 +311,7 @@ public class Logic {
         return repoOpControl.replaceIssueLabelsOnServer(issue, newLabels);
     }
 
-    private CompletableFuture<Boolean> updateIssueMilestonesOnServer(TurboIssue issue, Integer milestone) {
+    private CompletableFuture<Boolean> updateIssueMilestonesOnServer(TurboIssue issue, Optional<Integer> milestone) {
         logger.info("Changing milestone for " + issue + " on GitHub");
         return repoOpControl.replaceIssueMilestoneOnServer(issue, milestone);
     }
@@ -340,7 +341,7 @@ public class Logic {
 
     /**
      * Handles the result of updating an issue's milestone on server.
-     * Locally reverts back to the original labels if the server update fails.
+     * Locally reverts back to the original milestone if the server update fails.
      * @param isUpdateSuccessful
      * @param localModifiedIssue
      * @param originalMilestone
@@ -348,7 +349,7 @@ public class Logic {
      */
     private boolean handleIssueMilestoneUpdateOnServerResult(boolean isUpdateSuccessful,
                                                           Optional<TurboIssue> localModifiedIssue,
-                                                          Integer originalMilestone) {
+                                                          Optional<Integer> originalMilestone) {
         if (!localModifiedIssue.isPresent()) {
             logger.error("Unable to replace issue milestone locally");
             return false;
@@ -386,7 +387,7 @@ public class Logic {
      * @param modifiedIssue
      * @param originalMilestone
      */
-    private void revertLocalMilestoneReplace(TurboIssue modifiedIssue, Integer originalMilestone) {
+    private void revertLocalMilestoneReplace(TurboIssue modifiedIssue, Optional<Integer> originalMilestone) {
         TurboIssue currentIssue = getIssue(modifiedIssue.getRepoId(), modifiedIssue.getId()).orElse(modifiedIssue);
         LocalDateTime originalMilestoneModifiedAt = modifiedIssue.getMilestoneLastModifiedAt();
         LocalDateTime currentMilestoneAssignedAt = currentIssue.getMilestoneLastModifiedAt();

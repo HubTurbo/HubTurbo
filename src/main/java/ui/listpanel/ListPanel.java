@@ -341,7 +341,7 @@ public class ListPanel extends FilterPanel {
                 if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
                     ui.getBrowserComponent().showMilestones();
                 } else {
-                    changeMilestoneOfSelectedIssue();
+                    getSelectedElement().ifPresent(this::changeMilestone);
                 }
             }
             if (UNDO_LABEL_CHANGES.match(event)) {
@@ -398,7 +398,7 @@ public class ListPanel extends FilterPanel {
 
         changeMilestoneMenuItem.setText(changeMilestoneMenuItemText);
         changeMilestoneMenuItem.setOnAction(e -> {
-            changeMilestoneOfSelectedIssue();
+            getSelectedElement().ifPresent(this::changeMilestone);
         });
 
         markAllBelowAsReadMenuItem.setText(MARK_ALL_AS_READ_MENU_ITEM_TEXT);
@@ -444,11 +444,7 @@ public class ListPanel extends FilterPanel {
 
     private MenuItem updateChangeMilestoneMenuItem() {
         Optional<GuiElement> item = listView.getSelectedItem();
-        if (item.isPresent()) {
-            changeMilestoneMenuItem.setDisable(false);
-        } else {
-            changeMilestoneMenuItem.setDisable(true);
-        }
+        changeMilestoneMenuItem.setDisable(!item.isPresent());
 
         return changeMilestoneMenuItem;
     }
@@ -533,10 +529,8 @@ public class ListPanel extends FilterPanel {
         }
     }
 
-    private void changeMilestoneOfSelectedIssue() {
-        if (getSelectedElement().isPresent()) {
-            ui.triggerEvent(new ShowMilestonePickerEvent(getSelectedElement().get().getIssue()));
-        }
+    private void changeMilestone(GuiElement issueGuiElement) {
+        ui.triggerEvent(new ShowMilestonePickerEvent(issueGuiElement.getIssue()));
     }
 
     @Override
