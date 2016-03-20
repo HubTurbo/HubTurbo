@@ -448,12 +448,23 @@ public class ListPanel extends FilterPanel {
         updateCloseReopenIssueMenuItem();
         updateChangeLabelsMenuItem();
         updateChangeMilestoneMenuItem();
-
+        updateChangeAssigneeMenuItem();
         return contextMenu;
     }
 
     public ContextMenu getContextMenu() {
         return contextMenu;
+    }
+
+    private MenuItem updateChangeAssigneeMenuItem() {
+        Optional<GuiElement> item = listView.getSelectedItem();
+        if (item.isPresent()) {
+            changeAssigneeMenuItem.setDisable(false);
+        } else {
+            changeAssigneeMenuItem.setDisable(true);
+        }
+
+        return changeAssigneeMenuItem;
     }
 
     private MenuItem updateChangeLabelsMenuItem() {
