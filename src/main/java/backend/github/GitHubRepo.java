@@ -262,8 +262,8 @@ public class GitHubRepo implements Repo {
     }
 
     @Override
-    public Optional<Integer> setMilestone(String repoId, int issueId, String issueTitle, Optional<Integer> issueMilestone)
-            throws IOException {
+    public Optional<Integer> setMilestone(String repoId, int issueId, String issueTitle,
+                                          Optional<Integer> issueMilestone) throws IOException {
         // github api requires at least id and title
         Issue createdIssue = new Issue();
         createdIssue.setNumber(issueId);

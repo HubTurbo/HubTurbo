@@ -181,7 +181,8 @@ public class DummyRepo implements Repo {
     }
 
     @Override
-    public Optional<Integer> setMilestone(String repoId, int issueId, String issueTitle, Optional<Integer> issueMilestone) {
+    public Optional<Integer> setMilestone(String repoId, int issueId, String issueTitle,
+                                          Optional<Integer> issueMilestone) {
         Issue returnedIssue = getRepoState(repoId).setMilestone(issueId, issueMilestone);
         if (returnedIssue.getMilestone() == null) return Optional.empty();
         return Optional.of(returnedIssue.getMilestone().getNumber());

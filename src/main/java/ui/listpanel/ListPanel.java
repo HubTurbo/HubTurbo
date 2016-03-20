@@ -76,7 +76,7 @@ public class ListPanel extends FilterPanel {
     private static final String CHANGE_LABELS_MENU_ITEM_TEXT = "Change labels (L)";
 
     private static final MenuItem changeMilestoneMenuItem = new MenuItem();
-    private static final String changeMilestoneMenuItemText = "Change milestone (M)";
+    private static final String CHANGE_MILESTONE_MENU_ITEM_TEXT = "Change milestone (M)";
 
     public ListPanel(UI ui, GUIController guiController, PanelControl parentPanelControl, int panelIndex) {
         super(ui, guiController, parentPanelControl, panelIndex);
@@ -396,7 +396,7 @@ public class ListPanel extends FilterPanel {
             changeLabels();
         });
 
-        changeMilestoneMenuItem.setText(changeMilestoneMenuItemText);
+        changeMilestoneMenuItem.setText(CHANGE_MILESTONE_MENU_ITEM_TEXT);
         changeMilestoneMenuItem.setOnAction(e -> {
             getSelectedElement().ifPresent(this::changeMilestone);
         });
@@ -443,8 +443,8 @@ public class ListPanel extends FilterPanel {
     }
 
     private MenuItem updateChangeMilestoneMenuItem() {
-        Optional<GuiElement> item = listView.getSelectedItem();
-        changeMilestoneMenuItem.setDisable(!item.isPresent());
+        Optional<GuiElement> selectedItem = listView.getSelectedItem();
+        changeMilestoneMenuItem.setDisable(!selectedItem.isPresent());
 
         return changeMilestoneMenuItem;
     }

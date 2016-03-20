@@ -70,7 +70,7 @@ public class MilestonePickerState {
      */
     private final void toggleFirstMatchingMilestone(String query) {
         Optional<PickerMilestone> firstMatchingMilestone = getFirstMatchingMilestone(currentMilestonesList, query);
-        firstMatchingMilestone.ifPresent(milestone -> toggleMilestone(milestone));
+        firstMatchingMilestone.ifPresent(this::toggleMilestone);
     }
 
     /**

@@ -279,26 +279,26 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Optional<Inte
 
     private Optional<PickerMilestone> getExistingMilestone(List<PickerMilestone> milestoneList) {
         return milestoneList.stream()
-                .filter(milestone -> milestone.isExisting())
+                .filter(PickerMilestone::isExisting)
                 .findAny();
     }
 
     private boolean hasSelectedMilestone(List<PickerMilestone> milestoneList) {
         return milestoneList.stream()
-                .filter(milestone -> milestone.isSelected())
+                .filter(PickerMilestone::isSelected)
                 .findAny()
                 .isPresent();
     }
 
     private Optional<PickerMilestone> getSelectedMilestone(List<PickerMilestone> milestoneList) {
         return milestoneList.stream()
-                .filter(milestone -> milestone.isSelected())
+                .filter(PickerMilestone::isSelected)
                 .findAny();
     }
 
     private Optional<PickerMilestone> getHighlightedMilestone(List<PickerMilestone> milestones) {
         return milestones.stream()
-                .filter(milestone -> milestone.isHighlighted())
+                .filter(PickerMilestone::isHighlighted)
                 .findAny();
     }
 

@@ -32,8 +32,6 @@ public class ReplaceIssueMilestoneTask extends GitHubRepoTask<Boolean> {
             return;
         }
 
-        System.out.println("Request to set milestone: " + issueMilestone.toString());
-        System.out.println("Returned milestone is: " + result.toString());
         response.complete(issueMilestone.equals(result));
     }
 }

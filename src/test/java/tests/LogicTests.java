@@ -80,7 +80,7 @@ public class LogicTests {
      */
     @Test
     public void replaceIssueMilestone_repoIOFails_unsuccessful() throws ExecutionException, InterruptedException {
-        TurboIssue issue = createIssueWithMilestone(1, null);
+        TurboIssue issue = createIssueWithMilestone(1, Optional.empty());
         mockRepoIOReplaceIssueMilestoneResult(false);
         mockMultiModelReplaceIssueMilestone(Optional.of(issue), Optional.empty());
 

@@ -312,7 +312,7 @@ public class ModelTests {
         Optional<TurboIssue> result = model.replaceIssueMilestone(issue1.getId(), milestoneIdReplacement);
         assertEquals(1, result.get().getId());
         assertTrue(result.get().getMilestone().isPresent());
-        assertEquals(milestoneIdReplacement, result.get().getMilestone().get());
+        assertEquals(milestoneIdReplacement, result.get().getMilestone());
     }
 
     /**

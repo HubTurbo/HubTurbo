@@ -20,7 +20,7 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
     public PickerMilestone(TurboMilestone milestone) {
         super(milestone.getRepoId(), milestone.getId(), milestone.getTitle());
         setDueDate(milestone.getDueDate());
-        setDescription(milestone.getDescription() == null ? "" : milestone.getDescription());
+        setDescription(milestone.getDescription());
         setOpen(milestone.isOpen());
         setOpenIssues(milestone.getOpenIssues());
         setClosedIssues(milestone.getClosedIssues());
@@ -139,29 +139,26 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
         return this.isExisting;
     }
 
-    /**
-     * Milestones which are open are deemed to be smaller than milestones which are closed
-     * Milestones with earlier due dates are deemed to be "larger".
-     *
-     * In addition, this treats null milestones with no set due date to be "smaller than"
-     * those which have due dates
-     *
-     * @param milestone
-     * @return
-     */
     @Override
     public int compareTo(PickerMilestone milestone) {
-        if (isHighlighted) return -1;
-        if (milestone.isHighlighted()) return 1;
-        if (this.getDueDate().equals(milestone.getDueDate())) return 0;
+        // highlighted milestones are smaller
+        if (isHighlighted != milestone.isHighlighted()) {
+            return isHighlighted ? -1 : 1;
+        }
+        // open milestones are smaller
         if (this.isOpen() != milestone.isOpen()) {
             return this.isOpen() ? -1 : 1;
         }
-        if (!this.getDueDate().isPresent()) return -1;
-        if (!milestone.getDueDate().isPresent()) return 1;
 
+        if (this.getDueDate().equals(milestone.getDueDate())) return 0;
+
+        // milestones with due dates are smaller
+        if (!this.getDueDate().isPresent()) return 1;
+        if (!milestone.getDueDate().isPresent()) return -1;
+
+        // milestones with earlier due dates are smaller
         return this.getDueDate().get()
-                .isAfter(milestone.getDueDate().get()) ? -1 : 1;
+                .isBefore(milestone.getDueDate().get()) ? -1 : 1;
     }
 
     @Override

@@ -411,10 +411,10 @@ public class DummyRepoState {
                     new Date()).setMilestoneTitle(milestones.get(milestoneOfIssue).getTitle()));
         }
 
-        eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test"),
-                IssueEventType.Milestoned,
-                new Date()).setMilestoneTitle(milestones.get(milestone).getTitle()));
         if (milestone.isPresent()) {
+            eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test"),
+                    IssueEventType.Milestoned,
+                    new Date()).setMilestoneTitle(milestones.get(milestone.get()).getTitle()));
             toSet.setMilestoneById(milestone.get());
         } else {
             toSet.removeMilestone();
