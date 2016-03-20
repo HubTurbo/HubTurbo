@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
 import prefs.PanelInfo;
 import prefs.Preferences;
+import ui.IdGenerator;
 import ui.TestController;
 import ui.UI;
 import ui.components.FilterTextField;
@@ -50,7 +51,7 @@ public class UseSessionConfigsTest extends UITest {
         pushKeys(KeyCode.TAB);
         type("test");
         click("Sign in");
-        ComboBox<String> repositorySelector = findOrWaitFor("#repositorySelector");
+        ComboBox<String> repositorySelector = findOrWaitFor(IdGenerator.getRepositorySelectorIdForTest());
         waitForValue(repositorySelector);
         assertEquals("dummy/dummy", repositorySelector.getValue());
 
