@@ -79,7 +79,7 @@ allprojects {
     	}
         testCompile "org.mockito:mockito-core:$mockitoVersion"
         testCompile group: "org.mock-server", name: "mockserver-netty", version: "$mockServerVersion"
- 		testRuntime 'org.testfx:openjfx-monocle:1.8.0_20'
+ 		testCompile 'org.testfx:openjfx-monocle:1.8.0_20'
         compile fileTree(dir: 'lib', include: '*.jar')
     }
 
