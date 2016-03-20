@@ -21,6 +21,7 @@ import java.util.Optional;
 public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Optional<Integer>>> {
     private static final String OCTICON_ARROW = "\uf03e";
     private static final String DIALOG_TITLE = "Select Milestone";
+    private static final int QUERY_DISPLAY_LIMIT = 5;
 
     private final List<PickerMilestone> originalMilestones = new ArrayList<>();
     private FlowPane assignedMilestonePane;
@@ -136,19 +137,20 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Optional<Inte
         updateExistingMilestone(getExistingMilestone(pickerMilestoneList), assignedMilestonePane);
         addAssignmentIndicator(assignedMilestonePane);
         updateNewlyAssignedMilestone(getHighlightedMilestone(pickerMilestoneList),
-                getSelectedMilestone(pickerMilestoneList), assignedMilestonePane);
+                                     getSelectedMilestone(pickerMilestoneList), assignedMilestonePane);
     }
 
     private void populateMatchingMilestones(List<PickerMilestone> matchingMilestoneList, VBox matchingMilestones) {
         matchingMilestones.getChildren().clear();
         matchingMilestoneList.stream()
                 .sorted()
-                .limit(5)
+                .limit(QUERY_DISPLAY_LIMIT)
                 .forEach(milestone -> matchingMilestones.getChildren().add(createDetailedMilestoneBox(milestone)));
 
-        if (matchingMilestoneList.size() <= 5) return;
+        if (matchingMilestoneList.size() <= QUERY_DISPLAY_LIMIT) return;
 
-        Label hiddenMilestonesIndicator = createHiddenMilestonesIndicator(matchingMilestoneList.size() - 5);
+        Label hiddenMilestonesIndicator = createHiddenMilestonesIndicator(
+                                                  matchingMilestoneList.size() - QUERY_DISPLAY_LIMIT);
         matchingMilestones.getChildren().add(hiddenMilestonesIndicator);
     }
 

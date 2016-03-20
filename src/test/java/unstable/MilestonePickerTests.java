@@ -13,9 +13,8 @@ import static org.junit.Assert.assertEquals;
 public class MilestonePickerTests extends UITest {
     @Test
     public void showMilestonePicker() {
-        ListPanelCell listPanelCell = find("#dummy/dummy_col0_9");
         click("#dummy/dummy_col0_9");
-        UI.events.triggerEvent(new ShowMilestonePickerEvent(listPanelCell.getIssue()));
+        press(KeyCode.M);
 
         waitUntilNodeAppears("#milestonePickerTextField");
         TextField textField = find("#milestonePickerTextField");
@@ -28,7 +27,7 @@ public class MilestonePickerTests extends UITest {
     public void pickMilestone_noMilestone_milestoneAssigned() {
         ListPanelCell listPanelCell = find("#dummy/dummy_col0_9");
         click("#dummy/dummy_col0_9");
-        UI.events.triggerEvent(new ShowMilestonePickerEvent(listPanelCell.getIssue()));
+        press(KeyCode.M);
 
         waitUntilNodeAppears("#milestonePickerTextField");
         click("#milestonePickerTextField");
