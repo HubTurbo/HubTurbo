@@ -1,6 +1,7 @@
-package guitests;
+package unstable;
 
 import backend.stub.DummyRepoState;
+import guitests.UITest;
 import javafx.scene.control.ComboBox;
 import javafx.scene.input.KeyCode;
 

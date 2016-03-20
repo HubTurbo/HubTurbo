@@ -1,4 +1,4 @@
-package guitests;
+package unstable;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -6,6 +6,7 @@ import static org.loadui.testfx.Assertions.assertNodeExists;
 
 import java.io.File;
 
+import guitests.UITest;
 import javafx.application.Platform;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.junit.Test;
