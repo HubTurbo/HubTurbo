@@ -47,7 +47,7 @@ public class FilterTests extends UITest {
 
     @Test
     public void filterTextField_tallyMetadataUpdateSemanticException_emptyFilter() {
-        ListPanel issuePanel = find("#dummy/dummy_col0");
+        ListPanel issuePanel = find(IdGenerator.getPanelIdForTest(repoId, 0));
 
         // test semantic exception dummy/dummy_col0_filterTextField");
         click(IdGenerator.getPanelFilterTextFieldIdForTest(repoId, 0));

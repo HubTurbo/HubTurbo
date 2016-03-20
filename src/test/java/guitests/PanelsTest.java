@@ -51,7 +51,7 @@ public class PanelsTest extends UITest {
         pushKeys(CREATE_RIGHT_PANEL);
 
         // Ensure that new panels are associated with the current default repo
-        awaitCondition(() -> existsQuiet(IdGenerator.getPanelId("dummy2/dummy2", 2)));
+        awaitCondition(() -> existsQuiet(IdGenerator.getPanelIdForTest("dummy2/dummy2", 2)));
     }
 
     private void reorderPanelsByDragging(FilterPanel panel0, FilterPanel panel1, FilterPanel panel2) {

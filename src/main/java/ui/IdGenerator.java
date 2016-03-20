@@ -107,4 +107,12 @@ public final class IdGenerator {
     public static String getBoardNameSaveButtonIdForTest() {
         return "#" + getBoardNameSaveButtonId();
     }
+
+    public static String getAssignedLabelsPaneIdForTest() {
+        return "#assignedLabels";
+    }
+
+    public static String getLabelPickerQueryFieldIdForTest() {
+        return "#queryField";
+    }
 }

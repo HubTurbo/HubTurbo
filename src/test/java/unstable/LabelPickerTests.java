@@ -10,6 +10,7 @@ import javafx.scene.layout.FlowPane;
 import org.junit.Test;
 
 import backend.resource.TurboIssue;
+import ui.IdGenerator;
 import ui.UI;
 import ui.listpanel.ListPanelCell;
 import util.events.ShowLabelPickerEvent;
@@ -18,8 +19,9 @@ import static org.junit.Assert.assertEquals;
 
 public class LabelPickerTests extends UITest {
 
-    private static final String QUERY_FIELD_ID = "#queryField";
-    private static final String DEFAULT_ISSUECARD_ID = "#dummy/dummy_col0_9";
+    private static final String QUERY_FIELD_ID = IdGenerator.getLabelPickerQueryFieldIdForTest();
+    private static final String DEFAULT_ISSUECARD_ID = IdGenerator.getPanelCellIdForTest("dummy/dummy", 0, 9);
+    private static final String ASSIGNED_LABELS_PANE_ID = IdGenerator.getAssignedLabelsPaneIdForTest();
 
     @Test
     public void showLabelPicker_typeQuery_displaysCorrectly() {
@@ -34,8 +36,8 @@ public class LabelPickerTests extends UITest {
     @Test
     public void showLabelPicker_emptyLabels_displayedCorrectText() {
         triggerLabelPicker(new TurboIssue("dummy/dummy", 1, ""));
-        waitUntilNodeAppears("#assignedLabels");
-        FlowPane assignedLabels = find("#assignedLabels");
+        waitUntilNodeAppears(ASSIGNED_LABELS_PANE_ID);
+        FlowPane assignedLabels = find(ASSIGNED_LABELS_PANE_ID);
         Label label = (Label) assignedLabels.getChildren().get(0);
         assertEquals("No currently selected labels. ", label.getText());
         exitCleanly();
