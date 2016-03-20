@@ -69,7 +69,6 @@ public class UITest extends FxRobot {
     private static final Map<Character, KeyCode> specialCharsMap = getSpecialCharsMap();
     
     // Sets property to run tests headless
-    /*
     static {
         System.setProperty("java.awt.robot", "true");
         System.setProperty("testfx.robot", "glass");
@@ -77,7 +76,6 @@ public class UITest extends FxRobot {
         System.setProperty("prism.order", "sw");
         System.setProperty("prism.text", "t2k");
     }
-    */
 
     protected static class TestUI extends UI {
         public TestUI() {
