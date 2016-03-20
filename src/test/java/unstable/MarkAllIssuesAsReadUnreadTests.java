@@ -7,6 +7,8 @@ import javafx.scene.input.KeyCode;
 import org.junit.Before;
 import org.junit.Test;
 import ui.IdGenerator;
+import org.loadui.testfx.GuiTest;
+
 import ui.components.FilterTextField;
 import ui.components.IssueListView;
 import ui.listpanel.ListPanel;
@@ -21,7 +23,7 @@ public class MarkAllIssuesAsReadUnreadTests extends UITest {
 
     @Before
     public void setup() {
-        PlatformEx.runAndWait(stage::requestFocus);
+        PlatformEx.runAndWait(getStage()::requestFocus);
 
         FilterTextField filterTextField = getFilterTextFieldAtPanel(0);
         filterTextField.setText("");
@@ -87,10 +89,10 @@ public class MarkAllIssuesAsReadUnreadTests extends UITest {
             awaitCondition(menuItem::isVisible);
         }
 
-        if (isMarkAsRead) {
-            click(ListPanel.MARK_ALL_AS_READ_MENU_ITEM_TEXT);
+        if (isMarkAsRead){
+            clickOn(ListPanel.MARK_ALL_AS_READ_MENU_ITEM_TEXT);
         } else {
-            click(ListPanel.MARK_ALL_AS_UNREAD_MENU_ITEM_TEXT);
+            clickOn(ListPanel.MARK_ALL_AS_UNREAD_MENU_ITEM_TEXT);
         }
     }
 

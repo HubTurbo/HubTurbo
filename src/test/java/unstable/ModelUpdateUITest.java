@@ -4,10 +4,12 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeoutException;
 
 import backend.stub.DummyRepoState;
 import org.junit.Test;
-import org.loadui.testfx.utils.FXTestUtils;
+import org.loadui.testfx.GuiTest;
+import org.testfx.api.FxToolkit;
 
 import guitests.UITest;
 import ui.IdGenerator;
@@ -22,8 +24,8 @@ public class ModelUpdateUITest extends UITest {
     private static final int EVENT_DELAY = 1500;
 
     @Override
-    public void launchApp() {
-        FXTestUtils.launchApp(TestUI.class, "--test=true", "--testjson=true", "--bypasslogin=true");
+    public void setup() throws TimeoutException {
+        FxToolkit.setupApplication(UITest.TestUI.class, "--test=true", "--testjson=true", "--bypasslogin=true");
     }
 
     @Test

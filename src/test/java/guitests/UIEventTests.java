@@ -3,6 +3,8 @@ package guitests;
 import javafx.scene.input.KeyCode;
 
 import org.junit.Test;
+import org.loadui.testfx.GuiTest;
+
 import ui.UI;
 import ui.components.KeyboardShortcuts;
 import util.events.*;
@@ -28,8 +30,8 @@ public class UIEventTests extends UITest {
     public void createIssueTest() {
         UI.events.registerEvent((IssueCreatedEventHandler) e -> UIEventTests.increaseEventTestCount());
         resetEventTestCount();
-        click("New");
-        click("Issue");
+        clickOn("New");
+        clickOn("Issue");
         assertEquals(1, eventTestCount);
         resetEventTestCount();
         press(NEW_ISSUE);
@@ -40,8 +42,8 @@ public class UIEventTests extends UITest {
     public void createLabelTest() {
         UI.events.registerEvent((LabelCreatedEventHandler) e -> UIEventTests.increaseEventTestCount());
         resetEventTestCount();
-        click("New");
-        click("Label");
+        clickOn("New");
+        clickOn("Label");
         assertEquals(1, eventTestCount);
         resetEventTestCount();
         press(NEW_LABEL);
@@ -52,8 +54,8 @@ public class UIEventTests extends UITest {
     public void createMilestoneTest() {
         UI.events.registerEvent((MilestoneCreatedEventHandler) e -> UIEventTests.increaseEventTestCount());
         resetEventTestCount();
-        click("New");
-        click("Milestone");
+        clickOn("New");
+        clickOn("Milestone");
         assertEquals(1, eventTestCount);
         resetEventTestCount();
         press(NEW_MILESTONE);

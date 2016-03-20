@@ -7,6 +7,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.FlowPane;
 
 import org.junit.Test;
+import org.loadui.testfx.GuiTest;
 
 import backend.resource.TurboIssue;
 import ui.IdGenerator;
@@ -32,7 +33,7 @@ public class LabelPickerTests extends UITest {
     public void showLabelPicker_emptyLabels_displayedCorrectText() {
         triggerLabelPicker(new TurboIssue("dummy/dummy", 1, ""));
         waitUntilNodeAppears(ASSIGNED_LABELS_PANE_ID);
-        FlowPane assignedLabels = find(ASSIGNED_LABELS_PANE_ID);
+        FlowPane assignedLabels = GuiTest.find(ASSIGNED_LABELS_PANE_ID);
         Label label = (Label) assignedLabels.getChildren().get(0);
         assertEquals("No currently selected labels. ", label.getText());
         exitCleanly();
@@ -44,7 +45,7 @@ public class LabelPickerTests extends UITest {
     }
 
     private void triggerLabelPicker(TurboIssue issue) {
-        Platform.runLater(stage::hide);
+        Platform.runLater(getStage()::hide);
         UI.events.triggerEvent(new ShowLabelPickerEvent(issue));
         waitUntilNodeAppears(IdGenerator.getLabelPickerTextFieldIdReference());
     }

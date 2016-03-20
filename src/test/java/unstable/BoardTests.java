@@ -8,6 +8,7 @@ import static ui.components.KeyboardShortcuts.*;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.loadui.testfx.GuiTest;
 
 import guitests.UITest;
 import javafx.scene.control.TextField;
@@ -112,8 +113,8 @@ public class BoardTests extends UITest {
     private void saveBoardWithName(String name) {
         traverseMenu("Boards", "Save as");
         waitUntilNodeAppears(boardNameInputId);
-        ((TextField) find(boardNameInputId)).setText(name);
-        click("OK");
+        ((TextField) GuiTest.find(boardNameInputId)).setText(name);
+        clickOn("OK");
     }
 
     @Test
@@ -161,8 +162,8 @@ public class BoardTests extends UITest {
     private void tryBoardName(String name) {
         traverseMenu("Boards", "Save as");
         waitUntilNodeAppears(boardNameInputId);
-        ((TextField) find(boardNameInputId)).setText(name);
-        assertTrue(find(boardNameSaveButtonId).isDisabled());
+        ((TextField) GuiTest.find(boardNameInputId)).setText(name);
+        assertTrue(GuiTest.find(boardNameSaveButtonId).isDisabled());
         pushKeys(KeyCode.ESCAPE);
         waitUntilNodeDisappears(boardNameInputId);
     }
@@ -220,7 +221,7 @@ public class BoardTests extends UITest {
 
         traverseMenu("Boards", "Delete", "Board 1");
         waitUntilNodeAppears(hasText("OK"));
-        click("OK");
+        clickOn("OK");
 
         // No board is open now
         assertEquals(0, panelControl.getNumberOfSavedBoards());
@@ -244,8 +245,8 @@ public class BoardTests extends UITest {
         // Saving will prompt the user to save as a new board
         traverseMenu("Boards", "Save");
         waitUntilNodeAppears(boardNameInputId);
-        ((TextField) find(boardNameInputId)).setText("Board 1");
-        click("OK");
+        ((TextField) GuiTest.find(boardNameInputId)).setText("Board 1");
+        clickOn("OK");
 
         assertEquals(1, panelControl.getNumberOfSavedBoards());
         assertEquals(ui.getTitle(), getUiTitleWithOpenBoard("Board 1"));
@@ -278,12 +279,12 @@ public class BoardTests extends UITest {
 
         traverseMenu("Boards", "New");
         waitUntilNodeAppears(hasText("OK"));
-        click("OK");
+        clickOn("OK");
 
         waitUntilNodeAppears(boardNameInputId);
-        ((TextField) find(boardNameInputId)).setText("empty");
+        ((TextField) GuiTest.find(boardNameInputId)).setText("empty");
         waitUntilNodeAppears(hasText("OK"));
-        click("OK");
+        clickOn("OK");
 
         waitAndAssertEquals(0, panelControl::getPanelCount);
         waitAndAssertEquals(ui.getTitle(), () -> getUiTitleWithOpenBoard("empty"));

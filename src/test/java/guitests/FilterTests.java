@@ -8,6 +8,8 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import org.junit.Test;
+import org.loadui.testfx.GuiTest;
+
 import ui.listpanel.ListPanel;
 import util.PlatformEx;
 

@@ -2,10 +2,11 @@ package guitests;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
-import org.loadui.testfx.utils.FXTestUtils;
+import org.testfx.api.FxToolkit;
 
 import javafx.application.Platform;
 import util.PlatformEx;
@@ -13,8 +14,8 @@ import util.PlatformEx;
 public class PlatformExTest extends UITest {
 
     @Override
-    public void launchApp() {
-        FXTestUtils.launchApp(TestUI.class);
+    public void setup() throws TimeoutException {
+        FxToolkit.setupApplication(TestUI.class);
     }
 
     /**

@@ -2,6 +2,8 @@ package guitests;
 
 import javafx.scene.input.KeyCode;
 import org.junit.Test;
+import org.loadui.testfx.GuiTest;
+
 import ui.UI;
 import ui.components.FilterTextField;
 import util.events.UpdateProgressEvent;

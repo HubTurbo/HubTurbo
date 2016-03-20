@@ -6,8 +6,9 @@ import javafx.scene.text.Text;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.loadui.testfx.GuiTest;
 import org.loadui.testfx.exceptions.NoNodesFoundException;
-import org.loadui.testfx.utils.FXTestUtils;
+import org.testfx.api.FxToolkit;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import ui.IdGenerator;
@@ -25,6 +26,8 @@ import static ui.components.KeyboardShortcuts.CLOSE_PANEL;
 import static ui.components.KeyboardShortcuts.CREATE_RIGHT_PANEL;
 import static ui.components.KeyboardShortcuts.MAXIMIZE_WINDOW;
 
+import java.util.concurrent.TimeoutException;
+
 public class PanelRenameTest extends UITest {
 
     public static final int EVENT_DELAY = 1000;
@@ -32,8 +35,8 @@ public class PanelRenameTest extends UITest {
     private PanelControl panels;
 
     @Override
-    public void launchApp() {
-        FXTestUtils.launchApp(TestUI.class, "--bypasslogin=true");
+    public void setup() throws TimeoutException {
+        FxToolkit.setupApplication(TestUI.class, "--bypasslogin=true");
     }
 
     @Before
@@ -97,22 +100,22 @@ public class PanelRenameTest extends UITest {
         String panelRenameTextFieldId =  IdGenerator.getPanelRenameTextFieldIdReference(3);
         String panelNameAreaId = IdGenerator.getPanelNameAreaIdReference(3);
         waitUntilNodeAppears(panelCloseButtonId);
-        boolean isPresentBeforeEdit = exists(panelCloseButtonId);
+        boolean isPresentBeforeEdit = GuiTest.exists(panelCloseButtonId);
         PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(3)));
         PlatformEx.waitOnFxThread();
         boolean isPresentDuringEdit = true; //stub value, this should change to false.
         try {
-            exists(panelCloseButtonId);
+            GuiTest.exists(panelCloseButtonId);
         } catch (NoNodesFoundException e) {
             isPresentDuringEdit = false;
         }
 
         String randomName3 = RandomStringUtils.randomAlphanumeric(PANEL_MAX_NAME_LENGTH - 1);
-        TextField renameTextField3 = find(panelRenameTextFieldId);
+        TextField renameTextField3 = GuiTest.find(panelRenameTextFieldId);
         renameTextField3.setText(randomName3);
         push(KeyCode.ENTER);
-        boolean isPresentAfterEdit = exists(panelCloseButtonId);
-        Text panelNameText3 = find(panelNameAreaId);
+        boolean isPresentAfterEdit = GuiTest.exists(panelCloseButtonId);
+        Text panelNameText3 = GuiTest.find(panelNameAreaId);
         assertEquals(true, isPresentBeforeEdit);
         assertEquals(false, isPresentDuringEdit);
         assertEquals(true, isPresentAfterEdit);
@@ -124,7 +127,7 @@ public class PanelRenameTest extends UITest {
         pushKeys(CREATE_RIGHT_PANEL);
         PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(4)));
         type("Renamed panel with confirm tick");
-        click(IdGenerator.getOcticonButtonIdReference(4, "confirmButton"));
+        clickOn(IdGenerator.getOcticonButtonIdReference(4, "confirmButton"));
         FilterPanel panel4 = (FilterPanel) panels.getPanel(4);
         Text panelNameText4 = panel4.getNameText();
         assertEquals("Renamed panel with confirm tick", panelNameText4.getText());
@@ -134,7 +137,7 @@ public class PanelRenameTest extends UITest {
         pushKeys(CREATE_RIGHT_PANEL);
         PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(5)));
         type("Renamed panel with undo");
-        click(IdGenerator.getOcticonButtonIdReference(5, "undoButton"));
+        clickOn(IdGenerator.getOcticonButtonIdReference(5, "undoButton"));
         FilterPanel panel5 = (FilterPanel) panels.getPanel(5);
         Text panelNameText5 = panel5.getNameText();
         assertEquals("Panel", panelNameText5.getText());

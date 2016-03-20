@@ -2,7 +2,8 @@ package guitests;
 
 import javafx.scene.input.KeyCode;
 import org.junit.Test;
-import org.loadui.testfx.utils.FXTestUtils;
+import org.testfx.api.FxToolkit;
+
 import ui.UI;
 import util.GitHubURL;
 import util.events.IssueCreatedEvent;
@@ -16,6 +17,8 @@ import util.events.testevents.SendKeysToBrowserEventHandler;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.concurrent.TimeoutException;
+
 public class ChromeDriverTest extends UITest {
 
     private static final int EVENT_DELAY = 1000;
@@ -26,9 +29,9 @@ public class ChromeDriverTest extends UITest {
     private boolean jumpToComment = false; // NOPMD
 
     @Override
-    public void launchApp() {
-        FXTestUtils.launchApp(
-                TestUI.class, "--test=true", "--bypasslogin=true", "--testchromedriver=true");
+    public void setup() throws TimeoutException {
+        FxToolkit.setupApplication(
+            TestUI.class, "--test=true", "--bypasslogin=true", "--testchromedriver=true");
     }
 
     @Test
@@ -145,14 +148,14 @@ public class ChromeDriverTest extends UITest {
         assertEquals(true, jumpToComment);
         jumpToComment = false;
 
-        click("View");
-        click("Documentation");
+        clickOn("View");
+        clickOn("Documentation");
         sleep(EVENT_DELAY);
         assertEquals(GitHubURL.DOCS_PAGE, url);
         clearUrl();
 
-        click("File");
-        click("Logout");
+        clickOn("File");
+        clickOn("Logout");
     }
 
     public void clearUrl() {

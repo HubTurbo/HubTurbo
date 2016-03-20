@@ -40,7 +40,7 @@ public class PanelsTest extends UITest {
 
         reorderPanelsByDragging(panel0, panel1, panel2);
 
-        click(panel0.getCloseButton());
+        clickOn(panel0.getCloseButton());
         waitUntilNodeDisappears(panel0);
 
         // Switch default repo
@@ -84,7 +84,7 @@ public class PanelsTest extends UITest {
 
     private void selectPanel(int index) {
         eventTriggered.set(false);
-        click(getFilterPanel(index).getNameText());
+        clickOn(getFilterPanel(index).getNameText());
         awaitCondition(eventTriggered::get);
     }
 

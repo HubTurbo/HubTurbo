@@ -2,6 +2,7 @@ package guitests;
 
 import static junit.framework.TestCase.assertTrue;
 
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -9,7 +10,8 @@ import org.junit.After;
 import org.junit.Test;
 
 import javafx.scene.input.KeyCode;
-import org.loadui.testfx.utils.FXTestUtils;
+import org.testfx.api.FxToolkit;
+
 import ui.TestController;
 import ui.UI;
 import ui.components.FilterTextField;
@@ -20,9 +22,9 @@ import util.events.testevents.NavigateToPageEventHandler;
 public class FilterTextFieldTest extends UITest {
 
     @Override
-    public void launchApp() {
-        FXTestUtils.launchApp(
-                TestUI.class, "--test=true", "--bypasslogin=true", "--testchromedriver=true");
+    public void setup() throws TimeoutException {
+        FxToolkit.setupApplication(
+            TestUI.class, "--test=true", "--bypasslogin=true", "--testchromedriver=true");
     }
 
     @Test
@@ -163,7 +165,7 @@ public class FilterTextFieldTest extends UITest {
         FilterPanel issuePanel = (FilterPanel) TestController.getUI().getPanelControl().getPanel(0);
         FilterTextField field = issuePanel.getFilterTextField();
         waitUntilNodeAppears(field);
-        click(issuePanel.getFilterTextField());
+        clickOn(issuePanel.getFilterTextField());
         return field;
     }
 

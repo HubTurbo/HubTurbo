@@ -78,10 +78,10 @@ public class BoardAutoCreatorTest extends UITest {
 
         PlatformEx.waitOnFxThread();
         waitUntilNodeAppears(String.format(SAVE_MESSAGE, "Milestones"));
-        click("No");
+        clickOn("No");
         assertNodeExists(hasText("Milestones board has been created and loaded.\n\n"
                 + "It is saved under the name \"Milestones\"."));
-        click("OK");
+        clickOn("OK");
 
         assertEquals(5, panelControl.getPanelCount());
         assertEquals(Optional.of(1), panelControl.getCurrentlySelectedPanel());
@@ -110,10 +110,10 @@ public class BoardAutoCreatorTest extends UITest {
 
         PlatformEx.waitOnFxThread();
         waitUntilNodeAppears(String.format(SAVE_MESSAGE, "Work Allocation"));
-        click("No");
+        clickOn("No");
         assertNodeExists(hasText("Work Allocation board has been created and loaded.\n\n"
                 + "It is saved under the name \"Work Allocation\"."));
-        click("OK");
+        clickOn("OK");
 
         assertEquals(5, panelControl.getPanelCount());
         assertEquals(Optional.of(0), panelControl.getCurrentlySelectedPanel());
@@ -142,7 +142,7 @@ public class BoardAutoCreatorTest extends UITest {
         waitUntilNodeAppears(String.format(SAVE_MESSAGE, SAMPLE_BOARD));
         click("No");
         waitUntilNodeAppears(SAMPLE_BOARD_DIALOG);
-        click("OK");
+        clickOn("OK");
         verifyBoard(panelControl, BoardAutoCreator.getSamplePanelDetails());
     }
 

@@ -5,11 +5,13 @@ import static org.junit.Assert.fail;
 import static org.loadui.testfx.Assertions.assertNodeExists;
 
 import java.io.File;
+import java.util.concurrent.TimeoutException;
 
 import javafx.application.Platform;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.junit.Test;
-import org.loadui.testfx.utils.FXTestUtils;
+import org.loadui.testfx.GuiTest;
+import org.testfx.api.FxToolkit;
 
 import guitests.UITest;
 import javafx.scene.control.ComboBox;
@@ -44,8 +46,8 @@ public class RepositorySelectorTest extends UITest {
     }
 
     @Override
-    public void launchApp() {
-        FXTestUtils.launchApp(RepositorySelectorTestUI.class, "--testconfig=true");
+    public void setup() throws TimeoutException {
+        FxToolkit.setupApplication(RepositorySelectorTestUI.class, "--testconfig=true");
     }
 
     @Override
@@ -86,16 +88,16 @@ public class RepositorySelectorTest extends UITest {
 
         // we check if "dummy3/dummy3" is added to the repository selector
         // and that the primary repo is also changed
-        doubleClick(comboBox);
-        doubleClick();
+        doubleClickOn(comboBox);
+        doubleClickOn();
         type("dummy3/dummy3");
         push(KeyCode.ENTER);
         assertEquals(3, comboBox.getItems().size());
         assertEquals("dummy3/dummy3", primaryRepo);
 
         // we check if repo's id with white spaces are handled correctly
-        doubleClick(comboBox);
-        doubleClick();
+        doubleClickOn(comboBox);
+        doubleClickOn();
         type(" dummy4 / dummy4 ");
         push(KeyCode.ENTER);
         assertEquals(4, comboBox.getItems().size());

@@ -9,9 +9,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeoutException;
 
 import org.junit.Test;
-import org.loadui.testfx.utils.FXTestUtils;
+import org.testfx.api.FxToolkit;
 
 import guitests.UITest;
 import javafx.application.Platform;
@@ -27,9 +28,9 @@ public class KeyboardShortcutsConfigTest extends UITest {
     private Preferences testPref;
 
     @Override
-    public void launchApp() {
+    public void setup() throws TimeoutException {
         // isTestMode in UI checks for testconfig too so we don't need to specify --test=true here.
-        FXTestUtils.launchApp(UITest.TestUI.class, "--testconfig=true", "--bypasslogin=true");
+        FxToolkit.setupApplication(UITest.TestUI.class, "--testconfig=true", "--bypasslogin=true");
     }
 
     @Test
@@ -42,7 +43,7 @@ public class KeyboardShortcutsConfigTest extends UITest {
         reloadPrefs(testPref);
         Platform.runLater(() -> KeyboardShortcuts.loadKeyboardShortcuts(testPref));
         waitUntilNodeAppears(hasText("Invalid number of shortcut keys specified"));
-        click("Reset to default");
+        clickOn("Reset to default");
         reloadPrefs(testPref);
         assertEquals(KeyboardShortcuts.getDefaultKeyboardShortcuts().size(), testPref.getKeyboardShortcuts().size());
 
@@ -53,7 +54,7 @@ public class KeyboardShortcutsConfigTest extends UITest {
         reloadPrefs(testPref);
         Platform.runLater(() -> KeyboardShortcuts.loadKeyboardShortcuts(testPref));
         waitUntilNodeAppears(hasText("Invalid number of shortcut keys specified"));
-        click("Reset to default");
+        clickOn("Reset to default");
         reloadPrefs(testPref);
         assertEquals(KeyboardShortcuts.getDefaultKeyboardShortcuts().size(), testPref.getKeyboardShortcuts().size());
     }
@@ -70,7 +71,7 @@ public class KeyboardShortcutsConfigTest extends UITest {
         Platform.runLater(() -> KeyboardShortcuts.loadKeyboardShortcuts(testPref));
         waitUntilNodeAppears(hasText("Invalid key specified for MARK_AS_READ" +
                 " or it has already been used for some other shortcut. "));
-        click("Use default key");
+        clickOn("Use default key");
         reloadPrefs(testPref);
         assertEquals(KeyboardShortcuts.getDefaultKeyboardShortcuts().get("MARK_AS_READ"),
                 testPref.getKeyboardShortcuts().get("MARK_AS_READ"));
@@ -87,7 +88,7 @@ public class KeyboardShortcutsConfigTest extends UITest {
         reloadPrefs(testPref);
         Platform.runLater(() -> KeyboardShortcuts.loadKeyboardShortcuts(testPref));
         waitUntilNodeAppears(hasText("Could not find user defined keyboard shortcut for MARK_AS_READ"));
-        click("Use default key");
+        clickOn("Use default key");
         reloadPrefs(testPref);
         assertEquals(KeyboardShortcuts.getDefaultKeyboardShortcuts().get("MARK_AS_READ"),
                      testPref.getKeyboardShortcuts().get("MARK_AS_READ"));
@@ -105,7 +106,7 @@ public class KeyboardShortcutsConfigTest extends UITest {
         Platform.runLater(() -> KeyboardShortcuts.loadKeyboardShortcuts(testPref));
         waitUntilNodeAppears(hasText("Invalid key specified for MARK_AS_UNREAD" +
                                      " or it has already been used for some other shortcut. "));
-        click("Use default key");
+        clickOn("Use default key");
         reloadPrefs(testPref);
         assertEquals(KeyboardShortcuts.getDefaultKeyboardShortcuts().get("MARK_AS_UNREAD"),
                      testPref.getKeyboardShortcuts().get("MARK_AS_UNREAD"));

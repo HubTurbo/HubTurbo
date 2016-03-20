@@ -12,6 +12,7 @@ import javafx.scene.input.KeyCode;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.loadui.testfx.GuiTest;
 
 import ui.IdGenerator;
 import ui.components.FilterTextField;
@@ -25,8 +26,8 @@ public class ContextMenuTests extends UITest {
 
     @Before
     public void setup() {
-        Platform.runLater(stage::show);
-        Platform.runLater(stage::requestFocus);
+        Platform.runLater(getStage()::show);
+        Platform.runLater(getStage()::requestFocus);
 
         FilterTextField filterTextField = getFilterTextFieldAtPanel(0);
         filterTextField.setText("");
@@ -67,14 +68,14 @@ public class ContextMenuTests extends UITest {
         clickIssue(0, 9);
         rightClickIssue(0, 9);
         sleep(EVENT_DELAY);
-        click("Mark as read (E)");
+        clickOn("Mark as read (E)");
         sleep(EVENT_DELAY);
         assertTrue(getIssueCell(0, 9).getIssue().isCurrentlyRead());
 
         clickIssue(0, 9);
         rightClickIssue(0, 9);
         sleep(EVENT_DELAY);
-        click("Mark as unread (U)");
+        clickOn("Mark as unread (U)");
         sleep(EVENT_DELAY);
         assertFalse(getIssueCell(0, 9).getIssue().isCurrentlyRead());
     }
@@ -87,7 +88,7 @@ public class ContextMenuTests extends UITest {
         clickIssue(0, 9);
         rightClickIssue(0, 9);
         sleep(EVENT_DELAY);
-        click("Change labels (L)");
+        clickOn("Change labels (L)");
         sleep(DIALOG_DELAY);
 
         assertNotNull(getLabelPickerTextField());
@@ -101,13 +102,13 @@ public class ContextMenuTests extends UITest {
      */
     @Test
     public void contextMenu_selectChangeMilestoneMenu_successful() {
-        click("#dummy/dummy_col0_9");
-        rightClick("#dummy/dummy_col0_9");
+        clickOn("#dummy/dummy_col0_9");
+        rightClickOn("#dummy/dummy_col0_9");
         sleep(EVENT_DELAY);
-        click("Change milestone (M)");
+        clickOn("Change milestone (M)");
         sleep(DIALOG_DELAY);
 
-        assertNotNull(find("#milestonePickerTextField"));
+        assertNotNull(GuiTest.find("#milestonePickerTextField"));
 
         push(KeyCode.ESCAPE);
         sleep(EVENT_DELAY);
@@ -118,28 +119,28 @@ public class ContextMenuTests extends UITest {
      */
     @Test
     public void testCloseReopenIssue() {
-        click("#dummy/dummy_col0_9");
-        rightClick("#dummy/dummy_col0_9");
+        clickOn("#dummy/dummy_col0_9");
+        rightClickOn("#dummy/dummy_col0_9");
         sleep(EVENT_DELAY);
-        click("Close issue (C)");
+        clickOn("Close issue (C)");
         sleep(EVENT_DELAY);
         waitUntilNodeAppears("OK");
-        click("OK");
+        clickOn("OK");
         sleep(EVENT_DELAY);
         waitUntilNodeAppears("Undo");
-        click("Undo");
+        clickOn("Undo");
         sleep(EVENT_DELAY);
 
-        click("#dummy/dummy_col0_6");
-        rightClick("#dummy/dummy_col0_6");
+        clickOn("#dummy/dummy_col0_6");
+        rightClickOn("#dummy/dummy_col0_6");
         sleep(EVENT_DELAY);
-        click("Reopen issue (O)");
+        clickOn("Reopen issue (O)");
         sleep(EVENT_DELAY);
         waitUntilNodeAppears("OK");
-        click("OK");
+        clickOn("OK");
         sleep(EVENT_DELAY);
         waitUntilNodeAppears("Undo");
-        click("Undo");
+        clickOn("Undo");
         sleep(EVENT_DELAY);
     }
 

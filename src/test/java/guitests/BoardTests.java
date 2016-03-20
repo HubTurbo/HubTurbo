@@ -32,7 +32,7 @@ public class BoardTests extends UITest {
         waitUntilNodeAppears(hasText("OK"));
         // Use the default 'New Board' as board name
         // Workaround since we are unable to get text field into focus on Travis
-        click("OK");
+        clickOn("OK");
         waitAndAssertEquals(1, panelControl::getPanelCount);
 
         // Create a new panel, then save with the same name
@@ -40,12 +40,12 @@ public class BoardTests extends UITest {
         traverseMenu("Panels", "Create");
         traverseMenu("Boards", "Save as");
         waitUntilNodeAppears(hasText("OK"));
-        click("OK");
+        clickOn("OK");
         waitUntilNodeAppears(hasText("A board by the name 'New Board' already exists."));
 
         // Overwrite previous board, then open the board again
         // Expected: the board should contain 2 panels
-        click("Yes");
+        clickOn("Yes");
         traverseMenu("Boards", "Open", "New Board");
         waitAndAssertEquals(2, panelControl::getPanelCount);
 
@@ -57,9 +57,9 @@ public class BoardTests extends UITest {
         waitAndAssertEquals(3, panelControl::getPanelCount);
         traverseMenu("Boards", "Save as");
         waitUntilNodeAppears(hasText("OK"));
-        click("OK");
-        click("No");
-        click("Cancel");
+        clickOn("OK");
+        clickOn("No");
+        clickOn("Cancel");
         traverseMenu("Boards", "Open", "New Board");
         waitAndAssertEquals(2, panelControl::getPanelCount);
     }

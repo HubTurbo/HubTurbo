@@ -21,7 +21,7 @@ import static ui.components.KeyboardShortcuts.*;
 
 import static ui.components.KeyboardShortcuts.SWITCH_DEFAULT_REPO;
 
-public class KeyboardShortcutsTest extends NeoUITest {
+public class KeyboardShortcutsTest extends UITest {
 
     private UIComponentFocusEvent.EventType uiComponentFocusEventType;
     private int selectedIssueId;

@@ -3,8 +3,8 @@ package guitests;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.loadui.testfx.utils.FXTestUtils;
-import org.loadui.testfx.utils.TestUtils;
+import org.testfx.api.FxToolkit;
+
 import ui.BoardAutoCreator;
 import ui.TestController;
 import ui.issuepanel.PanelControl;
@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeoutException;
 
 import static guitests.BoardAutoCreatorTest.verifyBoard;
 
@@ -25,8 +26,8 @@ public class StartupBoardLauncherTest extends UITest {
     private PanelControl panelControl;
 
     @Override
-    public void launchApp() {
-        FXTestUtils.launchApp(TestUI.class, "--startupboard=true");
+    public void setup() throws TimeoutException{
+        FxToolkit.setupApplication(TestUI.class, "--startupboard=true");
     }
 
     @Before
@@ -37,7 +38,7 @@ public class StartupBoardLauncherTest extends UITest {
     @Test
     public void boardCreation_firstTimeUser_sampleBoardCreated() {
         login("dummy", "dummy", "test", "test");
-        TestUtils.awaitCondition(() -> BoardAutoCreator.getSamplePanelDetails().size() == countPanelsShown());
+        awaitCondition(() -> BoardAutoCreator.getSamplePanelDetails().size() == countPanelsShown());
 
         //Ensures that only 1 board was created and it was the sample board
         List<String> boardNames = panelControl.getAllBoardNames();

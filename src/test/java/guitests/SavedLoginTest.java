@@ -3,7 +3,9 @@ package guitests;
 import backend.RepoIO;
 import javafx.scene.control.ComboBox;
 import org.junit.Test;
-import org.loadui.testfx.utils.FXTestUtils;
+import org.loadui.testfx.GuiTest;
+import org.testfx.api.FxToolkit;
+
 import prefs.Preferences;
 import tests.TestUtils;
 import ui.TestController;
@@ -13,6 +15,7 @@ import util.events.EventDispatcher;
 
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -20,8 +23,8 @@ import static org.mockito.Mockito.mock;
 public class SavedLoginTest extends UITest {
 
     @Override
-    public void launchApp() {
-        FXTestUtils.launchApp(TestUI.class, "--testconfig=true");
+    public void setup() throws TimeoutException {
+        FxToolkit.setupApplication(TestUI.class, "--testconfig=true");
     }
 
     @Override

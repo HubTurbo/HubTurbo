@@ -2,6 +2,8 @@ package guitests;
 
 import javafx.scene.input.KeyCode;
 import org.junit.Test;
+import org.loadui.testfx.GuiTest;
+
 import ui.UI;
 import ui.listpanel.ListPanel;
 import util.events.testevents.UILogicRefreshEvent;

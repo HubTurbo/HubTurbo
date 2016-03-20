@@ -8,6 +8,7 @@ import javafx.scene.input.KeyCode;
 
 import javafx.scene.layout.VBox;
 import org.junit.Test;
+import org.loadui.testfx.GuiTest;
 
 import ui.IdGenerator;
 import ui.UI;
@@ -40,13 +41,13 @@ public class KeyboardShortcutsTest extends UITest {
         clearPanelIndex();
 
         // maximize
-        assertEquals(false, stage.getWidth() > 500);
+        assertEquals(false, getStage().getWidth() > 500);
         press(MAXIMIZE_WINDOW);
-        assertEquals(true, stage.getWidth() > 500);
+        assertEquals(true, getStage().getWidth() > 500);
 
         // mid-sized window
         press(DEFAULT_SIZE_WINDOW);
-        assertEquals(false, stage.getWidth() > 500);
+        assertEquals(false, getStage().getWidth() > 500);
 
         // jump from panel focus to first issue
         // - This is because on startup focus is on panel and not on filter box
@@ -128,6 +129,35 @@ public class KeyboardShortcutsTest extends UITest {
         press(SHOW_REPO_PICKER);
         waitUntilNodeAppears("#repositoryPickerUserInputField");
         press(KeyCode.ESCAPE);
+=======
+        // switch default repo tests
+        assertEquals(1, repoSelectorComboBox.getItems().size());
+        // setup - add a new repo
+        clickRepositorySelector();
+        selectAll();
+        type("dummy1/dummy1");
+        push(KeyCode.ENTER);
+        PlatformEx.waitOnFxThread();
+        assertEquals(2, repoSelectorComboBox.getItems().size());
+        assertEquals("dummy1/dummy1", repoSelectorComboBox.getValue());
+        // test shortcut on repo dropdown
+        doubleClickOn(repoSelectorComboBox);
+        press(SWITCH_DEFAULT_REPO);
+        // wait for issue 11 to appear then click on it
+        // issue 11 is chosen instead of issue 12
+        // as there is a problem with finding issue 12's node due to it being the first card in the panel
+        waitUntilNodeAppears(getIssueCell(1, DummyRepoState.NO_OF_DUMMY_ISSUES - 1));
+        assertEquals("dummy/dummy", repoSelectorComboBox.getValue());
+        // test shortcut when focus is on panel
+        clickIssue(1, DummyRepoState.NO_OF_DUMMY_ISSUES - 1);
+        press(SWITCH_DEFAULT_REPO);
+        PlatformEx.waitOnFxThread();
+        assertEquals("dummy1/dummy1", repoSelectorComboBox.getValue());
+        // test shortcut when focus is on issue list
+        press(JUMP_TO_NTH_ISSUE_KEYS.get(1));
+        press(SWITCH_DEFAULT_REPO);
+        PlatformEx.waitOnFxThread();
+        assertEquals("dummy/dummy", repoSelectorComboBox.getValue());
 
         // mark as read
         ListPanel issuePanel = getPanel(1);
@@ -186,7 +216,7 @@ public class KeyboardShortcutsTest extends UITest {
 
         // minimize window
         press(MINIMIZE_WINDOW);
-        assertEquals(true, stage.isIconified());
+        assertEquals(true, getStage().isIconified());
 
     }
 
