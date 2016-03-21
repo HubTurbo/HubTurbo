@@ -286,9 +286,7 @@ public class Logic {
         localMilestoneReplaceFuture.thenRun(this::refreshUI);
 
         return updateIssueMilestonesOnServer(issue, newMilestone)
-                .thenCombine(localMilestoneReplaceFuture,
-                        (isUpdateSuccessful, originalIssue) ->
-                                handleIssueMilestoneUpdateOnServerResult(isUpdateSuccessful, originalIssue));
+                .thenCombine(localMilestoneReplaceFuture, this::handleIssueMilestoneUpdateOnServerResult);
     }
 
     /**
@@ -386,8 +384,8 @@ public class Logic {
         TurboIssue currentIssue = getIssue(originalIssue.getRepoId(), originalIssue.getId()).orElse(originalIssue);
         LocalDateTime originalMilestoneModifiedAt = originalIssue.getMilestoneLastModifiedAt();
         LocalDateTime currentMilestoneAssignedAt = currentIssue.getMilestoneLastModifiedAt();
-        boolean isCurrentMilestoneModifiedFromOriginalMilestone = originalMilestoneModifiedAt.isEqual(
-                currentMilestoneAssignedAt);
+        boolean isCurrentMilestoneModifiedFromOriginalMilestone = originalMilestoneModifiedAt
+                                                                    .isEqual(currentMilestoneAssignedAt);
 
         if (!isCurrentMilestoneModifiedFromOriginalMilestone) return;
 

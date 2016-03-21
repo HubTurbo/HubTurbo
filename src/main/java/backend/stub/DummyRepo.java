@@ -10,10 +10,7 @@ import github.ReviewComment;
 import github.TurboIssueEvent;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
-import org.eclipse.egit.github.core.Comment;
-import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.Label;
-import org.eclipse.egit.github.core.PullRequest;
+import org.eclipse.egit.github.core.*;
 import ui.UI;
 import util.events.testevents.ClearLogicModelEvent;
 import util.events.testevents.UpdateDummyRepoEventHandler;
@@ -184,8 +181,8 @@ public class DummyRepo implements Repo {
     public Optional<Integer> setMilestone(String repoId, int issueId, String issueTitle,
                                           Optional<Integer> issueMilestone) {
         Issue returnedIssue = getRepoState(repoId).setMilestone(issueId, issueMilestone);
-        if (returnedIssue.getMilestone() == null) return Optional.empty();
-        return Optional.of(returnedIssue.getMilestone().getNumber());
+        return Optional.ofNullable(returnedIssue.getMilestone())
+                .map(Milestone::getNumber);
     }
 
     @Override

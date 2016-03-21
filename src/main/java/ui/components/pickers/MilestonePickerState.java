@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class MilestonePickerState {
     private List<PickerMilestone> currentMilestonesList;
@@ -20,20 +21,18 @@ public class MilestonePickerState {
     }
 
     private List<PickerMilestone> cloneList(List<PickerMilestone> sourceList) {
-        List<PickerMilestone> destList = new ArrayList<>();
-        sourceList.stream()
-                .forEach(milestone -> destList.add(new PickerMilestone(milestone)));
-        return destList;
+        return sourceList.stream()
+                .map(PickerMilestone::new)
+                .collect(Collectors.toList());
     }
 
     private void processInput(String userInput) {
         if (userInput.isEmpty()) return;
 
         String[] userInputWords = userInput.split(" ");
-        for (int i = 0; i < userInputWords.length; i++) {
-            String currentWord = userInputWords[i];
-            filterMilestones(currentWord);
-        }
+        Stream.of(userInputWords)
+                .forEach(this::filterMilestones);
+
         toggleFirstMatchingMilestone(currentMilestonesList);
     }
 
@@ -90,7 +89,7 @@ public class MilestonePickerState {
     }
 
     private void filterMilestones(String query) {
-        currentMilestonesList.stream()
+        currentMilestonesList
                 .forEach(milestone -> {
                     boolean matchQuery = Utility.containsIgnoreCase(milestone.getTitle(), query);
                     if (!milestone.isMatching()) milestone.isMatching(!matchQuery);

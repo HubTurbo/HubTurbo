@@ -13,7 +13,6 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
     private static final int SMALL_LABEL_FONT = 12;
     private static final int BIG_LABEL_FONT = 16;
     boolean isSelected = false;
-    boolean isHighlighted = false;
     boolean isFaded = false;
     boolean isExisting = false;
 
@@ -29,16 +28,8 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
     public PickerMilestone(PickerMilestone milestone) {
         this((TurboMilestone) milestone);
         isMatching(milestone.isMatching());
-        setHighlighted(milestone.isHighlighted());
         setSelected(milestone.isSelected());
         setExisting(milestone.isExisting());
-    }
-
-    public Node getSimpleNode() {
-        Label milestone = createCustomLabel(SMALL_LABEL_FONT);
-        setOpenStatusColour(milestone);
-        setRemovedInUI(milestone);
-        return milestone;
     }
 
     public Node getNode() {
@@ -46,7 +37,24 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
         setOpenStatusColour(milestone);
 
         if (isSelected) setSelectedInUI(milestone);
-        if (isHighlighted) setHighlightedInUI(milestone);
+
+        return milestone;
+    }
+
+    public Node getExistingMilestoneNode() {
+        Label milestone = createCustomLabel(SMALL_LABEL_FONT);
+        setOpenStatusColour(milestone);
+        setRemovedInUI(milestone);
+        return milestone;
+    }
+
+    public Node getNewlyAssignedMilestoneNode() {
+        Label milestone = createCustomLabel(BIG_LABEL_FONT);
+        setOpenStatusColour(milestone);
+
+        if (isSelected) {
+            setHighlightedInUI(milestone);
+        }
 
         return milestone;
     }
@@ -87,31 +95,12 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
         milestone.getStyleClass().add("labels-removed"); // add strikethrough
     }
 
-    public Node getNewlyAssignedMilestoneNode() {
-        Label milestone = createCustomLabel(BIG_LABEL_FONT);
-        setOpenStatusColour(milestone);
-
-        if (isSelected) {
-            setHighlightedInUI(milestone);
-        }
-
-        return milestone;
-    }
-
     public void setSelected(boolean isSelected) {
         this.isSelected = isSelected;
     }
 
     public boolean isSelected() {
         return this.isSelected;
-    }
-
-    public void setHighlighted(boolean isHighlighted) {
-        this.isHighlighted = isHighlighted;
-    }
-
-    public boolean isHighlighted() {
-        return this.isHighlighted;
     }
 
     public void isMatching(boolean isFaded) {
@@ -131,9 +120,9 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
 
     @Override
     public int compareTo(PickerMilestone milestone) {
-        // highlighted milestones are smaller
-        if (isHighlighted != milestone.isHighlighted()) {
-            return isHighlighted ? -1 : 1;
+        // selected milestones are smaller
+        if (isSelected != milestone.isSelected()) {
+            return isSelected ? -1 : 1;
         }
         // open milestones are smaller
         if (this.isOpen() != milestone.isOpen()) {

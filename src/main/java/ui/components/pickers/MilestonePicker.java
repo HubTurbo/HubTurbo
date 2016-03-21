@@ -5,7 +5,6 @@ import backend.resource.TurboMilestone;
 import javafx.application.Platform;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
-import javafx.util.Pair;
 import ui.UI;
 import undo.actions.ChangeMilestoneAction;
 import util.events.ShowMilestonePickerEventHandler;
@@ -25,20 +24,25 @@ public class MilestonePicker {
 
     private void showMilestonePicker(TurboIssue issue) {
         List<TurboMilestone> milestones = ui.logic.getRepo(issue.getRepoId()).getMilestones();
-        MilestonePickerDialog dialog = new MilestonePickerDialog(stage, issue, milestones);
-        Optional<Pair<ButtonType, Optional<Integer>>> milestoneDialogResponse = dialog.showAndWait();
+        Optional<MilestonePickerDialogResponse> milestoneDialogResponse =
+                new MilestonePickerDialog(stage, issue, milestones).showAndWait();
 
-        if (!milestoneDialogResponse.isPresent() ||
-                milestoneDialogResponse.get().getKey().equals(ButtonType.CANCEL)) {
-            return;
-        }
+        if (wasCancelled(milestoneDialogResponse)) return;
 
-        Optional<Integer> newlyAssignedMilestone = milestoneDialogResponse.get().getValue();
-
+        Optional<Integer> newlyAssignedMilestone = milestoneDialogResponse.get().getMilestoneId();
         if (!issue.getMilestone().equals(newlyAssignedMilestone)) {
-            ui.undoController.addAction(issue, new ChangeMilestoneAction(ui.logic, issue.getMilestone(),
-                    newlyAssignedMilestone));
+            addActionIfMilestoneChanged(issue, newlyAssignedMilestone);
         }
+    }
+
+    private boolean wasCancelled(Optional<MilestonePickerDialogResponse> milestoneDialogResponse) {
+        return !milestoneDialogResponse.isPresent() ||
+                milestoneDialogResponse.get().getButtonClicked().equals(ButtonType.CANCEL);
+    }
+
+    private void addActionIfMilestoneChanged(TurboIssue issue, Optional<Integer> newlyAssignedMilestone) {
+        ui.undoController.addAction(issue,
+                                    new ChangeMilestoneAction(ui.logic, issue.getMilestone(), newlyAssignedMilestone));
     }
 
 }

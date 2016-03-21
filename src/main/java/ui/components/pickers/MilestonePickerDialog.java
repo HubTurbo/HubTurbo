@@ -11,14 +11,13 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.util.Pair;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Optional<Integer>>> {
+public class MilestonePickerDialog extends Dialog<MilestonePickerDialogResponse> {
     private static final String OCTICON_ARROW = "\uf03e";
     private static final String DIALOG_TITLE = "Select Milestone";
 
@@ -41,13 +40,13 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Optional<Inte
         initUI();
         setupKeyEvents();
 
-        fillWithExistingMilestone(originalMilestones);
+        getExistingMilestone(originalMilestones)
+                .map(PickerMilestone::getTitle)
+                .ifPresent(this::fillInputFieldWithMilestoneName);
     }
 
-    private void fillWithExistingMilestone(List<PickerMilestone> milestoneList) {
-        Optional<PickerMilestone> existingMilestone = getExistingMilestone(milestoneList);
-        if (!existingMilestone.isPresent()) return;
-        inputField.setText(existingMilestone.get().getTitle());
+    private void fillInputFieldWithMilestoneName(String milestoneName) {
+        inputField.setText(milestoneName);
     }
 
     private void setupKeyEvents() {
@@ -92,9 +91,10 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Optional<Inte
         setResultConverter((dialogButton) -> {
             List<PickerMilestone> finalList = state.getCurrentMilestonesList();
             if (hasSelectedMilestone(finalList)) {
-                return new Pair<>(dialogButton, Optional.of(getSelectedMilestone(finalList).get().getId()));
+                return new MilestonePickerDialogResponse(dialogButton,
+                                                         Optional.of(getSelectedMilestone(finalList).get().getId()));
             }
-            return new Pair<>(dialogButton, Optional.empty());
+            return new MilestonePickerDialogResponse(dialogButton, Optional.empty());
         });
     }
 
@@ -104,12 +104,7 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Optional<Inte
     }
 
     private void handleMouseClick(String milestoneName) {
-        // We need to save this state before clearing the input field as clearing the input field
-        // will change the state
-        MilestonePickerState curState = state;
-        inputField.setText((inputField.getText() + " " + milestoneName).trim());
-        curState.toggleExactMatchMilestone(milestoneName);
-        state = curState;
+        inputField.setText(milestoneName);
         refreshUI(state);
     }
 
@@ -178,7 +173,7 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Optional<Inte
 
         if (!existingMilestone.isPresent()) return;
 
-        Node existingMilestoneNode = setMouseClickForNode(existingMilestone.get().getSimpleNode(),
+        Node existingMilestoneNode = setMouseClickForNode(existingMilestone.get().getExistingMilestoneNode(),
                 existingMilestone.get().getTitle());
         assignedMilestoneBox.getChildren().add(existingMilestoneNode);
     }

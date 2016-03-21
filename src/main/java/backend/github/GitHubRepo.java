@@ -272,17 +272,13 @@ public class GitHubRepo implements Repo {
         Milestone gitHubMilestone = new Milestone();
         // set milestone number to the desired milestone id
         // simply don't set a number to demilestone
-        if (issueMilestone.isPresent()) {
-            gitHubMilestone.setNumber(issueMilestone.get());
-        }
+        issueMilestone.ifPresent(gitHubMilestone::setNumber);
         createdIssue.setMilestone(gitHubMilestone);
 
         Issue returnedIssue = issueService.editIssue(RepositoryId.createFromId(repoId), createdIssue);
 
-        if (returnedIssue.getMilestone() == null) {
-            return Optional.empty();
-        }
-        return Optional.of(returnedIssue.getMilestone().getNumber());
+        return Optional.ofNullable(returnedIssue.getMilestone())
+                .map(Milestone::getNumber);
     }
 
     @Override
