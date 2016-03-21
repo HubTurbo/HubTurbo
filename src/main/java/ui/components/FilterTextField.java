@@ -28,8 +28,8 @@ public class FilterTextField extends TextField {
 
     // Background colours of FilterTextField.
     // The background colour set depends on whether the text in the textfield is a valid filter.
-    private static final String VALID_FILTER_STYLE = "-fx-control-inner-background: white";
-    private static final String INVALID_FILTER_STYLE = "-fx-control-inner-background: #EE8993";
+    public static final String VALID_FILTER_STYLE = "-fx-control-inner-background: white";
+    public static final String INVALID_FILTER_STYLE = "-fx-control-inner-background: #EE8993";
 
     // Callback functions
     private Runnable cancel = () -> {};
