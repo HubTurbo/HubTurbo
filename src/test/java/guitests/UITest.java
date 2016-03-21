@@ -24,6 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hamcrest.Matcher;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.loadui.testfx.GuiTest;
@@ -39,14 +40,7 @@ import backend.interfaces.RepoStore;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
-<<<<<<< HEAD
 import javafx.scene.Parent;
-=======
-import javafx.scene.control.ComboBoxBase;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextField;
->>>>>>> Modifies all tests to use new UITest
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -70,6 +64,7 @@ public class UITest extends FxRobot {
     private static final Map<Character, KeyCode> specialCharsMap = getSpecialCharsMap();
     
     // Sets property to run tests headless
+    /*
     static {
         System.setProperty("java.awt.robot", "true");
         System.setProperty("testfx.robot", "glass");
@@ -77,6 +72,7 @@ public class UITest extends FxRobot {
         System.setProperty("prism.order", "sw");
         System.setProperty("prism.text", "t2k");
     }
+    */
 
     protected static class TestUI extends UI {
         public TestUI() {
@@ -94,7 +90,7 @@ public class UITest extends FxRobot {
     public static void setupSpec() {
         try {
             FxToolkit.registerPrimaryStage();
-            FxToolkit.toolkitContext().setLaunchTimeoutInMillis(2500);
+            FxToolkit.hideStage();
         } catch (TimeoutException e) {
             logger.error(e.getMessage());
             e.printStackTrace();
@@ -103,6 +99,7 @@ public class UITest extends FxRobot {
 
     @Before
     public void setStage() throws TimeoutException {
+        FxToolkit.registerStage(() -> new Stage());
         FxToolkit.setupStage(this::handleSetupStage);
     }
 
@@ -111,6 +108,11 @@ public class UITest extends FxRobot {
         FxToolkit.setupApplication(TestUI.class, "--test=true", "--bypasslogin=true");
     }
     
+    @After
+    public void teardown() throws TimeoutException {
+        FxToolkit.hideStage();
+    }
+
     public Stage getStage() {
         return FxToolkit.toolkitContext().getRegisteredStage();
     }
@@ -124,7 +126,6 @@ public class UITest extends FxRobot {
         clearTestFolder();
         beforeStageStarts();
         stage.show();
-        stage.toFront();
     }
 
     public static void clearTestFolder() {
@@ -232,7 +233,7 @@ public class UITest extends FxRobot {
 
     private <T extends Node> Optional<T> findQuiet(Matcher<Object> matcher) {
         try {
-            return Optional.of(GuiTest.find(matcher));
+            return Optional.ofNullable(GuiTest.find(matcher));
         } catch (NoNodesFoundException | NoNodesVisibleException e) {
             return Optional.empty();
         }
@@ -252,7 +253,6 @@ public class UITest extends FxRobot {
      * <p>
      * Taken from org.loadui.testfx.utils, but modified to synchronise with
      * the JavaFX Application Thread, with a lower frequency.
-     * <p>
      * The additional synchronisation prevents bugs where
      * <p>
      * awaitCondition(a);
@@ -533,7 +533,13 @@ public class UITest extends FxRobot {
                         .release(specialCharsMap.get(text.charAt(i))).release(KeyCode.SHIFT);
 
             } else {
-                type(KeyCodeUtils.findKeyCode(text.charAt(i)));
+                char typed = text.charAt(i);
+                KeyCode identified = KeyCodeUtils.findKeyCode(typed);
+                if (Character.isUpperCase(typed)) {
+                    press(KeyCode.SHIFT).type(identified).release(KeyCode.SHIFT);
+                } else {
+                    type(identified);
+                }
             }
         }
         return this;
