@@ -203,12 +203,12 @@ public class ListPanel extends FilterPanel {
         totalIssueText.setText(String.valueOf(issuesCount));
     }
 
-    private void hideFooterPanelStatsDetails(boolean hide) {
-        openIssueText.setVisible(!hide);
-        closedIssueText.setVisible(!hide);
-        plusText.setVisible(!hide);
-        bracketCloseText.setVisible(!hide);
-        bracketOpenText.setVisible(!hide);
+    private void hideFooterPanelStatsDetails(boolean isHidden) {
+        openIssueText.setVisible(!isHidden);
+        closedIssueText.setVisible(!isHidden);
+        plusText.setVisible(!isHidden);
+        bracketCloseText.setVisible(!isHidden);
+        bracketOpenText.setVisible(!isHidden);
     }
 
     private void setupListView() {
