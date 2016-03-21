@@ -15,15 +15,15 @@ cache:
     - $HOME/.gradle/wrapper/
 
 script:
-    - "./gradlew clean check -i"
+    - "./gradlew clean -DunstableTests.single=KeyboardShortcutsConfigTest unstableTests -i"
+    # - "./gradlew clean check -i"
 
 after_success:
     - "./gradlew jacocoRootReport coveralls"
 
 branches:
   only:
-    - master
-    - release
+      - 1263-stabilise-keyboardshortcut-test
 
 before_install:
     - "export DISPLAY=:99.0"
