@@ -41,7 +41,7 @@ public class PickerBoard {
         // actual name for labels at the top, add tick for selected labels
         Label label = new Label(boardName);
         label.getStyleClass().add("labels");
-        String style = getStyle() + (isHighlighted ? " -fx-border-color: black;" : ""); // add highlight border
+        String style = getStyle() + (isHighlighted ? " -fx-border-color: black; -fx-font-weight: bold;" : "");
         style += (isFaded ? " -fx-opacity: 40%;" : ""); // change opacity if needed
         label.setStyle(style);
 
