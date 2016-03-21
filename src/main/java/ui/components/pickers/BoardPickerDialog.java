@@ -102,9 +102,10 @@ public class BoardPickerDialog extends Dialog<String> {
 
     private void populateBoards(BoardPickerState state) {
         boardNames.getChildren().clear();
-        state.getMatchedBoards().stream()
+        boards.stream()
                     .map(boardName -> {
                         PickerBoard pb = new PickerBoard(boardName);
+                        pb.faded(!state.getMatchedBoards().contains(boardName));
                         pb.highlighted(suggestion.isPresent() && suggestion.get().equals(boardName));
                         return pb;
                     })
