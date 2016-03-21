@@ -85,7 +85,7 @@ public class MilestonePickerState {
      */
     public List<PickerMilestone> getMatchingMilestonesList() {
         return this.currentMilestonesList.stream()
-                .filter(milestone -> !milestone.isFaded())
+                .filter(milestone -> !milestone.isMatching())
                 .collect(Collectors.toList());
     }
 
@@ -93,13 +93,13 @@ public class MilestonePickerState {
         currentMilestonesList.stream()
                 .forEach(milestone -> {
                     boolean matchQuery = Utility.containsIgnoreCase(milestone.getTitle(), query);
-                    if (!milestone.isFaded()) milestone.setFaded(!matchQuery);
+                    if (!milestone.isMatching()) milestone.isMatching(!matchQuery);
                 });
     }
 
     private Optional<PickerMilestone> getFirstMatchingMilestone(List<PickerMilestone> milestoneList) {
         return milestoneList.stream()
-                .filter(milestone -> !milestone.isFaded())
+                .filter(milestone -> !milestone.isMatching())
                 .findFirst();
     }
 

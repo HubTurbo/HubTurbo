@@ -21,7 +21,6 @@ import java.util.Optional;
 public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Optional<Integer>>> {
     private static final String OCTICON_ARROW = "\uf03e";
     private static final String DIALOG_TITLE = "Select Milestone";
-    private static final int QUERY_DISPLAY_LIMIT = 5;
 
     private final List<PickerMilestone> originalMilestones = new ArrayList<>();
     private FlowPane assignedMilestoneBox;
@@ -41,6 +40,14 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Optional<Inte
         state = new MilestonePickerState(originalMilestones);
         initUI();
         setupKeyEvents();
+
+        fillWithExistingMilestone(originalMilestones);
+    }
+
+    private void fillWithExistingMilestone(List<PickerMilestone> milestoneList) {
+        Optional<PickerMilestone> existingMilestone = getExistingMilestone(milestoneList);
+        if (!existingMilestone.isPresent()) return;
+        inputField.setText(existingMilestone.get().getTitle());
     }
 
     private void setupKeyEvents() {
@@ -67,7 +74,6 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Optional<Inte
                 });
 
         Collections.sort(originalMilestones);
-        selectExistingMilestone(originalMilestones, issue);
 
         return originalMilestones;
     }
@@ -75,12 +81,6 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Optional<Inte
     private boolean isExistingMilestone(TurboIssue issue, PickerMilestone milestone) {
         if (!issue.getMilestone().isPresent()) return false;
         return issue.getMilestone().get() == milestone.getId();
-    }
-
-    private void selectExistingMilestone(List<PickerMilestone> milestones, TurboIssue issue) {
-        milestones.stream()
-                .filter(milestone -> isExistingMilestone(issue, milestone))
-                .forEach(milestone -> milestone.setSelected(true));
     }
 
     private void setupButtons(DialogPane milestonePickerDialogPane) {
@@ -107,8 +107,7 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Optional<Inte
         // We need to save this state before clearing the input field as clearing the input field
         // will change the state
         MilestonePickerState curState = state;
-        inputField.clear();
-        inputField.setDisable(true);
+        inputField.setText((inputField.getText() + " " + milestoneName).trim());
         curState.toggleExactMatchMilestone(milestoneName);
         state = curState;
         refreshUI(state);
@@ -130,6 +129,7 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Optional<Inte
 
     private ScrollPane coverWithScrollPane(VBox matchingMilestonesBox) {
         ScrollPane matchingMilestonesScrollPane = new ScrollPane();
+        matchingMilestonesScrollPane.setMinHeight(200);
         matchingMilestonesScrollPane.setMaxHeight(200);
         matchingMilestonesScrollPane.setContent(matchingMilestonesBox);
         return matchingMilestonesScrollPane;
@@ -144,8 +144,7 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Optional<Inte
         assignedMilestonePane.getChildren().clear();
         updateExistingMilestone(getExistingMilestone(pickerMilestoneList), assignedMilestonePane);
         addAssignmentIndicator(assignedMilestonePane);
-        updateNewlyAssignedMilestone(getHighlightedMilestone(pickerMilestoneList),
-                                     getSelectedMilestone(pickerMilestoneList), assignedMilestonePane);
+        updateNewlyAssignedMilestone(getSelectedMilestone(pickerMilestoneList), assignedMilestonePane);
     }
 
     private void populateMatchingMilestones(List<PickerMilestone> matchingMilestoneList, VBox matchingMilestones) {
@@ -162,17 +161,14 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Optional<Inte
         assignedMilestoneStatus.getChildren().add(assignmentIndicator);
     }
 
-    private void updateNewlyAssignedMilestone(Optional<PickerMilestone> highlightedMilestone,
-                                              Optional<PickerMilestone> selectedMilestone,
+    private void updateNewlyAssignedMilestone(Optional<PickerMilestone> selectedMilestone,
                                               FlowPane assignedMilestoneStatus) {
         HBox newlyAssignedMilestoneBox = createNewlyAssignedMilestoneBox();
         assignedMilestoneStatus.getChildren().add(newlyAssignedMilestoneBox);
 
-        if (!highlightedMilestone.isPresent() && !selectedMilestone.isPresent()) return;
+        if (!selectedMilestone.isPresent()) return;
 
-        Node nodeToAdd = highlightedMilestone.isPresent()
-                ? highlightedMilestone.get().getNewlyAssignedMilestoneNode(true)
-                : selectedMilestone.get().getNewlyAssignedMilestoneNode(false);
+        Node nodeToAdd = selectedMilestone.get().getNewlyAssignedMilestoneNode();
         newlyAssignedMilestoneBox.getChildren().add(nodeToAdd);
     }
 
@@ -274,12 +270,6 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Optional<Inte
         return milestoneBox;
     }
 
-    private Label createHiddenMilestonesIndicator(int hiddenMilestonesSize) {
-        Label hiddenMilestonesIndicator = new Label("and " + hiddenMilestonesSize + " more...");
-        hiddenMilestonesIndicator.setPadding(new Insets(3, 3, 3, 3));
-        return hiddenMilestonesIndicator;
-    }
-
     private Optional<PickerMilestone> getExistingMilestone(List<PickerMilestone> milestoneList) {
         return milestoneList.stream()
                 .filter(PickerMilestone::isExisting)
@@ -296,12 +286,6 @@ public class MilestonePickerDialog extends Dialog<Pair<ButtonType, Optional<Inte
     private Optional<PickerMilestone> getSelectedMilestone(List<PickerMilestone> milestoneList) {
         return milestoneList.stream()
                 .filter(PickerMilestone::isSelected)
-                .findAny();
-    }
-
-    private Optional<PickerMilestone> getHighlightedMilestone(List<PickerMilestone> milestones) {
-        return milestones.stream()
-                .filter(PickerMilestone::isHighlighted)
                 .findAny();
     }
 

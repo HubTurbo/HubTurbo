@@ -28,7 +28,7 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
 
     public PickerMilestone(PickerMilestone milestone) {
         this((TurboMilestone) milestone);
-        setFaded(milestone.isFaded());
+        isMatching(milestone.isMatching());
         setHighlighted(milestone.isHighlighted());
         setSelected(milestone.isSelected());
         setExisting(milestone.isExisting());
@@ -47,7 +47,6 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
 
         if (isSelected) setSelectedInUI(milestone);
         if (isHighlighted) setHighlightedInUI(milestone);
-        if (isFaded) setFadedInUI(milestone);
 
         return milestone;
     }
@@ -76,10 +75,6 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
         milestone.setStyle("-fx-background-color: " + (isOpen() ? OPEN_COLOUR : CLOSE_COLOUR) + ";");
     }
 
-    private void setFadedInUI(Label milestone) {
-        milestone.setStyle(milestone.getStyle() + "-fx-opacity: 40%;");
-    }
-
     private void setHighlightedInUI(Label milestone) {
         milestone.setStyle(milestone.getStyle() + "-fx-border-color: black;");
     }
@@ -92,14 +87,9 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
         milestone.getStyleClass().add("labels-removed"); // add strikethrough
     }
 
-    public Node getNewlyAssignedMilestoneNode(boolean hasSuggestion) {
+    public Node getNewlyAssignedMilestoneNode() {
         Label milestone = createCustomLabel(BIG_LABEL_FONT);
         setOpenStatusColour(milestone);
-
-        if (hasSuggestion) {
-            setFadedInUI(milestone);
-            if (isSelected) setRemovedInUI(milestone);
-        }
 
         if (isSelected) {
             setHighlightedInUI(milestone);
@@ -124,11 +114,11 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
         return this.isHighlighted;
     }
 
-    public void setFaded(boolean isFaded) {
+    public void isMatching(boolean isFaded) {
         this.isFaded = isFaded;
     }
 
-    public boolean isFaded() {
+    public boolean isMatching() {
         return this.isFaded;
     }
     public void setExisting(boolean isExisting) {
