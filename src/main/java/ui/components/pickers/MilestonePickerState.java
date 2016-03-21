@@ -32,23 +32,9 @@ public class MilestonePickerState {
         String[] userInputWords = userInput.split(" ");
         for (int i = 0; i < userInputWords.length; i++) {
             String currentWord = userInputWords[i];
-            if (isConfirmedKeyword(userInput, userInputWords, i)) {
-                toggleFirstMatchingMilestone(currentWord);
-            } else {
-                filterMilestones(currentWord);
-            }
+            filterMilestones(currentWord);
         }
-    }
-
-    /**
-     * Checks if the ith word of the userInput is confirmed i.e. has a space after it
-     * @param userInput
-     * @param userInputWords
-     * @param i
-     * @return
-     */
-    private boolean isConfirmedKeyword(String userInput, String[] userInputWords, int i) {
-        return i < userInputWords.length - 1 || userInput.endsWith(" ");
+        toggleFirstMatchingMilestone(currentMilestonesList);
     }
 
     /**
@@ -66,10 +52,10 @@ public class MilestonePickerState {
      * Toggles the milestone that is the first match to the given query
      *
      * This method is NOT case-sensitive
-     * @param query
+     * @param milestoneList
      */
-    private final void toggleFirstMatchingMilestone(String query) {
-        Optional<PickerMilestone> firstMatchingMilestone = getFirstMatchingMilestone(currentMilestonesList, query);
+    private final void toggleFirstMatchingMilestone(List<PickerMilestone> milestoneList) {
+        Optional<PickerMilestone> firstMatchingMilestone = getFirstMatchingMilestone(milestoneList);
         firstMatchingMilestone.ifPresent(this::toggleMilestone);
     }
 
@@ -107,31 +93,13 @@ public class MilestonePickerState {
         currentMilestonesList.stream()
                 .forEach(milestone -> {
                     boolean matchQuery = Utility.containsIgnoreCase(milestone.getTitle(), query);
-                    milestone.setFaded(!matchQuery);
+                    if (!milestone.isFaded()) milestone.setFaded(!matchQuery);
                 });
-
-        if (hasMatchingMilestone(currentMilestonesList)) highlightFirstMatchingMilestone();
     }
 
-    private void highlightFirstMatchingMilestone() {
-        if (!hasMatchingMilestone(this.currentMilestonesList)) return;
-        this.currentMilestonesList.stream()
-                .filter(milestone -> !milestone.isFaded())
-                .findFirst()
-                .get()
-                .setHighlighted(true);
-    }
-
-    private boolean hasMatchingMilestone(List<PickerMilestone> milestoneList) {
+    private Optional<PickerMilestone> getFirstMatchingMilestone(List<PickerMilestone> milestoneList) {
         return milestoneList.stream()
                 .filter(milestone -> !milestone.isFaded())
-                .findAny()
-                .isPresent();
-    }
-
-    private Optional<PickerMilestone> getFirstMatchingMilestone(List<PickerMilestone> milestoneList, String query) {
-        return milestoneList.stream()
-                .filter(milestone -> Utility.containsIgnoreCase(milestone.getTitle(), query))
                 .findFirst();
     }
 
