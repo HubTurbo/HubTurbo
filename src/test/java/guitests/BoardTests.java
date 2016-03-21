@@ -15,7 +15,7 @@ public class BoardTests extends UITest {
     PanelControl panelControl;
 
     @Before
-    public void setup() {
+    public void setupUIComponent() {
         UI ui = TestController.getUI();
         panelControl = ui.getPanelControl();
 

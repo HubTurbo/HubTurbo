@@ -35,6 +35,7 @@ import org.testfx.api.FxRobot;
 import org.testfx.api.FxToolkit;
 
 import com.google.common.util.concurrent.SettableFuture;
+import com.sun.javafx.tk.Toolkit;
 
 import backend.interfaces.RepoStore;
 import javafx.application.Platform;
