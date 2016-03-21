@@ -19,8 +19,8 @@ public class ScrollableListViewTests extends UITest {
         }
         UI.events.triggerEvent(new UILogicRefreshEvent());
         sleep(2000);
-        ListPanel col0 = find(IdGenerator.getPanelIdForTest("dummy/dummy", 0));
-        click(IdGenerator.getPanelCellIdForTest("dummy/dummy", 0, 49));
+        ListPanel col0 = find(IdGenerator.getPanelIdForTest(0));
+        click(IdGenerator.getPanelCellIdForTest(0, 49));
         for (int i = 0; i < 40; i++) {
             push(KeyCode.DOWN);
         }

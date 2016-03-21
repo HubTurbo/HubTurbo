@@ -24,7 +24,7 @@ public class UpdateIssuesTest extends UITest {
 
     @Test
     public void updateIssues() throws InterruptedException, ExecutionException {
-        String filterTextFieldId = IdGenerator.getPanelFilterTextFieldIdForTest("dummy/dummy", 0);
+        String filterTextFieldId = IdGenerator.getPanelFilterTextFieldIdForTest(0);
         Label apiBox = find(IdGenerator.getApiBoxIdForTest());
         resetRepo();
 

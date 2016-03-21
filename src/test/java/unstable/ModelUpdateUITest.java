@@ -20,7 +20,7 @@ import util.events.testevents.UpdateDummyRepoEvent;
 public class ModelUpdateUITest extends UITest {
 
     private static final int EVENT_DELAY = 1500;
-    private static final String PANEL_ID = IdGenerator.getPanelIdForTest("dummy/dummy", 0);
+    private static final String PANEL_ID = IdGenerator.getPanelIdForTest(0);
 
     @Override
     public void launchApp() {

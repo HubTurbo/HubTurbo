@@ -19,9 +19,8 @@ import static org.junit.Assert.assertEquals;
 
 public class MarkAllIssuesAsReadUnreadTests extends UITest {
 
-    private static final String REPO_ID = "dummy/dummy";
-    private static final String PANEL_ID = IdGenerator.getPanelId(REPO_ID, 0);
-    private static final String FILTER_TEXT_FIELD_ID = IdGenerator.getPanelFilterTextFieldIdForTest(REPO_ID, 0);
+    private static final String PANEL_ID = IdGenerator.getPanelIdForTest(0);
+    private static final String FILTER_TEXT_FIELD_ID = IdGenerator.getPanelFilterTextFieldIdForTest(0);
 
     @Before
     public void setup() {
@@ -84,7 +83,7 @@ public class MarkAllIssuesAsReadUnreadTests extends UITest {
      * @param index        The issue number in the panel
      */
     private void clickAndMarkIssuesBelow(ListPanel issuePanel, int index, boolean isMarkAsRead) {
-        String panelCellId = IdGenerator.getPanelCellIdForTest(REPO_ID, 0, index);
+        String panelCellId = IdGenerator.getPanelCellIdForTest(0, index);
         click(panelCellId);
         rightClick(panelCellId);
         ContextMenu contextMenu = issuePanel.getContextMenu();
@@ -104,7 +103,7 @@ public class MarkAllIssuesAsReadUnreadTests extends UITest {
      */
     private void verifyReadStatusOfIssuesBelow(int index, boolean isExpectedStatusRead) {
         for (int i = index; i >= 1; i--) {
-            ListPanelCell listPanelCell = find(IdGenerator.getPanelCellIdForTest(REPO_ID, 0, index));
+            ListPanelCell listPanelCell = find(IdGenerator.getPanelCellIdForTest(0, index));
             assertEquals(listPanelCell.getIssue().isCurrentlyRead(), isExpectedStatusRead);
         }
     }

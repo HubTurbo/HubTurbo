@@ -39,7 +39,7 @@ public class ListPanelCell extends ListCell<GuiElement> {
         updateStyleToMatchStatus(issue);
 
         setGraphic(new ListPanelCard(guiElement, parent, issuesWithNewComments));
-        this.setId(IdGenerator.getPanelCellId(issue.getRepoId(), parentPanelIndex, issue.getId()));
+        this.setId(IdGenerator.getPanelCellId(parentPanelIndex, issue.getId()));
     }
 
     private void updateStyleToMatchStatus(TurboIssue issue) {

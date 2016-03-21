@@ -76,7 +76,7 @@ public class RepositorySelectorTest extends UITest {
 
         // we check if the "dummy2/dummy2" is added to the repository selector
         // but the primary repo isn't changed
-        Platform.runLater(find(IdGenerator.getPanelFilterTextFieldIdForTest("dummy/dummy", 0))::requestFocus);
+        Platform.runLater(find(IdGenerator.getPanelFilterTextFieldIdForTest(0))::requestFocus);
         PlatformEx.waitOnFxThread();
         type("repo:dummy2/dummy2");
         push(KeyCode.ENTER);

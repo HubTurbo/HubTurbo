@@ -60,7 +60,7 @@ public class ChromeDriverTest extends UITest {
         assertEquals(GitHubURL.getPathForNewMilestone("dummy/dummy"), url);
         clearUrl();
 
-        click(IdGenerator.getPanelCellIdForTest("dummy/dummy", 0, 9));
+        click(IdGenerator.getPanelCellIdForTest(0, 9));
         sleep(EVENT_DELAY);
         clearUrl();
 

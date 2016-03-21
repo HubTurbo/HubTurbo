@@ -45,8 +45,8 @@ public class IssuePanelTests extends UITest {
 
     @Test
     public void keepSelectionTest() {
-        String panelId = IdGenerator.getPanelIdForTest("dummy/dummy", 0);
-        String panelTextFieldId = IdGenerator.getPanelFilterTextFieldIdForTest("dummy/dummy", 0);
+        String panelId = IdGenerator.getPanelIdForTest(0);
+        String panelTextFieldId = IdGenerator.getPanelFilterTextFieldIdForTest(0);
         // checks to see if ListPanel keeps the same issue selected even after
         // the list is updated
         ListPanel issuePanel = find(panelId);
@@ -70,7 +70,7 @@ public class IssuePanelTests extends UITest {
 
     @Test
     public void guiElementsTest() {
-        String panelTextFieldId = IdGenerator.getPanelFilterTextFieldIdForTest("dummy/dummy", 0);
+        String panelTextFieldId = IdGenerator.getPanelFilterTextFieldIdForTest(0);
 
         click(panelTextFieldId);
         selectAll();
@@ -176,7 +176,7 @@ public class IssuePanelTests extends UITest {
 
     @Test
     public void showAuthorAssignee_assignedPullRequest_authorAssigneeShown() {
-        String panelTextFieldId = IdGenerator.getPanelFilterTextFieldIdForTest("dummy/dummy", 0);
+        String panelTextFieldId = IdGenerator.getPanelFilterTextFieldIdForTest(0);
 
         click(panelTextFieldId);
         selectAll();
@@ -191,7 +191,7 @@ public class IssuePanelTests extends UITest {
 
     @Test
     public void showAuthorAssignee_assignedIssue_onlyAssigneeShown() {
-        String panelTextFieldId = IdGenerator.getPanelFilterTextFieldIdForTest("dummy/dummy", 0);
+        String panelTextFieldId = IdGenerator.getPanelFilterTextFieldIdForTest(0);
 
         click(panelTextFieldId);
         selectAll();

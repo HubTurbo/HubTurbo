@@ -26,7 +26,7 @@ public class ContextMenuTests extends UITest {
 
     @Before
     public void setup() {
-        String panelFilterTextFieldId = IdGenerator.getPanelFilterTextFieldIdForTest("dummy/dummy", 0);
+        String panelFilterTextFieldId = IdGenerator.getPanelFilterTextFieldIdForTest(0);
 
         Platform.runLater(stage::show);
         Platform.runLater(stage::requestFocus);
@@ -46,8 +46,8 @@ public class ContextMenuTests extends UITest {
      */
     @Test
     public void contextMenuDisabling_noIssueInListView_contextMenuItemsDisabled() {
-        String panelId = IdGenerator.getPanelIdForTest("dummy/dummy", 0);
-        String panelFilterTextFieldId = IdGenerator.getPanelFilterTextFieldIdForTest("dummy/dummy", 0);
+        String panelId = IdGenerator.getPanelIdForTest(0);
+        String panelFilterTextFieldId = IdGenerator.getPanelFilterTextFieldIdForTest(0);
 
         ListPanel issuePanel = find(panelId);
 
@@ -70,7 +70,7 @@ public class ContextMenuTests extends UITest {
      */
     @Test
     public void testMarkAsReadUnread() {
-        String cellId = IdGenerator.getPanelCellIdForTest("dummy/dummy", 0, 9);
+        String cellId = IdGenerator.getPanelCellIdForTest(0, 9);
 
         ListPanelCell listPanelCell = find(cellId);
 
@@ -94,7 +94,7 @@ public class ContextMenuTests extends UITest {
      */
     @Test
     public void testChangeLabels() {
-        String cellId = IdGenerator.getPanelCellIdForTest("dummy/dummy", 0, 9);
+        String cellId = IdGenerator.getPanelCellIdForTest(0, 9);
         String labelTextFieldId = IdGenerator.getLabelPickerTextFieldIdForTest();
 
         click(cellId);

@@ -71,7 +71,7 @@ public class UIEventTests extends UITest {
     public void panelClickedTest() {
         UI.events.registerEvent((PanelClickedEventHandler) e -> UIEventTests.increaseEventTestCount());
         resetEventTestCount();
-        click(IdGenerator.getPanelFilterTextFieldIdForTest("dummy/dummy", 0));
+        click(IdGenerator.getPanelFilterTextFieldIdForTest(0));
         assertEquals(1, eventTestCount);
     }
 
@@ -90,7 +90,7 @@ public class UIEventTests extends UITest {
         selectAll();
         type("dummy3/dummy3");
         push(KeyCode.ENTER);
-        click(IdGenerator.getPanelFilterTextFieldIdForTest("dummy/dummy", 0));
+        click(IdGenerator.getPanelFilterTextFieldIdForTest(0));
         resetEventTestCount();
         press(KeyboardShortcuts.SWITCH_DEFAULT_REPO);
         assertEquals(1, eventTestCount);

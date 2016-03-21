@@ -130,7 +130,7 @@ public abstract class FilterPanel extends AbstractPanel {
                     applyStringFilter(text);
                     return text;
                 });
-        filterTextField.setId(IdGenerator.getPanelFilterTextFieldId(guiController.getDefaultRepo(), panelIndex));
+        filterTextField.setId(IdGenerator.getPanelFilterTextFieldId(panelIndex));
         filterTextField.setMinWidth(388);
         filterTextField.setMaxWidth(388);
 

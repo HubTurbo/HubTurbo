@@ -12,8 +12,8 @@ import static org.junit.Assert.assertEquals;
 public class RangeTest extends UITest {
 
     private static final int EVENT_DELAY = 1000;
-    private static final String FILTER_TEXT_FIELD_ID = IdGenerator.getPanelFilterTextFieldIdForTest("dummy/dummy", 0);
-    private static final String PANEL_ID = IdGenerator.getPanelIdForTest("dummy/dummy", 0);
+    private static final String FILTER_TEXT_FIELD_ID = IdGenerator.getPanelFilterTextFieldIdForTest(0);
+    private static final String PANEL_ID = IdGenerator.getPanelIdForTest(0);
 
     @Test
     public void numberRangeTest() {

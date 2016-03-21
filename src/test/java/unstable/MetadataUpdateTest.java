@@ -36,7 +36,7 @@ public class MetadataUpdateTest extends UITest {
     }
 
     private void updated24(String qualifier) {
-        FilterTextField field = find(IdGenerator.getPanelFilterTextFieldIdForTest("dummy/dummy", 0));
+        FilterTextField field = find(IdGenerator.getPanelFilterTextFieldIdForTest(0));
 
         // Select everything in the field
         click(field);

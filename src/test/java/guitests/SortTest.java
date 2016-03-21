@@ -9,7 +9,7 @@ public class SortTest extends UITest {
     // TODO check that issue list is sorted correctly
     @Test
     public void sortTest() {
-        String filterTextFieldId = IdGenerator.getPanelFilterTextFieldIdForTest("dummy/dummy", 0);
+        String filterTextFieldId = IdGenerator.getPanelFilterTextFieldIdForTest(0);
         click(filterTextFieldId);
         // Ascending ID
         type("sort:id");

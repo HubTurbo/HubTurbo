@@ -75,7 +75,7 @@ public class PanelMenuBar extends HBox {
         HBox nameArea = new HBox();
 
         nameText = new Text(panelName);
-        nameText.setId(IdGenerator.getPanelNameAreaId(guiController.getDefaultRepo(), panel.panelIndex));
+        nameText.setId(IdGenerator.getPanelNameAreaId(panel.panelIndex));
         nameText.setWrappingWidth(NAME_DISPLAY_WIDTH);
 
         nameBox = new HBox();
@@ -110,7 +110,7 @@ public class PanelMenuBar extends HBox {
         renameButton = new Label(OCTICON_RENAME_PANEL);
 
         renameButton.getStyleClass().addAll("octicon", "label-button");
-        renameButton.setId(IdGenerator.getPanelRenameButtonId(guiController.getDefaultRepo(), panel.panelIndex));
+        renameButton.setId(IdGenerator.getPanelRenameButtonId(panel.panelIndex));
         renameButton.setOnMouseClicked(e -> {
             e.consume();
             activateInplaceRename();
@@ -124,7 +124,7 @@ public class PanelMenuBar extends HBox {
     private HBox createCloseButton() {
         HBox closeArea = new HBox();
         closeButton = new Label(OCTICON_CLOSE_PANEL);
-        closeButton.setId(IdGenerator.getPanelCloseButtonId(guiController.getDefaultRepo(), panel.panelIndex));
+        closeButton.setId(IdGenerator.getPanelCloseButtonId(panel.panelIndex));
         closeButton.getStyleClass().addAll("octicon", "label-button");
         closeButton.setOnMouseClicked((e) -> {
             e.consume();
@@ -142,7 +142,7 @@ public class PanelMenuBar extends HBox {
 
         Label buttonType = new Label(octString);
         buttonType.getStyleClass().addAll("octicon", "label-button");
-        buttonType.setId(IdGenerator.getOcticonButtonId(guiController.getDefaultRepo(), panel.panelIndex, cssName));
+        buttonType.setId(IdGenerator.getOcticonButtonId(panel.panelIndex, cssName));
         buttonArea.getChildren().add(buttonType);
 
         return buttonArea;
@@ -154,8 +154,7 @@ public class PanelMenuBar extends HBox {
      */
     public void initRenameableTextFieldAndEvents() {
         renameableTextField = new TextField();
-        renameableTextField.setId(IdGenerator.getPanelRenameTextFieldId(guiController.getDefaultRepo(),
-                                                                        panel.panelIndex));
+        renameableTextField.setId(IdGenerator.getPanelRenameTextFieldId(panel.panelIndex));
         Platform.runLater(() -> {
             renameableTextField.requestFocus();
             renameableTextField.selectAll();

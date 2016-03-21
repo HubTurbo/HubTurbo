@@ -19,8 +19,8 @@ public class IssueSelectedEventTest extends UITest {
 
     @Test
     public void eventTriggerOnIssueSelection_byRightClick_selectionEventNotTriggered() {
-        String panelId = IdGenerator.getPanelIdForTest("dummy/dummy", 0);
-        String cellId = IdGenerator.getPanelCellIdForTest("dummy/dummy", 0, 9);
+        String panelId = IdGenerator.getPanelIdForTest(0);
+        String cellId = IdGenerator.getPanelCellIdForTest(0, 9);
 
         AtomicInteger eventCount = new AtomicInteger(0);
         UI.events.registerEvent((IssueSelectedEventHandler) e -> eventCount.incrementAndGet());
@@ -42,7 +42,7 @@ public class IssueSelectedEventTest extends UITest {
      */
     @Test
     public void triggerIssueSelectedOnLeftClickAndKey_IssueInPanelLeftClickedAndKeyed_IssueSelectedTriggered() {
-        String cellId = IdGenerator.getPanelCellIdForTest("dummy/dummy", 0, 10);
+        String cellId = IdGenerator.getPanelCellIdForTest(0, 10);
 
         AtomicInteger eventCount = new AtomicInteger(0);
         UI.events.registerEvent((IssueSelectedEventHandler) e -> eventCount.incrementAndGet());

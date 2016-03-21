@@ -14,7 +14,7 @@ public class UIComponentsTest extends UITest {
     // TODO check that filter text field does indeed do autocomplete correctly, etc
     @Test
     public void keywordCompletionTest() {
-        String filterTextFieldId = IdGenerator.getPanelFilterTextFieldIdForTest("dummy/dummy", 0);
+        String filterTextFieldId = IdGenerator.getPanelFilterTextFieldIdForTest(0);
         click(filterTextFieldId);
         selectAll();
         push(KeyCode.BACK_SPACE);
@@ -26,7 +26,7 @@ public class UIComponentsTest extends UITest {
 
     @Test
     public void filterTextFieldTest() {
-        String filterTextFieldId = IdGenerator.getPanelFilterTextFieldIdForTest("dummy/dummy", 0);
+        String filterTextFieldId = IdGenerator.getPanelFilterTextFieldIdForTest(0);
         click(filterTextFieldId);
         selectAll();
         push(KeyCode.BACK_SPACE);
