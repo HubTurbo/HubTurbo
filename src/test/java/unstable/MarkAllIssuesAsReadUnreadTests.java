@@ -22,7 +22,7 @@ import static org.junit.Assert.assertEquals;
 public class MarkAllIssuesAsReadUnreadTests extends UITest {
 
     @Before
-    public void setup() {
+    public void setupUIComponent() {
         PlatformEx.runAndWait(getStage()::requestFocus);
 
         FilterTextField filterTextField = getFilterTextFieldAtPanel(0);

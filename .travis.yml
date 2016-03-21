@@ -4,8 +4,8 @@ jdk:
     - oraclejdk8
 
 env:
-    - TERM=dumb 
-#    - _JAVA_OPTIONS="-Dtestfx.robot=glass -Dtestfx.headless=true -Dprism.order=sw -Dprism.text=t2k -Dtestfx.setup.timeout=2500"
+    - TERM=dumb _JAVA_OPTIONS="-Dheadless=true"
+#   - _JAVA_OPTIONS="-Dtestfx.robot=glass -Dtestfx.headless=true -Dprism.order=sw -Dprism.text=t2k -Dtestfx.setup.timeout=2500"
 
 before_cache:
     - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock

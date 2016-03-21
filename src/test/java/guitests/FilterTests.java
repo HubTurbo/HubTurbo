@@ -17,6 +17,7 @@ import java.util.Optional;
 
 public class FilterTests extends UITest {
 
+    private static final String PANEL_IDENTIFIER =  "#dummy/dummy_col0";
     @Test
     public void parseExceptionTest() {
         ListPanel issuePanel = getPanel(0);
@@ -61,7 +62,12 @@ public class FilterTests extends UITest {
 
     @Test
     public void filterTextField_multiplePanels_correctPanelFiltered() {
+<<<<<<< HEAD
         ListPanel issuePanel = getPanel(0);
+=======
+        waitUntilNodeAppears(PANEL_IDENTIFIER);
+        ListPanel issuePanel = GuiTest.find(PANEL_IDENTIFIER);
+>>>>>>> Added waitUntilNodeAppears before find() to prevent NPE
 
         // filter panel 1
         clickFilterTextFieldAtPanel(0);
@@ -97,7 +103,12 @@ public class FilterTests extends UITest {
 
     @Test
     public void milestoneAliasFilterTest() {
+<<<<<<< HEAD
         ListPanel issuePanel = getPanel(0);
+=======
+        waitUntilNodeAppears(PANEL_IDENTIFIER);
+        ListPanel issuePanel = GuiTest.find(PANEL_IDENTIFIER);
+>>>>>>> Added waitUntilNodeAppears before find() to prevent NPE
 
         // test current-1 : equal to first milestone in dummy repo
         checkCurrWithResult("milestone", "current-1", issuePanel, 1);
@@ -136,8 +147,14 @@ public class FilterTests extends UITest {
     }
 
     @Test
+<<<<<<< HEAD
     public void countFilterTest() {
         ListPanel issuePanel = getPanel(0);
+=======
+    public void countFilterTest(){
+        waitUntilNodeAppears(PANEL_IDENTIFIER);
+        ListPanel issuePanel = GuiTest.find(PANEL_IDENTIFIER);
+>>>>>>> Added waitUntilNodeAppears before find() to prevent NPE
 
         // Checking 7 issues shown for count:7
         clickFilterTextFieldAtPanel(0);

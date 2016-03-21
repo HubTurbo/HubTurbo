@@ -1,4 +1,4 @@
-package guitests;
+package unstable;
 
 import static org.junit.Assert.assertEquals;
 
@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Test;
 import org.testfx.api.FxToolkit;
 
+import guitests.UITest;
 import javafx.application.Platform;
 import util.PlatformEx;
 

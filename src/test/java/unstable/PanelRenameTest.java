@@ -1,4 +1,4 @@
-package guitests;
+package unstable;
 
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -9,6 +9,9 @@ import org.junit.Test;
 import org.loadui.testfx.GuiTest;
 import org.loadui.testfx.exceptions.NoNodesFoundException;
 import org.testfx.api.FxToolkit;
+
+import guitests.UITest;
+
 import org.apache.commons.lang3.RandomStringUtils;
 
 import ui.IdGenerator;

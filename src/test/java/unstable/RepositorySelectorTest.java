@@ -60,7 +60,7 @@ public class RepositorySelectorTest extends UITest {
     }
 
     @Test
-    public void repositorySelectorTest() {
+    public void testrepositorySelectorTest() {
         // check if test json is present
         File testConfig = new File(TestController.TEST_DIRECTORY, TestController.TEST_SESSION_CONFIG_FILENAME);
         boolean testConfigExists = testConfig.exists() && testConfig.isFile();

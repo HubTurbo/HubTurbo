@@ -1,4 +1,4 @@
-package guitests;
+package unstable;
 
 import static ui.components.KeyboardShortcuts.*;
 
@@ -6,6 +6,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.junit.Test;
 
+import guitests.UITest;
 import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
 import ui.IdGenerator;

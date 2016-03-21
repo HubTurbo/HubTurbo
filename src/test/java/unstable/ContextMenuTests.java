@@ -25,7 +25,7 @@ public class ContextMenuTests extends UITest {
     private static final int DIALOG_DELAY = 1500;
 
     @Before
-    public void setup() {
+    public void setupUIComponent() {
         Platform.runLater(getStage()::show);
         Platform.runLater(getStage()::requestFocus);
 
