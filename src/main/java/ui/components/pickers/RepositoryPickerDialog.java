@@ -5,7 +5,6 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -20,7 +19,6 @@ import java.util.*;
 public class RepositoryPickerDialog extends Dialog<String> {
 
     private static final String REPO_PICKER_TITLE = "Pick another repository";
-    private static final String DEFAULT_SELECTED_REPO_MESSAGE = "Selected repository: ";
     private static final int DEFAULT_MATCHING_REPO_LIST_HEIGHT = 350;
     private static final int DEFAULT_MATCHING_REPO_LIST_WIDTH = 350;
     private static final int SPACING_BETWEEN_NODES = 10;
@@ -29,7 +27,6 @@ public class RepositoryPickerDialog extends Dialog<String> {
 
     private VBox mainLayout;
     private VBox matchingRepositoryList;
-    private HBox chosenRepository;
     private TextField userInputTextField;
     private RepositoryPickerState state;
 
@@ -62,48 +59,38 @@ public class RepositoryPickerDialog extends Dialog<String> {
         createMatchingRepositoriesList();
         createUserInputTextField();
         createHandlers();
-        createChosenRepository();
 
         initialiseDefaultValues();
 
         ScrollPane scrollPane = new ScrollPane(matchingRepositoryList);
         scrollPane.setFitToHeight(true);
         scrollPane.setFitToWidth(true);
-        mainLayout.getChildren().addAll(userInputTextField, scrollPane, chosenRepository);
+        mainLayout.getChildren().addAll(userInputTextField, scrollPane);
     }
 
     private void createHandlers() {
-        userInputTextField.setOnKeyReleased(e -> {
+        userInputTextField.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.DOWN) {
                 state.selectNextMatchingRepository();
+                e.consume();
             } else if (e.getCode() == KeyCode.UP) {
                 state.selectPreviousMatchingRepository();
+                e.consume();
             }
-            refreshUi();
+            updateMatchingRepositoryList();
         });
-    }
-
-    private void refreshUi() {
-        updateMatchingRepositoryList();
-        updateSelectedRepository();
     }
 
     private void updateMatchingRepositoryList() {
         matchingRepositoryList.getChildren().clear();
         List<PickerRepository> matchingRepositories = state.getMatchingRepositories();
         matchingRepositories.stream()
-                .sorted()
                 .forEach(repo -> {
                     Node repoLabel = repo.getNode();
                     VBox.setMargin(repoLabel, DEFAULT_MARGIN);
                     matchingRepositoryList.getChildren().add(repoLabel);
                     repoLabel.setOnMouseClicked(e -> handleMouseClick(repo.getRepositoryId()));
                 });
-    }
-
-    private void updateSelectedRepository() {
-        chosenRepository.getChildren().clear();
-        chosenRepository.getChildren().add(new Label(DEFAULT_SELECTED_REPO_MESSAGE + state.getSelectedRepositoryId()));
     }
 
     private void initialiseDefaultValues() {
@@ -118,10 +105,6 @@ public class RepositoryPickerDialog extends Dialog<String> {
         matchingRepositoryList.setPrefWidth(DEFAULT_MATCHING_REPO_LIST_WIDTH);
     }
 
-    private void createChosenRepository() {
-        chosenRepository = new HBox();
-    }
-
     private void handleMouseClick(String repositoryId) {
         userInputTextField.setDisable(true);
         updateUserQuery(repositoryId);
@@ -130,7 +113,7 @@ public class RepositoryPickerDialog extends Dialog<String> {
     private void updateUserQuery(String query) {
         matchingRepositoryList.getChildren().clear();
         state.updateUserQuery(query);
-        refreshUi();
+        updateMatchingRepositoryList();
     }
 
     private void createUserInputTextField() {

@@ -1,5 +1,7 @@
 package ui.components.pickers;
 
+import org.controlsfx.control.spreadsheet.Picker;
+
 import java.util.*;
 import java.util.stream.IntStream;
 
@@ -10,7 +12,6 @@ public class RepositoryPickerState {
 
     private final List<PickerRepository> repositories = new ArrayList<>();
     private final List<PickerRepository> matchingRepositories = new ArrayList<>();
-    private String selectedRepositoryId = "";
 
     public RepositoryPickerState(Set<String> storedRepositories) {
         storedRepositories.stream()
@@ -19,12 +20,16 @@ public class RepositoryPickerState {
     }
 
     public void updateUserQuery(String query) {
+        clearRepositorySelection();
         updateMatchingRepositories(query);
-        updateSelectedRepository(query);
     }
 
     public String getSelectedRepositoryId() {
-        return selectedRepositoryId;
+        Optional<PickerRepository> selectedRepository = matchingRepositories.stream()
+                .filter(repo -> repo.isSelected())
+                .findFirst();
+        assert selectedRepository.isPresent();
+        return selectedRepository.get().getRepositoryId();
     }
 
     /**
@@ -34,20 +39,11 @@ public class RepositoryPickerState {
      */
     public void selectNextMatchingRepository() {
         OptionalInt selectedPositionInMatching = getSelectedRepositoryPositionInMatching();
-        if (!selectedPositionInMatching.isPresent()) {
-            // if there is no previous selection, select the first matching repository if it exists
-            if (!matchingRepositories.isEmpty()) {
-                PickerRepository toSelect = matchingRepositories.get(0);
-                toSelect.setSelected(true);
-                setSelectedRepositoryId(toSelect.getRepositoryId());
-            }
-        } else {
-            int currentPosition = selectedPositionInMatching.getAsInt();
-            int nextPosition = currentPosition == matchingRepositories.size() - 1 ? 0 : currentPosition + 1;
-            matchingRepositories.get(currentPosition).setSelected(false);
-            matchingRepositories.get(nextPosition).setSelected(true);
-            setSelectedRepositoryId(matchingRepositories.get(nextPosition).getRepositoryId());
-        }
+        assert selectedPositionInMatching.isPresent();
+        int currentPosition = selectedPositionInMatching.getAsInt();
+        int nextPosition = currentPosition == matchingRepositories.size() - 1 ? 0 : currentPosition + 1;
+        matchingRepositories.get(currentPosition).setSelected(false);
+        matchingRepositories.get(nextPosition).setSelected(true);
     }
 
     /**
@@ -57,20 +53,11 @@ public class RepositoryPickerState {
      */
     public void selectPreviousMatchingRepository() {
         OptionalInt selectedPositionInMatching = getSelectedRepositoryPositionInMatching();
-        if (!selectedPositionInMatching.isPresent()) {
-            // if there is no previous selection, select the last matching repository if it exists
-            if (!matchingRepositories.isEmpty()) {
-                PickerRepository toSelect = matchingRepositories.get(matchingRepositories.size() - 1);
-                toSelect.setSelected(true);
-                setSelectedRepositoryId(toSelect.getRepositoryId());
-            }
-        } else {
-            int currentPosition = selectedPositionInMatching.getAsInt();
-            int nextPosition = currentPosition == 0 ? matchingRepositories.size() - 1 : currentPosition - 1;
-            matchingRepositories.get(currentPosition).setSelected(false);
-            matchingRepositories.get(nextPosition).setSelected(true);
-            setSelectedRepositoryId(matchingRepositories.get(nextPosition).getRepositoryId());
-        }
+        assert selectedPositionInMatching.isPresent();
+        int currentPosition = selectedPositionInMatching.getAsInt();
+        int nextPosition = currentPosition == 0 ? matchingRepositories.size() - 1 : currentPosition - 1;
+        matchingRepositories.get(currentPosition).setSelected(false);
+        matchingRepositories.get(nextPosition).setSelected(true);
     }
 
     private OptionalInt getSelectedRepositoryPositionInMatching() {
@@ -90,24 +77,38 @@ public class RepositoryPickerState {
                 matchingRepositories.add(repo);
             }
         });
+        Optional<PickerRepository> possibleExactMatch = getPickerRepositoryById(matchingRepositories, query);
+        if (!possibleExactMatch.isPresent() && !query.isEmpty()) {
+            PickerRepository newRepository = new PickerRepository(query);
+            newRepository.setSelected(true);
+            matchingRepositories.add(0, newRepository);
+        } else if (!query.isEmpty()) {
+            PickerRepository exactMatch = possibleExactMatch.get();
+            exactMatch.setSelected(true);
+        } else {
+            assert !matchingRepositories.isEmpty();
+            PickerRepository firstMatching = matchingRepositories.get(0);
+            firstMatching.setSelected(true);
+        }
     }
 
     /**
-     * Clears previous selection and select user input as selected repository id since
-     * there can only be at most one selected repository at any given time in the list
-     * of stored repositories.
+     * Finds whether there is any PickerRepository in repositoryList
+     * which has exactly same id as query, the matching is case-insensitive.
      */
-    private void updateSelectedRepository(String query) {
-        repositories.stream().forEach(repo -> repo.setSelected(false));
-        setSelectedRepositoryId(query);
+    private Optional<PickerRepository> getPickerRepositoryById(List<PickerRepository> repositoryList, String repoId) {
+        return repositoryList.stream()
+                .filter(repo -> repo.getRepositoryId().equalsIgnoreCase(repoId))
+                .findFirst();
     }
 
-    private void setSelectedRepositoryId(String query) {
-        selectedRepositoryId = query;
+    private void clearRepositorySelection() {
+        repositories.stream().forEach(repo -> repo.setSelected(false));
     }
 
     /**
-     * Returns a sorted list of PickerRepository which matches the current user input.
+     * Returns a list of PickerRepository which matches the current user input.
+     * The first entry matchingRepository is always the user input.
      */
     public List<PickerRepository> getMatchingRepositories() {
         return new ArrayList<>(matchingRepositories);
