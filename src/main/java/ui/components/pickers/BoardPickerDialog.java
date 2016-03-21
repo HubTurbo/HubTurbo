@@ -31,6 +31,7 @@ public class BoardPickerDialog extends Dialog<String> {
     private List<String> boards;
     private BoardPickerState state;
     private Optional<String> suggestion = Optional.empty();
+    private ButtonType confirmButtonType;
 
     @FXML
     private VBox mainLayout;
@@ -88,7 +89,7 @@ public class BoardPickerDialog extends Dialog<String> {
     }
 
     private void createButtons() {
-        ButtonType confirmButtonType = new ButtonType("Confirm", ButtonBar.ButtonData.OK_DONE);
+        confirmButtonType = new ButtonType("Confirm", ButtonBar.ButtonData.OK_DONE);
         getDialogPane().getButtonTypes().addAll(confirmButtonType, ButtonType.CANCEL);
 
         setResultConverter(dialogButton -> {
@@ -112,6 +113,11 @@ public class BoardPickerDialog extends Dialog<String> {
                     .forEach(boardName -> boardNames.getChildren().add(getPickerBoardNode(boardName)));
 
         getDialogPane().getScene().getWindow().sizeToScene();
+        if (suggestion.isPresent()) {
+            getDialogPane().lookupButton(confirmButtonType).setDisable(false);
+        } else {
+            getDialogPane().lookupButton(confirmButtonType).setDisable(true);
+        }
     }
 
     private final Node getPickerBoardNode(PickerBoard board) {
