@@ -49,26 +49,12 @@ public class IssuePickerState {
      * @param userInput 
      */
     private final void update(String userInput) {
-        String[] keywords = userInput.split(";");
-
-        for (int i = 0; i < keywords.length; i++) {
-            String query = keywords[i].trim();
-
-            if (isKeywordInProgress(keywords, i)) {
-                updateSuggestedIssues(allIssues, query);
-                if (!query.isEmpty()) currentSuggestion = suggestedIssues.stream().findFirst();
-            } else {
-                TurboIssue.getFirstMatchingIssue(allIssues, query).ifPresent(this::updateSelectedIssues);
-            }
+        String query = userInput.trim();
+        updateSuggestedIssues(allIssues, query);
+        if (!query.isEmpty()) {
+            currentSuggestion = suggestedIssues.stream().findFirst();
+            TurboIssue.getFirstMatchingIssue(allIssues, query).ifPresent(this::updateSelectedIssues);
         }
-    }
-
-
-    /**
-     * Only the last keyword is considered in progress except if it is the only keyword
-     */
-    private boolean isKeywordInProgress(String[] keywords, int i) {
-        return i == keywords.length - 1;
     }
 
     /**
@@ -90,6 +76,6 @@ public class IssuePickerState {
      */
     private void updateSuggestedIssues(List<TurboIssue> issues, String query) {
         suggestedIssues.clear();
-        suggestedIssues.addAll(TurboIssue.getMatchedIssues(issues, query));
+        suggestedIssues.addAll(TurboIssue.contains(issues, query));
     }
 }

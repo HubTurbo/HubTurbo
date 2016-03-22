@@ -346,7 +346,7 @@ public class TurboIssue {
      * @param query
      * @return list of issues that contains the query
      */
-    public static List<TurboIssue> getMatchedIssues(List<TurboIssue> issues, String query){
+    public static List<TurboIssue> contains(List<TurboIssue> issues, String query){
         List<String> queries = Arrays.asList(query.split("\\s"));
         return issues.stream()
             .filter(i -> Utility.containsIgnoreCaseMultipleWords(i.getTitle() + " " + i.getId(), queries))
@@ -359,7 +359,7 @@ public class TurboIssue {
      * @return first issue that matches the given query 
      */
     public static Optional<TurboIssue> getFirstMatchingIssue(List<TurboIssue> issues, String query) {
-        return getMatchedIssues(issues, query).stream().findFirst();
+        return contains(issues, query).stream().findFirst();
     }
 
     @SuppressWarnings("unused")

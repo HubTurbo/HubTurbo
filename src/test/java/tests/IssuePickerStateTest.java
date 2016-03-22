@@ -16,7 +16,7 @@ public class IssuePickerStateTest {
 
     @Test
     public void determineState_addMatchedLabels() {
-        IssuePickerState state = setupState("dummy/dummy", Arrays.asList("test", "hello"), "test; ");
+        IssuePickerState state = setupState("dummy/dummy", Arrays.asList("test", "hello"), "test");
 
         assertEquals(1, state.getSelectedIssues().size());
     }

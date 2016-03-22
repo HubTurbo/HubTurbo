@@ -1,4 +1,4 @@
-package unstable;
+package guitests;
 
 import static org.junit.Assert.*;
 
@@ -8,10 +8,8 @@ import java.util.List;
 import org.junit.Test;
 
 import backend.resource.TurboIssue;
-import guitests.UITest;
 import javafx.application.Platform;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyCode;
 import ui.UI;
 import util.events.ShowIssuePickerEvent;
 
@@ -26,12 +24,6 @@ public class IssuePickerTest extends UITest {
         click(issuePickerTextField);
         type("world");
         assertEquals("world", issuePickerTextField.getText());
-        exitCleanly();
-    }
-
-    private void exitCleanly() {
-        push(KeyCode.ESCAPE);
-        waitUntilNodeDisappears(QUERY_FIELD_ID);
     }
 
     private void triggerIssuePicker(List<TurboIssue> allIssues) {

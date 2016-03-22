@@ -1,11 +1,9 @@
 package ui.components.issuepicker;
 
-import com.sun.javafx.tk.FontLoader;
-import com.sun.javafx.tk.Toolkit;
-
 import backend.resource.TurboIssue;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 
 /**
  * This class is to represent a displayed issue in IssuePickerDialog
@@ -15,25 +13,26 @@ import javafx.scene.control.Label;
  */
 public class PickerIssue extends TurboIssue {
 
+    private static final String LABEL_TITLE = "%d %s";
     private static final String FADED_OPACITY = "40%";
     private static final String DEFAULT_COLOR = "f48322";
 
+    private final String displayTitle;
     private boolean isFaded;
     private boolean isRemoved;
     
     public PickerIssue(TurboIssue issue) {
         super(issue);
+        displayTitle = String.format(LABEL_TITLE, getId(), getTitle());
     }
 
     public Node getNode() {
-        Label label = new Label(String.valueOf(getId()));
+        Label label = new Label(displayTitle);
         label.getStyleClass().add("labels");
         if (isRemoved) label.getStyleClass().add("labels-removed"); // add strikethrough
         label.setStyle(getStyle());
-
-        FontLoader fontLoader = Toolkit.getToolkit().getFontLoader();
-        double width = (double) fontLoader.computeStringWidth(label.getText(), label.getFont());
-        label.setPrefWidth(width + 30);
+        label.setMaxWidth(200);
+        label.setTooltip(new Tooltip(displayTitle));
         return label;
     }
 

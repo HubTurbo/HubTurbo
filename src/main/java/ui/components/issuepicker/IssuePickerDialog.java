@@ -39,6 +39,7 @@ public class IssuePickerDialog extends Dialog<List<String>> {
     private static final String TITLE = "Issue Picker";
     private static final String FXML_PATH = "fxml/IssuePickerView.fxml";
     private static final Logger logger = HTLog.get(IssuePickerDialog.class);
+    private static final int MAX_ISSUE_SIZE = 40;
 
     private final MultiModel models;
     private final List<TurboIssue> allIssues;
@@ -97,39 +98,29 @@ public class IssuePickerDialog extends Dialog<List<String>> {
      */
     private final void populatePanes(IssuePickerState state) {
         // Population of UI elements
-        populateSelectedIssues(state.getSelectedIssues(), state.getCurrentSuggestion());
+        populateSelectedIssues(state.getSelectedIssues());
         populateSuggestedIssues(state.getSuggestedIssues(), state.getCurrentSuggestion());
 
         // Ensures dialog pane resize according to content
         getDialogPane().getScene().getWindow().sizeToScene();
     }
 
-    private void populateSelectedIssues(List<TurboIssue> chosenIssues, Optional<TurboIssue> currentSuggestion) {
+    private void populateSelectedIssues(List<TurboIssue> chosenIssues) {
         selectedIssues.getChildren().clear();
-        Map<String, FlowPane> repoContent = getRepoContent(chosenIssues, currentSuggestion);
+        Map<String, FlowPane> repoContent = getRepoContent(chosenIssues);
 
         repoContent.entrySet().forEach(entry -> {
-            entry.getValue().getChildren().add(0, createRepoTitle(entry.getKey()));
-            selectedIssues.getChildren().addAll(entry.getValue());
+            selectedIssues.getChildren().addAll(createRepoTitle(entry.getKey()), entry.getValue());
         });
     }
 
     private void populateSuggestedIssues(List<TurboIssue> matchedIssues, Optional<TurboIssue> currentSuggestion) {
         suggestedIssues.getChildren().clear();
-        matchedIssues.stream()
-            .forEach(issue -> suggestedIssues.getChildren().add(processSuggestedIssue(issue, currentSuggestion)));
+        matchedIssues.stream().limit(MAX_ISSUE_SIZE)
+            .forEach(issue -> suggestedIssues.getChildren().add(processIssue(issue, currentSuggestion)));
     }
 
-    private Node processSelectedIssue(TurboIssue issue, Optional<TurboIssue> suggestion) {
-        PickerIssue styledIssue = new PickerIssue(issue);
-
-        if (suggestion.isPresent() && suggestion.get().equals(issue)) {
-            return styledIssue.faded(true).removed(true).getNode();
-        }
-        return new PickerIssue(issue).getNode();
-    }
-
-    private Node processSuggestedIssue(TurboIssue issue, Optional<TurboIssue> currentSuggestion) {
+    private Node processIssue(TurboIssue issue, Optional<TurboIssue> currentSuggestion) {
         GuiElement element = new GuiElement(issue, models.getLabelsOfIssue(issue), models.getMilestoneOfIssue(issue),
                                             models.getAssigneeOfIssue(issue), models.getAuthorOfIssue(issue));
         IssueCard card = new IssueCard(element, isSuggestedIssue(issue, currentSuggestion));
@@ -152,7 +143,7 @@ public class IssuePickerDialog extends Dialog<List<String>> {
         issuepickerQueryField.setDisable(true);
         Platform.runLater(card::requestFocus);
         state.updateSelectedIssues(issue);
-        populateSelectedIssues(state.getSelectedIssues(), state.getCurrentSuggestion());
+        populateSelectedIssues(state.getSelectedIssues());
     }
 
     // UI helper methods
@@ -174,9 +165,10 @@ public class IssuePickerDialog extends Dialog<List<String>> {
 
         // defines what happens when user confirms/presses enter
         setResultConverter(dialogButton -> {
-            if (dialogButton == confirmButtonType) {
+            if (dialogButton.getButtonData() == ButtonData.OK_DONE) {
                 // Confirms final issue that is suggested to user upon confirmation
                 if (!issuepickerQueryField.isDisabled()) issuepickerQueryField.appendText(";");
+                System.out.println(state.getSelectedIssues());
                 return state.getSelectedIssues().stream().map(TurboIssue::toString).collect(Collectors.toList());
             }
             return null;
@@ -199,7 +191,7 @@ public class IssuePickerDialog extends Dialog<List<String>> {
         return repoName;
     }
 
-    private final Map<String, FlowPane> getRepoContent(List<TurboIssue> chosenIssues, Optional<TurboIssue> suggestion) {
+    private final Map<String, FlowPane> getRepoContent(List<TurboIssue> chosenIssues) {
         Map<String, FlowPane> repoContent = new HashMap<>();
         chosenIssues.stream()
             .forEach(issue -> {
@@ -207,43 +199,11 @@ public class IssuePickerDialog extends Dialog<List<String>> {
                 if (!repoContent.containsKey(repoId)) {
                     repoContent.put(repoId, createRepoPane(GROUP_PAD));
                 }
-                repoContent.get(repoId).getChildren().add(processSelectedIssue(issue, suggestion));
+                repoContent.get(repoId).getChildren().add(processIssue(issue, Optional.of(issue)));
             });
-        
-        // adds suggested issue if not present in selected issues
-        if (canAddSuggestion(chosenIssues, suggestion)) addCurrentSuggestion(repoContent, suggestion.get());
         return repoContent;
     }
 
-    /**
-     * Adds suggested issue to selected issue 
-     * @param repoContent
-     * @param chosenIssues
-     * @param issue
-     */
-    private void addCurrentSuggestion(Map<String, FlowPane> repoContent, TurboIssue issue) {
-        Node styledIssue = new PickerIssue(issue).faded(true).getNode();
-
-        if (!repoContent.containsKey(issue.getRepoId())) {
-            FlowPane repoContentPane = createRepoPane(GROUP_PAD);
-            repoContentPane.getChildren().add(styledIssue);
-            repoContent.put(issue.getRepoId(), repoContentPane);
-            return;
-        }
-        repoContent.get(issue.getRepoId()).getChildren().add(styledIssue);
-    }
-    
-    /**
-     * Suggestion not added if text field is disabled because user has not confirmed addition of the issue
-     * @param chosenIssues
-     * @param suggestion
-     * @return
-     */
-    private boolean canAddSuggestion(List<TurboIssue> chosenIssues, Optional<TurboIssue> suggestion) {
-        return !issuepickerQueryField.isDisabled() 
-            && suggestion.isPresent() && !chosenIssues.contains(suggestion.get());
-    }
-    
     private boolean isSuggestedIssue(TurboIssue issue, Optional<TurboIssue> currentSuggestion) {
         return currentSuggestion.isPresent() && currentSuggestion.get().equals(issue);
     }

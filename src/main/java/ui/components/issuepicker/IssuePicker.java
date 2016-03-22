@@ -21,7 +21,6 @@ public class IssuePicker {
 
     private Optional<List<String>> showIssuePicker(MultiModel models) {
         IssuePickerDialog issuePickerDialog = new IssuePickerDialog(stage, models);
-        // show IssuePickerDialog and wait for result
         return issuePickerDialog.showAndWait();
 
     }
