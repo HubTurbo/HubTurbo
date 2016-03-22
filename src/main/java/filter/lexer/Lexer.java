@@ -14,35 +14,35 @@ public class Lexer {
     private static final Pattern NO_WHITESPACE = Pattern.compile("\\S");
     private static final String ALPHANUMERIC = "[a-zA-Z0-9]";
     private static final String VALID_USERNAME = String.format(
-           "%s[-a-zA-Z0-9]*%s", ALPHANUMERIC, ALPHANUMERIC);
+        "%s[-a-zA-Z0-9]*%s", ALPHANUMERIC, ALPHANUMERIC);
 
     private final List<Rule> rules = Arrays.asList(
-            new Rule("AND|&&?", TokenType.AND),
-            new Rule("OR|\\|\\|?", TokenType.OR),
-            new Rule("NOT|~|!|-", TokenType.NOT),
+        new Rule("AND|&&?", TokenType.AND),
+        new Rule("OR|\\|\\|?", TokenType.OR),
+        new Rule("NOT|~|!|-", TokenType.NOT),
 
-            // These have higher priority than Symbol
-            new Rule("\\d{4}-\\d{1,2}-\\d{1,2}", TokenType.DATE), // YYYY-MM?-DD?
-            new Rule("[A-Za-z]+(-[A-Za-z]+)*\\s*:", TokenType.QUALIFIER),
-            new Rule(String.format("%s/[A-Za-z0-9-]+#", VALID_USERNAME), TokenType.COMPOUND_ID_PREFIX),
-            new Rule(";", TokenType.SEMICOLON),
-            new Rule("[A-Za-z0-9#][/A-Za-z0-9.'+-]*", TokenType.SYMBOL),
+        // These have higher priority than Symbol
+        new Rule("\\d{4}-\\d{1,2}-\\d{1,2}", TokenType.DATE), // YYYY-MM?-DD?
+        new Rule("[A-Za-z]+(-[A-Za-z]+)*\\s*:", TokenType.QUALIFIER),
+        new Rule(String.format("%s/[A-Za-z0-9-]+#", VALID_USERNAME), TokenType.COMPOUND_ID_PREFIX),
+        new Rule(";", TokenType.SEMICOLON),
+        new Rule("[A-Za-z0-9#][/A-Za-z0-9.'+-]*", TokenType.SYMBOL),
 
-            new Rule("\\(", TokenType.LBRACKET),
-            new Rule("\\)", TokenType.RBRACKET),
-            new Rule("\"[^\"]+\"", TokenType.QUOTED_CONTENT),
-            new Rule(",", TokenType.COMMA),
-            new Rule("%", TokenType.PERCENT),
-            new Rule("\\.\\.", TokenType.DOTDOT),
+        new Rule("\\(", TokenType.LBRACKET),
+        new Rule("\\)", TokenType.RBRACKET),
+        new Rule("\"[^\"]+\"", TokenType.QUOTED_CONTENT),
+        new Rule(",", TokenType.COMMA),
+        new Rule("%", TokenType.PERCENT),
+        new Rule("\\.\\.", TokenType.DOTDOT),
 
-            // These have higher priority than < and >
-            new Rule("<=", TokenType.LTE),
-            new Rule(">=", TokenType.GTE),
-            new Rule("<", TokenType.LT),
-            new Rule(">", TokenType.GT),
+        // These have higher priority than < and >
+        new Rule("<=", TokenType.LTE),
+        new Rule(">=", TokenType.GTE),
+        new Rule("<", TokenType.LT),
+        new Rule(">", TokenType.GT),
 
-            new Rule("\\*", TokenType.STAR)
-        );
+        new Rule("\\*", TokenType.STAR)
+    );
 
     private final String input;
     private int position;
@@ -85,8 +85,8 @@ public class Lexer {
         throw new ParseException("Unrecognised token " + input.charAt(position) + " at " + position);
     }
 
-    public ArrayList<Token> lex() {
-        ArrayList<Token> result = new ArrayList<>();
+    public List<Token> lex() {
+        List<Token> result = new ArrayList<>();
 
         Token previous = null;
         while (position < input.length()

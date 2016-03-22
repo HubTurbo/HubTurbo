@@ -91,14 +91,10 @@ public class FilterTextFieldTest extends UITest {
     @Test
     public void filterTextFieldColor_invalidFilter_invalidFilterStyleApplied(){
 
-        // Tests if parse errors applies invalid filter style to text field
-        testInvalidFilterStyleApplied("is:-open");
-        testInvalidFilterStyleApplied("--");
-        testInvalidFilterStyleApplied("(");
-        testInvalidFilterStyleApplied("incomplete &");
+        // Tests if parse errors apply invalid filter style
+        testInvalidFilterStyleApplied("is: is:");
 
-        // Tests if semantic errors applies invalid filter style to text field
-        // These invalid filters will cause the invalid filter style be applied after ENTER is pressed
+        // Tests if semantic errors apply invalid filter style
         testInvalidFilterStyleAppliedAfterEnter("is:invalid");
     }
 

@@ -1,7 +1,5 @@
 package ui.components;
 
-import filter.ParseException;
-import filter.Parser;
 import javafx.application.Platform;
 import javafx.scene.control.IndexRange;
 import javafx.scene.control.TextField;
@@ -13,6 +11,7 @@ import org.controlsfx.validation.ValidationSupport;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,7 +38,7 @@ public class FilterTextField extends TextField {
     private Function<String, String> onConfirm = (s) -> s;
 
     // For reverting edits
-    private String previousText;
+    private String previousText = "";
 
     // The list of keywords which will be used in completion
     private List<String> keywords = new ArrayList<>();
@@ -47,25 +46,23 @@ public class FilterTextField extends TextField {
     // For on-the-fly parsing and checking
     private final ValidationSupport validationSupport = new ValidationSupport();
 
-
-    public FilterTextField(String initialText) {
-        super(initialText);
-        previousText = initialText;
-        setup();
+    public FilterTextField(Predicate<String> validation) {
+        super("");
+        setup(validation);
     }
 
-    private void setup() {
+    private void setup(Predicate<String> validation) {
         setPrefColumnCount(30);
         validationSupport.registerValidator(this, (c, newValue) -> {
-            boolean wasError = false;
-            try {
-                Parser.parse(getText());
-                setStyleForValidFilter();
-            } catch (ParseException e) {
-                wasError = true;
+            boolean isError = !validation.test(getText());
+
+            if (isError) {
                 setStyleForInvalidFilter();
+            } else {
+                setStyleForValidFilter();
             }
-            return ValidationResult.fromErrorIf(this, "Parse error", wasError);
+
+            return ValidationResult.fromErrorIf(this, "Parse error", isError);
         });
         setOnKeyTyped(e -> {
             boolean isModifierKeyPress = e.isAltDown() || e.isMetaDown() || e.isControlDown();
