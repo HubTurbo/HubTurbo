@@ -560,7 +560,7 @@ public class BrowserComponent {
                     return;
             }
 
-            String xpath = "//*[@id=\"js-repo-pjax-container\"]/div[2]/div[1]/div/div[2]/div[2]/nav/a[%d]";
+            String xpath = "//*[@id=\"js-repo-pjax-container\"]/div[2]/div[1]/div/div/div[2]/nav/a[%d]";
             clickElementByXpath(String.format(xpath, tabIndex));
         }
     }
