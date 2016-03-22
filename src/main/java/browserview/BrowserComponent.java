@@ -220,6 +220,14 @@ public class BrowserComponent {
     }
 
     /**
+    * Navigates to HubTurbo filters doc page, run on separate thread.
+    */
+    public void showFilterDocs() {
+        logger.info("Showing filters documentation page");
+        runBrowserOperation(() -> driver.get(GitHubURL.FILTERS_PAGE, false));
+    }
+
+    /**
      * Navigates to the GitHub changelog page.
      * Run on a separate thread.
      */
