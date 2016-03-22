@@ -99,7 +99,6 @@ public class UITest extends FxRobot {
 
     @Before
     public void setStage() throws TimeoutException {
-        FxToolkit.registerStage(() -> new Stage());
         FxToolkit.setupStage(this::handleSetupStage);
     }
 

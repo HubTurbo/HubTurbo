@@ -16,10 +16,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeoutException;
 
-import static guitests.BoardAutoCreatorTest.verifyBoard;
-
 import static org.junit.Assert.assertEquals;
 import static ui.BoardAutoCreator.SAMPLE_BOARD;
+import static unstable.BoardAutoCreatorTest.verifyBoard;
 
 public class StartupBoardLauncherTest extends UITest {
 

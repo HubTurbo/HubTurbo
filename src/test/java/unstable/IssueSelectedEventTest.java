@@ -1,4 +1,4 @@
-package guitests;
+package unstable;
 
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -6,6 +6,7 @@ import javafx.scene.input.KeyCode;
 import org.junit.Test;
 import org.loadui.testfx.GuiTest;
 
+import guitests.UITest;
 import ui.UI;
 import ui.listpanel.ListPanel;
 import util.events.IssueSelectedEventHandler;
