@@ -39,7 +39,6 @@ public class PanelMenuBar extends HBox {
     private HBox nameBox;
     private Label renameButton;
     private final FilterPanel panel;
-    private final GUIController guiController;
     private Label closeButton;
     private final UI ui;
     private String panelName = DEFAULT_PANEL_NAME;
@@ -50,9 +49,8 @@ public class PanelMenuBar extends HBox {
     public static final int NAME_AREA_WIDTH = PANEL_WIDTH - 65;
     public static final int TOOLTIP_WRAP_WIDTH = 220; //prefWidth for longer tooltip
 
-    public PanelMenuBar(FilterPanel panel, GUIController guiController, UI ui) {
+    public PanelMenuBar(FilterPanel panel, UI ui) {
         this.ui = ui;
-        this.guiController = guiController;
         this.panel = panel;
         this.setSpacing(2);
         this.setMinWidth(PANEL_WIDTH);

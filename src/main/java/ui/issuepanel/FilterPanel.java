@@ -51,11 +51,11 @@ public abstract class FilterPanel extends AbstractPanel {
 
     protected FilterExpression currentFilterExpression = Qualifier.EMPTY;
 
-    public FilterPanel(UI ui, GUIController guiController, PanelControl parentPanelControl, int panelIndex) {
-        super(guiController, parentPanelControl, panelIndex);
+    public FilterPanel(UI ui, PanelControl parentPanelControl, int panelIndex) {
+        super(parentPanelControl, panelIndex);
         this.ui = ui;
 
-        panelMenuBar = new PanelMenuBar(this, guiController, ui);
+        panelMenuBar = new PanelMenuBar(this, ui);
         getChildren().addAll(panelMenuBar, createFilterBox());
         setUpEventHandler();
         focusedProperty().addListener((unused, wasFocused, isFocused) -> {
