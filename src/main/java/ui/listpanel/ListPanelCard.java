@@ -23,7 +23,6 @@ import ui.GuiElement;
 import ui.issuepanel.FilterPanel;
 import util.Utility;
 import backend.resource.TurboIssue;
-import backend.resource.TurboLabel;
 import backend.resource.TurboMilestone;
 import backend.resource.TurboUser;
 import filter.expression.FilterExpression;
@@ -43,8 +42,7 @@ public class ListPanelCard extends VBox {
      */
 
     private final GuiElement guiElement;
-    private final FlowPane issueDetails = new FlowPane();
-    private final HBox authorAssigneeBox = new HBox();
+    private final FlowPane issueDetails;
     private final FilterPanel parentPanel;
     private final HashSet<Integer> issuesWithNewComments;
 
@@ -60,6 +58,7 @@ public class ListPanelCard extends VBox {
                          HashSet<Integer> issuesWithNewComments) {
         this.guiElement = guiElement;
         this.parentPanel = parentPanel;
+        this.issueDetails = createDetailsPane();
         this.issuesWithNewComments = issuesWithNewComments;
         setup();
     }
@@ -79,14 +78,12 @@ public class ListPanelCard extends VBox {
             issueTitle.getStyleClass().add("issue-panel-closed");
         }
 
-        setupIssueDetailsBox();
-        setupAuthorAssigneeBox();
         updateDetails();
 
         setPadding(new Insets(0, 0, 0, 0));
         setSpacing(1);
 
-        getChildren().addAll(issueTitle, issueDetails, authorAssigneeBox);
+        getChildren().addAll(issueTitle, issueDetails);
 
         if (Qualifier.hasUpdatedQualifier(parentPanel.getCurrentFilterExpression())) {
             getChildren().add(getEventDisplay(issue,
@@ -191,16 +188,13 @@ public class ListPanelCard extends VBox {
         }
     }
 
-    private void setupIssueDetailsBox() {
-        issueDetails.setMaxWidth(CARD_WIDTH);
-        issueDetails.setPrefWrapLength(CARD_WIDTH);
-        issueDetails.setHgap(3);
-        issueDetails.setVgap(3);
-    }
-
-    private void setupAuthorAssigneeBox() {
-        authorAssigneeBox.setPrefWidth(CARD_WIDTH);
-        authorAssigneeBox.setPadding(new Insets(0, 0, 1, 0));
+    private FlowPane createDetailsPane() {
+        FlowPane detailsPane = new FlowPane();
+        detailsPane.setMaxWidth(CARD_WIDTH);
+        detailsPane.setPrefWrapLength(CARD_WIDTH);
+        detailsPane.setHgap(3);
+        detailsPane.setVgap(3);
+        return detailsPane;
     }
 
     private void updateDetails() {
@@ -227,10 +221,6 @@ public class ListPanelCard extends VBox {
             issueDetails.getChildren().add(commentCount);
         }
 
-        for (TurboLabel label : guiElement.getLabels()) {
-            issueDetails.getChildren().add(label.getNode());
-        }
-
         if (issue.getMilestone().isPresent() && guiElement.getMilestone().isPresent()) {
             TurboMilestone milestone = guiElement.getMilestone().get();
             issueDetails.getChildren().add(new Label(milestone.getTitle()));
@@ -238,18 +228,20 @@ public class ListPanelCard extends VBox {
 
         if (issue.isPullRequest()) {
             HBox authorBox = createDisplayUserBox(guiElement.getAuthor(), issue.getCreator());
-            authorAssigneeBox.getChildren().add(authorBox);
+            issueDetails.getChildren().add(authorBox);
             if (issue.getAssignee().isPresent()) {
                 Label rightArrow = new Label(OCTICON_ARROW_RIGHT);
                 rightArrow.getStyleClass().addAll("octicon", "pull-request-assign-icon");
-                authorAssigneeBox.getChildren().add(rightArrow);
+                issueDetails.getChildren().add(rightArrow);
             }
         }
 
         if (issue.getAssignee().isPresent()) {
             HBox assigneeBox = createDisplayUserBox(guiElement.getAssignee(), issue.getAssignee().get());
-            authorAssigneeBox.getChildren().add(assigneeBox);
+            issueDetails.getChildren().add(assigneeBox);
         }
+
+        guiElement.getLabels().forEach(label -> issueDetails.getChildren().add(label.getNode()));
     }
 
     /**
@@ -276,6 +268,7 @@ public class ListPanelCard extends VBox {
     private HBox setupUserBox() {
         HBox userBox = new HBox();
         userBox.setAlignment(Pos.BASELINE_CENTER);
+        userBox.setSpacing(3);
         return userBox;
     }
 
@@ -292,5 +285,4 @@ public class ListPanelCard extends VBox {
         }
         return userAvatar;
     }
-
 }

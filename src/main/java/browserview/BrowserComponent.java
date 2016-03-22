@@ -220,6 +220,14 @@ public class BrowserComponent {
     }
 
     /**
+    * Navigates to HubTurbo filters doc page, run on separate thread.
+    */
+    public void showFilterDocs() {
+        logger.info("Showing filters documentation page");
+        runBrowserOperation(() -> driver.get(GitHubURL.FILTERS_PAGE, false));
+    }
+
+    /**
      * Navigates to the GitHub changelog page.
      * Run on a separate thread.
      */
@@ -552,7 +560,7 @@ public class BrowserComponent {
                     return;
             }
 
-            String xpath = "//*[@id=\"js-repo-pjax-container\"]/div[2]/div[1]/div/div[2]/div[2]/nav/a[%d]";
+            String xpath = "//*[@id=\"js-repo-pjax-container\"]/div[2]/div[1]/div/div/div[2]/nav/a[%d]";
             clickElementByXpath(String.format(xpath, tabIndex));
         }
     }

@@ -1,26 +1,37 @@
 package tests;
 
-import filter.ParseException;
-import filter.Parser;
-import filter.expression.*;
-import org.junit.Test;
+import static filter.expression.QualifierType.*;
+import static org.junit.Assert.*;
 
 import java.time.LocalDate;
 import java.util.Arrays;
 
-import static filter.expression.QualifierType.*;
-import static org.junit.Assert.*;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
+import filter.ParseException;
+import filter.Parser;
+import filter.expression.*;
 
 public class FilterParserTests {
 
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
     @Test
-    public void basics() {
-        assertEquals(Parser.parse(null), Qualifier.EMPTY);
+    public void parse_nullInput_exceptionThrown() {
+        thrown.expect(NullPointerException.class);
+        Parser.parse(null);
+    }
+
+    @Test
+    public void parse_emptyInput_emptyQualifier() {
         assertEquals(Parser.parse(""), Qualifier.EMPTY);
     }
 
     @Test
-    public void keywords() {
+    public void parse_basicExamples_validAST() {
         assertEquals(Parser.parse("a(b)"),
             new Conjunction(new Qualifier(KEYWORD, "a"), new Qualifier(KEYWORD, "b")));
         assertEquals(Parser.parse("    a   (   b   )   "),
@@ -42,7 +53,7 @@ public class FilterParserTests {
     }
 
     @Test
-    public void quotes() {
+    public void parse_quotedInputs_validAST() {
         // Content with space
         assertEquals(Parser.parse("body:\"this is\""), new Qualifier(DESCRIPTION, "this is"));
 
@@ -51,70 +62,90 @@ public class FilterParserTests {
 
     }
 
-    @Test(expected = ParseException.class)
-    public void emptyQuotes() {
-        Parser.parse("body: \"\""); 
-    }
-
-    @Test(expected = ParseException.class)
-    public void multiplesQuotes() {
-        Parser.parse("body: \"\"\""); 
-    }
-
-
-    @Test(expected = ParseException.class)
-    public void prefixQuotes() {
-        Parser.parse("body: test\"will not be parsed\"\""); 
+    @Test
+    public void parse_emptyQuotes_exceptionThrown() {
+        thrown.expect(ParseException.class);
+        Parser.parse("body: \"\"");
     }
 
     @Test
-    public void unexpectedEOFs() {
-        try {
-            Parser.parse("a:.");
-            fail("Inputs which end unexpectedly should throw a parse exception");
-        } catch (ParseException ignored) {}
-        try {
-            Parser.parse("a:");
-            fail("Inputs which end unexpectedly should throw a parse exception");
-        } catch (ParseException ignored) {}
-        try {
-            Parser.parse("~");
-            fail("Inputs which end unexpectedly should throw a parse exception");
-        } catch (ParseException ignored) {}
-        try {
-            Parser.parse("a(b) ||");
-            fail("Inputs which end unexpectedly should throw a parse exception");
-        } catch (ParseException ignored) {}
+    public void parse_unbalancedQuotes_exceptionThrown() {
+        thrown.expect(ParseException.class);
+        Parser.parse("body: \"\"\"");
     }
 
     @Test
-    public void emptyQualifiers() {
-
-        try {
-            Parser.parse("-milestone: label:priority.high");
-            fail("'label:' can't be the input to a qualifier => empty qualifier => parse exception");
-        } catch (ParseException ignored) {}
-
-        try {
-            Parser.parse("label:priority.high -milestone:");
-            fail("Empty qualifiers should cause a parse exception");
-        } catch (ParseException ignored) {}
-
-        try {
-            Parser.parse("a:b; c:d;e");
-            fail("Qualifier content expected, start of a new qualifier found.");
-        } catch (ParseException ignored) {}
+    public void parse_quotesInPrefixPosition_exceptionThrown() {
+        thrown.expect(ParseException.class);
+        Parser.parse("body: test\"will not be parsed\"\"");
     }
 
     @Test
-    public void operators() {
+    public void parse_unrecognisedTokenAsQualifierContent_exceptionThrown() {
+        thrown.expect(ParseException.class);
+        Parser.parse("a:.");
+    }
+
+    @Test
+    public void parse_noQualifierContent_exceptionThrown() {
+        thrown.expect(ParseException.class);
+        Parser.parse("a:");
+    }
+
+    @Test
+    public void parse_standalonePrefixOperator_exceptionThrown() {
+        thrown.expect(ParseException.class);
+        Parser.parse("~");
+    }
+
+    @Test
+    public void parse_standaloneInfixOperator_exceptionThrown() {
+        thrown.expect(ParseException.class);
+        Parser.parse("&&");
+    }
+
+    @Test
+    public void parse_standaloneSemicolon_exceptionThrown() {
+        thrown.expect(ParseException.class);
+        Parser.parse(";");
+    }
+
+    @Test
+    public void parse_nothingAfterInfixOperator_exceptionThrown() {
+        thrown.expect(ParseException.class);
+        Parser.parse("a(b) ||");
+    }
+
+    @Test
+    public void parse_precedingEmptyQualifer_exceptionThrown() {
+        thrown.expect(ParseException.class);
+        Parser.parse("-milestone: label:priority.high");
+    }
+
+    @Test
+    public void parse_trailingEmptyQualifer_exceptionThrown() {
+        thrown.expect(ParseException.class);
+        Parser.parse("label:priority.high -milestone:");
+    }
+
+    @Test
+    public void parse_missingSemicolonOperand_exceptionThrown() {
+        thrown.expect(ParseException.class);
+        Parser.parse("a:b; c:d;e");
+    }
+
+    @Test
+    public void parse_disjunction_validAST() {
         assertEquals(Parser.parse("id:b OR id:d"),
             new Disjunction(new Qualifier(ID, "b"), new Qualifier(ID, "d")));
         assertEquals(Parser.parse("id:b | id:d"),
             new Disjunction(new Qualifier(ID, "b"), new Qualifier(ID, "d")));
         assertEquals(Parser.parse("id:b || id:d"),
             new Disjunction(new Qualifier(ID, "b"), new Qualifier(ID, "d")));
+    }
 
+    @Test
+    public void parse_conjunction_validAST() {
         assertEquals(Parser.parse("id:b id:d"),
             new Conjunction(new Qualifier(ID, "b"), new Qualifier(ID, "d")));
         assertEquals(Parser.parse("id:b AND id:d"),
@@ -123,131 +154,123 @@ public class FilterParserTests {
             new Conjunction(new Qualifier(ID, "b"), new Qualifier(ID, "d")));
         assertEquals(Parser.parse("id:b && id:d"),
             new Conjunction(new Qualifier(ID, "b"), new Qualifier(ID, "d")));
+    }
 
+    @Test
+    public void parse_negation_validAST() {
         assertEquals(Parser.parse("!id:b"),
             new Negation(new Qualifier(ID, "b")));
         assertEquals(Parser.parse("-id:b"),
             new Negation(new Qualifier(ID, "b")));
         assertEquals(Parser.parse("~id:b"),
             new Negation(new Qualifier(ID, "b")));
+    }
 
-        // Shorter form of OR
+    @Test
+    public void parse_disjunctionShorthand_validAST() {
 
         assertEquals(Parser.parse("label:a;b;c"),
+            new Disjunction(
                 new Disjunction(
-                        new Disjunction(
-                                new Qualifier(LABEL, "a"),
-                                new Qualifier(LABEL, "b")
-                        ),
-                        new Qualifier(LABEL, "c")
-                ));
+                    new Qualifier(LABEL, "a"),
+                    new Qualifier(LABEL, "b")),
+                new Qualifier(LABEL, "c")));
 
         assertEquals(Parser.parse("~label:a;b"),
-                new Negation(
-                        new Disjunction(
-                                new Qualifier(LABEL, "a"),
-                                new Qualifier(LABEL, "b")
-                        )
-                ));
-
-        //TODO: change this test in the future when proper semantic exception is implemented #1173
-        try {
-            Parser.parse("sort:label;assignee");
-        } catch (ParseException ignored) {
-            fail("Change this test to account for semantic error in the future.");
-        }
-
-        // Implicit conjunction
-
-        assertEquals(Parser.parse("milestone:0.4 state:open OR label:urgent"),
+            new Negation(
                 new Disjunction(
-                    new Conjunction(
-                        new Qualifier(MILESTONE, "0.4"),
-                        new Qualifier(STATE, "open")),
-                    new Qualifier(LABEL, "urgent")));
+                    new Qualifier(LABEL, "a"),
+                    new Qualifier(LABEL, "b"))));
+    }
+
+    @Test
+    public void parse_disjunctionShorthandInSort_exceptionThrown() {
+        // TODO: change this test in the future when proper semantic exception is implemented #1173
+        // It currently does not throw an exception.
+        Parser.parse("sort:label;assignee");
+    }
+
+    @Test
+    public void parse_implicitConjunction_correctAST() {
+        assertEquals(Parser.parse("milestone:0.4 state:open OR label:urgent"),
+            new Disjunction(
+                new Conjunction(
+                    new Qualifier(MILESTONE, "0.4"),
+                    new Qualifier(STATE, "open")),
+                new Qualifier(LABEL, "urgent")));
         assertEquals(Parser.parse("milestone:0.4 state:open OR label:urgent"),
             Parser.parse("milestone:0.4 AND state:open OR label:urgent"));
-
-        try {
-            Parser.parse(";");
-            fail("Operator by itself should cause a parse exception.");
-        } catch (ParseException ignored) {}
-
-        try {
-            Parser.parse("&&");
-            fail("Operator by itself should cause a parse exception.");
-        } catch (ParseException ignored) {}
     }
 
     @Test
-    public void associativity() {
+    public void parse_associativity_correctAST() {
         assertEquals(Parser.parse("id:b OR id:d OR id:f"),
+            new Disjunction(
                 new Disjunction(
-                    new Disjunction(
-                        new Qualifier(ID, "b"),
-                        new Qualifier(ID, "d")),
-                    new Qualifier(ID, "f")));
+                    new Qualifier(ID, "b"),
+                    new Qualifier(ID, "d")),
+                new Qualifier(ID, "f")));
 
         assertEquals(Parser.parse("id:b AND id:d AND id:f"),
+            new Conjunction(
                 new Conjunction(
-                    new Conjunction(
-                        new Qualifier(ID, "b"),
-                        new Qualifier(ID, "d")),
-                    new Qualifier(ID, "f")));
+                    new Qualifier(ID, "b"),
+                    new Qualifier(ID, "d")),
+                new Qualifier(ID, "f")));
     }
 
     @Test
-    public void numberOperators() {
+    public void parse_numberOperators_validAST() {
         assertEquals(Parser.parse("updated:<24"),
-                new Qualifier(UPDATED, new NumberRange(null, 24, true)));
+            new Qualifier(UPDATED, new NumberRange(null, 24, true)));
         assertEquals(Parser.parse("updated:<=24"),
-                new Qualifier(UPDATED, new NumberRange(null, 24)));
+            new Qualifier(UPDATED, new NumberRange(null, 24)));
         assertEquals(Parser.parse("updated:>=24"),
-                new Qualifier(UPDATED, new NumberRange(24, null)));
+            new Qualifier(UPDATED, new NumberRange(24, null)));
         assertEquals(Parser.parse("updated:>24"),
-                new Qualifier(UPDATED, new NumberRange(24, null, true)));
+            new Qualifier(UPDATED, new NumberRange(24, null, true)));
         assertNotEquals(Parser.parse("updated:<24"),
-                new Qualifier(UPDATED, new NumberRange(24, null, true)));
+            new Qualifier(UPDATED, new NumberRange(24, null, true)));
 
         assertEquals(Parser.parse("updated:24"),
-                new Qualifier(UPDATED, 24));
+            new Qualifier(UPDATED, 24));
         assertNotEquals(Parser.parse("updated:25"),
-                new Qualifier(UPDATED, 24));
+            new Qualifier(UPDATED, 24));
     }
 
     @Test
-    public void numberRanges() {
+    public void parse_numberRanges_validAST() {
         assertEquals(Parser.parse("updated:1 .. 24"),
-                new Qualifier(UPDATED, new NumberRange(1, 24, false)));
+            new Qualifier(UPDATED, new NumberRange(1, 24, false)));
         assertEquals(Parser.parse("updated:1 .. *"),
-                new Qualifier(UPDATED, new NumberRange(1, null)));
+            new Qualifier(UPDATED, new NumberRange(1, null)));
 
         // Parsing currently requires a space between operand and operator
         assertEquals(Parser.parse("updated:1..2"),
-                new Qualifier(UPDATED, "1..2"));
+            new Qualifier(UPDATED, "1..2"));
     }
 
     @Test
-    public void dateRanges() {
+    public void parse_dateRanges_validAST() {
         assertEquals(Parser.parse("created:2014-06-01 .. 2013-03-15"),
-                new Qualifier(CREATED, new DateRange(LocalDate.of(2014, 6, 1), LocalDate.of(2013, 3, 15))));
+            new Qualifier(CREATED, new DateRange(LocalDate.of(2014, 6, 1), LocalDate.of(2013, 3, 15))));
 
         assertEquals(Parser.parse("created:2014-06-01 .. *"),
-                new Qualifier(CREATED, new DateRange(LocalDate.of(2014, 6, 1), null)));
+            new Qualifier(CREATED, new DateRange(LocalDate.of(2014, 6, 1), null)));
 
         assertEquals(Parser.parse("a created:2014-06-01 .. 2013-03-15 b"),
+            new Conjunction(
                 new Conjunction(
-                        new Conjunction(
-                                new Qualifier(KEYWORD, "a"),
-                                new Qualifier(CREATED,
-                                    new DateRange(LocalDate.of(2014, 6, 1),
-                                        LocalDate.of(2013, 3, 15)))),
-                        new Qualifier(KEYWORD, "b"))
+                    new Qualifier(KEYWORD, "a"),
+                    new Qualifier(CREATED,
+                        new DateRange(LocalDate.of(2014, 6, 1),
+                            LocalDate.of(2013, 3, 15)))),
+                new Qualifier(KEYWORD, "b"))
         );
     }
 
     @Test
-    public void dateRangeUsage() {
+    public void encloses_dateRanges_correctEnclosure() {
 
         // date .. date
         DateRange dr = new DateRange(LocalDate.of(2014, 1, 1), LocalDate.of(2014, 6, 3));
@@ -292,85 +315,85 @@ public class FilterParserTests {
     }
 
     @Test
-    public void dateRangeOperators() {
+    public void parse_dateOperators_validAST() {
         assertEquals(Parser.parse("created:<2014-06-01"),
-                new Qualifier(CREATED, new DateRange(null, LocalDate.of(2014, 6, 1), true)));
+            new Qualifier(CREATED, new DateRange(null, LocalDate.of(2014, 6, 1), true)));
 
         assertEquals(Parser.parse("created : <= 2014-06-01"),
-                new Qualifier(CREATED, new DateRange(null, LocalDate.of(2014, 6, 1))));
+            new Qualifier(CREATED, new DateRange(null, LocalDate.of(2014, 6, 1))));
 
         assertEquals(Parser.parse("created : > 2014-06-01"),
-                new Qualifier(CREATED, new DateRange(LocalDate.of(2014, 6, 1), null, true)));
+            new Qualifier(CREATED, new DateRange(LocalDate.of(2014, 6, 1), null, true)));
 
         assertEquals(Parser.parse("created : >= 2014-06-01"),
-                new Qualifier(CREATED, new DateRange(LocalDate.of(2014, 6, 1), null)));
+            new Qualifier(CREATED, new DateRange(LocalDate.of(2014, 6, 1), null)));
 
         assertNotEquals(Parser.parse("created : <= 2014-06-01"),
-                new Qualifier(CREATED, new DateRange(LocalDate.of(2014, 6, 1), null)));
+            new Qualifier(CREATED, new DateRange(LocalDate.of(2014, 6, 1), null)));
     }
 
     @Test
-    public void dates() {
+    public void parse_dates_validAST() {
         assertEquals(Parser.parse("created   :   2014-6-1"),
-                new Qualifier(CREATED, LocalDate.of(2014, 6, 1)));
+            new Qualifier(CREATED, LocalDate.of(2014, 6, 1)));
 
         assertEquals(Parser.parse("created   :   2014-06-01"),
-                new Qualifier(CREATED, LocalDate.of(2014, 6, 1)));
+            new Qualifier(CREATED, LocalDate.of(2014, 6, 1)));
 
         assertEquals(Parser.parse("a created   :   2014-06-01 b"),
+            new Conjunction(
                 new Conjunction(
-                        new Conjunction(
-                                new Qualifier(KEYWORD, "a"),
-                                new Qualifier(CREATED, LocalDate.of(2014, 6, 1))),
-                        new Qualifier(KEYWORD, "b")));
+                    new Qualifier(KEYWORD, "a"),
+                    new Qualifier(CREATED, LocalDate.of(2014, 6, 1))),
+                new Qualifier(KEYWORD, "b")));
 
         assertNotEquals(new Qualifier(CREATED, LocalDate.of(2014, 6, 2)),
-                new Qualifier(CREATED, LocalDate.of(2014, 6, 1)));
+            new Qualifier(CREATED, LocalDate.of(2014, 6, 1)));
     }
 
     @Test
-    public void precedence() {
+    public void parse_precedence_correctAST() {
         assertEquals(Parser.parse("id:b OR id:d AND id:f"),
-                new Disjunction(
-                    new Qualifier(ID, "b"),
-                    new Conjunction(
-                        new Qualifier(ID, "d"),
-                        new Qualifier(ID, "f"))));
+            new Disjunction(
+                new Qualifier(ID, "b"),
+                new Conjunction(
+                    new Qualifier(ID, "d"),
+                    new Qualifier(ID, "f"))));
         assertEquals(Parser.parse("~id:b OR id:d AND id:f"),
-                new Disjunction(
-                    new Negation(
-                        new Qualifier(ID, "b")),
-                    new Conjunction(new Qualifier(ID, "d"), new Qualifier(ID, "f"))));
+            new Disjunction(
+                new Negation(
+                    new Qualifier(ID, "b")),
+                new Conjunction(new Qualifier(ID, "d"), new Qualifier(ID, "f"))));
 
         assertEquals(Parser.parse("id:b ~id:d"),
             new Conjunction(new Qualifier(ID, "b"), new Negation(new Qualifier(ID, "d"))));
     }
 
     @Test
-    public void grouping() {
+    public void parse_grouping_correctAST() {
         assertEquals(Parser.parse("(id:b OR id:d) AND id:f"),
-                new Conjunction(
-                    new Disjunction(
-                        new Qualifier(ID, "b"),
-                        new Qualifier(ID, "d")),
-                    new Qualifier(ID, "f")));
+            new Conjunction(
+                new Disjunction(
+                    new Qualifier(ID, "b"),
+                    new Qualifier(ID, "d")),
+                new Qualifier(ID, "f")));
         assertEquals(Parser.parse("(id:b OR id:d) id:f"),
-                new Conjunction(
+            new Conjunction(
+                new Disjunction(
+                    new Qualifier(ID, "b"),
+                    new Qualifier(ID, "d")),
+                new Qualifier(ID, "f")));
+        assertEquals(Parser.parse("id:f ~(id:b OR id:d)"),
+            new Conjunction(
+                new Qualifier(ID, "f"),
+                new Negation(
                     new Disjunction(
                         new Qualifier(ID, "b"),
-                        new Qualifier(ID, "d")),
-                    new Qualifier(ID, "f")));
-        assertEquals(Parser.parse("id:f ~(id:b OR id:d)"),
-                new Conjunction(
-                    new Qualifier(ID, "f"),
-                    new Negation(
-                        new Disjunction(
-                            new Qualifier(ID, "b"),
-                            new Qualifier(ID, "d")))));
+                        new Qualifier(ID, "d")))));
     }
 
     @Test
-    public void colon() {
+    public void parse_whitespaceAroundColons_validAST() {
         assertEquals(Parser.parse("assignee:darius"),
             new Qualifier(ASSIGNEE, "darius"));
         assertEquals(Parser.parse("assignee    :    darius   "),
@@ -384,7 +407,7 @@ public class FilterParserTests {
     }
 
     @Test
-    public void sortingKeys() {
+    public void parse_sortingKeys_validAST() {
         assertEquals(Parser.parse("sort:id"),
             new Qualifier(SORT, Arrays.asList(new SortKey("id", false))));
         assertEquals(Parser.parse("sort: id , repo "),
@@ -397,11 +420,11 @@ public class FilterParserTests {
         assertEquals(Parser.parse("sort:~id, NOT repo"),
             new Qualifier(SORT, Arrays.asList(new SortKey("id", true), new SortKey("repo", true))));
         assertNotEquals(Parser.parse("sort:~repo, NOT id"),
-                new Qualifier(SORT, Arrays.asList(new SortKey("id", true), new SortKey("repo", true))));
+            new Qualifier(SORT, Arrays.asList(new SortKey("id", true), new SortKey("repo", true))));
     }
 
     @Test
-    public void serialisation() {
+    public void parse_serialisation_idempotent() {
 
         String[] tests = {
             "", // Empty
@@ -444,5 +467,32 @@ public class FilterParserTests {
             assertEquals(a, b);
             assertEquals(a.hashCode(), b.hashCode());
         }
+    }
+
+
+    @Test
+    public void check_incompleteValidInputs_true() {
+
+        // Incomplete but valid inputs are accepted when the parser checks syntax
+        assertTrue(Parser.check(""));
+        assertTrue(Parser.check("id:"));
+        assertTrue(Parser.check("id: a ||"));
+        assertTrue(Parser.check("("));
+        assertTrue(Parser.check("id: a ("));
+    }
+
+    @Test
+    public void check_validInputs_true() {
+
+        // Valid inputs are still accepted
+        assertTrue(Parser.check("id:c && (id:a || id:b)"));
+    }
+
+    @Test
+    public void check_invalidInputs_false() {
+
+        // Ill-formed inputs are still rejected
+        assertFalse(Parser.check("id: id:"));
+        assertFalse(Parser.check("id: ("));
     }
 }

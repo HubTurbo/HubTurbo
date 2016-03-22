@@ -3,10 +3,11 @@ package util;
 public final class GitHubURL {
 
     public static final String LOGIN_PAGE = "https://github.com/login";
-    public static final String DOCS_PAGE =
-            "https://github.com/HubTurbo/HubTurbo/blob/release/docs/userGuide.md";
-    public static final String KEYBOARD_SHORTCUTS_PAGE =
-            "https://github.com/HubTurbo/HubTurbo/blob/release/docs/keyboardShortcuts.md";
+
+    private static final String RELEASE_BLOB_PREFIX = "https://github.com/HubTurbo/HubTurbo/blob/release/";
+    public static final String DOCS_PAGE = RELEASE_BLOB_PREFIX + "docs/userGuide.md";
+    public static final String FILTERS_PAGE = RELEASE_BLOB_PREFIX + "docs/filters.md";
+    public static final String KEYBOARD_SHORTCUTS_PAGE = RELEASE_BLOB_PREFIX + "docs/keyboardShortcuts.md";
 
     public static String getPathForAllIssues(String repoId) {
         return String.format("https://github.com/%s/issues", repoId);
