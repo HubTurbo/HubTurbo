@@ -155,6 +155,11 @@ pmd {
     ruleSets = []
 }
 
+// Ask Gradle not to pass additional auxclasspath parameter to PMD until PMD fixes its false positives
+tasks.withType(Pmd) {
+    classpath = null
+}
+
 task jacocoRootReport(type: JacocoReport) {
     dependsOn = allprojects.test
     sourceDirectories = files(allprojects.sourceSets.main.allSource.srcDirs)

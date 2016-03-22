@@ -37,9 +37,7 @@
     <exclude name="UncommentedEmptyMethodBody" />
   </rule>
 
-  <rule ref="rulesets/java/unusedcode.xml">
-    <exclude name="UnusedPrivateMethod" />
-  </rule>
+  <rule ref="rulesets/java/unusedcode.xml" />
 
   <exclude-pattern>.*/guitests/.*</exclude-pattern>
   <exclude-pattern>.*/tests/.*</exclude-pattern>
