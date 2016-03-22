@@ -33,19 +33,19 @@ public class FilterParserTests {
     @Test
     public void parse_basicExamples_validAST() {
         assertEquals(Parser.parse("a(b)"),
-            new Conjunction(new Qualifier(KEYWORD, "a"), new Qualifier(KEYWORD, "b")));
+                new Conjunction(new Qualifier(KEYWORD, "a"), new Qualifier(KEYWORD, "b")));
         assertEquals(Parser.parse("    a   (   b   )   "),
-            new Conjunction(new Qualifier(KEYWORD, "a"), new Qualifier(KEYWORD, "b")));
+                new Conjunction(new Qualifier(KEYWORD, "a"), new Qualifier(KEYWORD, "b")));
         assertEquals(Parser.parse("a(b c)"),
-            new Conjunction(
-                new Qualifier(KEYWORD, "a"),
-                new Conjunction(new Qualifier(KEYWORD, "b"), new Qualifier(KEYWORD, "c"))));
-        assertEquals(Parser.parse("c a(b)"),
-            new Conjunction(
                 new Conjunction(
-                    new Qualifier(KEYWORD, "c"),
-                    new Qualifier(KEYWORD, "a")),
-                new Qualifier(KEYWORD, "b")));
+                        new Qualifier(KEYWORD, "a"),
+                        new Conjunction(new Qualifier(KEYWORD, "b"), new Qualifier(KEYWORD, "c"))));
+        assertEquals(Parser.parse("c a(b)"),
+                new Conjunction(
+                        new Conjunction(
+                                new Qualifier(KEYWORD, "c"),
+                                new Qualifier(KEYWORD, "a")),
+                        new Qualifier(KEYWORD, "b")));
         assertNotEquals(new Qualifier(EMPTY, ""), null);
         assertNotEquals(new Qualifier(EMPTY, ""), "null");
         assertNotEquals(new Qualifier(KEYWORD, "a"), new Qualifier(KEYWORD, "b"));
@@ -137,33 +137,33 @@ public class FilterParserTests {
     @Test
     public void parse_disjunction_validAST() {
         assertEquals(Parser.parse("id:b OR id:d"),
-            new Disjunction(new Qualifier(ID, "b"), new Qualifier(ID, "d")));
+                new Disjunction(new Qualifier(ID, "b"), new Qualifier(ID, "d")));
         assertEquals(Parser.parse("id:b | id:d"),
-            new Disjunction(new Qualifier(ID, "b"), new Qualifier(ID, "d")));
+                new Disjunction(new Qualifier(ID, "b"), new Qualifier(ID, "d")));
         assertEquals(Parser.parse("id:b || id:d"),
-            new Disjunction(new Qualifier(ID, "b"), new Qualifier(ID, "d")));
+                new Disjunction(new Qualifier(ID, "b"), new Qualifier(ID, "d")));
     }
 
     @Test
     public void parse_conjunction_validAST() {
         assertEquals(Parser.parse("id:b id:d"),
-            new Conjunction(new Qualifier(ID, "b"), new Qualifier(ID, "d")));
+                new Conjunction(new Qualifier(ID, "b"), new Qualifier(ID, "d")));
         assertEquals(Parser.parse("id:b AND id:d"),
-            new Conjunction(new Qualifier(ID, "b"), new Qualifier(ID, "d")));
+                new Conjunction(new Qualifier(ID, "b"), new Qualifier(ID, "d")));
         assertEquals(Parser.parse("id:b & id:d"),
-            new Conjunction(new Qualifier(ID, "b"), new Qualifier(ID, "d")));
+                new Conjunction(new Qualifier(ID, "b"), new Qualifier(ID, "d")));
         assertEquals(Parser.parse("id:b && id:d"),
-            new Conjunction(new Qualifier(ID, "b"), new Qualifier(ID, "d")));
+                new Conjunction(new Qualifier(ID, "b"), new Qualifier(ID, "d")));
     }
 
     @Test
     public void parse_negation_validAST() {
         assertEquals(Parser.parse("!id:b"),
-            new Negation(new Qualifier(ID, "b")));
+                new Negation(new Qualifier(ID, "b")));
         assertEquals(Parser.parse("-id:b"),
-            new Negation(new Qualifier(ID, "b")));
+                new Negation(new Qualifier(ID, "b")));
         assertEquals(Parser.parse("~id:b"),
-            new Negation(new Qualifier(ID, "b")));
+                new Negation(new Qualifier(ID, "b")));
     }
 
     @Test
@@ -193,30 +193,30 @@ public class FilterParserTests {
     @Test
     public void parse_implicitConjunction_correctAST() {
         assertEquals(Parser.parse("milestone:0.4 state:open OR label:urgent"),
-            new Disjunction(
-                new Conjunction(
-                    new Qualifier(MILESTONE, "0.4"),
-                    new Qualifier(STATE, "open")),
-                new Qualifier(LABEL, "urgent")));
+                new Disjunction(
+                        new Conjunction(
+                                new Qualifier(MILESTONE, "0.4"),
+                                new Qualifier(STATE, "open")),
+                        new Qualifier(LABEL, "urgent")));
         assertEquals(Parser.parse("milestone:0.4 state:open OR label:urgent"),
-            Parser.parse("milestone:0.4 AND state:open OR label:urgent"));
+                Parser.parse("milestone:0.4 AND state:open OR label:urgent"));
     }
 
     @Test
     public void parse_associativity_correctAST() {
         assertEquals(Parser.parse("id:b OR id:d OR id:f"),
-            new Disjunction(
                 new Disjunction(
-                    new Qualifier(ID, "b"),
-                    new Qualifier(ID, "d")),
-                new Qualifier(ID, "f")));
+                        new Disjunction(
+                                new Qualifier(ID, "b"),
+                                new Qualifier(ID, "d")),
+                        new Qualifier(ID, "f")));
 
         assertEquals(Parser.parse("id:b AND id:d AND id:f"),
-            new Conjunction(
                 new Conjunction(
-                    new Qualifier(ID, "b"),
-                    new Qualifier(ID, "d")),
-                new Qualifier(ID, "f")));
+                        new Conjunction(
+                                new Qualifier(ID, "b"),
+                                new Qualifier(ID, "d")),
+                        new Qualifier(ID, "f")));
     }
 
     @Test
@@ -253,19 +253,19 @@ public class FilterParserTests {
     @Test
     public void parse_dateRanges_validAST() {
         assertEquals(Parser.parse("created:2014-06-01 .. 2013-03-15"),
-            new Qualifier(CREATED, new DateRange(LocalDate.of(2014, 6, 1), LocalDate.of(2013, 3, 15))));
+                new Qualifier(CREATED, new DateRange(LocalDate.of(2014, 6, 1), LocalDate.of(2013, 3, 15))));
 
         assertEquals(Parser.parse("created:2014-06-01 .. *"),
-            new Qualifier(CREATED, new DateRange(LocalDate.of(2014, 6, 1), null)));
+                new Qualifier(CREATED, new DateRange(LocalDate.of(2014, 6, 1), null)));
 
         assertEquals(Parser.parse("a created:2014-06-01 .. 2013-03-15 b"),
-            new Conjunction(
                 new Conjunction(
-                    new Qualifier(KEYWORD, "a"),
-                    new Qualifier(CREATED,
-                        new DateRange(LocalDate.of(2014, 6, 1),
-                            LocalDate.of(2013, 3, 15)))),
-                new Qualifier(KEYWORD, "b"))
+                        new Conjunction(
+                                new Qualifier(KEYWORD, "a"),
+                                new Qualifier(CREATED,
+                                        new DateRange(LocalDate.of(2014, 6, 1),
+                                                LocalDate.of(2013, 3, 15)))),
+                        new Qualifier(KEYWORD, "b"))
         );
     }
 
@@ -354,71 +354,71 @@ public class FilterParserTests {
     @Test
     public void parse_precedence_correctAST() {
         assertEquals(Parser.parse("id:b OR id:d AND id:f"),
-            new Disjunction(
-                new Qualifier(ID, "b"),
-                new Conjunction(
-                    new Qualifier(ID, "d"),
-                    new Qualifier(ID, "f"))));
+                new Disjunction(
+                        new Qualifier(ID, "b"),
+                        new Conjunction(
+                                new Qualifier(ID, "d"),
+                                new Qualifier(ID, "f"))));
         assertEquals(Parser.parse("~id:b OR id:d AND id:f"),
-            new Disjunction(
-                new Negation(
-                    new Qualifier(ID, "b")),
-                new Conjunction(new Qualifier(ID, "d"), new Qualifier(ID, "f"))));
+                new Disjunction(
+                        new Negation(
+                                new Qualifier(ID, "b")),
+                        new Conjunction(new Qualifier(ID, "d"), new Qualifier(ID, "f"))));
 
         assertEquals(Parser.parse("id:b ~id:d"),
-            new Conjunction(new Qualifier(ID, "b"), new Negation(new Qualifier(ID, "d"))));
+                new Conjunction(new Qualifier(ID, "b"), new Negation(new Qualifier(ID, "d"))));
     }
 
     @Test
     public void parse_grouping_correctAST() {
         assertEquals(Parser.parse("(id:b OR id:d) AND id:f"),
-            new Conjunction(
-                new Disjunction(
-                    new Qualifier(ID, "b"),
-                    new Qualifier(ID, "d")),
-                new Qualifier(ID, "f")));
+                new Conjunction(
+                        new Disjunction(
+                                new Qualifier(ID, "b"),
+                                new Qualifier(ID, "d")),
+                        new Qualifier(ID, "f")));
         assertEquals(Parser.parse("(id:b OR id:d) id:f"),
-            new Conjunction(
-                new Disjunction(
-                    new Qualifier(ID, "b"),
-                    new Qualifier(ID, "d")),
-                new Qualifier(ID, "f")));
+                new Conjunction(
+                        new Disjunction(
+                                new Qualifier(ID, "b"),
+                                new Qualifier(ID, "d")),
+                        new Qualifier(ID, "f")));
         assertEquals(Parser.parse("id:f ~(id:b OR id:d)"),
-            new Conjunction(
-                new Qualifier(ID, "f"),
-                new Negation(
-                    new Disjunction(
-                        new Qualifier(ID, "b"),
-                        new Qualifier(ID, "d")))));
+                new Conjunction(
+                        new Qualifier(ID, "f"),
+                        new Negation(
+                                new Disjunction(
+                                        new Qualifier(ID, "b"),
+                                        new Qualifier(ID, "d")))));
     }
 
     @Test
     public void parse_whitespaceAroundColons_validAST() {
         assertEquals(Parser.parse("assignee:darius"),
-            new Qualifier(ASSIGNEE, "darius"));
+                new Qualifier(ASSIGNEE, "darius"));
         assertEquals(Parser.parse("assignee    :    darius   "),
-            new Qualifier(ASSIGNEE, "darius"));
+                new Qualifier(ASSIGNEE, "darius"));
         assertEquals(Parser.parse("assignee:dar ius(one)"),
-            new Conjunction(
                 new Conjunction(
-                    new Qualifier(ASSIGNEE, "dar"),
-                    new Qualifier(KEYWORD, "ius")),
-                new Qualifier(KEYWORD, "one")));
+                        new Conjunction(
+                                new Qualifier(ASSIGNEE, "dar"),
+                                new Qualifier(KEYWORD, "ius")),
+                        new Qualifier(KEYWORD, "one")));
     }
 
     @Test
     public void parse_sortingKeys_validAST() {
         assertEquals(Parser.parse("sort:id"),
-            new Qualifier(SORT, Arrays.asList(new SortKey("id", false))));
+                new Qualifier(SORT, Arrays.asList(new SortKey("id", false))));
         assertEquals(Parser.parse("sort: id , repo "),
-            new Qualifier(SORT, Arrays.asList(new SortKey("id", false), new SortKey("repo", false))));
+                new Qualifier(SORT, Arrays.asList(new SortKey("id", false), new SortKey("repo", false))));
 
         assertEquals(Parser.parse("sort:-id"),
-            new Qualifier(SORT, Arrays.asList(new SortKey("id", true))));
+                new Qualifier(SORT, Arrays.asList(new SortKey("id", true))));
         assertEquals(Parser.parse("sort:id, ~repo"),
-            new Qualifier(SORT, Arrays.asList(new SortKey("id", false), new SortKey("repo", true))));
+                new Qualifier(SORT, Arrays.asList(new SortKey("id", false), new SortKey("repo", true))));
         assertEquals(Parser.parse("sort:~id, NOT repo"),
-            new Qualifier(SORT, Arrays.asList(new SortKey("id", true), new SortKey("repo", true))));
+                new Qualifier(SORT, Arrays.asList(new SortKey("id", true), new SortKey("repo", true))));
         assertNotEquals(Parser.parse("sort:~repo, NOT id"),
             new Qualifier(SORT, Arrays.asList(new SortKey("id", true), new SortKey("repo", true))));
     }

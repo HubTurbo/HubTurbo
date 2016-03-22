@@ -6,6 +6,7 @@ import filter.Parser;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
 import org.junit.Test;
+
 import static org.junit.Assert.*;
 
 import backend.interfaces.IModel;
@@ -59,7 +60,7 @@ public class MilestoneAliasTests {
         msCurrPlus3.setDueDate(Optional.empty());
 
         model = createIModelFromTurboMilestones(msCurrMin3, msCurrMin2, msCurrMin1,
-                                        msCurr, msCurrPlus1, msCurrPlus2, msCurrPlus3);
+                msCurr, msCurrPlus1, msCurrPlus2, msCurrPlus3);
 
         FilterExpression noMilestoneAlias;
         List<Qualifier> milestoneQualifiers;

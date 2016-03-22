@@ -59,15 +59,15 @@ public class GitHubRepo implements Repo {
 
     @Override
     public ImmutableTriple<List<TurboIssue>, String, Date> getUpdatedIssues(String repoId,
-                                                                            String eTag, Date lastCheckTime) {
+            String eTag, Date lastCheckTime) {
 
         IssueUpdateService issueUpdateService = new IssueUpdateService(client, eTag, lastCheckTime);
         List<Issue> updatedItems = issueUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
         List<TurboIssue> items = updatedItems.stream()
-            .map(i -> new TurboIssue(repoId, i))
-            .collect(Collectors.toList());
+                .map(i -> new TurboIssue(repoId, i))
+                .collect(Collectors.toList());
         return new ImmutableTriple<>(items, issueUpdateService.getUpdatedETags(),
-            issueUpdateService.getUpdatedCheckTime());
+                issueUpdateService.getUpdatedCheckTime());
     }
 
     @Override
@@ -92,24 +92,24 @@ public class GitHubRepo implements Repo {
     }
 
     private <TR, R, S extends UpdateService<R>> ImmutablePair<List<TR>, String> getUpdatedResource(
-        String repoId, String eTag, BiFunction<GitHubClientEx, String, S> constructService,
-        BiFunction<String, R, TR> resourceConstructor) {
+            String repoId, String eTag, BiFunction<GitHubClientEx, String, S> constructService,
+            BiFunction<String, R, TR> resourceConstructor) {
 
         S updateService = constructService.apply(client, eTag);
         List<R> updatedItems = updateService.getUpdatedItems(RepositoryId.createFromId(repoId));
         List<TR> items = updatedItems.stream()
-            .map(i -> resourceConstructor.apply(repoId, i))
-            .collect(Collectors.toList());
+                .map(i -> resourceConstructor.apply(repoId, i))
+                .collect(Collectors.toList());
         return new ImmutablePair<>(items,
-            updateService.getUpdatedETags());
+                updateService.getUpdatedETags());
     }
 
     @Override
     public List<TurboLabel> getLabels(String repoId) {
         try {
             return labelService.getLabels(RepositoryId.createFromId(repoId)).stream()
-                .map(l -> new TurboLabel(repoId, l))
-                .collect(Collectors.toList());
+                    .map(l -> new TurboLabel(repoId, l))
+                    .collect(Collectors.toList());
         } catch (IOException e) {
             HTLog.error(logger, e);
             return new ArrayList<>();
@@ -120,8 +120,8 @@ public class GitHubRepo implements Repo {
     public List<TurboMilestone> getMilestones(String repoId) {
         try {
             return milestoneService.getMilestones(RepositoryId.createFromId(repoId), "all").stream()
-                .map(m -> new TurboMilestone(repoId, m))
-                .collect(Collectors.toList());
+                    .map(m -> new TurboMilestone(repoId, m))
+                    .collect(Collectors.toList());
         } catch (IOException e) {
             HTLog.error(logger, e);
             return new ArrayList<>();
@@ -132,12 +132,12 @@ public class GitHubRepo implements Repo {
     public List<TurboUser> getCollaborators(String repoId) {
         try {
             return collaboratorService.getCollaborators(RepositoryId.createFromId(repoId)).stream()
-                .map(u -> new TurboUser(repoId, u))
-                .collect(Collectors.toList());
+                    .map(u -> new TurboUser(repoId, u))
+                    .collect(Collectors.toList());
         } catch (RequestException e) {
             if (e.getStatus() == 403) {
                 logger.info(HTLog.format(repoId, "Unable to get collaborators: "
-                    + e.getLocalizedMessage()));
+                        + e.getLocalizedMessage()));
             } else {
                 HTLog.error(logger, e);
             }
@@ -153,8 +153,8 @@ public class GitHubRepo implements Repo {
         filters.put(IssueService.FIELD_FILTER, "all");
         filters.put(IssueService.FILTER_STATE, "all");
         return getAll(issueService.pageIssues(RepositoryId.createFromId(repoId), filters), repoId).stream()
-            .map(i -> new TurboIssue(repoId, i))
-            .collect(Collectors.toList());
+                .map(i -> new TurboIssue(repoId, i))
+                .collect(Collectors.toList());
     }
 
     private List<Issue> getAll(PageIterator<Issue> iterator, String repoId) {
@@ -183,7 +183,7 @@ public class GitHubRepo implements Repo {
                 float progress = (float) elements.size() / (float) totalIssueCount;
                 UI.events.triggerEvent(new UpdateProgressEvent(repoId, progress));
                 logger.info(HTLog.format(repoId, "Loaded %d issues (%.0f%% done)",
-                    elements.size(), progress * 100));
+                        elements.size(), progress * 100));
             }
             UI.events.triggerEvent(new UpdateProgressEvent(repoId));
         } catch (NoSuchPageException pageException) {
@@ -198,8 +198,8 @@ public class GitHubRepo implements Repo {
 
     @Override
     public ImmutablePair<List<TurboIssueEvent>, String> getUpdatedEvents(String repoId,
-                                                                         int issueId,
-                                                                         String currentETag) {
+            int issueId,
+            String currentETag) {
         try {
             GitHubEventsResponse eventsResponse = issueService.getIssueEvents(
                     RepositoryId.createFromId(repoId), issueId, currentETag);
@@ -224,7 +224,7 @@ public class GitHubRepo implements Repo {
     public List<ReviewComment> getReviewComments(String repoId, int pullRequestId) {
         try {
             return pullRequestService.getReviewComments(RepositoryId.createFromId(repoId),
-                                                        pullRequestId);
+                    pullRequestId);
         } catch (IOException e) {
             HTLog.error(logger, e);
             return new ArrayList<>();
@@ -234,6 +234,7 @@ public class GitHubRepo implements Repo {
     /**
      * Get all types of comments for an issue. Review comments and commit comments
      * are only relevant if the issue is a also pull request
+     *
      * @param repoId
      * @param issue
      * @return list of comments for an issue

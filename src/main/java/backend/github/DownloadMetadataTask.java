@@ -23,7 +23,7 @@ public class DownloadMetadataTask extends GitHubRepoTask<Map<Integer, IssueMetad
     private final List<TurboIssue> issuesToUpdate;
 
     public DownloadMetadataTask(TaskRunner taskRunner, Repo repo, String repoId,
-                                List<TurboIssue> issuesToUpdate) {
+            List<TurboIssue> issuesToUpdate) {
         super(taskRunner, repo);
         this.repoId = repoId;
         this.issuesToUpdate = issuesToUpdate;
@@ -50,8 +50,9 @@ public class DownloadMetadataTask extends GitHubRepoTask<Map<Integer, IssueMetad
         });
 
         logger.info(HTLog.format(repoId, "Downloaded " + result.entrySet().stream()
-            .map(entry -> "(" + entry.getValue().summarise() + ") for #" + entry.getKey())
-            .collect(Collectors.joining(", "))));
+                .map(entry -> "(" + entry.getValue().summarise() + ") " +
+                        "for #" + entry.getKey())
+                .collect(Collectors.joining(", "))));
 
         response.complete(result);
     }

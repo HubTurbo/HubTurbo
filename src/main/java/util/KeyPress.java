@@ -11,8 +11,8 @@ public final class KeyPress {
     public static boolean isDoublePress(KeyCode matchingKeyCode, KeyCode currentKeyCode) {
         long keyEventTime = System.currentTimeMillis();
         if ((keyEventTime - lastKeyEventTime) < keyPressSpeed
-            && currentKeyCode.equals(lastKeyPressedCode)
-            && currentKeyCode.equals(matchingKeyCode)) {
+                && currentKeyCode.equals(lastKeyPressedCode)
+                && currentKeyCode.equals(matchingKeyCode)) {
             lastKeyPressedCode = null;
             lastKeyEventTime = 0;
             return true;
@@ -42,5 +42,6 @@ public final class KeyPress {
 
     }
 
-    private KeyPress() {}
+    private KeyPress() {
+    }
 }

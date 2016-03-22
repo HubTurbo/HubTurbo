@@ -22,7 +22,7 @@ public class FilterTextFieldTest extends UITest {
     @Override
     public void launchApp() {
         FXTestUtils.launchApp(
-            TestUI.class, "--test=true", "--bypasslogin=true", "--testchromedriver=true");
+                TestUI.class, "--test=true", "--bypasslogin=true", "--testchromedriver=true");
     }
 
     @Test
@@ -139,7 +139,7 @@ public class FilterTextFieldTest extends UITest {
     }
 
     @Test
-    public void filterTextFieldColor_validFilter_validFilterStyleApplied(){
+    public void filterTextFieldColor_validFilter_validFilterStyleApplied() {
         testValidFilterStyleApplied("is:open");
         testValidFilterStyleApplied("-is:open");
         testValidFilterStyleApplied("hello");
@@ -148,7 +148,7 @@ public class FilterTextFieldTest extends UITest {
     }
 
     @Test
-    public void filterTextFieldColor_invalidFilter_invalidFilterStyleApplied(){
+    public void filterTextFieldColor_invalidFilter_invalidFilterStyleApplied() {
 
         // Tests if parse errors apply invalid filter style
         testInvalidFilterStyleApplied("is: is:");

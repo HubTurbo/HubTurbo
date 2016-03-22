@@ -177,7 +177,7 @@ public class TurboIssueTests {
                 10, () -> LogicTests.createIssueWithLabels(1, newLabels));
 
         List<TurboIssue> updatedList = TurboIssue.reconcile(Arrays.asList(originalIssue),
-                                                            Arrays.asList(updatedIssue));
+                Arrays.asList(updatedIssue));
         assertEquals(newLabels, updatedList.get(0).getLabels());
     }
 
@@ -193,7 +193,7 @@ public class TurboIssueTests {
                 10, () -> LogicTests.createIssueWithLabels(1, originalLabels));
 
         List<TurboIssue> updatedList = TurboIssue.reconcile(Arrays.asList(originalIssue),
-                                                            Arrays.asList(updatedIssue));
+                Arrays.asList(updatedIssue));
         assertEquals(originalLabels, updatedList.get(0).getLabels());
     }
 }

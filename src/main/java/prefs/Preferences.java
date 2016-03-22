@@ -10,7 +10,7 @@ import java.util.Optional;
 
 /**
  * Represents persistent user configuration. Maps to a file on disk.
- *
+ * <p>
  * Overrides PMD's recommendation that this class should be final.
  * It cannot be as we need to mock it.
  */
@@ -85,11 +85,11 @@ public class Preferences { // NOPMD
     public List<String> getPanelNames() {
         return global.getPanelNames();
     }
-    
+
     public List<PanelInfo> getPanelInfo() {
         return global.getPanelInfo();
     }
-    
+
     public void setPanelInfo(List<PanelInfo> panelInfo) {
         global.setPanelInfo(panelInfo);
     }
@@ -118,31 +118,31 @@ public class Preferences { // NOPMD
     public void removeBoard(String name) {
         global.removeBoard(name);
     }
-    
+
     public void setLastOpenBoard(String board) {
         global.setLastOpenBoard(board);
     }
-    
+
     public Optional<String> getLastOpenBoard() {
         return global.getLastOpenBoard();
     }
-    
+
     public Optional<String> switchBoard() {
         if (getLastOpenBoard().isPresent() && getAllBoards().size() > 1) {
             List<String> boardNames = getAllBoardNames();
             int lastBoard = boardNames.indexOf(getLastOpenBoard().get());
             int index = (lastBoard + 1) % boardNames.size();
-            
+
             setLastOpenBoard(boardNames.get(index));
         }
-        
+
         return getLastOpenBoard();
     }
-    
+
     public void clearLastOpenBoard() {
         global.clearLastOpenBoard();
     }
-    
+
     public List<PanelInfo> getBoardPanels(String board) {
         return global.getBoardPanels(board);
     }

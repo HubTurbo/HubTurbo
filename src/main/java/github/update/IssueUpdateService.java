@@ -18,12 +18,12 @@ public class IssueUpdateService extends UpdateService<Issue> {
 
     private final Date lastIssueCheckTime;
 
-    public IssueUpdateService(GitHubClientEx client, String issuesETag, Date lastIssueCheckTime){
+    public IssueUpdateService(GitHubClientEx client, String issuesETag, Date lastIssueCheckTime) {
         super(client, SEGMENT_ISSUES, issuesETag);
         this.lastIssueCheckTime = new Date(lastIssueCheckTime.getTime());
     }
 
-    private Map<String, String> createUpdatedIssuesParams(){
+    private Map<String, String> createUpdatedIssuesParams() {
         Map<String, String> params = new HashMap<>();
         params.put("since", Utility.formatDateISO8601(lastIssueCheckTime));
         params.put("state", "all");
@@ -31,11 +31,13 @@ public class IssueUpdateService extends UpdateService<Issue> {
     }
 
     @Override
-    protected PagedRequest<Issue> createUpdatedRequest(IRepositoryIdProvider repoId){
+    protected PagedRequest<Issue> createUpdatedRequest(IRepositoryIdProvider repoId) {
         PagedRequest<Issue> request = super.createUpdatedRequest(repoId);
         request.setParams(createUpdatedIssuesParams());
-        request.setType(new TypeToken<Issue>(){}.getType());
-        request.setArrayType(new TypeToken<ArrayList<Issue>>(){}.getType());
+        request.setType(new TypeToken<Issue>() {
+        }.getType());
+        request.setArrayType(new TypeToken<ArrayList<Issue>>() {
+        }.getType());
         return request;
     }
 }

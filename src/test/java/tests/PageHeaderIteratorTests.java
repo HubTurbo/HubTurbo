@@ -26,6 +26,7 @@ public class PageHeaderIteratorTests {
     /**
      * Tests that PageHeaderIterator throws a NoSuchElement exception when its next
      * method is called with a initial request to an non-existent repository
+     *
      * @throws NoSuchElementException
      */
     @Test(expected = NoSuchElementException.class)
@@ -50,6 +51,7 @@ public class PageHeaderIteratorTests {
     /**
      * Tests that a PageHeaderIterator correctly retrieves ETag headers for 3 pages from
      * a mocked server that conform to GitHub API's pagination specifications and terminates afterwards.
+     *
      * @throws NoSuchElementException
      */
     @Test
@@ -68,7 +70,8 @@ public class PageHeaderIteratorTests {
 
         HttpRequest page3Request = createMockServerPagedHeaderRequest(3);
         List<Header> page3Headers = TestUtils.parseHeaderRecord(
-                TestUtils.readFileFromResource(this, "tests/PagedHeadersSample/page3-header.txt"));
+                TestUtils.readFileFromResource(this, "tests/PagedHeadersSample/page3-header.txt")
+        );
         String page3Etag = "a6f367d674155d6fbbacbc2fca04917b";
 
         setUpHeadRequestOnMockServer(mockServer, page1Request, page1Headers);
@@ -102,8 +105,6 @@ public class PageHeaderIteratorTests {
     private void setUpHeadRequestOnMockServer(MockServerClient mockServer, HttpRequest request, List<Header> headers) {
         mockServer
                 .when(request)
-                .respond(
-                        response().withHeaders(headers)
-                );
+                .respond(response().withHeaders(headers));
     }
 }

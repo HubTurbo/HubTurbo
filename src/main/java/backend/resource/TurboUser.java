@@ -1,6 +1,7 @@
 package backend.resource;
 
 import static util.Utility.replaceNull;
+
 import javafx.scene.image.Image;
 
 import org.eclipse.egit.github.core.User;
@@ -10,21 +11,18 @@ import backend.resource.serialization.SerializableUser;
 @SuppressWarnings("unused")
 public class TurboUser {
 
-    private void ______SERIALIZED_FIELDS______() {
-    }
+    private void ______SERIALIZED_FIELDS______() {}
 
     private final String loginName;
     private final String realName;
     private final String avatarURL;
 
-    private void ______TRANSIENT_FIELDS______() {
-    }
+    private void ______TRANSIENT_FIELDS______() {}
 
     private final String repoId;
     private transient Image avatar = null;
 
-    private void ______CONSTRUCTORS______() {
-    }
+    private void ______CONSTRUCTORS______() {}
 
     /**
      * Default constructor.
@@ -71,8 +69,7 @@ public class TurboUser {
         this.repoId = replaceNull(repoId, "");
     }
 
-    private void ______METHODS______() {
-    }
+    private void ______METHODS______() {}
 
     @Override
     public String toString() {
@@ -83,15 +80,16 @@ public class TurboUser {
         return this.avatar;
     }
 
-    private void ______BOILERPLATE______() {
-    }
+    private void ______BOILERPLATE______() {}
 
     public String getRepoId() {
         return repoId;
     }
+
     public String getRealName() {
         return realName;
     }
+
     public String getLoginName() {
         return loginName;
     }
@@ -110,8 +108,8 @@ public class TurboUser {
         if (o == null || getClass() != o.getClass()) return false;
         TurboUser that = (TurboUser) o;
         return loginName.equals(that.loginName) &&
-               realName.equals(that.realName) &&
-               avatarURL.equals(that.avatarURL);
+                realName.equals(that.realName) &&
+                avatarURL.equals(that.avatarURL);
     }
 
     @Override

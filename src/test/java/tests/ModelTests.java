@@ -32,10 +32,10 @@ public class ModelTests {
 
         // Explicit declaration of empty signature
         modelEmptySig2 = new Model(REPO,
-            dummy.getIssues(REPO),
-            dummy.getLabels(REPO),
-            dummy.getMilestones(REPO),
-            dummy.getCollaborators(REPO));
+                dummy.getIssues(REPO),
+                dummy.getLabels(REPO),
+                dummy.getMilestones(REPO),
+                dummy.getCollaborators(REPO));
 
         modelUpdated = new Model(REPO,
                 dummy.getIssues(REPO),
@@ -92,35 +92,35 @@ public class ModelTests {
         assertNotEquals(modelEmptySig.hashCode(), modelUpdated.hashCode());
 
         Model model = new Model("something", modelUpdated.getIssues(), modelUpdated.getLabels(),
-            modelUpdated.getMilestones(), modelUpdated.getUsers(), modelUpdated.getUpdateSignature());
+                modelUpdated.getMilestones(), modelUpdated.getUsers(), modelUpdated.getUpdateSignature());
         assertNotEquals(model.hashCode(), modelUpdated.hashCode());
         assertNotEquals(model, modelUpdated);
 
         List<TurboIssue> issues = new ArrayList<>(modelUpdated.getIssues());
         issues.add(new TurboIssue(REPO, 11, "something"));
         model = new Model(REPO, issues, modelUpdated.getLabels(),
-            modelUpdated.getMilestones(), modelUpdated.getUsers(), modelUpdated.getUpdateSignature());
+                modelUpdated.getMilestones(), modelUpdated.getUsers(), modelUpdated.getUpdateSignature());
         assertNotEquals(model.hashCode(), modelUpdated.hashCode());
         assertNotEquals(model, modelUpdated);
 
         List<TurboLabel> labels = new ArrayList<>(modelUpdated.getLabels());
         labels.add(new TurboLabel(REPO, "Label 11"));
         model = new Model(REPO, modelUpdated.getIssues(), labels,
-            modelUpdated.getMilestones(), modelUpdated.getUsers(), modelUpdated.getUpdateSignature());
+                modelUpdated.getMilestones(), modelUpdated.getUsers(), modelUpdated.getUpdateSignature());
         assertNotEquals(model.hashCode(), modelUpdated.hashCode());
         assertNotEquals(model, modelUpdated);
 
         List<TurboMilestone> milestones = new ArrayList<>(modelUpdated.getMilestones());
         milestones.add(new TurboMilestone(REPO, 11, "something"));
         model = new Model(REPO, modelUpdated.getIssues(), modelUpdated.getLabels(),
-            milestones, modelUpdated.getUsers(), modelUpdated.getUpdateSignature());
+                milestones, modelUpdated.getUsers(), modelUpdated.getUpdateSignature());
         assertNotEquals(model.hashCode(), modelUpdated.hashCode());
         assertNotEquals(model, modelUpdated);
 
         List<TurboUser> users = new ArrayList<>(modelUpdated.getUsers());
         users.add(new TurboUser(REPO, "someone"));
         model = new Model(REPO, modelUpdated.getIssues(), modelUpdated.getLabels(),
-            modelUpdated.getMilestones(), users, modelUpdated.getUpdateSignature());
+                modelUpdated.getMilestones(), users, modelUpdated.getUpdateSignature());
         assertNotEquals(model.hashCode(), modelUpdated.hashCode());
         assertNotEquals(model, modelUpdated);
     }
@@ -188,7 +188,7 @@ public class ModelTests {
             assertEquals(milestoneIds.get(milestoneCount - 1).intValue(),
                     modelUpdated.getMilestoneById(milestoneCount).get().getId());
             assertEquals("Milestone " + milestoneCount,
-                modelUpdated.getMilestoneByTitle("Milestone " + milestoneCount).get().getTitle());
+                    modelUpdated.getMilestoneByTitle("Milestone " + milestoneCount).get().getTitle());
             milestoneCount++;
         }
 
@@ -202,7 +202,7 @@ public class ModelTests {
         for (TurboUser user : modelUpdated.getUsers()) {
             assertEquals(userLogins.get(userCount - 1), user.getLoginName());
             assertEquals("User " + userCount,
-                modelUpdated.getUserByLogin("User " + userCount).get().getLoginName());
+                    modelUpdated.getUserByLogin("User " + userCount).get().getLoginName());
             userCount++;
         }
     }
@@ -214,10 +214,12 @@ public class ModelTests {
 
         try {
             modelUpdated.getIssueById(0);
-        } catch (AssertionError ignored) {}
+        } catch (AssertionError ignored) {
+        }
         try {
             modelUpdated.getIssueById(-1);
-        } catch (AssertionError ignored) {}
+        } catch (AssertionError ignored) {
+        }
 
         assertEquals(Optional.<TurboIssue>empty(), modelUpdated.getIssueById(DummyRepoState.NO_OF_DUMMY_ISSUES + 1));
         assertEquals("Issue 10", modelUpdated.getIssueById(10).get().getTitle());
@@ -226,10 +228,12 @@ public class ModelTests {
 
         try {
             modelUpdated.getLabelByActualName(null);
-        } catch (AssertionError ignored) {}
+        } catch (AssertionError ignored) {
+        }
         try {
             modelUpdated.getLabelByActualName("");
-        } catch (AssertionError ignored) {}
+        } catch (AssertionError ignored) {
+        }
 
         assertEquals(Optional.<TurboLabel>empty(),
                 modelUpdated.getLabelByActualName("Label " + (DummyRepoState.NO_OF_DUMMY_ISSUES + 1)));
@@ -239,18 +243,22 @@ public class ModelTests {
 
         try {
             modelUpdated.getMilestoneById(-1);
-        } catch (AssertionError ignored) {}
+        } catch (AssertionError ignored) {
+        }
         try {
             modelUpdated.getMilestoneById(0);
-        } catch (AssertionError ignored) {}
+        } catch (AssertionError ignored) {
+        }
 
 
         try {
             modelUpdated.getMilestoneByTitle(null);
-        } catch (AssertionError ignored) {}
+        } catch (AssertionError ignored) {
+        }
         try {
             modelUpdated.getMilestoneByTitle("");
-        } catch (AssertionError ignored) {}
+        } catch (AssertionError ignored) {
+        }
 
         assertEquals(Optional.<TurboMilestone>empty(),
                 modelUpdated.getMilestoneById(DummyRepoState.NO_OF_DUMMY_ISSUES + 1));
@@ -264,10 +272,12 @@ public class ModelTests {
 
         try {
             modelUpdated.getUserByLogin(null);
-        } catch (AssertionError ignored) {}
+        } catch (AssertionError ignored) {
+        }
         try {
             modelUpdated.getUserByLogin("");
-        } catch (AssertionError ignored) {}
+        } catch (AssertionError ignored) {
+        }
 
         assertEquals(Optional.<TurboUser>empty(),
                 modelUpdated.getUserByLogin("User " + (DummyRepoState.NO_OF_DUMMY_ISSUES + 1)));
@@ -330,7 +340,7 @@ public class ModelTests {
         List<TurboIssue> issues = Arrays.asList(issue3, issue2, issue1);
 
         Model model = new Model(repoId, issues, new ArrayList<TurboLabel>(),
-                                new ArrayList<TurboMilestone>(), new ArrayList<TurboUser>());
+                new ArrayList<TurboMilestone>(), new ArrayList<TurboUser>());
         Optional<TurboIssue> result = model.replaceIssueLabels(issue1.getId(), newLabels);
         assertEquals(1, result.get().getId());
         assertEquals(newLabels, result.get().getLabels());

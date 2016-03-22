@@ -52,13 +52,13 @@ public class DummyRepoState {
             TurboIssue dummyIssue;
             // Issue #7 is a PR
             switch (i) {
-                case 6:
-                case 10:
-                    dummyIssue = makeDummyPR();
-                    break;
-                default:
-                    dummyIssue = makeDummyIssue();
-                    break;
+            case 6:
+            case 10:
+                dummyIssue = makeDummyPR();
+                break;
+            default:
+                dummyIssue = makeDummyIssue();
+                break;
             }
             // All default issues are treated as if created a long time ago
             dummyIssue.setUpdatedAt(LocalDateTime.of(2000 + i, 1, 1, 0, 0));
@@ -153,27 +153,26 @@ public class DummyRepoState {
         updatedEvents.add(10);
 
         // Then set label 3 and 11 for issue 8, and immediately remove label 11
-        String[] oldLabels = {"Label 3", "Label 11"};
-        String[] newLabels = {"Label 3"};
+        String[] oldLabels = { "Label 3", "Label 11" };
+        String[] newLabels = { "Label 3" };
         setLabels(8, Arrays.asList(oldLabels));
         setLabels(8, Arrays.asList(newLabels));
         // Then put a temporary (colourful) label into the repo
         labels.put("Deleted", new TurboLabel(dummyRepoId, "84b6eb", "Deleted"));
-        String[] issue9Labels = {"Label 1"};
-        String[] deletedLabels = {"Label 1", "Deleted"};
+        String[] issue9Labels = { "Label 1" };
+        String[] deletedLabels = { "Label 1", "Deleted" };
         setLabels(9, Arrays.asList(deletedLabels)); // add and unset it immediately on issue 9
         setLabels(9, Arrays.asList(issue9Labels));
         labels.remove("Deleted"); // Then remove this label. The labeling events should still display the color.
     }
 
-    protected ImmutableTriple<List<TurboIssue>, String, Date>
-        getUpdatedIssues(String eTag, Date lastCheckTime) {
+    protected ImmutableTriple<List<TurboIssue>, String, Date> getUpdatedIssues(String eTag, Date lastCheckTime) {
 
         String currETag = eTag;
         if (!updatedIssues.isEmpty() || eTag == null) currETag = UUID.randomUUID().toString();
 
         ImmutableTriple<List<TurboIssue>, String, Date> toReturn = new ImmutableTriple<>(
-            deepCopyIssues(updatedIssues), currETag, lastCheckTime);
+                deepCopyIssues(updatedIssues), currETag, lastCheckTime);
 
         updatedIssues = new TreeMap<>();
         return toReturn;
@@ -184,7 +183,7 @@ public class DummyRepoState {
         if (!updatedLabels.isEmpty() || eTag == null) currETag = UUID.randomUUID().toString();
 
         ImmutablePair<List<TurboLabel>, String> toReturn
-            = new ImmutablePair<>(deepCopyLabels(updatedLabels), currETag);
+                = new ImmutablePair<>(deepCopyLabels(updatedLabels), currETag);
 
         updatedLabels = new TreeMap<>();
         return toReturn;
@@ -195,7 +194,7 @@ public class DummyRepoState {
         if (!updatedMilestones.isEmpty() || eTag == null) currETag = UUID.randomUUID().toString();
 
         ImmutablePair<List<TurboMilestone>, String> toReturn
-            = new ImmutablePair<>(deepCopyMilestones(updatedMilestones), currETag);
+                = new ImmutablePair<>(deepCopyMilestones(updatedMilestones), currETag);
 
         updatedMilestones = new TreeMap<>();
         return toReturn;
@@ -206,7 +205,7 @@ public class DummyRepoState {
         if (!updatedUsers.isEmpty() || eTag == null) currETag = UUID.randomUUID().toString();
 
         ImmutablePair<List<TurboUser>, String> toReturn
-            = new ImmutablePair<>(deepCopyUsers(updatedUsers), currETag);
+                = new ImmutablePair<>(deepCopyUsers(updatedUsers), currETag);
 
         updatedUsers = new TreeMap<>();
         return toReturn;
@@ -402,9 +401,10 @@ public class DummyRepoState {
                         new Date()).setLabelName(labelName).setLabelColour(labels.get(labelName).getColour()))
         );
         newLabels.stream().filter(newLabel -> !labelsOfIssue.contains(newLabel)).forEach(newLabel ->
-                eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test-nonself"),
-                        IssueEventType.Labeled,
-                        new Date()).setLabelName(newLabel).setLabelColour(labels.get(newLabel).getColour()))
+                eventsOfIssue.add
+                        (new TurboIssueEvent(new User().setLogin("test-nonself"),
+                                IssueEventType.Labeled,
+                                new Date()).setLabelName(newLabel).setLabelColour(labels.get(newLabel).getColour()))
         );
         toSet.setLabels(newLabels);
         toSet.setUpdatedAt(LocalDateTime.now());
@@ -480,7 +480,7 @@ public class DummyRepoState {
 
         // Replace originals with copies, and queue them up to be retrieved
         markUpdatedComments(toComment,
-            IssueMetadata.intermediate(metadataOfIssue.getEvents(), commentsOfIssue, "", ""));
+                IssueMetadata.intermediate(metadataOfIssue.getEvents(), commentsOfIssue, "", ""));
 
         return toComment;
     }
@@ -510,7 +510,7 @@ public class DummyRepoState {
      * Auxiliary method that replaces original issue & metadata with the mutated copies after updating the issue.
      * Simulates the event of an user action causing the ETag of the issue events to change.
      *
-     * @param toMark The mutated copy of the issue, to replace the original issue
+     * @param toMark   The mutated copy of the issue, to replace the original issue
      * @param toInsert The mutated metadata of the issue, to replace the original issue metadata
      */
     private void markUpdatedEvents(TurboIssue toMark, IssueMetadata toInsert) {
@@ -526,7 +526,7 @@ public class DummyRepoState {
      * Auxiliary method that replaces original issue & metadata with the mutated copies after updating the issue.
      * Simulates the event of an user action causing the ETag of the issue comments to change.
      *
-     * @param toMark The mutated copy of the issue, to replace the original issue
+     * @param toMark   The mutated copy of the issue, to replace the original issue
      * @param toInsert The mutated metadata of the issue, to replace the original issue metadata
      */
     private void markUpdatedComments(TurboIssue toMark, IssueMetadata toInsert) {

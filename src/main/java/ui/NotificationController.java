@@ -28,12 +28,14 @@ public class NotificationController {
             notificationPane.setText(notification.getMessage());
             notificationPane.getActions().clear();
             notificationPane.getActions().add(new Action(notification.getButtonLabel(),
-                    actionEvent -> {
-                        notification.getButtonRunnable().run();
-                        hideNotification();
-                    }));
-            notificationPaneTimer = new TickingTimer("Notification Timer", notification.getTimeoutDuration(),
-                    integer -> {}, () -> {}, TimeUnit.SECONDS);
+                actionEvent -> {
+                    notification.getButtonRunnable().run();
+                    hideNotification();
+                })
+            );
+            notificationPaneTimer = new TickingTimer("Notification Timer",
+                    notification.getTimeoutDuration(), integer -> {}, () -> {},
+                    TimeUnit.SECONDS);
             notificationPane.show();
             notificationPaneTimer.start();
             this.notification = Optional.of(notification);
@@ -60,7 +62,7 @@ public class NotificationController {
 
     private void determineAndRunNotificationAction() {
         if (notification.isPresent() &&
-            notification.get().getNotificationType() == Notification.NotificationType.ACTIONONBUTTON) {
+                notification.get().getNotificationType() == Notification.NotificationType.ACTIONONBUTTON) {
             notification.get().getButtonRunnable().run();
             // other NotifcationTypes can be implemented here if needed
         }

@@ -39,13 +39,15 @@ public class UtilityTest {
         try {
             safeLongToInt(a);
             fail();
-        } catch (IllegalArgumentException ignored) {}
+        } catch (IllegalArgumentException ignored) {
+        }
 
         a = Integer.MIN_VALUE - 30L;
         try {
             safeLongToInt(a);
             fail();
-        } catch (IllegalArgumentException ignored) {}
+        } catch (IllegalArgumentException ignored) {
+        }
     }
 
     @Test
@@ -60,13 +62,14 @@ public class UtilityTest {
         testDate.setTimeZone(TimeZone.getTimeZone("GMT"));
 
         assertEquals(testDate.getTime().toString(),
-            parseHTTPLastModifiedDate("Tue, 15 Nov 1994 12:45:26 GMT").toString());
+                parseHTTPLastModifiedDate("Tue, 15 Nov 1994 12:45:26 GMT").toString());
 
         try {
             assertEquals(testDate.getTime().toString(),
-                parseHTTPLastModifiedDate("some non-date string").toString());
+                    parseHTTPLastModifiedDate("some non-date string").toString());
             fail();
-        } catch (IllegalArgumentException ignored) {}
+        } catch (IllegalArgumentException ignored) {
+        }
     }
 
     @Test

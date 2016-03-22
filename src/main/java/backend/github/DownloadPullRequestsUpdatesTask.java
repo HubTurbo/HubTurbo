@@ -28,7 +28,8 @@ public class DownloadPullRequestsUpdatesTask extends GitHubRepoTask<List<PullReq
         List<PullRequest> updatedPullRequests = repo.getUpdatedPullRequests(
                 model.getRepoId(), model.getUpdateSignature().lastCheckTime);
         logger.info(HTLog.format(model.getRepoId(), "%s pr(s)) changed%s",
-                updatedPullRequests.size(), updatedPullRequests.isEmpty() ? "" : ": " + updatedPullRequests));
+                updatedPullRequests.size(), updatedPullRequests.isEmpty() ? "" : ": " +
+                        updatedPullRequests));
         response.complete(updatedPullRequests);
     }
 }

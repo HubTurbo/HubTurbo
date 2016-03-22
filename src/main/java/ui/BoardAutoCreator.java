@@ -34,10 +34,10 @@ public class BoardAutoCreator {
                 String.format("repo:%s is:open label:\"latest-tips\"", TIPS_REPO_NAME));
         panelMap.put("Seven latest updated issues in my two sample repos",
                 String.format("repo:%s;%s is:issue sort:!updated,comments count:7",
-                FIRST_SAMPLE_REPO_NAME, SECOND_SAMPLE_REPO_NAME));
+                        FIRST_SAMPLE_REPO_NAME, SECOND_SAMPLE_REPO_NAME));
         panelMap.put("Open issues assigned to Darius or Manmeet",
                 String.format("repo:%s is:issue is:open (assignee:dariusf || assignee:codemanmeet)",
-                FIRST_SAMPLE_REPO_NAME));
+                        FIRST_SAMPLE_REPO_NAME));
         panelMap.put("Progress of the current milestone",
                 String.format("repo:%s m:curr sort:status", FIRST_SAMPLE_REPO_NAME));
         panelMap.put("Issues awaiting prioritization",
@@ -115,7 +115,8 @@ public class BoardAutoCreator {
         int noOfPanelsToBeGenerated = Math.min(MAX_WORK_ALLOCATION_PANELS, userList.size());
 
         List<PanelInfo> panelData = generatePanelInfoFromTurboUsers(userList.subList(0, noOfPanelsToBeGenerated),
-                "Work allocated to %s", "assignee:%s sort:milestone,status");
+                "Work allocated to %s", "assignee:%s " +
+                        "sort:milestone,status");
 
         String boardName = Utility.getNameClosestToDesiredName(WORK_ALLOCATION, prefs.getAllBoardNames());
 
@@ -130,6 +131,7 @@ public class BoardAutoCreator {
      * Creates a sample board to showcase HubTurbo's functionality with sample repos in filters.
      * The dialog box shows a confirmation message for the successful
      * creation and loading of the sample board if isDialogShown is set to true.
+     *
      * @param isDialogShown
      */
     public void createSampleBoard(boolean isDialogShown) {
@@ -149,13 +151,13 @@ public class BoardAutoCreator {
 
         triggerBoardSaveEventSequence(SAMPLE_BOARD);
 
-        if (isDialogShown){
+        if (isDialogShown) {
             DialogMessage.showInformationDialog("Auto-create Board - " + SAMPLE_BOARD, SAMPLE_BOARD_DIALOG);
         }
     }
 
     private List<PanelInfo> generatePanelInfoFromTurboUsers(List<TurboUser> users,
-                                                            String nameTemplate, String filterTemplate) {
+            String nameTemplate, String filterTemplate) {
         return users.stream()
                 .map(user -> new PanelInfo(String.format(nameTemplate, user.getFriendlierName()),
                         String.format(filterTemplate, user.getLoginName())))

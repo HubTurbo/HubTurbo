@@ -114,7 +114,7 @@ public class IssuePanelTests extends UITest {
     @Test
     public void testCreateLabelUpdateEventNodesForSampleEvents()
             throws IllegalAccessException, IllegalArgumentException, InvocationTargetException,
-                   NoSuchMethodException, SecurityException {
+            NoSuchMethodException, SecurityException {
 
         Method layoutMethod = ListPanelCard.class.getDeclaredMethod(
                 "layoutEvents", GuiElement.class, List.class, List.class);
@@ -145,7 +145,7 @@ public class IssuePanelTests extends UITest {
         assertEquals(4, ((HBox) nodes.get(3)).getChildren().size());
         assertEquals(4, ((HBox) nodes.get(4)).getChildren().size());
         assertEquals(5, ((VBox) layoutMethod.invoke(null,
-                                    guiElement, events, new ArrayList<Comment>())).getChildren().size());
+                guiElement, events, new ArrayList<Comment>())).getChildren().size());
     }
 
     @Test
@@ -160,9 +160,9 @@ public class IssuePanelTests extends UITest {
         List<TurboIssueEvent> events = new ArrayList<>();
         events.add(
                 new TurboIssueEvent(
-                    new User().setLogin("A"), IssueEventType.Labeled,
+                        new User().setLogin("A"), IssueEventType.Labeled,
                         Utility.localDateTimeToDate(LocalDateTime.of(2015, 1, 1, 1, 1, 0)))
-                    .setLabelName("X").setLabelColour("ffffff"));
+                        .setLabelName("X").setLabelColour("ffffff"));
 
         assertEquals(1,
                 TurboIssueEvent.createLabelUpdateEventNodes(

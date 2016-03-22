@@ -13,7 +13,7 @@ import ui.GUIController;
  * A AbstractPanel is a JavaFX node that is contained by a PanelControl.
  * It is in charge of displaying arbitrary content and provides
  * functionality for being added, removed, and reordered (via dragging).
- *
+ * <p>
  * Since objects of this class are JavaFX nodes, content can be displayed
  * simply by adding child nodes to them.
  */
@@ -102,11 +102,11 @@ public abstract class AbstractPanel extends VBox {
      */
     public abstract void close();
 
-    public PanelControl getParentPanelControl(){
+    public PanelControl getParentPanelControl() {
         return parentPanelControl;
     }
 
-    public int getPanelIndex(){
+    public int getPanelIndex() {
         return panelIndex;
     }
 }

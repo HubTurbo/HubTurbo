@@ -10,9 +10,9 @@ import java.util.Map;
 public class DownloadMetadataTaskStub extends DownloadMetadataTask {
 
     public DownloadMetadataTaskStub(TaskRunner taskRunner,
-                                    DummyRepo repo,
-                                    String repoId,
-                                    List<TurboIssue> issuesToUpdate) {
+            DummyRepo repo,
+            String repoId,
+            List<TurboIssue> issuesToUpdate) {
         super(taskRunner, repo, repoId, issuesToUpdate);
     }
 

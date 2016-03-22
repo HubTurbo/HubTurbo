@@ -24,6 +24,7 @@ import util.HTLog;
 
 /**
  * Iterator for getting values of a header field from paged responses
+ *
  * @see org.eclipse.egit.github.core.client.PageIterator
  */
 public class PageHeaderIterator implements Iterable<String>, Iterator<String> {
@@ -38,7 +39,7 @@ public class PageHeaderIterator implements Iterable<String>, Iterator<String> {
     private HttpURLConnection lastConnection;
 
     public PageHeaderIterator(GitHubRequest request, GitHubClientEx client,
-                              String headerField) {
+            String headerField) {
         this.request = request;
         this.client = client;
         this.headerField = headerField;
@@ -92,6 +93,7 @@ public class PageHeaderIterator implements Iterable<String>, Iterator<String> {
 
     /**
      * Returns the value of headerField of the next response page
+     *
      * @return the value of headerField of the next response page
      */
     @Override

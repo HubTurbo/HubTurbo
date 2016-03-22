@@ -66,10 +66,11 @@ public class LoginDialog extends Dialog<Boolean> {
         Platform.runLater(() -> enableUI(false));
         CompletableFuture.supplyAsync(
             () -> ui.logic.loginController.attemptLogin(repoOwnerField.getText(),
-                repoNameField.getText(),
-                usernameField.getText(),
-                passwordField.getText()),
-            executor).thenAccept(success -> {
+                    repoNameField.getText(),
+                    usernameField.getText(),
+                    passwordField.getText()),
+                executor
+        ).thenAccept(success -> {
             if (success) {
                 Platform.runLater(() -> {
                     close();
@@ -172,7 +173,8 @@ public class LoginDialog extends Dialog<Boolean> {
     /**
      * A variadic function that applies percentage-width column constraints to
      * the given grid pane.
-     * @param grid the grid pane to apply column constraints to
+     *
+     * @param grid   the grid pane to apply column constraints to
      * @param values an array of integer values which should add up to 100
      */
     private static void applyColumnConstraints(GridPane grid, int... values) {

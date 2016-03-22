@@ -24,7 +24,7 @@ public class UpdateLocalModelOp implements RepoOp<Model> {
     private static final Logger logger = HTLog.get(UpdateLocalModelOp.class);
 
     public UpdateLocalModelOp(MultiModel models, GitHubModelUpdatesData updates,
-                              CompletableFuture<Model> result) {
+            CompletableFuture<Model> result) {
         this.models = models;
         this.updates = updates;
         this.result = result;
@@ -42,10 +42,10 @@ public class UpdateLocalModelOp implements RepoOp<Model> {
 
         UpdateSignature newSignature =
                 new UpdateSignature(updates.getIssues().eTag, updates.getLabels().eTag,
-                                    updates.getMilestones().eTag, updates.getUsers().eTag,
-                                    updates.getIssues().lastCheckTime);
+                        updates.getMilestones().eTag, updates.getUsers().eTag,
+                        updates.getIssues().lastCheckTime);
         Model updatedModel = new Model(updates.getRepoId(), getUpdateIssues(), getUpdatedLabels(),
-                                       getUpdatedMilestones(), getUpdatedUsers(), newSignature);
+                getUpdatedMilestones(), getUpdatedUsers(), newSignature);
 
         logger.info(HTLog.format(updatedModel.getRepoId(), "Updated model with " + updatedModel.summarise()));
         if (oldModelOptional.isPresent()) {

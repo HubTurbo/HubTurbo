@@ -54,7 +54,7 @@ public class RepositorySelectorTest extends UITest {
         // setup test json with last viewed repo "dummy/dummy"
         // obviously the json for that repo doesn't exist
         ConfigFileHandler configFileHandler =
-            new ConfigFileHandler(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
+                new ConfigFileHandler(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
         GlobalConfig globalConfig = new GlobalConfig();
         globalConfig.setLastLoginCredentials("test", "test");
         globalConfig.setLastViewedRepository("dummy/dummy");

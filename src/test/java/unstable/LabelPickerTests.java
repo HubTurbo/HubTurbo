@@ -13,6 +13,7 @@ import backend.resource.TurboIssue;
 import ui.UI;
 import ui.listpanel.ListPanelCell;
 import util.events.ShowLabelPickerEvent;
+
 import static org.junit.Assert.assertEquals;
 
 public class LabelPickerTests extends UITest {

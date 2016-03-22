@@ -25,7 +25,7 @@ public class UIEventTests extends UITest {
     private static void resetEventTestCount() {
         eventTestCount = 0;
     }
-    
+
     private static void getEventRepoId(PrimaryRepoChangedEvent e) {
         defaultRepoId = e.repoId;
     }
@@ -73,7 +73,7 @@ public class UIEventTests extends UITest {
         click("#dummy/dummy_col0_filterTextField");
         assertEquals(1, eventTestCount);
     }
-    
+
     @Test
     public void defaultRepoSwitchedTest() {
         UI.events.registerEvent((PrimaryRepoChangedEventHandler) e -> UIEventTests.increaseEventTestCount());

@@ -18,7 +18,7 @@ public class ListPanelCell extends ListCell<GuiElement> {
     private GuiElement guiElement;
 
     public ListPanelCell(ListPanel parent,
-                         int parentPanelIndex, HashSet<Integer> issuesWithNewComments) {
+            int parentPanelIndex, HashSet<Integer> issuesWithNewComments) {
         super();
         this.parent = parent;
         this.parentPanelIndex = parentPanelIndex;
@@ -44,7 +44,7 @@ public class ListPanelCell extends ListCell<GuiElement> {
     private void updateStyleToMatchStatus(TurboIssue issue) {
         final String closedStyle = "issue-cell-closed";
         boolean isCurrentStyleClosed = getStyleClass().contains(closedStyle);
-        if (!issue.isOpen()){
+        if (!issue.isOpen()) {
             if (!isCurrentStyleClosed) {
                 getStyleClass().add(closedStyle);
             }

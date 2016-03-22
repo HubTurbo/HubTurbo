@@ -15,22 +15,24 @@ import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_MILES
 public class MilestoneUpdateService extends UpdateService<Milestone> {
 
 
-    public MilestoneUpdateService(GitHubClientEx client, String milestonesETag){
+    public MilestoneUpdateService(GitHubClientEx client, String milestonesETag) {
         super(client, SEGMENT_MILESTONES, milestonesETag);
     }
 
-    private Map<String, String> createUpdatedMilestonesParams(){
+    private Map<String, String> createUpdatedMilestonesParams() {
         Map<String, String> params = new HashMap<>();
         params.put("state", "all");
         return params;
     }
 
     @Override
-    protected PagedRequest<Milestone> createUpdatedRequest(IRepositoryIdProvider repoId){
+    protected PagedRequest<Milestone> createUpdatedRequest(IRepositoryIdProvider repoId) {
         PagedRequest<Milestone> request = super.createUpdatedRequest(repoId);
         request.setParams(createUpdatedMilestonesParams());
-        request.setType(new TypeToken<Milestone>(){}.getType());
-        request.setArrayType(new TypeToken<ArrayList<Milestone>>(){}.getType());
+        request.setType(new TypeToken<Milestone>() {
+        }.getType());
+        request.setArrayType(new TypeToken<ArrayList<Milestone>>() {
+        }.getType());
         return request;
     }
 }

@@ -26,6 +26,7 @@ import static org.mockserver.model.HttpResponse.response;
 public class GitHubClientExTests {
     /**
      * Tests that head request to nonexistent repo throws an exception
+     *
      * @throws IOException
      */
     @Test(expected = IOException.class)
@@ -47,29 +48,25 @@ public class GitHubClientExTests {
     /**
      * Tests that GitHubClientEx' head method makes a HTTP HEAD request and receive a corresponding
      * header response from a mocked server
+     *
      * @throws IOException
      */
     @Test
     public void testValidHeadRequest() throws IOException {
         MockServerClient mockServer = ClientAndServer.startClientAndServer(8888);
         HttpRequest expectedRequest = request()
-                        .withMethod("HEAD")
-                        .withPath(TestUtils.API_PREFIX + "/repos/repo")
-                        .withQueryStringParameters(
-                                new Parameter("state", "all"),
-                                new Parameter("per_page", "100"),
-                                new Parameter("page", "1")
-                        );
+                .withMethod("HEAD")
+                .withPath(TestUtils.API_PREFIX + "/repos/repo")
+                .withQueryStringParameters(
+                        new Parameter("state", "all"),
+                        new Parameter("per_page", "100"),
+                        new Parameter("page", "1")
+                );
         String eTagValue = "aaf65fc6b10d5afbdc9cd0aa6e6ada4c";
 
         mockServer
                 .when(expectedRequest)
-                .respond(
-                        response()
-                                .withHeader(
-                                        "ETag", eTagValue
-                                )
-                );
+                .respond(response().withHeader("ETag", eTagValue));
 
         PagedRequest<Milestone> request = new PagedRequest<>();
         Map<String, String> params = new HashMap<>();

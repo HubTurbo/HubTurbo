@@ -46,12 +46,13 @@ public final class RepoOpControl {
     /**
      * Updates repository stored locally with data from a GitHubModelUpdatesData object.
      * Set syncOperation to queue this operation in the blocking queue for the updating repository
+     *
      * @param updates
      * @param syncOperation
      * @return
      */
     public CompletableFuture<Model> updateLocalModel(GitHubModelUpdatesData updates,
-                                                     boolean syncOperation) {
+            boolean syncOperation) {
         init(updates.getRepoId());
         CompletableFuture<Model> result = new CompletableFuture<>();
         UpdateLocalModelOp op = new UpdateLocalModelOp(models, updates, result);

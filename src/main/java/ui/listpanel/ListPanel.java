@@ -102,6 +102,7 @@ public class ListPanel extends FilterPanel {
 
     /**
      * Creates a Graphic element(HBox) containing a label that show the total no of issues in the ListPanel.
+     *
      * @return HBox Instance to be added to the ListPanel.
      */
     private HBox createPanelFooter() {
@@ -128,6 +129,7 @@ public class ListPanel extends FilterPanel {
     /**
      * Determines if an issue has had new comments added (or removed) based on
      * its last-known comment count in {@link #issueCommentCounts}.
+     *
      * @param issue
      * @return true if the issue has changed, false otherwise
      */
@@ -147,6 +149,7 @@ public class ListPanel extends FilterPanel {
     /**
      * Updates {@link #issueCommentCounts} with the latest counts.
      * Returns a list of issues which have new comments.
+     *
      * @return
      */
     private HashSet<Integer> updateIssueCommentCounts(boolean hasMetadata) {
@@ -270,27 +273,27 @@ public class ListPanel extends FilterPanel {
                 ui.getBrowserComponent().showDocs();
             }
             if (SHOW_ISSUES.match(event)
-                && KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
+                    && KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
 
                 ui.getBrowserComponent().showIssues();
             }
             if (SHOW_PULL_REQUESTS.match(event)
-                && KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
+                    && KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
 
                 ui.getBrowserComponent().showPullRequests();
             }
             if (SHOW_HELP.match(event)
-                && KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
+                    && KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
 
                 ui.getBrowserComponent().showDocs();
             }
             if (SHOW_KEYBOARD_SHORTCUTS.match(event)
-                && KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
+                    && KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
 
                 ui.getBrowserComponent().showKeyboardShortcuts();
             }
             if (SHOW_CONTRIBUTORS.match(event)
-                && KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
+                    && KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
 
                 ui.getBrowserComponent().showContributors();
                 event.consume();
@@ -323,7 +326,7 @@ public class ListPanel extends FilterPanel {
 
             }
             if (PR_FILES_CHANGED.match(event)
-                && KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
+                    && KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
 
                 if (!ui.getBrowserComponent().isCurrentUrlIssue()) {
                     openPageOfCurrentlySelectedIssue();
@@ -334,7 +337,7 @@ public class ListPanel extends FilterPanel {
                 event.consume();
             }
             if (PR_COMMITS.match(event)
-                && KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
+                    && KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
 
                 if (!ui.getBrowserComponent().isCurrentUrlIssue()) {
                     openPageOfCurrentlySelectedIssue();
@@ -369,7 +372,7 @@ public class ListPanel extends FilterPanel {
                 listView.selectNthItem(1);
             }
             for (Map.Entry<Integer, KeyCodeCombination> entry : JUMP_TO_NTH_ISSUE_KEYS.entrySet()) {
-                if (entry.getValue().match(event)){
+                if (entry.getValue().match(event)) {
                     event.consume();
                     listView.selectNthItem(entry.getKey());
                     break;
@@ -378,7 +381,7 @@ public class ListPanel extends FilterPanel {
             if (SHOW_RELATED_ISSUE_OR_PR.match(event) && ui.getBrowserComponent().isCurrentUrlIssue()) {
                 if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
                     showRelatedIssueOrPR();
-                // only for default. can remove if default key for MARK_AS_READ_CHANGES
+                    // only for default. can remove if default key for MARK_AS_READ_CHANGES
                 } else if (KeyboardShortcuts.markAsRead.match(event)) {
                     markAsRead();
                 }
@@ -390,11 +393,11 @@ public class ListPanel extends FilterPanel {
         if (!listView.getSelectedItem().isPresent()) return;
         TurboIssue issue = listView.getSelectedItem().get().getIssue();
         Optional<Integer> relatedIssueNumber = listView.getSelectedItem().get().getIssue().isPullRequest()
-            ? GithubPageElements.extractIssueNumber(listView.getSelectedItem().get().getIssue().getDescription())
-            : ui.getBrowserComponent().getPRNumberFromIssue();
+                ? GithubPageElements.extractIssueNumber(listView.getSelectedItem().get().getIssue().getDescription())
+                : ui.getBrowserComponent().getPRNumberFromIssue();
         if (!relatedIssueNumber.isPresent()) return;
         ui.triggerEvent(
-            new IssueSelectedEvent(issue.getRepoId(), relatedIssueNumber.get(), panelIndex, issue.isPullRequest())
+                new IssueSelectedEvent(issue.getRepoId(), relatedIssueNumber.get(), panelIndex, issue.isPullRequest())
         );
     }
 
@@ -545,16 +548,17 @@ public class ListPanel extends FilterPanel {
 
     /**
      * Marks the selected item and item below it in the list view as read/unread
+     *
      * @param isRead Setting it to true marks all items on and below the selected issue as read.
      *               Setting it to false marks all items on and below the selected issue as unread.
      */
-    private void markAllItemsBelow(boolean isRead){
+    private void markAllItemsBelow(boolean isRead) {
         if (!listView.getSelectedIndex().isPresent()) {
             return;
         }
         for (int i = listView.getSelectedIndex().get(); i < listView.getItems().size(); i++) {
             TurboIssue issue = listView.getItems().get(i).getIssue();
-            if (isRead){
+            if (isRead) {
                 issue.markAsRead(UI.prefs);
             } else {
                 issue.markAsUnread(UI.prefs);

@@ -99,7 +99,8 @@ public class ScreenManager {
      */
     public static Region getStageBounds(List<Rectangle2D> intersectingScreenBounds) {
         DoubleSummaryStatistics occupyingHeights = intersectingScreenBounds.stream()
-                .mapToDouble(Rectangle2D::getHeight).summaryStatistics();
+                .mapToDouble(Rectangle2D::getHeight)
+                .summaryStatistics();
 
         double maxHeight = occupyingHeights.getMax();
         double minHeight = occupyingHeights.getMin();
@@ -121,14 +122,14 @@ public class ScreenManager {
 
         if (availableDimensions.getWidth() > maximiseThreshold * screenDimensions.getWidth()) {
             return new Rectangle((int) getCollapsedX(),
-                                 0,
-                                 (int) availableDimensions.getWidth(),
-                                 (int) availableDimensions.getHeight());
+                    0,
+                    (int) availableDimensions.getWidth(),
+                    (int) availableDimensions.getHeight());
         } else {
             return new Rectangle(0,
-                                 0,
-                                 (int) screenDimensions.getWidth(),
-                                 (int) screenDimensions.getHeight());
+                    0,
+                    (int) screenDimensions.getWidth(),
+                    (int) screenDimensions.getHeight());
         }
     }
 

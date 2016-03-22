@@ -27,6 +27,6 @@ public class OpenRepoOp implements RepoOp<Model> {
     @Override
     public CompletableFuture<Model> perform() {
         return repoIO.openRepository(repoId)
-            .thenApply(chain(result));
+                .thenApply(chain(result));
     }
 }

@@ -75,7 +75,7 @@ public class FilterEvalTests {
     @Test
     public void satisfiesId_validCompoundId() {
         TurboIssue issue = new TurboIssue("dummy/dummy", 1, "1");
-       
+
         assertFalse(matches("id:test/test#1", issue));
         assertFalse(matches("id:dummy/dummy#2", issue));
         assertTrue(matches("id:dummy/dummy#1", issue));
@@ -89,7 +89,7 @@ public class FilterEvalTests {
     @Test
     public void satisfiesId_compoundIdWithRangeOperator() {
         TurboIssue issue = new TurboIssue("dummy/dummy", 4, "4");
-       
+
         assertTrue(matches("id:dummy/dummy#>3", issue));
         assertTrue(matches("id:dummy/dummy#>=4", issue));
         assertTrue(matches("id:dummy/dummy#<6", issue));
@@ -422,10 +422,10 @@ public class FilterEvalTests {
         issue.addLabel(label);
 
         model = TestUtils.singletonModel(new Model(new Model(REPO,
-            new ArrayList<>(Arrays.asList(issue)),
-            new ArrayList<>(Arrays.asList(label, label2)),
-            new ArrayList<>(),
-            new ArrayList<>())));
+                new ArrayList<>(Arrays.asList(issue)),
+                new ArrayList<>(Arrays.asList(label, label2)),
+                new ArrayList<>(),
+                new ArrayList<>())));
 
         assertTrue(Qualifier.process(model, Parser.parse("label:t."), issue));
 
@@ -740,7 +740,7 @@ public class FilterEvalTests {
         assertFalse(matches("created:<=2014-12-1", issue));
         assertTrue(matches("created:>2014-12-1", issue));
         assertTrue(matches("created:2014-12-2", issue));
-        
+
         // test: qualifier alias
         assertFalse(matches("cr:<2014-12-1", issue));
     }
@@ -760,7 +760,7 @@ public class FilterEvalTests {
 
         assertFalse(matches("updated:<24", issue));
         assertEquals(matches("updated:<24", issue),
-            matches("updated:24", issue));
+                matches("updated:24", issue));
         assertTrue(matches("updated:>24", issue));
 
         // test: qualifier alias
@@ -771,7 +771,7 @@ public class FilterEvalTests {
 
         assertTrue(matches("updated:<26", issue));
         assertEquals(matches("updated:<26", issue),
-            matches("updated:26", issue));
+                matches("updated:26", issue));
         assertFalse(matches("updated:>26", issue));
     }
 
@@ -786,7 +786,7 @@ public class FilterEvalTests {
 
         assertTrue(matches("repo:" + REPO, issue));
         assertFalse(matches("repo:something/else", issue));
-        
+
         // test: qualifier alias
         assertTrue(matches("r:" + REPO, issue));
     }
@@ -794,7 +794,7 @@ public class FilterEvalTests {
     @Test
     public void satisfiesRepo_invalidInputs_throwSemanticException() {
         verifyQualifierContentError(QualifierType.REPO, "repo:2011-1-1");
-        
+
         // test: compound id lookup
         verifyQualifierContentError(QualifierType.REPO, "id:2011#1");
     }

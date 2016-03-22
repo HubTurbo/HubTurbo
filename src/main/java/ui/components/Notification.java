@@ -6,7 +6,7 @@ public class Notification {
 
     public static final int DEFAULT_NOTIFICATION_PANE_VISIBLE_PERIOD = 30;
 
-    public enum NotificationType { NOACTION, ACTIONONBUTTON }
+    public enum NotificationType {NOACTION, ACTIONONBUTTON}
 
     private final NotificationType notificationType;
     private final Node icon;
@@ -15,8 +15,7 @@ public class Notification {
     private final Runnable buttonRunnable;
     private final int timeoutDuration;
 
-    public Notification
-            (Node icon, String message, String buttonLabel, Runnable buttonRunnable) {
+    public Notification(Node icon, String message, String buttonLabel, Runnable buttonRunnable) {
         this.notificationType = NotificationType.ACTIONONBUTTON;
         this.icon = icon;
         this.message = message;

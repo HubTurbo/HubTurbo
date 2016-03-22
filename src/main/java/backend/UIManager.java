@@ -22,7 +22,7 @@ public class UIManager {
     }
 
     public void update(Map<FilterExpression, List<GuiElement>> elementsToShow,
-                       List<TurboUser> users) {
+            List<TurboUser> users) {
         Platform.runLater(() ->
                 ui.triggerEvent(new ModelUpdatedEvent(elementsToShow, users)));
     }
@@ -33,6 +33,7 @@ public class UIManager {
 
     /**
      * Gets the list of panels currently shown in the UI
+     *
      * @return
      */
     public List<FilterPanel> getAllPanels() {

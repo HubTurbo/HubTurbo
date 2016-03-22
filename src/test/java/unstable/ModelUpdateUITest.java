@@ -27,7 +27,7 @@ public class ModelUpdateUITest extends UITest {
 
     @Test
     public void modelUpdate_panel_addedIssuesShowUp()
-        throws InterruptedException, ExecutionException {
+            throws InterruptedException, ExecutionException {
         resetRepo();
         addIssue();
         FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssuesCount);
@@ -37,7 +37,7 @@ public class ModelUpdateUITest extends UITest {
 
     @Test
     public void modelUpdate_panel_multipleAddedIssuesShowUp()
-        throws InterruptedException, ExecutionException {
+            throws InterruptedException, ExecutionException {
         resetRepo();
         addIssue();
         addIssue();
@@ -49,7 +49,7 @@ public class ModelUpdateUITest extends UITest {
 
     @Test
     public void modelUpdate_panel_correctNumberOfIssuesShown()
-        throws InterruptedException, ExecutionException {
+            throws InterruptedException, ExecutionException {
         addIssue();
         resetRepo();
         FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssuesCount);
@@ -59,7 +59,7 @@ public class ModelUpdateUITest extends UITest {
 
     @Test
     public void modelUpdate_panel_deletedIssuesNoLongerShowUp()
-        throws InterruptedException, ExecutionException {
+            throws InterruptedException, ExecutionException {
         resetRepo();
         addIssue();
         addIssue();
@@ -71,7 +71,7 @@ public class ModelUpdateUITest extends UITest {
 
     @Test
     public void modelUpdate_panel_multipleDeletedIssuesNoLongerShowUp()
-        throws InterruptedException, ExecutionException {
+            throws InterruptedException, ExecutionException {
         resetRepo();
         addIssue();
         addIssue();

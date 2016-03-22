@@ -42,7 +42,8 @@ public class JavaVersion implements Comparable<JavaVersion> {
                 Integer.parseInt(javaVersionMatcher.group(2)),
                 Integer.parseInt(javaVersionMatcher.group(3)),
                 Integer.parseInt(javaVersionMatcher.group(4)),
-                Integer.parseInt((javaVersionMatcher.group(6) != null ? javaVersionMatcher.group(6) : "0")));
+                Integer.parseInt((javaVersionMatcher.group(6) != null ? javaVersionMatcher.group(6) :
+                        "0")));
     }
 
     public String toString() {
@@ -53,9 +54,9 @@ public class JavaVersion implements Comparable<JavaVersion> {
     public int compareTo(JavaVersion other) {
         return this.discard != other.discard ? this.discard - other.discard :
                 this.major != other.major ? this.major - other.major :
-                this.minor != other.minor ? this.minor - other.minor :
-                this.update != other.update ? this.update - other.update :
-                this.build != other.build ? this.build - other.build : 0;
+                        this.minor != other.minor ? this.minor - other.minor :
+                                this.update != other.update ? this.update - other.update :
+                                        this.build != other.build ? this.build - other.build : 0;
     }
 
     @Override

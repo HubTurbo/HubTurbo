@@ -59,14 +59,14 @@ public class TurboMilestoneTest {
 
         Comparator<TurboMilestone> comparator = TurboMilestone.getDueDateComparator();
         List<TurboMilestone> milestones = Arrays.asList(milestoneWithDueDateOpen1, milestoneWithDueDateOpen2,
-                                                        milestoneWithDueDateClosed1, milestoneWithDueDateClosed2,
-                                                        milestoneWithoutDueDateOpen1, milestoneWithoutDueDateOpen2,
-                                                        milestoneWithoutDueDateClosed1, milestoneWithoutDueDateClosed2);
+                milestoneWithDueDateClosed1, milestoneWithDueDateClosed2,
+                milestoneWithoutDueDateOpen1, milestoneWithoutDueDateOpen2,
+                milestoneWithoutDueDateClosed1, milestoneWithoutDueDateClosed2);
         Collections.sort(milestones, comparator);
         List<TurboMilestone> expected = Arrays.asList(milestoneWithoutDueDateClosed1, milestoneWithoutDueDateClosed2,
-                                                        milestoneWithDueDateOpen1, milestoneWithDueDateClosed2,
-                                                        milestoneWithDueDateOpen2, milestoneWithDueDateClosed1,
-                                                        milestoneWithoutDueDateOpen1, milestoneWithoutDueDateOpen2);
+                milestoneWithDueDateOpen1, milestoneWithDueDateClosed2,
+                milestoneWithDueDateOpen2, milestoneWithDueDateClosed1,
+                milestoneWithoutDueDateOpen1, milestoneWithoutDueDateOpen2);
         assertEquals(expected, milestones);
     }
 

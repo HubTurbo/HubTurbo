@@ -89,7 +89,8 @@
 }
 
 .labels {
-    -fx-background-radius: 3; -fx-padding: 1 5;
+    -fx-background-radius: 3;
+    -fx-padding: 1 5;
 }
 
 /* For buttons that are used as labels (the + and x buttons on panels) */
@@ -154,43 +155,43 @@
 /*Scrollbar styling*/
 /* The main scrollbar **track** CSS class  */
 .scroll-bar:horizontal .track,
-.scroll-bar:vertical .track{
-    -fx-background-color:transparent;
-    -fx-border-color:transparent;
+.scroll-bar:vertical .track {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
     -fx-background-radius: 0em;
-    -fx-border-radius:2em;
+    -fx-border-radius: 2em;
 }
 
 /* The increment and decrement button CSS class of scrollbar */
-.scroll-bar:horizontal .increment-button ,
+.scroll-bar:horizontal .increment-button,
 .scroll-bar:horizontal .decrement-button {
-    -fx-background-color:transparent;
+    -fx-background-color: transparent;
     -fx-background-radius: 0em;
-    -fx-padding:0 0 10 0;
+    -fx-padding: 0 0 10 0;
 
 }
 
 /* The increment and decrement button CSS class of scrollbar */
 
-.scroll-bar:vertical .increment-button ,
+.scroll-bar:vertical .increment-button,
 .scroll-bar:vertical .decrement-button {
 
-    -fx-background-color:transparent;
+    -fx-background-color: transparent;
     -fx-background-radius: 0em;
-    -fx-padding:0 10 0 0;
+    -fx-padding: 0 10 0 0;
 
 }
 
 .scroll-bar .increment-arrow,
 .scroll-bar .decrement-arrow {
     -fx-shape: " ";
-    -fx-padding:0;
+    -fx-padding: 0;
 }
 
 /* The main scrollbar **thumb** CSS class which we drag every time (movable) */
 .scroll-bar:horizontal .thumb,
 .scroll-bar:vertical .thumb {
-    -fx-background-color:derive(black,90%);
+    -fx-background-color: derive(black, 90%);
     -fx-background-insets: 2, 0, 0;
     -fx-background-radius: 2em;
 }

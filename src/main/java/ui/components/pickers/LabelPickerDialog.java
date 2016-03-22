@@ -25,7 +25,7 @@ import ui.UI;
 import util.HTLog;
 
 /**
- * Serves as a presenter that synchronizes changes in labels with dialog view  
+ * Serves as a presenter that synchronizes changes in labels with dialog view
  */
 public class LabelPickerDialog extends Dialog<List<String>> {
 
@@ -61,8 +61,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
     @FXML
     public void initialize() {
-        queryField.textProperty().addListener(
-            (observable, oldText, newText) -> handleUserInput(queryField.getText()));
+        queryField.textProperty().addListener((observable, oldText, newText) -> handleUserInput(queryField.getText()));
     }
 
     private void initUI(Stage stage, TurboIssue issue) {
@@ -94,38 +93,39 @@ public class LabelPickerDialog extends Dialog<List<String>> {
 
     /**
      * Populates respective panes with labels that matches current user input
+     *
      * @param state
      */
     private final void populatePanes(LabelPickerState state) {
         // Population of UI elements
         populateAssignedLabels(state.getInitialLabels(), state.getRemovedLabels(), state.getAddedLabels(),
-                               state.getCurrentSuggestion());
+                state.getCurrentSuggestion());
         populateFeedbackLabels(state.getAssignedLabels(), state.getMatchedLabels(), state.getCurrentSuggestion());
         // Ensures dialog pane resize according to content
         getDialogPane().getScene().getWindow().sizeToScene();
     }
 
     private final void populateAssignedLabels(List<TurboLabel> initialLabels, List<TurboLabel> removedLabels,
-                                        List<TurboLabel> addedLabels, Optional<TurboLabel> suggestion) {
+            List<TurboLabel> addedLabels, Optional<TurboLabel> suggestion) {
         assignedLabels.getChildren().clear();
         populateInitialLabels(initialLabels, removedLabels, suggestion);
         populateToBeAddedLabels(addedLabels, suggestion);
     }
 
     private final void populateInitialLabels(List<TurboLabel> initialLabels, List<TurboLabel> removedLabels,
-                                       Optional<TurboLabel> suggestion) {
+            Optional<TurboLabel> suggestion) {
         initialLabels.stream()
-            .forEach(label -> assignedLabels.getChildren()
-            .add(processInitialLabel(label, removedLabels, suggestion)));
+                .forEach(label -> assignedLabels.getChildren()
+                        .add(processInitialLabel(label, removedLabels, suggestion)));
     }
 
-    private final Node processInitialLabel(TurboLabel initialLabel, List<TurboLabel> removedLabels, 
-                                            Optional<TurboLabel> suggestion) {
+    private final Node processInitialLabel(TurboLabel initialLabel, List<TurboLabel> removedLabels,
+            Optional<TurboLabel> suggestion) {
         TurboLabel repoInitialLabel = TurboLabel.getFirstMatchingTurboLabel(allLabels, initialLabel.getFullName());
         if (!removedLabels.contains(initialLabel)) {
             if (suggestion.isPresent() && initialLabel.equals(suggestion.get())) {
                 return getPickerLabelNode(
-                    new PickerLabel(repoInitialLabel, true).faded(true).removed(true));
+                        new PickerLabel(repoInitialLabel, true).faded(true).removed(true));
             }
             return getPickerLabelNode(new PickerLabel(repoInitialLabel, true));
         }
@@ -165,11 +165,11 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     private final Node processAddedLabel(TurboLabel addedLabel, Optional<TurboLabel> suggestion) {
         if (!suggestion.isPresent() || !addedLabel.equals(suggestion.get())) {
             return getPickerLabelNode(
-                new PickerLabel(TurboLabel.getFirstMatchingTurboLabel(allLabels, addedLabel.getFullName()), true));
+                    new PickerLabel(TurboLabel.getFirstMatchingTurboLabel(allLabels, addedLabel.getFullName()), true));
         }
         return getPickerLabelNode(
                 new PickerLabel(TurboLabel.getFirstMatchingTurboLabel(allLabels, addedLabel.getFullName()), true)
-                .faded(true).removed(true));
+                        .faded(true).removed(true));
     }
 
     private final void populateSuggestedLabel(List<TurboLabel> addedLabels, Optional<TurboLabel> suggestion) {
@@ -179,26 +179,26 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     }
 
     private final boolean hasNewSuggestion(List<TurboLabel> addedLabels, Optional<TurboLabel> suggestion) {
-        return suggestion.isPresent() 
-            && !(TurboLabel.getMatchedLabels(allLabels, issue.getLabels())).contains(suggestion.get()) 
-            && !addedLabels.contains(suggestion.get());
+        return suggestion.isPresent()
+                && !(TurboLabel.getMatchedLabels(allLabels, issue.getLabels())).contains(suggestion.get())
+                && !addedLabels.contains(suggestion.get());
     }
 
     private final Node processSuggestedLabel(TurboLabel suggestedLabel) {
         return getPickerLabelNode(
-             new PickerLabel(TurboLabel.getFirstMatchingTurboLabel(allLabels, suggestedLabel.getFullName()), true)
-             .faded(true));
+                new PickerLabel(TurboLabel.getFirstMatchingTurboLabel(allLabels, suggestedLabel.getFullName()), true)
+                        .faded(true));
     }
 
     private final void populateFeedbackLabels(List<TurboLabel> assignedLabels, List<TurboLabel> matchedLabels,
-                                        Optional<TurboLabel> suggestion) {
+            Optional<TurboLabel> suggestion) {
         feedbackLabels.getChildren().clear();
         populateGroupLabels(assignedLabels, matchedLabels, suggestion);
         populateGrouplessLabels(assignedLabels, matchedLabels, suggestion);
     }
 
     private final void populateGroupLabels(List<TurboLabel> finalLabels, List<TurboLabel> matchedLabels,
-                                     Optional<TurboLabel> suggestion) {
+            Optional<TurboLabel> suggestion) {
 
         Map<String, FlowPane> groupContent = getGroupContent(finalLabels, matchedLabels, suggestion);
         groupContent.entrySet().forEach(entry -> {
@@ -208,7 +208,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     }
 
     private final Map<String, FlowPane> getGroupContent(List<TurboLabel> finalLabels, List<TurboLabel> matchedLabels,
-                                                  Optional<TurboLabel> suggestion) {
+            Optional<TurboLabel> suggestion) {
         Map<String, FlowPane> groupContent = new HashMap<>();
         allLabels.stream().sorted()
                 .filter(label -> label.isInGroup())
@@ -218,35 +218,36 @@ public class LabelPickerDialog extends Dialog<List<String>> {
                         groupContent.put(group, createGroupPane(GROUP_PAD));
                     }
                     groupContent.get(group).getChildren().add(processMatchedLabel(
-                        label, matchedLabels, finalLabels, suggestion));
+                            label, matchedLabels, finalLabels, suggestion));
                 });
         return groupContent;
     }
 
     private final void populateGrouplessLabels(List<TurboLabel> finalLabels, List<TurboLabel> matchedLabels,
-                                         Optional<TurboLabel> suggestion) {
+            Optional<TurboLabel> suggestion) {
         FlowPane groupless = createGroupPane(GROUPLESS_PAD);
         allLabels.stream()
-            .filter(label -> !label.isInGroup())
-            .forEach(label -> groupless.getChildren().add(processMatchedLabel(
-                label, matchedLabels, finalLabels, suggestion)));
+                .filter(label -> !label.isInGroup())
+                .forEach(label -> groupless.getChildren().add(processMatchedLabel(
+                        label, matchedLabels, finalLabels, suggestion)));
 
         feedbackLabels.getChildren().add(groupless);
     }
 
-    private final Node processMatchedLabel(TurboLabel repoLabel, List<TurboLabel> matchedLabels, 
-                                           List<TurboLabel> assignedLabels, Optional<TurboLabel> suggestion) {
+    private final Node processMatchedLabel(TurboLabel repoLabel, List<TurboLabel> matchedLabels,
+            List<TurboLabel> assignedLabels, Optional<TurboLabel> suggestion) {
 
         return getPickerLabelNode(
-            new PickerLabel(TurboLabel.getFirstMatchingTurboLabel(allLabels, repoLabel.getFullName()), false)
-                .faded(!matchedLabels.contains(repoLabel))
-                .highlighted(suggestion.isPresent() && suggestion.get().equals(repoLabel))
-                .selected(assignedLabels.contains(repoLabel)));
+                new PickerLabel(TurboLabel.getFirstMatchingTurboLabel(allLabels, repoLabel.getFullName()), false)
+                        .faded(!matchedLabels.contains(repoLabel))
+                        .highlighted(suggestion.isPresent() && suggestion.get().equals(repoLabel))
+                        .selected(assignedLabels.contains(repoLabel)));
     }
 
     /**
      * Positions dialog based on width and height of stage to avoid dialog appearing off-screen on certain computers
      * if default position is used
+     *
      * @param stage
      */
     private final void positionDialog(Stage stage) {
@@ -316,14 +317,14 @@ public class LabelPickerDialog extends Dialog<List<String>> {
      */
     private final void handleUserInput(String query) {
         state = new LabelPickerState(
-            TurboLabel.getMatchedLabels(allLabels, issue.getLabels()), allLabels, query.toLowerCase());
+                TurboLabel.getMatchedLabels(allLabels, issue.getLabels()), allLabels, query.toLowerCase());
         populatePanes(state);
     }
 
     private void handleLabelClick(String labelName) {
         queryField.setDisable(true);
         TurboLabel.getMatchedLabels(allLabels, labelName)
-            .stream().findFirst().ifPresent(state::updateAssignedLabels);
+                .stream().findFirst().ifPresent(state::updateAssignedLabels);
         populatePanes(state);
     }
 }

@@ -9,7 +9,9 @@ import org.openqa.selenium.WebDriver;
 import ui.ScreenManager;
 
 import java.awt.Rectangle;
+
 import javafx.geometry.Rectangle2D;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -166,10 +168,10 @@ public class ScreenManagerTests {
      * Produces a mocked ScreenManager object that responds to getDimensions and getAvailableDimensions based
      * on information provided as parameters.
      *
-     * @param pViewX The x-coordinate of the top right corner of the pView window.
-     * @param maxWidth The width of the screen.
+     * @param pViewX         The x-coordinate of the top right corner of the pView window.
+     * @param maxWidth       The width of the screen.
      * @param availableWidth The width of the space on the right of the pView window.
-     * @param height The height of the screen.
+     * @param height         The height of the screen.
      * @return The mocked ScreenManager object.
      */
     private static ScreenManager getMockedScreenManager(double pViewX, int maxWidth, int availableWidth, int height) {

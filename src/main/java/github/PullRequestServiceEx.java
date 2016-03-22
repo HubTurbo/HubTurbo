@@ -29,7 +29,7 @@ public class PullRequestServiceEx extends PullRequestService {
      * @throws IOException
      */
     public List<ReviewComment> getReviewComments(IRepositoryIdProvider repository,
-                                                 int pullRequestNumber) throws IOException {
+            int pullRequestNumber) throws IOException {
         return getReviewComments(repository, Integer.toString(pullRequestNumber));
     }
 
@@ -42,7 +42,7 @@ public class PullRequestServiceEx extends PullRequestService {
      * @throws IOException
      */
     public List<ReviewComment> getReviewComments(IRepositoryIdProvider repository,
-                                                 String pullRequestNumber) throws IOException {
+            String pullRequestNumber) throws IOException {
         String repoId = getId(repository);
         return getReviewComments(repoId, pullRequestNumber);
     }
@@ -68,9 +68,9 @@ public class PullRequestServiceEx extends PullRequestService {
 
         StringBuilder uri = new StringBuilder(SEGMENT_REPOS);
         uri.append('/').append(repoId)
-            .append(SEGMENT_PULLS)
-            .append('/').append(pullRequestNumber)
-            .append(SEGMENT_COMMENTS);
+                .append(SEGMENT_PULLS)
+                .append('/').append(pullRequestNumber)
+                .append(SEGMENT_COMMENTS);
 
         PagedRequest<ReviewComment> request = createPagedRequest();
         request.setUri(uri);

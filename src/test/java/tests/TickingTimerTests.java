@@ -23,7 +23,9 @@ public class TickingTimerTests {
     }
 
     private static TickingTimer createTickingTimer() {
-        return new TickingTimer("test", 10, (i) -> {}, () -> {}, TimeUnit.SECONDS);
+        return new TickingTimer("test", 10, (i) -> {
+        }, () -> {
+        }, TimeUnit.SECONDS);
     }
 
     @Test(expected = AssertionError.class)
@@ -68,14 +70,9 @@ public class TickingTimerTests {
                 4, 3)); // After 3.5
 
         // Timeouts every five seconds, tick every second
-        final TickingTimer tickingTimer = new TickingTimer("test2",
-                5,
-                ticks::add,
-                () -> {
-                    ticks.add(10); // Append 10 every timeout
-                },
-                TimeUnit.SECONDS
-        );
+        final TickingTimer tickingTimer = new TickingTimer("test2", 5, ticks::add, () -> {
+            ticks.add(10);
+        }, TimeUnit.SECONDS);
 
         tickingTimer.start();
         delay(1.5);

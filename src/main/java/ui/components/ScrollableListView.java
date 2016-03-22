@@ -11,7 +11,7 @@ import java.util.function.IntSupplier;
 
 /**
  * A ListView subclass that can be programmatically scrolled.
- *
+ * <p>
  * It builds on the functionality of the vanilla ListView by adding
  * methods for scrolling in different ways and can be easily extended
  * to support other kinds of scrolling.
@@ -42,6 +42,7 @@ public class ScrollableListView<T> extends ListView<T> {
 
     /**
      * Scrolls until the item with the given index is visible.
+     *
      * @param newIndex
      */
     public void scrollAndShow(int newIndex) {

@@ -44,7 +44,7 @@ public class RepoIOTests {
         RepoSource source = mock(RepoSource.class);
         CompletableFuture<List<String>> response = new CompletableFuture<>();
         doReturn(response).when(source).replaceIssueLabels(any(TurboIssue.class),
-                                                           anyListOf(String.class));
+                anyListOf(String.class));
 
         RepoIO repoIO = new RepoIO(Optional.of(source), Optional.empty(), Optional.empty());
         CompletableFuture result = repoIO.replaceIssueLabels(mock(TurboIssue.class), new ArrayList<>());

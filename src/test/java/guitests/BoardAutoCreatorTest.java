@@ -18,6 +18,7 @@ import ui.TestController;
 import ui.UI;
 import ui.issuepanel.PanelControl;
 import util.PlatformEx;
+
 import static ui.BoardAutoCreator.SAMPLE_BOARD;
 import static ui.BoardAutoCreator.SAMPLE_BOARD_DIALOG;
 
@@ -110,7 +111,7 @@ public class BoardAutoCreatorTest extends UITest {
     /**
      * Confirms the currently displayed board consists the set of panels specified in panelDetails
      */
-    public static void verifyBoard(PanelControl pc, Map<String, String> panelDetails){
+    public static void verifyBoard(PanelControl pc, Map<String, String> panelDetails) {
         List<PanelInfo> panelInfos = pc.getCurrentPanelInfos();
         assertEquals(panelDetails.size(), pc.getPanelCount());
         assertEquals(Optional.of(0), pc.getCurrentlySelectedPanel());

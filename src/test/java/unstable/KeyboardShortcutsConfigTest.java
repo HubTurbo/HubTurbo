@@ -64,11 +64,11 @@ public class KeyboardShortcutsConfigTest extends UITest {
         reloadPrefs(testPref);
         Platform.runLater(() -> KeyboardShortcuts.loadKeyboardShortcuts(testPref));
         waitUntilNodeAppears(hasText("Invalid key specified for MARK_AS_READ" +
-            " or it has already been used for some other shortcut. "));
+                " or it has already been used for some other shortcut. "));
         click("Use default key");
         reloadPrefs(testPref);
         assertEquals(KeyboardShortcuts.getDefaultKeyboardShortcuts().get("MARK_AS_READ"),
-            testPref.getKeyboardShortcuts().get("MARK_AS_READ"));
+                testPref.getKeyboardShortcuts().get("MARK_AS_READ"));
     }
 
     @Test
@@ -84,7 +84,7 @@ public class KeyboardShortcutsConfigTest extends UITest {
         click("Use default key");
         reloadPrefs(testPref);
         assertEquals(KeyboardShortcuts.getDefaultKeyboardShortcuts().get("MARK_AS_READ"),
-            testPref.getKeyboardShortcuts().get("MARK_AS_READ"));
+                testPref.getKeyboardShortcuts().get("MARK_AS_READ"));
     }
 
     @Test
@@ -97,11 +97,11 @@ public class KeyboardShortcutsConfigTest extends UITest {
         reloadPrefs(testPref);
         Platform.runLater(() -> KeyboardShortcuts.loadKeyboardShortcuts(testPref));
         waitUntilNodeAppears(hasText("Invalid key specified for MARK_AS_UNREAD" +
-            " or it has already been used for some other shortcut. "));
+                " or it has already been used for some other shortcut. "));
         click("Use default key");
         reloadPrefs(testPref);
         assertEquals(KeyboardShortcuts.getDefaultKeyboardShortcuts().get("MARK_AS_UNREAD"),
-            testPref.getKeyboardShortcuts().get("MARK_AS_UNREAD"));
+                testPref.getKeyboardShortcuts().get("MARK_AS_UNREAD"));
     }
 
     private static void reloadPrefs(Preferences prefs) {

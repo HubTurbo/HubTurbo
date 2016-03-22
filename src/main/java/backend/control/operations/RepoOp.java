@@ -4,6 +4,7 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * A repository-level operation.
+ *
  * @param <T> the return type of the operation
  */
 public interface RepoOp<T> {

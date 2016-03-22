@@ -5,6 +5,7 @@ import static ui.issuepanel.AbstractPanel.OCTICON_TICK_MARK;
 import static ui.issuepanel.AbstractPanel.OCTICON_UNDO;
 import static ui.issuepanel.AbstractPanel.OCTICON_RENAME_PANEL;
 import static ui.issuepanel.AbstractPanel.OCTICON_CLOSE_PANEL;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -48,7 +49,7 @@ public class PanelMenuBar extends HBox {
     public static final int NAME_AREA_WIDTH = PANEL_WIDTH - 65;
     public static final int TOOLTIP_WRAP_WIDTH = 220; //prefWidth for longer tooltip
 
-    public PanelMenuBar(FilterPanel panel, GUIController guiController, UI ui){
+    public PanelMenuBar(FilterPanel panel, GUIController guiController, UI ui) {
         this.ui = ui;
         this.guiController = guiController;
         this.panel = panel;
@@ -84,7 +85,7 @@ public class PanelMenuBar extends HBox {
 
         nameBox.setOnMouseClicked(mouseEvent -> {
             if (mouseEvent.getButton().equals(MouseButton.PRIMARY)
-                && mouseEvent.getClickCount() == 2) {
+                    && mouseEvent.getClickCount() == 2) {
 
                 mouseEvent.consume();
                 activateInplaceRename();
@@ -146,7 +147,8 @@ public class PanelMenuBar extends HBox {
         return buttonArea;
     }
 
-    /** Called in FilterPanel.java when the ShowRenamePanelEventHandler is invoked.
+    /**
+     * Called in FilterPanel.java when the ShowRenamePanelEventHandler is invoked.
      * A renameableTextField is generated in which the user inputs the new panel name.
      */
     public void initRenameableTextFieldAndEvents() {
@@ -162,7 +164,8 @@ public class PanelMenuBar extends HBox {
         renameableTextField.setPrefColumnCount(30);
     }
 
-    /** Handles the button and the keyboard events when the panle is in the rename stage
+    /**
+     * Handles the button and the keyboard events when the panle is in the rename stage
      */
     private void buttonAndKeyboardEventHandler() {
         // for button events
@@ -189,10 +192,11 @@ public class PanelMenuBar extends HBox {
         });
     }
 
-    /** Augments components of PanelMenuBar when the renaming of the panel happens.
+    /**
+     * Augments components of PanelMenuBar when the renaming of the panel happens.
      * The confirm button and the undo button are added to the panel.
      */
-    private void augmentRenameableTextField(){
+    private void augmentRenameableTextField() {
         menuBarNameArea.getChildren().remove(nameBox);
         this.getChildren().removeAll(menuBarRenameButton, menuBarCloseButton);
         menuBarNameArea.getChildren().addAll(renameableTextField);
@@ -203,7 +207,8 @@ public class PanelMenuBar extends HBox {
         this.getChildren().addAll(menuBarConfirmButton, menuBarUndoButton);
     }
 
-    /** Closes the renameableTextField. The pencil and the close button are
+    /**
+     * Closes the renameableTextField. The pencil and the close button are
      * added back in.
      */
     private void closeRenameableTextField() {
@@ -214,34 +219,35 @@ public class PanelMenuBar extends HBox {
         panel.requestFocus();
     }
 
-    private void panelNameValidator(){
+    private void panelNameValidator() {
         String newName = renameableTextField.getText().trim();
         if (!newName.equals("")) {
             setPanelName(newName);
         }
     }
-    public void setNameText(String name){
+
+    public void setNameText(String name) {
         this.nameText.setText(name);
     }
 
-    public Text getNameText(){
+    public Text getNameText() {
         return this.nameText;
     }
 
-    public void setPanelName(String panelName){
+    public void setPanelName(String panelName) {
         this.panelName = panelName;
         setNameText(panelName);
     }
 
-    public String getPanelName(){
+    public String getPanelName() {
         return this.panelName;
     }
 
-    public Label getRenameButton(){
+    public Label getRenameButton() {
         return this.renameButton;
     }
 
-    public Label getCloseButton(){
+    public Label getCloseButton() {
         return this.closeButton;
     }
 }

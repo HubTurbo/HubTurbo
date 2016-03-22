@@ -17,10 +17,10 @@ public class GuiElement {
     private final Optional<TurboUser> author;
 
     public GuiElement(TurboIssue issue,
-                      List<TurboLabel> labels,
-                      Optional<TurboMilestone> milestone,
-                      Optional<TurboUser> assignee,
-                      Optional<TurboUser> author) {
+            List<TurboLabel> labels,
+            Optional<TurboMilestone> milestone,
+            Optional<TurboUser> assignee,
+            Optional<TurboUser> author) {
         this.issue = issue;
         this.labels = labels;
         this.milestone = milestone;

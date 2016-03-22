@@ -58,25 +58,25 @@ public class PanelFocusTest extends UITest {
 
         // check that focus is on first panel
         awaitCondition(() ->
-            0 == panelControl.getCurrentlySelectedPanel().get());
+                0 == panelControl.getCurrentlySelectedPanel().get());
 
         // Check that pressing F will go to second panel
         // This checks that no filter text field is in focus and panel
         // shortcut works at startup
         pushKeys(KeyCode.F);
         awaitCondition(() ->
-            1 == panelControl.getCurrentlySelectedPanel().get());
+                1 == panelControl.getCurrentlySelectedPanel().get());
 
         // More shortcut checks to ensure the focus is always correct
         pushKeys(JUMP_TO_FILTER_BOX);
         awaitCondition(() ->
-            1 == panelControl.getCurrentlySelectedPanel().get());
+                1 == panelControl.getCurrentlySelectedPanel().get());
         pushKeys(JUMP_TO_FIRST_ISSUE);
         awaitCondition(() ->
-            1 == panelControl.getCurrentlySelectedPanel().get());
+                1 == panelControl.getCurrentlySelectedPanel().get());
         pushKeys(KeyCode.F);
         awaitCondition(() ->
-            2 == panelControl.getCurrentlySelectedPanel().get());
+                2 == panelControl.getCurrentlySelectedPanel().get());
     }
 
     private void panelFocus_focusedPanel_focusCorrectOnCreatingPanels(PanelControl panelControl) {
@@ -89,11 +89,11 @@ public class PanelFocusTest extends UITest {
         //   colour focused but the real JavaFX focus is on first panel
         pushKeys(CREATE_RIGHT_PANEL);
         awaitCondition(() -> panelControl.getCurrentlySelectedPanel().get() ==
-            panelControl.getPanelCount() - 1);
+                panelControl.getPanelCount() - 1);
 
         type("  ");
         awaitCondition(() -> panelControl.getCurrentlySelectedPanel().get() ==
-            panelControl.getPanelCount() - 1);
+                panelControl.getPanelCount() - 1);
 
         // test that upon creating panel on the left, focus is on the first panel
         // - same consideration as above
@@ -104,7 +104,7 @@ public class PanelFocusTest extends UITest {
     }
 
     private void panelFocus_firstPanel_firstPanelShown(PanelControl panelControl)
-        throws IllegalAccessException {
+            throws IllegalAccessException {
         /**
          * Testing First Panel is shown (i.e. scrollbar is set to left end)
          * and on focus upon Opening Board
@@ -122,7 +122,7 @@ public class PanelFocusTest extends UITest {
         // 2. Create a new panel so that scroll bar is on the left
         pushKeys(CREATE_RIGHT_PANEL);
         awaitCondition(() -> panelControl.getCurrentlySelectedPanel().get() ==
-            panelControl.getPanelCount() - 1);
+                panelControl.getPanelCount() - 1);
         // 3. Open board
         pushKeys(SWITCH_BOARD);
 
@@ -130,13 +130,13 @@ public class PanelFocusTest extends UITest {
         awaitCondition(() -> 0 == panelControl.getCurrentlySelectedPanel().get());
         // Check that first panel is shown by checking scrollbar position
         ScrollPane panelsScrollPaneReflection =
-            (ScrollPane) FieldUtils.readField(panelControl, "panelsScrollPane", true);
+                (ScrollPane) FieldUtils.readField(panelControl, "panelsScrollPane", true);
         assertEquals(0, panelsScrollPaneReflection.getHvalue(), 0.001);
     }
 
     private void createDefaultPanels() {
         ConfigFileHandler configFileHandler =
-            new ConfigFileHandler(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
+                new ConfigFileHandler(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
         GlobalConfig globalConfig = new GlobalConfig();
 
         PanelInfo test1 = new PanelInfo();

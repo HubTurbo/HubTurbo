@@ -11,7 +11,7 @@ import javafx.scene.control.Tooltip;
 
 /**
  * This class is to represent a label in LabelPickerDialog
- *
+ * <p>
  * It contains attributes such as selected, highlighted, removed and faded in order
  * to produce the appropriate styled node through getNode()
  */
@@ -80,6 +80,7 @@ public class PickerLabel extends TurboLabel {
 
     /**
      * This isn't unnecessary as fields are added, but are not taken into account for equality.
+     *
      * @return
      */
     @Override
@@ -90,6 +91,7 @@ public class PickerLabel extends TurboLabel {
 
     /**
      * This isn't unnecessary as fields are added, but are not taken into account for equality.
+     *
      * @return
      */
     @Override

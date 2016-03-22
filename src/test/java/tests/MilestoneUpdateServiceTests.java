@@ -44,33 +44,21 @@ public class MilestoneUpdateServiceTests {
         List<Header> page1Headers = TestUtils.parseHeaderRecord(page1Header);
         List<Header> page2Headers = TestUtils.parseHeaderRecord(page2Header);
 
-        mockServer.when(
-                createMockServerRequest("HEAD", 1)
-        ).respond(
-                response().withHeaders(page1Headers)
-        );
+        mockServer
+                .when(createMockServerRequest("HEAD", 1))
+                .respond(response().withHeaders(page1Headers));
 
-        mockServer.when(
-                createMockServerRequest("GET", 1)
-        ).respond(
-                response()
-                        .withHeaders(page1Headers)
-                        .withBody(page1)
-        );
+        mockServer
+                .when(createMockServerRequest("GET", 1))
+                .respond(response().withHeaders(page1Headers).withBody(page1));
 
-        mockServer.when(
-                createMockServerRequest("HEAD", 2)
-        ).respond(
-                response().withHeaders(page2Headers)
-        );
+        mockServer
+                .when(createMockServerRequest("HEAD", 2))
+                .respond(response().withHeaders(page2Headers));
 
-        mockServer.when(
-                createMockServerRequest("GET", 2)
-        ).respond(
-                response()
-                        .withHeaders(page2Headers)
-                        .withBody(page2)
-        );
+        mockServer
+                .when(createMockServerRequest("GET", 2))
+                .respond(response().withHeaders(page2Headers).withBody(page2));
     }
 
     /**
@@ -89,7 +77,7 @@ public class MilestoneUpdateServiceTests {
         assertTrue(milestones.isEmpty());
         assertEquals(previousETags, service.getUpdatedETags());
         assertEquals(Utility.parseHTTPLastModifiedDate("Sun, 27 Dec 2015 15:28:46 GMT"),
-                     service.getUpdatedCheckTime());
+                service.getUpdatedCheckTime());
     }
 
     /**

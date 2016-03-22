@@ -17,10 +17,10 @@ public final class GitHubModelUpdatesData {
     private final GitHubRepoTask.Result<TurboUser> users;
 
     public GitHubModelUpdatesData(Model model,
-                                  GitHubRepoTask.Result<TurboIssue> issues, List<PullRequest> pullRequests,
-                                  GitHubRepoTask.Result<TurboLabel> labels,
-                                  GitHubRepoTask.Result<TurboMilestone> milestones,
-                                  GitHubRepoTask.Result<TurboUser> users) {
+            GitHubRepoTask.Result<TurboIssue> issues, List<PullRequest> pullRequests,
+            GitHubRepoTask.Result<TurboLabel> labels,
+            GitHubRepoTask.Result<TurboMilestone> milestones,
+            GitHubRepoTask.Result<TurboUser> users) {
         this.model = model;
         this.issues = issues;
         this.pullRequests = pullRequests;
