@@ -20,19 +20,15 @@ public class BoardPicker {
         ui.registerEvent((ShowBoardPickerEventHandler) e -> Platform.runLater(() -> showBoardPicker(e.boards)));
     }
 
-    // TODO implement multiple dialogs, currently, only one dialog is allowed and it blocks the main UI when open
-
     private void showBoardPicker(List<String> boards) {
         // create new BoardPickerDialog
         BoardPickerDialog boardPickerDialog = new BoardPickerDialog(boards, stage);
         // show BoardPickerDialog and wait for result
         Optional<String> result = boardPickerDialog.showAndWait();
-        stage.show(); // ensures stage is showing after label picker is closed (mostly for tests)
+        stage.show(); // ensures stage is showing after board picker is closed (mostly for tests)
         // if result is present (user did not cancel) then replace issue labels with result
 
-        result.ifPresent(res -> {
-            ui.getMenuControl().switchBoard(res);
-        });
+        result.ifPresent(res -> ui.getMenuControl().switchBoard(res));
     }
 
 }

@@ -6,14 +6,14 @@ import java.util.stream.Collectors;
 /**
  * @author Liu Xinan
  */
-public class BoardPickerState {
+class BoardPickerState {
 
     private Set<String> boards;
     private List<String> matchedBoards;
     private Optional<String> suggestion;
     private String keyword;
 
-    public BoardPickerState(Set<String> boards, String userInput) {
+    BoardPickerState(Set<String> boards, String userInput) {
         this(boards, new ArrayList<>(), userInput.trim(), Optional.empty());
         update();
     }
@@ -26,15 +26,15 @@ public class BoardPickerState {
         this.keyword = keyword;
     }
 
-    public List<String> getMatchedBoards() {
+    List<String> getMatchedBoards() {
         return matchedBoards;
     }
 
-    public Optional<String> getSuggestion() {
+    Optional<String> getSuggestion() {
         return suggestion;
     }
 
-    private final void update() {
+    private void update() {
         if (keyword.isEmpty()) {
             matchAllBoards();
         }
@@ -42,11 +42,11 @@ public class BoardPickerState {
         updateSuggestion();
     }
 
-    private final void matchAllBoards() {
+    private void matchAllBoards() {
         matchedBoards = boards.stream().collect(Collectors.toList());
     }
 
-    private final void updateMatchedBoards() {
+    private void updateMatchedBoards() {
         String[] prefixes = keyword.split("\\s+");
         matchedBoards = boards.stream()
                     .filter(board -> {
@@ -62,22 +62,14 @@ public class BoardPickerState {
                         return true;
                     })
                     .collect(Collectors.toList());
-        matchedBoards.sort((left, right) -> left.compareToIgnoreCase(right));
     }
 
-    private final void updateSuggestion() {
+    private void updateSuggestion() {
         if (!matchedBoards.isEmpty()) {
-            suggestion = Optional.of(matchedBoards.get(0));
+            suggestion = matchedBoards.stream().min(String::compareToIgnoreCase);
         } else {
             suggestion = Optional.empty();
         }
-//        if (matchedBoards.size() == 1) {
-//            suggestion = Optional.of(matchedBoards.get(0));
-//        } else if (matchedBoards.size() > 1) {
-//            matchedBoards.stream()
-//                        .filter(board -> board.equalsIgnoreCase(keyword))
-//                        .forEach(board -> suggestion = Optional.of(board));
-//        }
     }
 
 }
