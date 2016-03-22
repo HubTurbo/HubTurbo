@@ -43,9 +43,13 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseButton;
 import javafx.stage.Stage;
 import prefs.Preferences;
+import ui.IdGenerator;
 import ui.MenuControl;
 import ui.TestController;
 import ui.UI;
+import ui.components.FilterTextField;
+import ui.listpanel.ListPanel;
+import ui.listpanel.ListPanelCell;
 import util.PlatformEx;
 import util.PlatformSpecific;
 
@@ -405,6 +409,42 @@ public class UITest extends GuiTest {
         for (String menuName : menuNames) {
             click(menuName);
         }
+    }
+
+    public TextField getLabelPickerTextField() {
+        return find(IdGenerator.getLabelPickerTextFieldIdForTest());
+    }
+
+    public void clickFilterTextFieldAtPanel(int panelIndex) {
+        click(IdGenerator.getPanelFilterTextFieldIdForTest(panelIndex));
+    }
+
+    public FilterTextField getFilterTextFieldAtPanel(int panelIndex) {
+        return find(IdGenerator.getPanelFilterTextFieldIdForTest(panelIndex));
+    }
+
+    public void clickIssue(int panelIndex, int issueId) {
+        click(IdGenerator.getPanelCellIdForTest(panelIndex, issueId));
+    }
+
+    public void rightClickIssue(int panelIndex, int issueId) {
+        rightClick(IdGenerator.getPanelCellIdForTest(panelIndex, issueId));
+    }
+
+    public void clickPanel(int panelIndex) {
+        click(IdGenerator.getPanelIdForTest(panelIndex));
+    }
+
+    public void rightClickPanel(int panelIndex) {
+        rightClick(IdGenerator.getPanelIdForTest(panelIndex));
+    }
+
+    public ListPanel getPanel(int panelIndex) {
+        return find(IdGenerator.getPanelIdForTest(panelIndex));
+    }
+
+    public ListPanelCell getIssueCell(int panelIndex, int issueId) {
+        return find(IdGenerator.getPanelCellIdForTest(panelIndex, issueId));
     }
 
     /**

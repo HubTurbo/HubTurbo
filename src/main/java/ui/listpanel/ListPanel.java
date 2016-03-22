@@ -28,6 +28,7 @@ import org.apache.logging.log4j.Logger;
 
 import ui.GUIController;
 import ui.GuiElement;
+import ui.IdGenerator;
 import ui.UI;
 import ui.components.IssueListView;
 import ui.components.KeyboardShortcuts;
@@ -191,7 +192,7 @@ public class ListPanel extends FilterPanel {
         closedIssuesCount = getClosedIssuesCount();
         openIssuesCount = issuesCount - closedIssuesCount;
         listView.restoreSelection();
-        this.setId(guiController.getDefaultRepo() + "_col" + panelIndex);
+        this.setId(IdGenerator.getPanelId(panelIndex));
         updateFooter();
 
 

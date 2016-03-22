@@ -19,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 
 public class LabelPickerTests extends UITest {
 
-    private static final String QUERY_FIELD_ID = IdGenerator.getLabelPickerQueryFieldIdForTest();
+    private static final String QUERY_FIELD_ID = IdGenerator.getLabelPickerTextFieldIdForTest();
     private static final String DEFAULT_ISSUECARD_ID = IdGenerator.getPanelCellIdForTest(0, 9);
     private static final String ASSIGNED_LABELS_PANE_ID = IdGenerator.getAssignedLabelsPaneIdForTest();
 
