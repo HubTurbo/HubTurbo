@@ -1,7 +1,9 @@
-package guitests;
+package unstable;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import guitests.UITest;
 import prefs.Preferences;
 import ui.TestController;
 import ui.UI;
@@ -11,7 +13,7 @@ import java.util.List;
 
 import static org.loadui.testfx.controls.Commons.hasText;
 
-public class BoardTests extends UITest {
+public class BoardDuplicateTests extends UITest {
     PanelControl panelControl;
 
     @Before
