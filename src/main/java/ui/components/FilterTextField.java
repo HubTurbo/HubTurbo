@@ -16,6 +16,8 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static ui.components.KeyboardShortcuts.SHOW_DOCS;
+
 /**
  * A field augmented with the ability to revert edits, autocompletion, on-the-fly error
  * checking, and callbacks for various actions.
@@ -32,8 +34,9 @@ public class FilterTextField extends TextField {
     public static final String INVALID_FILTER_STYLE = "-fx-control-inner-background: #EE8993";
 
     // Callback functions
-    private Runnable cancel = () -> {};
-    private Function<String, String> confirm = (s) -> s;
+    private Runnable onCancel = () -> {};
+    private Runnable onShowDocs = () -> {};
+    private Function<String, String> onConfirm = (s) -> s;
 
     // For reverting edits
     private String previousText;
@@ -43,6 +46,7 @@ public class FilterTextField extends TextField {
 
     // For on-the-fly parsing and checking
     private final ValidationSupport validationSupport = new ValidationSupport();
+
 
     public FilterTextField(String initialText) {
         super(initialText);
@@ -81,10 +85,10 @@ public class FilterTextField extends TextField {
             }
         });
         setOnKeyPressed(e -> {
-             if (e.getCode() == KeyCode.TAB) {
+            if (e.getCode() == KeyCode.TAB) {
                  // Disable tab for UI traversal
                  e.consume();
-             }
+            }
         });
         setOnKeyReleased(e -> {
             e.consume();
@@ -92,10 +96,15 @@ public class FilterTextField extends TextField {
                 confirmEdit();
             } else if (e.getCode() == KeyCode.ESCAPE) {
                 if (getText().equals(previousText)) {
-                    cancel.run();
+                    onCancel.run();
                 } else {
                     revertEdit();
                 }
+            }
+        });
+        addEventHandler(KeyEvent.KEY_PRESSED, event -> {
+            if (SHOW_DOCS.match(event)) {
+                onShowDocs.run();
             }
         });
     }
@@ -226,11 +235,11 @@ public class FilterTextField extends TextField {
     }
 
     /**
-     * Commits the current contents of the field. This triggers its 'confirm' callback.
+     * Commits the current contents of the field. This triggers its 'onConfirm' callback.
      */
     private void confirmEdit() {
         previousText = getText();
-        String newText = confirm.apply(getText());
+        String newText = onConfirm.apply(getText());
         int caretPosition = getCaretPosition();
         setText(newText);
         positionCaret(caretPosition);
@@ -245,21 +254,30 @@ public class FilterTextField extends TextField {
     }
 
     /**
-     * Sets the 'cancel' callback, which will be called with Esc is pressed and there is
+     * Sets the 'onCancel' callback, which will be called with Esc is pressed and there is
      * no edit to revert.
      */
-    public FilterTextField setOnCancel(Runnable cancel) {
-        this.cancel = cancel;
+    public FilterTextField setOnCancel(Runnable onCancel) {
+        this.onCancel = onCancel;
         return this;
     }
 
     /**
-     * Sets the 'confirm' callback, which will be called when Enter is pressed, or when the
+     * Sets the 'onConfirm' callback, which will be called when Enter is pressed, or when the
      * contents of the field are manually set with {@link #setFilterText}. The callback will
      * be passed the current contents of the field.
      */
-    public FilterTextField setOnConfirm(Function<String, String> confirm) {
-        this.confirm = confirm;
+    public FilterTextField setOnConfirm(Function<String, String> onConfirm) {
+        this.onConfirm = onConfirm;
+        return this;
+    }
+    
+    /**
+     * Sets the 'onShowDocs' callback, which will be called when the user triggers the show_docs
+     * keyboard shortcut event.
+     */
+    public FilterTextField setOnShowDocs(Runnable onShowDocs) {
+        this.onShowDocs = onShowDocs;
         return this;
     }
 

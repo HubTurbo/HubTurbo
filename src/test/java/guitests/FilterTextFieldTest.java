@@ -3,15 +3,26 @@ package guitests;
 import static junit.framework.TestCase.assertTrue;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.Test;
 
 import javafx.scene.input.KeyCode;
+import org.loadui.testfx.utils.FXTestUtils;
 import ui.TestController;
+import ui.UI;
 import ui.components.FilterTextField;
 import ui.issuepanel.FilterPanel;
+import util.GitHubURL;
+import util.events.testevents.NavigateToPageEventHandler;
 
 public class FilterTextFieldTest extends UITest {
+
+    @Override
+    public void launchApp() {
+        FXTestUtils.launchApp(
+            TestUI.class, "--test=true", "--bypasslogin=true", "--testchromedriver=true");
+    }
 
     @Test
     public void inputsTest() {
@@ -57,6 +68,15 @@ public class FilterTextFieldTest extends UITest {
 
         push(KeyCode.ESCAPE);
         awaitCondition(() -> toggle.get() % 2 == 1);
+    }
+
+    @Test
+    public void showDocs_filterTextFieldInFocus_navigateToFilterDocsPage() {
+        AtomicReference<String> url = new AtomicReference<>();
+        UI.events.registerEvent((NavigateToPageEventHandler) e -> url.set(e.url));
+        getFirstPanelField();
+        push(KeyCode.F1);
+        waitAndAssertEquals(GitHubURL.FILTERS_PAGE, url::get);
     }
 
     @Test
@@ -115,19 +135,6 @@ public class FilterTextFieldTest extends UITest {
         awaitCondition(() -> field.getText().equals(" assigne e "));
     }
 
-    private FilterTextField getFirstPanelField() {
-        FilterPanel issuePanel = (FilterPanel) TestController.getUI().getPanelControl().getPanel(0);
-        FilterTextField field = issuePanel.getFilterTextField();
-        waitUntilNodeAppears(field);
-        click(issuePanel.getFilterTextField());
-        return field;
-    }
-
-    private void clearField() {
-        selectAll();
-        push(KeyCode.BACK_SPACE);
-    }
-
     private void testCompletions(FilterTextField field) {
         // Basic completion
         clearField();
@@ -158,6 +165,14 @@ public class FilterTextFieldTest extends UITest {
         awaitCondition(() -> field.getText().equals("closedt"));
     }
 
+    private FilterTextField getFirstPanelField() {
+        FilterPanel issuePanel = (FilterPanel) TestController.getUI().getPanelControl().getPanel(0);
+        FilterTextField field = issuePanel.getFilterTextField();
+        waitUntilNodeAppears(field);
+        click(issuePanel.getFilterTextField());
+        return field;
+    }
+
     private void testValidFilterStyleApplied(String filter) {
         FilterTextField field = getFirstPanelField();
         clearField();
@@ -177,5 +192,10 @@ public class FilterTextFieldTest extends UITest {
         clearField();
         type(filter).push(KeyCode.ENTER);
         assertTrue(field.getStyle().contains(FilterTextField.INVALID_FILTER_STYLE));
+    }
+
+    private void clearField() {
+        selectAll();
+        push(KeyCode.BACK_SPACE);
     }
 }
