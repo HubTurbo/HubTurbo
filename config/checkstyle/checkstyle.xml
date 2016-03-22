@@ -302,6 +302,8 @@
       <property name="severity" value="error"/>
     </module>
 
+    <module name="Indentation" />
+
     <module name="NoWhitespaceBefore">
       <!-- Checks that there is no whitespace before various unary operators.
            Linebreaks are allowed.
