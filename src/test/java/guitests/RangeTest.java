@@ -1,35 +1,30 @@
 package guitests;
 
 import backend.stub.DummyRepoState;
-import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import org.junit.Test;
-import ui.IdGenerator;
-import ui.listpanel.ListPanel;
 
 import static org.junit.Assert.assertEquals;
 
 public class RangeTest extends UITest {
 
     private static final int EVENT_DELAY = 1000;
-    private static final String FILTER_TEXT_FIELD_ID = IdGenerator.getPanelFilterTextFieldIdForTest(0);
-    private static final String PANEL_ID = IdGenerator.getPanelIdForTest(0);
 
     @Test
     public void numberRangeTest() {
-        ((TextField) find(FILTER_TEXT_FIELD_ID)).setText("id:>5");
-        click(FILTER_TEXT_FIELD_ID);
+        getFilterTextFieldAtPanel(0).setText("id:>5");
+        clickFilterTextFieldAtPanel(0);
         press(KeyCode.ENTER).release(KeyCode.ENTER);
         sleep(EVENT_DELAY);
-        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES - 5, ((ListPanel) find(PANEL_ID)).getIssuesCount());
+        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES - 5, getPanel(0).getIssuesCount());
     }
 
     @Test
     public void dateRangeTest() {
-        ((TextField) find(FILTER_TEXT_FIELD_ID)).setText("created:>2002-12-31");
-        click(FILTER_TEXT_FIELD_ID);
+        getFilterTextFieldAtPanel(0).setText("created:>2002-12-31");
+        clickFilterTextFieldAtPanel(0);
         press(KeyCode.ENTER).release(KeyCode.ENTER);
         sleep(EVENT_DELAY);
-        assertEquals(8, ((ListPanel) find(PANEL_ID)).getIssuesCount());
+        assertEquals(8, getPanel(0).getIssuesCount());
     }
 }

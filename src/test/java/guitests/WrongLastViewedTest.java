@@ -46,7 +46,6 @@ public class WrongLastViewedTest extends UITest {
 
     @Test
     public void wrongLastViewedTest() throws InterruptedException {
-        ComboBox<String> repositorySelector = find(IdGenerator.getRepositorySelectorIdForTest());
-        assertEquals("test2/test2", repositorySelector.getValue());
+        assertEquals("test2/test2", getRepositorySelector().getValue());
     }
 }

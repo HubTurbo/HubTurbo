@@ -19,17 +19,14 @@ import static org.junit.Assert.assertEquals;
 
 public class LabelPickerTests extends UITest {
 
-    private static final String QUERY_FIELD_ID = IdGenerator.getLabelPickerTextFieldIdForTest();
-    private static final String DEFAULT_ISSUECARD_ID = IdGenerator.getPanelCellIdForTest(0, 9);
     private static final String ASSIGNED_LABELS_PANE_ID = IdGenerator.getAssignedLabelsPaneIdForTest();
 
     @Test
     public void showLabelPicker_typeQuery_displaysCorrectly() {
-        triggerLabelPicker(getIssueCard(DEFAULT_ISSUECARD_ID).getIssue());
-        TextField labelPickerTextField = find(QUERY_FIELD_ID);
-        click(labelPickerTextField);
+        triggerLabelPicker(getIssueCell(0, 9).getIssue());
+        clickLabelPickerTextField();
         type("world");
-        assertEquals("world", labelPickerTextField.getText());
+        assertEquals("world", getLabelPickerTextField().getText());
         exitCleanly();
     }
 
@@ -45,16 +42,12 @@ public class LabelPickerTests extends UITest {
 
     private void exitCleanly() {
         push(KeyCode.ESCAPE);
-        waitUntilNodeDisappears(QUERY_FIELD_ID);
-    }
-
-    private ListPanelCell getIssueCard(String issueCardId) {
-        return find(issueCardId);
+        waitUntilNodeDisappears(getLabelPickerTextField());
     }
 
     private void triggerLabelPicker(TurboIssue issue) {
         Platform.runLater(stage::hide);
         UI.events.triggerEvent(new ShowLabelPickerEvent(issue));
-        waitUntilNodeAppears(QUERY_FIELD_ID);
+        waitUntilNodeAppears(getLabelPickerTextField());
     }
 }

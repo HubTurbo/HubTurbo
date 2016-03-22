@@ -27,16 +27,16 @@ public class PanelsTest extends UITest {
         pushKeys(MAXIMIZE_WINDOW);
         pushKeys(CREATE_RIGHT_PANEL);
         pushKeys(CREATE_RIGHT_PANEL);
-        waitUntilNodeAppears(getPanel(0).getFilterTextField());
+        waitUntilNodeAppears(getFilterPanel(0).getFilterTextField());
 
         type("repo:dummy2/dummy2");
         push(KeyCode.ENTER);
 
         selectPanel(1);
 
-        final FilterPanel panel0 = getPanel(0);
-        final FilterPanel panel1 = getPanel(1);
-        final FilterPanel panel2 = getPanel(2);
+        final FilterPanel panel0 = getFilterPanel(0);
+        final FilterPanel panel1 = getFilterPanel(1);
+        final FilterPanel panel2 = getFilterPanel(2);
 
         reorderPanelsByDragging(panel0, panel1, panel2);
 
@@ -44,7 +44,7 @@ public class PanelsTest extends UITest {
         waitUntilNodeDisappears(panel0);
 
         // Switch default repo
-        click(IdGenerator.getRepositorySelectorIdForTest());
+        clickRepositorySelector();
         selectAll();
         type("dummy2/dummy2");
         push(KeyCode.ENTER);
@@ -56,22 +56,22 @@ public class PanelsTest extends UITest {
 
     private void reorderPanelsByDragging(FilterPanel panel0, FilterPanel panel1, FilterPanel panel2) {
         dragUnconditionally(dragSrc(panel1), dragDest(panel0));
-        awaitCondition(() -> getPanel(0) == panel1);
+        awaitCondition(() -> getFilterPanel(0) == panel1);
 
         dragUnconditionally(dragSrc(panel0), dragDest(panel1));
-        awaitCondition(() -> getPanel(0) == panel0);
+        awaitCondition(() -> getFilterPanel(0) == panel0);
 
         dragUnconditionally(dragSrc(panel1), dragDest(panel0));
-        awaitCondition(() -> getPanel(0) == panel1);
+        awaitCondition(() -> getFilterPanel(0) == panel1);
 
         dragUnconditionally(dragSrc(panel1), dragDest(panel2));
-        awaitCondition(() -> getPanel(0) == panel0 && getPanel(1) == panel2 && getPanel(2) == panel1);
+        awaitCondition(() -> getFilterPanel(0) == panel0 && getFilterPanel(1) == panel2 && getFilterPanel(2) == panel1);
 
         dragUnconditionally(dragSrc(panel2), dragDest(panel1));
-        awaitCondition(() -> getPanel(0) == panel0 && getPanel(1) == panel1 && getPanel(2) == panel2);
+        awaitCondition(() -> getFilterPanel(0) == panel0 && getFilterPanel(1) == panel1 && getFilterPanel(2) == panel2);
 
         dragUnconditionally(dragSrc(panel0), dragDest(panel1));
-        awaitCondition(() -> getPanel(0) == panel1);
+        awaitCondition(() -> getFilterPanel(0) == panel1);
     }
 
     private Node dragSrc(FilterPanel panel) {
@@ -84,11 +84,11 @@ public class PanelsTest extends UITest {
 
     private void selectPanel(int index) {
         eventTriggered.set(false);
-        click(getPanel(index).getNameText());
+        click(getFilterPanel(index).getNameText());
         awaitCondition(eventTriggered::get);
     }
 
-    private FilterPanel getPanel(int index) {
+    private FilterPanel getFilterPanel(int index) {
         PanelControl panels = TestController.getUI().getPanelControl();
         return (FilterPanel) panels.getPanel(index);
     }

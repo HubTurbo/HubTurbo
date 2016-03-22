@@ -3,7 +3,6 @@ package guitests;
 import javafx.scene.input.KeyCode;
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
-import ui.IdGenerator;
 import ui.UI;
 import util.GitHubURL;
 import util.events.IssueCreatedEvent;
@@ -60,7 +59,7 @@ public class ChromeDriverTest extends UITest {
         assertEquals(GitHubURL.getPathForNewMilestone("dummy/dummy"), url);
         clearUrl();
 
-        click(IdGenerator.getPanelCellIdForTest(0, 9));
+        clickIssue(0, 9);
         sleep(EVENT_DELAY);
         clearUrl();
 

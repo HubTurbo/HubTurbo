@@ -2,7 +2,6 @@ package guitests;
 
 import javafx.scene.input.KeyCode;
 import org.junit.Test;
-import ui.IdGenerator;
 import ui.UI;
 import ui.listpanel.ListPanel;
 import util.events.testevents.UILogicRefreshEvent;
@@ -19,8 +18,8 @@ public class ScrollableListViewTests extends UITest {
         }
         UI.events.triggerEvent(new UILogicRefreshEvent());
         sleep(2000);
-        ListPanel col0 = find(IdGenerator.getPanelIdForTest(0));
-        click(IdGenerator.getPanelCellIdForTest(0, 49));
+        ListPanel col0 = getPanel(0);
+        clickIssue(0, 49);
         for (int i = 0; i < 40; i++) {
             push(KeyCode.DOWN);
         }

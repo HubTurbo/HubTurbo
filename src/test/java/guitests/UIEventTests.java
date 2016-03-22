@@ -1,10 +1,8 @@
 package guitests;
 
-import javafx.scene.control.ComboBox;
 import javafx.scene.input.KeyCode;
 
 import org.junit.Test;
-import ui.IdGenerator;
 import ui.UI;
 import ui.components.KeyboardShortcuts;
 import util.events.*;
@@ -71,7 +69,7 @@ public class UIEventTests extends UITest {
     public void panelClickedTest() {
         UI.events.registerEvent((PanelClickedEventHandler) e -> UIEventTests.increaseEventTestCount());
         resetEventTestCount();
-        click(IdGenerator.getPanelFilterTextFieldIdForTest(0));
+        clickFilterTextFieldAtPanel(0);
         assertEquals(1, eventTestCount);
     }
 
@@ -85,12 +83,11 @@ public class UIEventTests extends UITest {
         resetEventTestCount();
 
         // Test with multiple repositories
-        ComboBox<String> comboBox = find(IdGenerator.getRepositorySelectorIdForTest());
-        click(comboBox);
+        clickRepositorySelector();
         selectAll();
         type("dummy3/dummy3");
         push(KeyCode.ENTER);
-        click(IdGenerator.getPanelFilterTextFieldIdForTest(0));
+        clickFilterTextFieldAtPanel(0);
         resetEventTestCount();
         press(KeyboardShortcuts.SWITCH_DEFAULT_REPO);
         assertEquals(1, eventTestCount);

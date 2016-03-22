@@ -2,7 +2,6 @@ package guitests;
 
 import javafx.scene.input.KeyCode;
 import org.junit.Test;
-import ui.IdGenerator;
 import ui.UI;
 import ui.components.FilterTextField;
 import util.events.UpdateProgressEvent;
@@ -14,33 +13,25 @@ public class UIComponentsTest extends UITest {
     // TODO check that filter text field does indeed do autocomplete correctly, etc
     @Test
     public void keywordCompletionTest() {
-        String filterTextFieldId = IdGenerator.getPanelFilterTextFieldIdForTest(0);
-        click(filterTextFieldId);
+        clickFilterTextFieldAtPanel(0);
         selectAll();
         push(KeyCode.BACK_SPACE);
         type("ass");
         push(KeyCode.TAB);
-        FilterTextField filterTextField = find(filterTextFieldId);
+        FilterTextField filterTextField = getFilterTextFieldAtPanel(0);
         assertEquals("assignee", filterTextField.getText());
     }
 
     @Test
     public void filterTextFieldTest() {
-        String filterTextFieldId = IdGenerator.getPanelFilterTextFieldIdForTest(0);
-        click(filterTextFieldId);
+        clickFilterTextFieldAtPanel(0);
         selectAll();
         push(KeyCode.BACK_SPACE);
         type("is:open OR is:closed");
         push(KeyCode.ENTER);
-<<<<<<< 63e07465fa0e98a2fb3c264f6f7d62998b5259b8
-
-        FilterTextField filterTextField = find("#dummy/dummy_col0_filterTextField");
-=======
-        
-        FilterTextField filterTextField = find(filterTextFieldId);
->>>>>>> Refactored more id strings in ScrollableListViewTests, SortTest, UIComponentsTest, UIEventTests and UseGlobalConfigsTest.
+        FilterTextField filterTextField = getFilterTextFieldAtPanel(0);
         filterTextField.clear();
-        click(filterTextFieldId);
+        clickFilterTextFieldAtPanel(0);
         type("!@#$%^&*( ) { } :?");
         assertEquals("!@#$%^&*( ) { } :?", filterTextField.getText());
     }

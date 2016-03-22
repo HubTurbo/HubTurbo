@@ -45,7 +45,7 @@ public class ContextMenuTests extends UITest {
     public void contextMenuDisabling_noIssueInListView_contextMenuItemsDisabled() {
         ListPanel issuePanel = getPanel(0);
 
-        click(getFilterTextFieldAtPanel(0));
+        clickFilterTextFieldAtPanel(0);
         type("asdf");
         push(KeyCode.ENTER);
         sleep(EVENT_DELAY);

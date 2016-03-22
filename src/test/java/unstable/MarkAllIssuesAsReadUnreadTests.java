@@ -19,17 +19,14 @@ import static org.junit.Assert.assertEquals;
 
 public class MarkAllIssuesAsReadUnreadTests extends UITest {
 
-    private static final String PANEL_ID = IdGenerator.getPanelIdForTest(0);
-    private static final String FILTER_TEXT_FIELD_ID = IdGenerator.getPanelFilterTextFieldIdForTest(0);
-
     @Before
     public void setup() {
         PlatformEx.runAndWait(stage::requestFocus);
 
-        FilterTextField filterTextField = find(FILTER_TEXT_FIELD_ID);
+        FilterTextField filterTextField = getFilterTextFieldAtPanel(0);
         filterTextField.setText("");
 
-        click(FILTER_TEXT_FIELD_ID);
+        clickFilterTextFieldAtPanel(0);
         push(KeyCode.ENTER);
     }
 
@@ -40,7 +37,7 @@ public class MarkAllIssuesAsReadUnreadTests extends UITest {
     public void markAllBelowAsReadUnread_multipleIssuesInListView_issuesCorrectlyMarked()
             throws NoSuchFieldException, IllegalAccessException {
 
-        ListPanel issuePanel = find(PANEL_ID);
+        ListPanel issuePanel = getPanel(0);
         Field listViewField = ListPanel.class.getDeclaredField("listView");
         listViewField.setAccessible(true);
         IssueListView listViewValue = (IssueListView) listViewField.get(issuePanel);
@@ -83,9 +80,8 @@ public class MarkAllIssuesAsReadUnreadTests extends UITest {
      * @param index        The issue number in the panel
      */
     private void clickAndMarkIssuesBelow(ListPanel issuePanel, int index, boolean isMarkAsRead) {
-        String panelCellId = IdGenerator.getPanelCellIdForTest(0, index);
-        click(panelCellId);
-        rightClick(panelCellId);
+        clickIssue(0, index);
+        rightClickIssue(0, index);
         ContextMenu contextMenu = issuePanel.getContextMenu();
         for (MenuItem menuItem : contextMenu.getItems()) {
             awaitCondition(menuItem::isVisible);
@@ -103,7 +99,7 @@ public class MarkAllIssuesAsReadUnreadTests extends UITest {
      */
     private void verifyReadStatusOfIssuesBelow(int index, boolean isExpectedStatusRead) {
         for (int i = index; i >= 1; i--) {
-            ListPanelCell listPanelCell = find(IdGenerator.getPanelCellIdForTest(0, index));
+            ListPanelCell listPanelCell = getIssueCell(0, index);
             assertEquals(listPanelCell.getIssue().isCurrentlyRead(), isExpectedStatusRead);
         }
     }

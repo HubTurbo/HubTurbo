@@ -116,8 +116,8 @@ public class KeyboardShortcutsTest extends UITest {
         clearPanelIndex();
 
         // remove focus from repo selector
-        ComboBox<String> repoSelectorComboBox = find(IdGenerator.getRepositorySelectorIdForTest());
-        click(repoSelectorComboBox);
+        ComboBox<String> repoSelectorComboBox = getRepositorySelector();
+        clickRepositorySelector();
         assertEquals(true, repoSelectorComboBox.isFocused());
         press(KeyCode.ESCAPE).release(KeyCode.ESCAPE);
         assertEquals(false, repoSelectorComboBox.isFocused());
@@ -126,7 +126,7 @@ public class KeyboardShortcutsTest extends UITest {
         // switch default repo tests
         assertEquals(1, repoSelectorComboBox.getItems().size());
         // setup - add a new repo
-        click(repoSelectorComboBox);
+        clickRepositorySelector();
         selectAll();
         type("dummy1/dummy1");
         push(KeyCode.ENTER);
@@ -139,11 +139,10 @@ public class KeyboardShortcutsTest extends UITest {
         // wait for issue 11 to appear then click on it
         // issue 11 is chosen instead of issue 12
         // as there is a problem with finding issue 12's node due to it being the first card in the panel
-        String panelOneSecondIssueCellId = IdGenerator.getPanelCellIdForTest(1, DummyRepoState.NO_OF_DUMMY_ISSUES - 1);
-        waitUntilNodeAppears(panelOneSecondIssueCellId);
+        waitUntilNodeAppears(getIssueCell(1, DummyRepoState.NO_OF_DUMMY_ISSUES - 1));
         assertEquals("dummy/dummy", repoSelectorComboBox.getValue());
         // test shortcut when focus is on panel
-        click(panelOneSecondIssueCellId);
+        clickIssue(1, DummyRepoState.NO_OF_DUMMY_ISSUES - 1);
         press(SWITCH_DEFAULT_REPO);
         PlatformEx.waitOnFxThread();
         assertEquals("dummy1/dummy1", repoSelectorComboBox.getValue());
@@ -154,7 +153,7 @@ public class KeyboardShortcutsTest extends UITest {
         assertEquals("dummy/dummy", repoSelectorComboBox.getValue());
 
         // mark as read
-        ListPanel issuePanel = find(IdGenerator.getPanelIdForTest(1));
+        ListPanel issuePanel = getPanel(1);
         // mark as read an issue that has another issue below it
         push(KeyCode.HOME);
         // focus should change to the issue below
@@ -198,7 +197,7 @@ public class KeyboardShortcutsTest extends UITest {
         clearSelectedIssueId();
 
         // testing corner case for mark as read where there is only one issue displayed
-        click(IdGenerator.getPanelFilterTextFieldIdForTest(1));
+        clickFilterTextFieldAtPanel(1);
         type("id:5");
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();

@@ -70,13 +70,13 @@ public class RepositorySelectorTest extends UITest {
         assertNodeExists(IdGenerator.getLoginDialogOwnerFieldIdForTest());
         type("dummy").push(KeyCode.TAB);
         type("dummy").push(KeyCode.ENTER);
-        ComboBox<String> comboBox = find(IdGenerator.getRepositorySelectorIdForTest());
+        ComboBox<String> comboBox = getRepositorySelector();
         assertEquals(1, comboBox.getItems().size());
         assertEquals("dummy/dummy", primaryRepo);
 
         // we check if the "dummy2/dummy2" is added to the repository selector
         // but the primary repo isn't changed
-        Platform.runLater(find(IdGenerator.getPanelFilterTextFieldIdForTest(0))::requestFocus);
+        Platform.runLater(getFilterTextFieldAtPanel(0)::requestFocus);
         PlatformEx.waitOnFxThread();
         type("repo:dummy2/dummy2");
         push(KeyCode.ENTER);

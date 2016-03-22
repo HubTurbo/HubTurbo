@@ -93,7 +93,7 @@ public class RemovableRepoListAndModelsTest extends UITest {
         // it's still 1 repo in use
         noOfUsedRepo = 1;
         totalRepoInSystem = 1;
-        Platform.runLater(find(IdGenerator.getPanelFilterTextFieldIdForTest(0))::requestFocus);
+        Platform.runLater(getFilterTextFieldAtPanel(0)::requestFocus);
         PlatformEx.waitOnFxThread();
         selectAll();
         type("repo:dummY/Dummy");
@@ -137,10 +137,9 @@ public class RemovableRepoListAndModelsTest extends UITest {
 
         noOfUsedRepo = 4;
         totalRepoInSystem = 4;
-        String panelFilterTextField = IdGenerator.getPanelFilterTextFieldIdForTest(1);
         pushKeys(CREATE_RIGHT_PANEL);
-        waitUntilNodeAppears(panelFilterTextField);
-        click(panelFilterTextField);
+        waitUntilNodeAppears(getFilterTextFieldAtPanel(1));
+        clickFilterTextFieldAtPanel(1);
         selectAll();
         type("repo:dummy4/dummy4");
         push(KeyCode.ENTER);

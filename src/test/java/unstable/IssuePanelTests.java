@@ -28,7 +28,6 @@ import org.loadui.testfx.GuiTest;
 import org.loadui.testfx.exceptions.NoNodesFoundException;
 import tests.TurboIssueEventTests;
 import ui.GuiElement;
-import ui.IdGenerator;
 import ui.UI;
 import ui.listpanel.ListPanel;
 import ui.listpanel.ListPanelCard;
@@ -45,12 +44,10 @@ public class IssuePanelTests extends UITest {
 
     @Test
     public void keepSelectionTest() {
-        String panelId = IdGenerator.getPanelIdForTest(0);
-        String panelTextFieldId = IdGenerator.getPanelFilterTextFieldIdForTest(0);
         // checks to see if ListPanel keeps the same issue selected even after
         // the list is updated
-        ListPanel issuePanel = find(panelId);
-        click(panelTextFieldId);
+        ListPanel issuePanel = getPanel(0);
+        clickFilterTextFieldAtPanel(0);
         selectAll();
         type("sort:date");
         push(KeyCode.ENTER);
@@ -70,9 +67,7 @@ public class IssuePanelTests extends UITest {
 
     @Test
     public void guiElementsTest() {
-        String panelTextFieldId = IdGenerator.getPanelFilterTextFieldIdForTest(0);
-
-        click(panelTextFieldId);
+        clickFilterTextFieldAtPanel(0);
         selectAll();
         type("id:8");
         push(KeyCode.ENTER);
@@ -92,7 +87,7 @@ public class IssuePanelTests extends UITest {
 
         // Next we check for a label that was deleted from the repository, but should still be displayed under
         // metadata (label update events).
-        click(panelTextFieldId);
+        clickFilterTextFieldAtPanel(0);
         selectAll();
         type("id:9 updated:5");
         PlatformEx.waitOnFxThread();
@@ -176,9 +171,7 @@ public class IssuePanelTests extends UITest {
 
     @Test
     public void showAuthorAssignee_assignedPullRequest_authorAssigneeShown() {
-        String panelTextFieldId = IdGenerator.getPanelFilterTextFieldIdForTest(0);
-
-        click(panelTextFieldId);
+        clickFilterTextFieldAtPanel(0);
         selectAll();
         type("id:11");
         push(KeyCode.ENTER);
@@ -191,9 +184,7 @@ public class IssuePanelTests extends UITest {
 
     @Test
     public void showAuthorAssignee_assignedIssue_onlyAssigneeShown() {
-        String panelTextFieldId = IdGenerator.getPanelFilterTextFieldIdForTest(0);
-
-        click(panelTextFieldId);
+        clickFilterTextFieldAtPanel(0);
         selectAll();
         type("id:12");
         push(KeyCode.ENTER);

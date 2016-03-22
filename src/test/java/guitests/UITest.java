@@ -14,6 +14,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import javafx.scene.control.*;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,10 +34,6 @@ import javafx.event.ActionEvent;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.ComboBoxBase;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -409,6 +406,18 @@ public class UITest extends GuiTest {
         for (String menuName : menuNames) {
             click(menuName);
         }
+    }
+
+    public void clickRepositorySelector() {
+        click(IdGenerator.getRepositorySelectorIdForTest());
+    }
+
+    public ComboBox getRepositorySelector() {
+        return find(IdGenerator.getRepositorySelectorIdForTest());
+    }
+
+    public void clickLabelPickerTextField() {
+        click(IdGenerator.getLabelPickerTextFieldId());
     }
 
     public TextField getLabelPickerTextField() {

@@ -24,11 +24,10 @@ public class UpdateIssuesTest extends UITest {
 
     @Test
     public void updateIssues() throws InterruptedException, ExecutionException {
-        String filterTextFieldId = IdGenerator.getPanelFilterTextFieldIdForTest(0);
         Label apiBox = find(IdGenerator.getApiBoxIdForTest());
         resetRepo();
 
-        click(filterTextFieldId);
+        clickFilterTextFieldAtPanel(0);
         type("updated:24");
         push(KeyCode.ENTER);
 
@@ -38,7 +37,7 @@ public class UpdateIssuesTest extends UITest {
 
         // After updating, issue with ID 5 should have title Issue 5.1
         updateIssue(5, "Issue 5.1"); // 2 calls for issue 5, 1 for issue 9, 1 for issue 10 when refreshing UI.
-        click(filterTextFieldId);
+        clickFilterTextFieldAtPanel(0);
         push(KeyCode.ENTER); // 1 call for issue 5, 1 for issue 9, 1 for issue 10.
 
         // Updated view should now contain Issue 5.1, Issue 9 and Issue 10.
@@ -48,12 +47,12 @@ public class UpdateIssuesTest extends UITest {
         // Then have a non-self comment for Issue 9.
         UI.events.triggerEvent(UpdateDummyRepoEvent.addComment("dummy/dummy", 9, "Test comment", "test-nonself"));
         UI.events.triggerEvent(new UILogicRefreshEvent()); // 1 call for issues 5, 9, 10.
-        click(filterTextFieldId);
+        clickFilterTextFieldAtPanel(0);
         push(KeyCode.ENTER); // 1 call for issues 5, 9, 10.
         TestUtils.awaitCondition(() -> 3483 == getApiCount(apiBox.getText()));
         assertEquals(3, countIssuesShown());
 
-        click(filterTextFieldId);
+        clickFilterTextFieldAtPanel(0);
         push(KeyCode.ENTER); // 1 call for issues 5, 9, 10.
         TestUtils.awaitCondition(() -> 3480 == getApiCount(apiBox.getText()));
     }
