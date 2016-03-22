@@ -48,7 +48,7 @@ import static ui.components.KeyboardShortcuts.SWITCH_DEFAULT_REPO;
 public class UI extends Application implements EventDispatcher {
 
     public static final int VERSION_MAJOR = 3;
-    public static final int VERSION_MINOR = 23;
+    public static final int VERSION_MINOR = 24;
     public static final int VERSION_PATCH = 0;
 
     private static final Logger logger = LogManager.getLogger(UI.class.getName());
