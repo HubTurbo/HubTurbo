@@ -5,10 +5,8 @@ import javafx.scene.input.KeyCode;
 import org.junit.Test;
 import ui.UI;
 import ui.components.KeyboardShortcuts;
-import util.events.IssueCreatedEventHandler;
-import util.events.LabelCreatedEventHandler;
-import util.events.MilestoneCreatedEventHandler;
-import util.events.PanelClickedEventHandler;
+import util.PlatformEx;
+import util.events.*;
 import util.events.testevents.PrimaryRepoChangedEvent;
 import util.events.testevents.PrimaryRepoChangedEventHandler;
 

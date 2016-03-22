@@ -291,7 +291,7 @@ Available sorting criteria:
 - `id`: sorts by issue id (in ascending order)
 - `assignee`: sorts by assignee (in alphabetical order of assignees' names). Aliases: `a`
 - `state`: sorts by status (open issues followed by closed issues). Aliases: `status`, `st`
-- `milestone`: sorts by milestone (latest due date first). Aliases: `m`
+- `milestone`: sorts by milestone (latest due date first. In case of milestone without due date, open milestone without due date is considered to have a due date very far in the future, while closed milestone without due date is considered to have a due date very far in the past). Aliases: `m`
 - Anything else is interpreted as a *label group*: sorts by the label group specified in alphabetical order. Label groups can be disambiguated by appending a `.`, if there is a label group that clashes with one of the above names. For example, `sort:priority.` will sort issues by their priorities in alphabetical order (issues with `high` priority will come first, followed by `low` priority, then `medium` priority)
 
 ### count

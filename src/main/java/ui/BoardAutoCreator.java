@@ -24,16 +24,16 @@ public class BoardAutoCreator {
     private static final int MAX_WORK_ALLOCATION_PANELS = 5;
     public static final String SAMPLE_BOARD = "Sample Board!";
     private static final String FIRST_SAMPLE_REPO_NAME = "HubTurbo/SampleRepo";
-    private static final String SECOND_SAMPLE_REPO_NAME = "HubTurbo/HubTurbo";
+    private static final String SECOND_SAMPLE_REPO_NAME = "HubTurbo/SampleRepo2";
+    private static final String TIPS_REPO_NAME = "HubTurbo/TipsRepo";
     public static final String SAMPLE_BOARD_DIALOG = String.format("%s has been created and loaded.", SAMPLE_BOARD);
 
     public static final Map<String, String> getSamplePanelDetails(){
-        Map<String, String> panelMap = new HashMap<>();
-        panelMap.put("Seven Recent unread updates from my repos",
-                String.format("repo:%s;%s count:7 is:unread updated<24 sort:!updated",
-                FIRST_SAMPLE_REPO_NAME, SECOND_SAMPLE_REPO_NAME));
-        panelMap.put("All issues in my two sample repos",
-                String.format("repo:%s;%s is:issue sort:!updated,comments",
+        Map<String, String> panelMap = new LinkedHashMap<>();
+        panelMap.put("Latest tips",
+                String.format("repo:%s is:open label:\"latest-tips\"", TIPS_REPO_NAME));
+        panelMap.put("Seven latest updated issues in my two sample repos",
+                String.format("repo:%s;%s is:issue sort:!updated,comments count:7",
                 FIRST_SAMPLE_REPO_NAME, SECOND_SAMPLE_REPO_NAME));
         panelMap.put("Open issues assigned to Darius or Manmeet",
                 String.format("repo:%s is:issue is:open (assignee:dariusf || assignee:codemanmeet)",
