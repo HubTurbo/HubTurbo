@@ -274,7 +274,7 @@ public class ModelTests {
     }
 
     /**
-     * Tests that replaceIssueLabels returns Optional.empty() if the model for the
+     * Tests that replaceIssueLabelsOnServer returns Optional.empty() if the model for the
      * issue given in the argument can't be found
      */
     @Test
@@ -284,7 +284,7 @@ public class ModelTests {
     }
 
     /**
-     * Tests that replaceIssueLabels finds issue with the right id and successfully modify the issue's labels
+     * Tests that replaceIssueLabelsOnServer finds issue with the right id and successfully modify the issue's labels
      */
     @Test
     public void replaceIssueLabels_successful() {

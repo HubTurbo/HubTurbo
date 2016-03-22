@@ -1,6 +1,12 @@
 
 # Changelog
 
+# V3.23.0
+
+- A warning will now be shown to users on unsupported Java versions
+- Fixed bug with label picker mouse selection
+- Fixed bug with label picker appearing offscreen
+
 # V3.22.0
 
 - Improved visual feedback for filter syntax errors

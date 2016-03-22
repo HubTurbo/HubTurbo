@@ -11,22 +11,22 @@ import java.util.stream.Collectors;
  */
 public class LabelPickerState {
 
-    private Set<String> initialLabels;
-    private List<String> addedLabels;
-    private List<String> removedLabels;
-    private List<String> matchedLabels;
+    private List<TurboLabel> initialLabels;
+    private List<TurboLabel> addedLabels;
+    private List<TurboLabel> removedLabels;
+    private List<TurboLabel> matchedLabels;
     private List<TurboLabel> allLabels;
     private OptionalInt currentSuggestionIndex;
 
-    public LabelPickerState(Set<String> initialLabels, List<TurboLabel> allLabels, String userInput) {
+    public LabelPickerState(List<TurboLabel> initialLabels, List<TurboLabel> allLabels, String userInput) {
         this(initialLabels, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), allLabels,
                 OptionalInt.empty());
         update(userInput);
     }
 
-    private LabelPickerState(Set<String> initialLabels, List<String> addedLabels, List<String> removedLabels,
-                             List<String> matchedLabels, List<TurboLabel> allLabels, 
-                             OptionalInt currentSuggestionIndex) {
+    private LabelPickerState(List<TurboLabel> initialLabels, List<TurboLabel> addedLabels, 
+                             List<TurboLabel> removedLabels, List<TurboLabel> matchedLabels, 
+                             List<TurboLabel> allLabels, OptionalInt currentSuggestionIndex) {
         this.initialLabels = initialLabels;
         this.addedLabels = addedLabels;
         this.removedLabels = removedLabels;
@@ -42,7 +42,8 @@ public class LabelPickerState {
     private final void update(String userInput) {
         List<String> confirmedKeywords = getConfirmedKeywords(userInput);
         for (String confirmedKeyword : confirmedKeywords) {
-            updateIfMatchesLabel(confirmedKeyword);
+            TurboLabel.getMatchedLabels(allLabels, confirmedKeyword)
+                .stream().findFirst().ifPresent(this::updateAssignedLabels);
         }
 
         Optional<String> keywordInProgess = getKeywordInProgress(userInput);
@@ -53,37 +54,24 @@ public class LabelPickerState {
     }
 
     /**
-     * Updates current state if there is at least one matching label based on the 
-     * given keyword
-     * @param keyword
-     */
-    private final void updateIfMatchesLabel(String keyword) {
-        if (TurboLabel.hasMatchedLabel(allLabels, keyword)) {
-            updateAssignedLabels(TurboLabel.getFirstMatchingTurboLabel(allLabels, keyword));
-        }
-    }
-
-    /**
      * Updates assignedLabels based on properties of a label 
      * @param label
      */
-    public final void updateAssignedLabels(TurboLabel label) {
-        String labelName = label.getFullName();
-
-        if (isAnInitialLabel(labelName)) {
-            if (isARemovedLabel(labelName)) {
-                removeConflictingLabels(label);
-                removedLabels.remove(labelName);
+    public final void updateAssignedLabels(TurboLabel selectedLabel) {
+        if (isAnInitialLabel(selectedLabel)) {
+            if (isARemovedLabel(selectedLabel)) {
+                removeConflictingLabels(selectedLabel);
+                removedLabels.remove(selectedLabel);
             } else {
-                removedLabels.add(labelName);
+                removedLabels.add(selectedLabel);
             }
         } else {
-            if (isAnAddedLabel(labelName)) {
-                addedLabels.remove(labelName);
+            if (isAnAddedLabel(selectedLabel)) {
+                addedLabels.remove(selectedLabel);
             } else {
                 // add new label
-                removeConflictingLabels(label);
-                addedLabels.add(labelName);
+                removeConflictingLabels(selectedLabel);
+                addedLabels.add(selectedLabel);
             }
         }
     }
@@ -94,8 +82,7 @@ public class LabelPickerState {
      * @param keyword
      */
     private final void updateMatchedLabels(String keyword) {
-        List<TurboLabel> newMatchedLabels = TurboLabel.getMatchedLabels(allLabels, keyword);
-        matchedLabels = TurboLabel.getLabelsNameList(newMatchedLabels);
+        matchedLabels = TurboLabel.getMatchedLabels(allLabels, keyword);
     }
 
     /**
@@ -103,7 +90,7 @@ public class LabelPickerState {
      * @param keyword
      * @param newMatchedLabels
      */
-    private final void updateSuggestionIndex(String keyword, List<String> newMatchedLabels) {
+    private final void updateSuggestionIndex(String keyword, List<TurboLabel> newMatchedLabels) {
         if (keyword.isEmpty() || newMatchedLabels.isEmpty()) {
             currentSuggestionIndex = OptionalInt.empty();
         } else {
@@ -118,8 +105,8 @@ public class LabelPickerState {
     /**
      * @return final list of labels to be assigned
      */
-    public List<String> getAssignedLabels() {
-        List<String> assignedLabels = new ArrayList<>();
+    public List<TurboLabel> getAssignedLabels() {
+        List<TurboLabel> assignedLabels = new ArrayList<>();
         assignedLabels.addAll(initialLabels);
         assignedLabels.addAll(addedLabels);
         assignedLabels.removeAll(removedLabels);
@@ -129,28 +116,28 @@ public class LabelPickerState {
     /**
      * @return the initial list of labels
      */
-    public List<String> getInitialLabels() {
-        return new ArrayList<>(initialLabels);
+    public List<TurboLabel> getInitialLabels() {
+        return initialLabels;
     }
 
     /**
      * @return the list of initial labels that have been removed
      */
-    public List<String> getRemovedLabels() {
+    public List<TurboLabel> getRemovedLabels() {
         return removedLabels;
     }
 
     /**
      * @return the list of labels that are newly added
      */
-    public List<String> getAddedLabels() {
+    public List<TurboLabel> getAddedLabels() {
         return addedLabels;
     }
 
     /**
      * @return the name of the suggested label, if it exists
      */
-    public Optional<String> getCurrentSuggestion() {
+    public Optional<TurboLabel> getCurrentSuggestion() {
         if (currentSuggestionIndex.isPresent()) {
             assert isValidSuggestionIndex();
             return Optional.of(getSuggestedLabel());
@@ -161,7 +148,7 @@ public class LabelPickerState {
     /**
      * @return the names of the labels that match the current query
      */
-    public List<String> getMatchedLabels() {
+    public List<TurboLabel> getMatchedLabels() {
         return matchedLabels;
     }
 
@@ -169,38 +156,38 @@ public class LabelPickerState {
      * Removes labels that belong to the same group as the given label
      * @param label
      */
-    private void removeConflictingLabels(TurboLabel label) {
-        if (!label.isInExclusiveGroup()) return;
+    private void removeConflictingLabels(TurboLabel targetLabel) {
+        if (!targetLabel.isInExclusiveGroup()) return;
 
-        String group = label.getGroupName();
+        String group = targetLabel.getGroupName();
         // Remove from addedLabels
         addedLabels = addedLabels.stream()
-                .filter(name -> !new TurboLabel("", name).getGroupName().equals(group))
+                .filter(label -> !label.getGroupName().equals(group))
                 .collect(Collectors.toList());
 
         // Add to removedLabels all initialLabels that have conflicting group
         removedLabels.addAll(initialLabels.stream()
-                .filter(name -> new TurboLabel("", name).getGroupName().equals(group) 
-                    && !removedLabels.contains(label.getFullName()))
+                .filter(label -> label.getGroupName().equals(group) 
+                    && !removedLabels.contains(targetLabel))
                 .collect(Collectors.toList()));
     }
 
-    private boolean isAnInitialLabel(String name) {
-        return this.initialLabels.contains(name);
+    private boolean isAnInitialLabel(TurboLabel label) {
+        return this.initialLabels.contains(label);
     }
 
-    private boolean isAnAddedLabel(String name) {
-        return this.addedLabels.contains(name);
+    private boolean isAnAddedLabel(TurboLabel label) {
+        return this.addedLabels.contains(label);
     }
 
-    private boolean isARemovedLabel(String name) {
-        return this.removedLabels.contains(name);
+    private boolean isARemovedLabel(TurboLabel label) {
+        return this.removedLabels.contains(label);
     }
 
     /**
      * @return suggested label 
      */
-    private String getSuggestedLabel() {
+    private TurboLabel getSuggestedLabel() {
         return matchedLabels.get(currentSuggestionIndex.getAsInt());
     }
 

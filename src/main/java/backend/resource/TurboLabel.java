@@ -95,7 +95,8 @@ public class TurboLabel implements Comparable<TurboLabel> {
         return firstMatchingLabel.get();
     }
 
-    public static List<String> getLabelsNameList(List<TurboLabel> labels) {
+
+    public static List<String> getLabelNames(List<TurboLabel> labels) {
         return labels.stream()
                 .map(TurboLabel::getFullName)
                 .collect(Collectors.toList());
@@ -152,14 +153,14 @@ public class TurboLabel implements Comparable<TurboLabel> {
     }
 
     /**
-     * A label is matching if:
-     * the label's group contains keyword's group and label's name contains keyword's name
      * @param allLabels
-     * @param keyword
-     * @return true if there is at least 1 matching label for the keyword
+     * @param labelNames
+     * @return list of labels in allLabels that matches list of label names
      */
-    public static final boolean hasMatchedLabel(List<TurboLabel> allLabels, String keyword) {
-        return !getMatchedLabels(allLabels, keyword).isEmpty();
+    public static List<TurboLabel> getMatchedLabels(List<TurboLabel> allLabels, List<String> labelNames) {
+        return allLabels.stream()
+            .filter(label -> labelNames.contains(label.getFullName()))
+            .collect(Collectors.toList());
     }
 
     /**

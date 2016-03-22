@@ -1,5 +1,7 @@
 package tests;
 
+import backend.RepoIO;
+import backend.control.RepoOpControl;
 import backend.interfaces.IModel;
 import backend.resource.*;
 import org.apache.commons.io.IOUtils;
@@ -12,7 +14,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
+
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public final class TestUtils {
 
@@ -154,4 +161,16 @@ public final class TestUtils {
         Thread.sleep(delay);
         runnable.run();
     }
+
+    /**
+     * Creates a RepoOpControl instance with a mocked MultiModel which contains no Model i.e.
+     * the models return an empty Optional when its getModelById method is called.
+     * @param repoIO
+     */
+    public static RepoOpControl createRepoOpControlWithEmptyModels(RepoIO repoIO) {
+        MultiModel models = mock(MultiModel.class);
+        when(models.getModelById(anyString())).thenReturn(Optional.empty());
+        return new RepoOpControl(repoIO, models);
+    }
+
 }

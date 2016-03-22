@@ -36,7 +36,7 @@ public class RepoIOTests {
     }
 
     /**
-     * Tests that RepoIO's replaceIssueLabels calls RepoSource's replaceIssueLabels
+     * Tests that RepoIO's replaceIssueLabelsOnServer calls RepoSource's replaceIssueLabelsOnServer
      * and receives a corresponding CompletableFuture response
      */
     @Test
