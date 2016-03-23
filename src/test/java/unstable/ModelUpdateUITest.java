@@ -30,7 +30,7 @@ public class ModelUpdateUITest extends UITest {
         throws InterruptedException, ExecutionException {
         resetRepo();
         addIssue();
-        FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssueCount);
+        FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssuesCount);
         PlatformEx.runAndWait(countIssues);
         assertEquals(DummyRepoState.noOfDummyIssues + 1, countIssues.get().intValue());
     }
@@ -42,7 +42,7 @@ public class ModelUpdateUITest extends UITest {
         addIssue();
         addIssue();
         addIssue();
-        FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssueCount);
+        FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssuesCount);
         PlatformEx.runAndWait(countIssues);
         assertEquals(DummyRepoState.noOfDummyIssues + 3, countIssues.get().intValue());
     }
@@ -52,7 +52,7 @@ public class ModelUpdateUITest extends UITest {
         throws InterruptedException, ExecutionException {
         addIssue();
         resetRepo();
-        FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssueCount);
+        FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssuesCount);
         PlatformEx.runAndWait(countIssues);
         assertEquals(DummyRepoState.noOfDummyIssues, countIssues.get().intValue());
     }
@@ -64,7 +64,7 @@ public class ModelUpdateUITest extends UITest {
         addIssue();
         addIssue();
         deleteIssue(1);
-        FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssueCount);
+        FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssuesCount);
         PlatformEx.runAndWait(countIssues);
         assertEquals(DummyRepoState.noOfDummyIssues + 1, countIssues.get().intValue());
     }
@@ -78,7 +78,7 @@ public class ModelUpdateUITest extends UITest {
         addIssue();
         deleteIssue(1);
         deleteIssue(2);
-        FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssueCount);
+        FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssuesCount);
         PlatformEx.runAndWait(countIssues);
         assertEquals(DummyRepoState.noOfDummyIssues + 1, countIssues.get().intValue());
     }
