@@ -52,10 +52,10 @@ public class SuggestionMenu extends ContextMenu {
      */
     private void addMenuItem(String content) {
         Label label = new Label(content);
-        label.setStyle("-fx-opacity: 80%; ");
         CustomMenuItem item = new CustomMenuItem(label, false);
         item.setText(content);
         getItems().add(item);
+        item.setId(content);
         item.setOnAction(this::onActionHandler);
         assert getItems().size() <= maxEntries;
     }

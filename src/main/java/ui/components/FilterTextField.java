@@ -2,6 +2,7 @@ package ui.components;
 
 import filter.expression.QualifierType;
 import javafx.geometry.Side;
+import javafx.scene.Node;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -46,6 +47,9 @@ public class FilterTextField extends TextField {
     };
     private Function<String, String> onConfirm = (s) -> s;
 
+ // For reverting edits
+    private String previousText = "";
+
     // The list of keywords which will be used in completion
     private List<String> keywords = new ArrayList<>(QualifierType.getCompletionKeywords());
 
@@ -81,6 +85,7 @@ public class FilterTextField extends TextField {
 
             if (typed == '\t' && suggestion.isShowing()) {
                 suggestion.hide();
+                completeWord();
                 e.consume();
             }
             
@@ -100,10 +105,15 @@ public class FilterTextField extends TextField {
 
             if (e.getCode() == KeyCode.ENTER) {
                 suggestion.hide();
+                completeWord();
                 confirmEdit();
             } else if (e.getCode() == KeyCode.ESCAPE) {
-                suggestion.hide();
-                onCancel.run();
+                if (getText().equals(previousText)) {
+                    suggestion.hide();
+                    onCancel.run();
+                } else {
+                    revertEdit();
+                }
             }
         });
         addEventHandler(KeyEvent.KEY_PRESSED, event -> {
@@ -201,11 +211,21 @@ public class FilterTextField extends TextField {
         return "";
     }
 
+    /**
+     * Reverts the contents of the field to its last confirmed value.
+     */
+    private void revertEdit() {
+        System.out.println(previousText);
+        setText(previousText);
+        positionCaret(getLength());
+        selectAll();
+    }
 
     /**
      * Commits the current contents of the field. This triggers its 'onConfirm' callback.
      */
     private void confirmEdit() {
+        previousText = getText();
         String newText = onConfirm.apply(getText());
         int caretPosition = getCaretPosition();
         setText(newText);
@@ -216,7 +236,6 @@ public class FilterTextField extends TextField {
     
     private final SuggestionMenu setupSuggestion() {
         SuggestionMenu suggestion = new SuggestionMenu(MAX_SUGGESTIONS);
-        suggestion.setOnHidden(e -> completeWord());
         suggestion.loadSuggestions(keywords);
         return suggestion;
     }
