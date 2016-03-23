@@ -28,6 +28,7 @@ public class FilterTextFieldTest extends UITest {
     @Test
     public void completion_validPrefixes_match() {
         FilterTextField field = getFirstPanelField();
+
         // Basic completion
         clearField();
         type("cou").push(KeyCode.TAB);

@@ -103,7 +103,7 @@ public class FilterTextField extends TextField {
                 confirmEdit();
             } else if (e.getCode() == KeyCode.ESCAPE) {
                 suggestion.hide();
-                cancel.run();
+                onCancel.run();
             }
         });
         addEventHandler(KeyEvent.KEY_PRESSED, event -> {
@@ -206,7 +206,7 @@ public class FilterTextField extends TextField {
      * Commits the current contents of the field. This triggers its 'onConfirm' callback.
      */
     private void confirmEdit() {
-        String newText = confirm.apply(getText());
+        String newText = onConfirm.apply(getText());
         int caretPosition = getCaretPosition();
         setText(newText);
         positionCaret(caretPosition);
