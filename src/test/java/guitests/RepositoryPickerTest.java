@@ -28,8 +28,8 @@ public class RepositoryPickerTest extends UITest {
 
     private static String primaryRepo;
 
-    protected static class RepositorySelectorTestUI extends UI {
-        public RepositorySelectorTestUI() {
+    protected static class RepositoryPickerTestUI extends UI {
+        public RepositoryPickerTestUI() {
             super();
         }
 
@@ -47,7 +47,7 @@ public class RepositoryPickerTest extends UITest {
 
     @Override
     public void launchApp() {
-        FXTestUtils.launchApp(RepositorySelectorTestUI.class, "--testconfig=true");
+        FXTestUtils.launchApp(RepositoryPickerTestUI.class, "--testconfig=true");
     }
 
     @Override
@@ -63,7 +63,7 @@ public class RepositoryPickerTest extends UITest {
     }
 
     @Test
-    public void repositorySelectorTest() {
+    public void repositoryPickerTest() {
         // check if test json is present
         File testConfig = new File(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
         boolean testConfigExists = testConfig.exists() && testConfig.isFile();
@@ -84,7 +84,7 @@ public class RepositoryPickerTest extends UITest {
         assertEquals("dummy/dummy", primaryRepo);
         push(KeyCode.ESCAPE);
 
-        // we check if the "dummy2/dummy2" is added to the repository selector
+        // we check if the "dummy2/dummy2" is added to the repository picker
         // but the primary repo isn't changed
         Platform.runLater(find("#dummy/dummy_col0_filterTextField")::requestFocus);
         PlatformEx.waitOnFxThread();
@@ -96,7 +96,7 @@ public class RepositoryPickerTest extends UITest {
         assertEquals("dummy/dummy", primaryRepo);
         push(KeyCode.ESCAPE);
 
-        // we check if "dummy3/dummy3" is added to the repository selector
+        // we check if "dummy3/dummy3" is added to the repository picker
         // and that the primary repo is also changed
         push(KeyCode.CONTROL, KeyCode.R);
         userInputField = find("#repositoryPickerUserInputField");

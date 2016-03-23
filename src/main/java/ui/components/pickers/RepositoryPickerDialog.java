@@ -23,7 +23,7 @@ public class RepositoryPickerDialog extends Dialog<String> {
     private static final int DEFAULT_MATCHING_REPO_LIST_WIDTH = 350;
     private static final int SPACING_BETWEEN_NODES = 10;
     private static final Insets DEFAULT_PADDING = new Insets(10);
-    private static final Insets DEFAULT_MARGIN = new Insets(5);
+    private static final Insets DEFAULT_LABEL_MARGIN = new Insets(2);
 
     private VBox mainLayout;
     private VBox matchingRepositoryList;
@@ -60,12 +60,12 @@ public class RepositoryPickerDialog extends Dialog<String> {
         createUserInputTextField();
         createHandlers();
 
-        initialiseDefaultValues();
+        ScrollPane matchingRepositoryListScrollPane = new ScrollPane(matchingRepositoryList);
+        matchingRepositoryListScrollPane.setFitToHeight(true);
+        matchingRepositoryListScrollPane.setFitToWidth(true);
+        mainLayout.getChildren().addAll(userInputTextField, matchingRepositoryListScrollPane);
 
-        ScrollPane scrollPane = new ScrollPane(matchingRepositoryList);
-        scrollPane.setFitToHeight(true);
-        scrollPane.setFitToWidth(true);
-        mainLayout.getChildren().addAll(userInputTextField, scrollPane);
+        initialiseDefaultValues();
     }
 
     private void createHandlers() {
@@ -87,8 +87,8 @@ public class RepositoryPickerDialog extends Dialog<String> {
         matchingRepositories.stream()
                 .forEach(repo -> {
                     Node repoLabel = repo.getNode();
-                    VBox.setMargin(repoLabel, DEFAULT_MARGIN);
                     matchingRepositoryList.getChildren().add(repoLabel);
+                    matchingRepositoryList.setMargin(repoLabel, DEFAULT_LABEL_MARGIN);
                     repoLabel.setOnMouseClicked(e -> handleMouseClick(repo.getRepositoryId()));
                 });
     }
@@ -99,15 +99,17 @@ public class RepositoryPickerDialog extends Dialog<String> {
 
     private void createMatchingRepositoriesList() {
         matchingRepositoryList = new VBox();
-        matchingRepositoryList.setId("matchingRepositoryList");
         matchingRepositoryList.setPadding(DEFAULT_PADDING);
+        matchingRepositoryList.setId("matchingRepositoryList");
+        matchingRepositoryList.setStyle("-fx-background-color: white; -fx-border-color:black;");
         matchingRepositoryList.setPrefHeight(DEFAULT_MATCHING_REPO_LIST_HEIGHT);
         matchingRepositoryList.setPrefWidth(DEFAULT_MATCHING_REPO_LIST_WIDTH);
     }
 
     private void handleMouseClick(String repositoryId) {
         userInputTextField.setDisable(true);
-        updateUserQuery(repositoryId);
+        state.setSelectedRepositoryInMatchingList(repositoryId);
+        updateMatchingRepositoryList();
     }
 
     private void updateUserQuery(String query) {
@@ -135,7 +137,7 @@ public class RepositoryPickerDialog extends Dialog<String> {
         getDialogPane().getButtonTypes().addAll(confirmButtonType, ButtonType.CANCEL);
 
         setResultConverter(dialogButton -> {
-            if (dialogButton != confirmButtonType) {
+            if (!dialogButton.equals(confirmButtonType)) {
                 return null;
             }
 

@@ -60,6 +60,13 @@ public class RepositoryPickerState {
         matchingRepositories.get(nextPosition).setSelected(true);
     }
 
+    public void setSelectedRepositoryInMatchingList(String repositoryId) {
+        Optional<PickerRepository> pickerRepository = getPickerRepositoryById(matchingRepositories, repositoryId);
+        assert pickerRepository.isPresent();
+        clearRepositorySelection();
+        pickerRepository.get().setSelected(true);
+    }
+
     private OptionalInt getSelectedRepositoryPositionInMatching() {
         return IntStream.range(0, matchingRepositories.size())
                 .filter(index -> matchingRepositories.get(index).isSelected())
@@ -67,7 +74,7 @@ public class RepositoryPickerState {
     }
 
     /**
-     * Updates List<PickerRepository> so that it contains PickerRepositories that match
+     * Updates List<PickerRepository> matchingRepositories so that it contains PickerRepositories that match
      * the user's input
      */
     private void updateMatchingRepositories(String query) {

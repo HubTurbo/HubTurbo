@@ -1,7 +1,9 @@
 package ui.components.pickers;
 
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.layout.Border;
 
 /**
  * This class is used to represent a repo in RepositoryPicker.
@@ -11,11 +13,13 @@ import javafx.scene.control.Label;
  */
 public class PickerRepository implements Comparable<PickerRepository> {
 
-    private static final String BALLOT_BOX = "☐";
-    private static final String BALLOT_BOX_WITH_CHECK = "☑";
-
     private final String repositoryId;
     private boolean isSelected = false;
+
+    private static final int REPO_LABEL_PREFERRED_WIDTH = 340;
+    private static final Insets DEFAULT_REPO_LABEL_PADDING = new Insets(1);
+    private static final String SELECTED_REPO_LABEL_STYLE = "-fx-background-color: lightgreen; -fx-border-color:black;";
+    private static final String DEFAULT_REPO_LABEL_STYLE = "-fx-background-color: lightblue;";
 
     public PickerRepository(String repositoryId) {
         this.repositoryId = repositoryId;
@@ -27,11 +31,16 @@ public class PickerRepository implements Comparable<PickerRepository> {
 
     public Node getNode() {
         Label repoLabel = new Label();
+        repoLabel.setPrefWidth(REPO_LABEL_PREFERRED_WIDTH);
+        repoLabel.getStyleClass().add("labels");
+        repoLabel.setPadding(DEFAULT_REPO_LABEL_PADDING);
 
         if (isSelected) {
-            repoLabel.setText(BALLOT_BOX_WITH_CHECK + " " + repositoryId);
+            repoLabel.setText(repositoryId);
+            repoLabel.setStyle(SELECTED_REPO_LABEL_STYLE);
         } else {
-            repoLabel.setText(BALLOT_BOX + " " + repositoryId);
+            repoLabel.setText(repositoryId);
+            repoLabel.setStyle(DEFAULT_REPO_LABEL_STYLE);
         }
 
         return repoLabel;
