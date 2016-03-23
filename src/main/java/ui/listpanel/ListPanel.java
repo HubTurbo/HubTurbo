@@ -509,17 +509,18 @@ public class ListPanel extends FilterPanel {
 
     private MenuItem updateCloseReopenIssueMenuItem() {
         Optional<GuiElement> item = listView.getSelectedItem();
-        if (item.isPresent()) {
-            closeReopenIssueMenuItem.setDisable(false);
-            TurboIssue selectedIssue = item.get().getIssue();
-
-            if (selectedIssue.isOpen()) {
-                closeReopenIssueMenuItem.setText(closeIssueMenuItemText);
-            } else {
-                closeReopenIssueMenuItem.setText(reopenIssueMenuItemText);
-            }
-        } else {
+        if (!item.isPresent()) {
             closeReopenIssueMenuItem.setDisable(true);
+            return closeReopenIssueMenuItem;
+        }
+
+        closeReopenIssueMenuItem.setDisable(false);
+        TurboIssue selectedIssue = item.get().getIssue();
+
+        if (selectedIssue.isOpen()) {
+            closeReopenIssueMenuItem.setText(closeIssueMenuItemText);
+        } else {
+            closeReopenIssueMenuItem.setText(reopenIssueMenuItemText);
         }
 
         return closeReopenIssueMenuItem;

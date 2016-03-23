@@ -121,6 +121,21 @@ public class MultiModel implements IModel {
                 () -> logger.error("Model " + repoId + " not found in models"));
     }
 
+    /**
+     * Set the open/closed state of an issue specified by {@code issueId} in {@code repoId} to {@code isOpen}
+     *
+     * @param repoId
+     * @param issueId
+     * @param isOpen
+     * @return the modified TurboIssue if successful
+     */
+    public synchronized Optional<TurboIssue> editIssueState(String repoId, int issueId, boolean isOpen) {
+        Optional<Model> modelLookUpResult = getModelById(repoId);
+        return Utility.safeFlatMapOptional(modelLookUpResult,
+            (model) -> model.editIssueState(issueId, isOpen),
+            () -> logger.error("Model " + repoId + " not found in models"));
+    }
+
     public synchronized void insertMetadata(String repoId, Map<Integer, IssueMetadata> metadata, String currentUser) {
         models.get(repoId).getIssues().forEach(issue -> {
             if (metadata.containsKey(issue.getId())) {

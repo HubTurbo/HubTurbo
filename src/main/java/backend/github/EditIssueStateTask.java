@@ -5,6 +5,9 @@ import backend.interfaces.TaskRunner;
 
 import java.io.IOException;
 
+/**
+ * This class represents an async task that edits the state of an issue on GitHub.
+ */
 public class EditIssueStateTask extends GitHubRepoTask<Boolean> {
 
     private final String repoId;
