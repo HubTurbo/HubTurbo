@@ -39,7 +39,7 @@ public class ListPanel extends FilterPanel {
 
     private static final Logger logger = HTLog.get(ListPanel.class);
 
-    private static final String WATCH_LIST_FILTER_REGEX = "^id:([^#]+#\\d+;)*([^#]+#\\d+)$";
+    public static final String WATCH_LIST_FILTER_REGEX = "^id:([^#]+#\\d+;)*([^#]+#\\d+)$";
 
     private final UI ui;
     private int issuesCount = 0;
@@ -51,7 +51,6 @@ public class ListPanel extends FilterPanel {
     private final IssueListView listView;
     private final HashMap<Integer, Integer> issueCommentCounts = new HashMap<>();
     private final HashMap<Integer, Integer> issueNonSelfCommentCounts = new HashMap<>();
-
 
     Text openIssueText;
     Text closedIssueText;
@@ -65,9 +64,6 @@ public class ListPanel extends FilterPanel {
     private static final String WATCH_LIST_PANEL_NAME_PROMPT_TITLE = "Watch List Panel Name";
     private static final String WATCH_LIST_PANEL_NAME_PROMPT_HEADER = "Please enter a name for the watch list panel.";
     private static final String DEFAULT_WATCH_LIST_PANEL_NAME = "New Watch List Panel";
-
-    private Label totalLabel;
-
 
     // Context Menu
     private final ContextMenu contextMenu = new ContextMenu();
@@ -442,7 +438,7 @@ public class ListPanel extends FilterPanel {
 
         newWatchListMenuItem.setText(NEW_WATCH_LIST_MENU_ITEM_TEXT);
         newWatchListMenuItem.setOnAction(e -> {
-            createNewWatchListMenuItem();
+            createNewWatchListPanel();
         });
 
         addToWatchListMenu.setText(ADD_TO_WATCH_LIST_MENU_TEXT);
@@ -464,17 +460,20 @@ public class ListPanel extends FilterPanel {
         updateChangeLabelsMenuItem();
         updateChangeMilestoneMenuItem();
         updateChangeAssigneeMenuItem();
-        updateWatchListPanels();
+        updateAvailableWatchListPanels();
 
         return contextMenu;
     }
 
-    /**
-     * Updates the list of available watch list panel
-     */
-    private void updateWatchListPanels() {
-        addToWatchListMenu.getItems().clear();
-        addToWatchListMenu.getItems().add(newWatchListMenuItem);
+    private void updateAvailableWatchListPanels() {
+        restoreDefaultAddToWatchListPanelMenu();
+        Optional<GuiElement> item = listView.getSelectedItem();
+
+        if (item.isPresent()) {
+            addToWatchListMenu.setDisable(false);
+        } else {
+            addToWatchListMenu.setDisable(true);
+        }
 
         parentPanelControl.getChildren().forEach(node -> {
             if (isWatchListPanel(node)) {
@@ -482,6 +481,11 @@ public class ListPanel extends FilterPanel {
                 addToWatchListMenu.getItems().add(currentWatchPanel);
             }
         });
+    }
+
+    private void restoreDefaultAddToWatchListPanelMenu() {
+        addToWatchListMenu.getItems().clear();
+        addToWatchListMenu.getItems().add(newWatchListMenuItem);
     }
 
     /**
@@ -497,7 +501,7 @@ public class ListPanel extends FilterPanel {
     }
 
     /**
-     * A (filter) panel is a watch list panel if its qualifier is empty or its qualifier only has id qualifier.
+     * @return true if the node is a filter panel and its filter is a 'watch list filter'
      */
     private boolean isWatchListPanel(Node node) {
         if (!(node instanceof FilterPanel)) {
@@ -508,11 +512,11 @@ public class ListPanel extends FilterPanel {
     }
 
     /**
-     * A FilterExpression is a valid watchListFilterExpression if :
+     * A FilterExpression is a valid watch list filter if :
      *  - it is an empty string, OR
      *  - it is in the form of : id:repo1#id1;repo2#id2;repo3#id3;...
      */
-    private boolean isWatchListFilter(String filter) {
+    public static boolean isWatchListFilter(String filter) {
         return filter.isEmpty() || filter.matches(WATCH_LIST_FILTER_REGEX);
     }
 
@@ -611,17 +615,20 @@ public class ListPanel extends FilterPanel {
         }
     }
 
-    private void createNewWatchListMenuItem() {
+    /**
+     * Creates a new watch list panel containing the currently selected issue
+     */
+    private void createNewWatchListPanel() {
         Optional<GuiElement> item = listView.getSelectedItem();
-        if (item.isPresent()) {
-            TurboIssue issue = listView.getSelectedItem().get().getIssue();
-            int panelCount = parentPanelControl.getPanelCount();
-            FilterPanel newWatchListPanel = parentPanelControl.addPanelAt(panelCount);
-            newWatchListPanel.setFilterByString(String.format(CREATE_WATCH_LIST_FORMAT,
-                                                                ui.logic.getDefaultRepo(), issue.getId()));
-            String newWatchListPanelName = promptUserForNewWatchListPanelName();
-            newWatchListPanel.setPanelName(newWatchListPanelName);
-        }
+        assert item.isPresent();
+
+        TurboIssue issue = item.get().getIssue();
+        int panelCount = parentPanelControl.getPanelCount();
+        FilterPanel newWatchListPanel = parentPanelControl.addPanelAt(panelCount);
+        newWatchListPanel.setFilterByString(String.format(CREATE_WATCH_LIST_FORMAT,
+                ui.logic.getDefaultRepo(), issue.getId()));
+        String newWatchListPanelName = promptUserForNewWatchListPanelName();
+        newWatchListPanel.setPanelName(newWatchListPanelName);
     }
 
     private String promptUserForNewWatchListPanelName() {
@@ -634,17 +641,17 @@ public class ListPanel extends FilterPanel {
 
     private void addSelectedIssueToWatchListPanel(FilterPanel watchListPanel) {
         Optional<GuiElement> item = listView.getSelectedItem();
-        if (item.isPresent()) {
-            TurboIssue issue = item.get().getIssue();
-            String oldFilter = watchListPanel.getFilterTextField().getText();
-            String newFilter = "";
-            if (oldFilter.isEmpty()) {
-                newFilter = String.format(CREATE_WATCH_LIST_FORMAT, issue.getRepoId(), issue.getId());
-            } else {
-                newFilter = String.format(APPEND_TO_WATCH_LIST_FORMAT, oldFilter, issue.getRepoId(), issue.getId());
-            }
-            watchListPanel.setFilterByString(newFilter);
+        assert item.isPresent();
+
+        TurboIssue issue = item.get().getIssue();
+        String oldFilter = watchListPanel.getFilterTextField().getText();
+        String newFilter;
+        if (oldFilter.isEmpty()) {
+            newFilter = String.format(CREATE_WATCH_LIST_FORMAT, issue.getRepoId(), issue.getId());
+        } else {
+            newFilter = String.format(APPEND_TO_WATCH_LIST_FORMAT, oldFilter, issue.getRepoId(), issue.getId());
         }
+        watchListPanel.setFilterByString(newFilter);
     }
 
     /**
