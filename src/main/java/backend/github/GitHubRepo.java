@@ -37,7 +37,7 @@ public class GitHubRepo implements Repo {
     private final GitHubClientEx client = new GitHubClientEx();
     private final IssueServiceEx issueService = new IssueServiceEx(client);
     private final PullRequestServiceEx pullRequestService = new PullRequestServiceEx(client);
-    private final CollaboratorService collaboratorService = new CollaboratorService(client);
+    private final CollaboratorServiceEx collaboratorService = new CollaboratorServiceEx(client);
     private final LabelServiceEx labelService = new LabelServiceEx(client);
     private final MilestoneService milestoneService = new MilestoneService(client);
 
