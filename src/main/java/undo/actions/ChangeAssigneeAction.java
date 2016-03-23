@@ -9,14 +9,14 @@ import java.util.concurrent.CompletableFuture;
 public class ChangeAssigneeAction implements Action<TurboIssue> {
     public static final String DESCRIPTION = "Change assignee";
 
-    private final String oldAssigneeLoginName;
-    private final String newAssigneeLoginName;
+    private final Optional<String> oldAssigneeLoginName;
+    private final Optional<String> newAssigneeLoginName;
     private final Logic logic;
 
     public ChangeAssigneeAction(Logic logic, Optional<String> oldAssigneeLoginName,
                                 Optional<String> newAssigneeLoginName) {
-        this.oldAssigneeLoginName = oldAssigneeLoginName.isPresent() ? oldAssigneeLoginName.get() : null;
-        this.newAssigneeLoginName = newAssigneeLoginName.isPresent() ? newAssigneeLoginName.get() : null;
+        this.oldAssigneeLoginName = oldAssigneeLoginName;
+        this.newAssigneeLoginName = newAssigneeLoginName;
         this.logic = logic;
     }
 

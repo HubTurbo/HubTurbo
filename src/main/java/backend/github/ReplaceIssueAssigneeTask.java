@@ -5,15 +5,16 @@ import backend.interfaces.TaskRunner;
 import org.eclipse.egit.github.core.Issue;
 
 import java.io.IOException;
+import java.util.Optional;
 
 public class ReplaceIssueAssigneeTask extends GitHubRepoTask<Boolean> {
     private final String repoId;
     private final int issueId;
     private final String issueTitle;
-    private final String issueAssigneeLoginName;
+    private final Optional<String> issueAssigneeLoginName;
 
     public ReplaceIssueAssigneeTask(TaskRunner taskRunner, Repo repo, String repoId, int issueId,
-                                    String issueTitle, String issueAssigneeLoginName) {
+                                    String issueTitle, Optional<String> issueAssigneeLoginName) {
         super(taskRunner, repo);
         this.repoId = repoId;
         this.issueId = issueId;
@@ -23,17 +24,13 @@ public class ReplaceIssueAssigneeTask extends GitHubRepoTask<Boolean> {
 
     @Override
     public void run() {
+        Optional<String> result;
         try {
-            Issue result = repo.setAssignee(repoId, issueId, issueTitle, issueAssigneeLoginName);
-            String resultAssigneeLoginName = result.getAssignee().getLogin();
-
-            if (resultAssigneeLoginName == null) {
-                response.complete(issueAssigneeLoginName == null);
-            } else {
-                response.complete(result.getAssignee().getLogin().equals(issueAssigneeLoginName));
-            }
+            result = repo.setAssignee(repoId, issueId, issueTitle, issueAssigneeLoginName);
         } catch (IOException e) {
             response.completeExceptionally(e);
+            return;
         }
+        response.complete(issueAssigneeLoginName.equals(result));
     }
 }

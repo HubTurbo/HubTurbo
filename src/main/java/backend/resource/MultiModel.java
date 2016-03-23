@@ -147,7 +147,7 @@ public class MultiModel implements IModel {
      * @return the modified TurboIssue if successful
      */
     public synchronized Optional<TurboIssue> replaceIssueAssignee(String repoId, int issueId,
-                                                                  String assigneeLoginName) {
+                                                                  Optional<String> assigneeLoginName) {
         Optional<Model> modelLookUpResult = getModelById(repoId);
         return Utility.safeFlatMapOptional(modelLookUpResult,
                 (model) -> model.replaceIssueAssignee(issueId, assigneeLoginName),

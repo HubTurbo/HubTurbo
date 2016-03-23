@@ -99,12 +99,12 @@ public class RepoIOTests {
     public void testReplaceIssueAssignee() {
         RepoSource source = mock(RepoSource.class);
         CompletableFuture<List<String>> response = new CompletableFuture<>();
-        doReturn(response).when(source).replaceIssueAssignee(any(TurboIssue.class), any(String.class));
+        doReturn(response).when(source).replaceIssueAssignee(any(TurboIssue.class), any(Optional.class));
 
         RepoIO repoIO = new RepoIO(Optional.of(source), Optional.empty(), Optional.empty());
-        CompletableFuture result = repoIO.replaceIssueAssignee(mock(TurboIssue.class), "");
+        CompletableFuture result = repoIO.replaceIssueAssignee(mock(TurboIssue.class), Optional.of(""));
 
-        verify(source, times(1)).replaceIssueAssignee(any(TurboIssue.class), any(String.class));
+        verify(source, times(1)).replaceIssueAssignee(any(TurboIssue.class), any(Optional.class));
         assertEquals(response, result);
     }
 

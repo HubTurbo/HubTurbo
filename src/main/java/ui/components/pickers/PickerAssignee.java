@@ -17,9 +17,9 @@ public class PickerAssignee extends TurboUser implements Comparable<PickerAssign
     private static final int LABEL_HEIGHT = 40;
 
     private boolean isExisting = false;
-    private boolean isFaded = false;
-    private boolean isHighlighted = false;
     private boolean isSelected = false;
+    // set to true so that all users are matching when the text field is empty
+    private boolean isMatching = true;
 
     public PickerAssignee(TurboUser user) {
         super(user);
@@ -29,29 +29,17 @@ public class PickerAssignee extends TurboUser implements Comparable<PickerAssign
         this((TurboUser) assignee);
         setExisting(assignee.isExisting());
         setSelected(assignee.isSelected());
-        setFaded(assignee.isFaded());
-        setHighlighted(assignee.isHighlighted());
+        setMatching(assignee.isMatching());
     }
 
-    public Node getHNode() {
-        HBox assigneeBox = new HBox();
-        assigneeBox.setSpacing(30);
-        assigneeBox.setPadding(new Insets(0, 0, 0, 30));
-        assigneeBox.setAlignment(Pos.CENTER_LEFT);
-        assigneeBox.setPrefWidth(398);
-
+    public Node getMatchingNode() {
+        HBox assigneeBox = getAssigneeHBox();
         ImageView avatar = getAvatarImageView();
         Label assigneeLoginName = getAssigneeLabel();
+
         if (isSelected) {
             assigneeLoginName.setText(assigneeLoginName.getText() + " ✓");
-        }
-
-        if (isHighlighted) {
             assigneeBox.setStyle(assigneeBox.getStyle() + "-fx-background-color: skyblue");
-        }
-
-        if (isFaded) {
-            assigneeBox.setStyle(assigneeLoginName.getStyle() + "-fx-opacity: 40%;");
         }
 
         assigneeBox.getChildren().setAll(avatar, assigneeLoginName);
@@ -59,53 +47,15 @@ public class PickerAssignee extends TurboUser implements Comparable<PickerAssign
         return assigneeBox;
     }
 
-    private Label getAssigneeLabel() {
-        Label assigneeLoginName = new Label(getLoginName());
-        FontLoader fontLoader = Toolkit.getToolkit().getFontLoader();
-        double width = fontLoader.computeStringWidth(assigneeLoginName.getText(), assigneeLoginName.getFont());
-        assigneeLoginName.setPrefWidth(width + 35);
-        assigneeLoginName.setPrefHeight(LABEL_HEIGHT);
-        assigneeLoginName.getStyleClass().add("labels");
-        return assigneeLoginName;
+    public Node getNewlyAssignedAssigneeNode() {
+        return getAssigneeLabelWithAvatar();
     }
 
-    public Node getNewlyAssignedAssigneeNode(boolean hasSuggestion) {
+    public Node getExistingAssigneeNode(boolean hasSelected) {
         Label assignee = getAssigneeLabelWithAvatar();
-
-        if (hasSuggestion) {
-            assignee.setStyle(assignee.getStyle() + "-fx-opacity: 40%;");
-        }
-
-        if (isSelected) {
-            assignee.setStyle(assignee.getStyle() + "-fx-border-color: black;");
-        }
-
-        return assignee;
-    }
-
-    public Node getExistingAssigneeNode(boolean hasSuggestion) {
-        Label assignee = getAssigneeLabelWithAvatar();
-
-        if (isSelected && (hasSuggestion || isHighlighted)) {
-            assignee.setStyle(assignee.getStyle() + "-fx-opacity: 40%;");
-        }
-
-        if (!isExisting || !isSelected || hasSuggestion || isHighlighted) {
+        if (hasSelected || !isSelected()) {
             assignee.getStyleClass().add("labels-removed"); // add strikethrough
         }
-
-        return assignee;
-    }
-
-    private Label getAssigneeLabelWithAvatar() {
-        Label assignee = new Label(getLoginName());
-        assignee.setGraphic(getAvatarImageView());
-        FontLoader fontLoader = Toolkit.getToolkit().getFontLoader();
-        double width = fontLoader.computeStringWidth(assignee.getText(), assignee.getFont());
-        assignee.setPrefWidth(width + 35 + AVATAR_SIZE);
-        assignee.setPrefHeight(LABEL_HEIGHT);
-        assignee.getStyleClass().add("labels");
-        assignee.setStyle("-fx-background-color: lightgreen;");
         return assignee;
     }
 
@@ -117,20 +67,12 @@ public class PickerAssignee extends TurboUser implements Comparable<PickerAssign
         return this.isSelected;
     }
 
-    public void setHighlighted(boolean isHighlighted) {
-        this.isHighlighted = isHighlighted;
+    public void setMatching(boolean isMatching) {
+        this.isMatching = isMatching;
     }
 
-    public boolean isHighlighted() {
-        return this.isHighlighted;
-    }
-
-    public void setFaded(boolean isFaded) {
-        this.isFaded = isFaded;
-    }
-
-    public boolean isFaded() {
-        return this.isFaded;
+    public boolean isMatching() {
+        return this.isMatching;
     }
     public void setExisting(boolean isExisting) {
         this.isExisting = isExisting;
@@ -168,5 +110,36 @@ public class PickerAssignee extends TurboUser implements Comparable<PickerAssign
     @SuppressWarnings("PMD")
     public int hashCode() {
         return super.hashCode();
+    }
+
+    private HBox getAssigneeHBox() {
+        HBox assigneeBox = new HBox();
+        assigneeBox.setSpacing(30);
+        assigneeBox.setPadding(new Insets(0, 0, 0, 30));
+        assigneeBox.setAlignment(Pos.CENTER_LEFT);
+        assigneeBox.setPrefWidth(398);
+        return assigneeBox;
+    }
+
+    private Label getAssigneeLabel() {
+        Label assigneeLoginName = new Label(getLoginName());
+        FontLoader fontLoader = Toolkit.getToolkit().getFontLoader();
+        double width = fontLoader.computeStringWidth(assigneeLoginName.getText(), assigneeLoginName.getFont());
+        assigneeLoginName.setPrefWidth(width + 35);
+        assigneeLoginName.setPrefHeight(LABEL_HEIGHT);
+        assigneeLoginName.getStyleClass().add("labels");
+        return assigneeLoginName;
+    }
+
+    private Label getAssigneeLabelWithAvatar() {
+        Label assignee = new Label(getLoginName());
+        assignee.setGraphic(getAvatarImageView());
+        FontLoader fontLoader = Toolkit.getToolkit().getFontLoader();
+        double width = fontLoader.computeStringWidth(assignee.getText(), assignee.getFont());
+        assignee.setPrefWidth(width + 35 + AVATAR_SIZE);
+        assignee.setPrefHeight(LABEL_HEIGHT);
+        assignee.getStyleClass().add("labels");
+        assignee.setStyle("-fx-background-color: lightgreen;");
+        return assignee;
     }
 }

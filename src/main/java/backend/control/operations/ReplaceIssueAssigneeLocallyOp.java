@@ -15,12 +15,12 @@ public class ReplaceIssueAssigneeLocallyOp implements RepoOp<Optional<TurboIssue
 
     private final MultiModel models;
     private final TurboIssue issue;
-    private final String assigneeLoginName;
+    private final Optional<String> assigneeLoginName;
     private final CompletableFuture<Optional<TurboIssue>> result;
 
     private static final Logger logger = HTLog.get(UpdateLocalModelOp.class);
 
-    public ReplaceIssueAssigneeLocallyOp(MultiModel models, TurboIssue issue, String assigneeLoginName,
+    public ReplaceIssueAssigneeLocallyOp(MultiModel models, TurboIssue issue, Optional<String> assigneeLoginName,
                                        CompletableFuture<Optional<TurboIssue>> result) {
         this.models = models;
         this.issue = issue;

@@ -5,7 +5,6 @@ import backend.resource.TurboUser;
 import javafx.application.Platform;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
-import javafx.util.Pair;
 import ui.UI;
 import undo.actions.ChangeAssigneeAction;
 import util.events.ShowAssigneePickerEventHandler;
@@ -25,20 +24,26 @@ public class AssigneePicker {
     }
 
     private void showAssigneePicker(TurboIssue issue) {
-
         List<TurboUser> assigneeList = ui.logic.getRepo(issue.getRepoId()).getUsers();
         AssigneePickerDialog assigneePickerDialog = new AssigneePickerDialog(stage, issue, assigneeList);
-        Optional<Pair<ButtonType, String>> assigneeDialogResponse = assigneePickerDialog.showAndWait();
+        Optional<AssigneePickerDialogResponse> assigneeDialogResponse = assigneePickerDialog.showAndWait();
 
-        if (!assigneeDialogResponse.isPresent() ||
-                assigneeDialogResponse.get().getKey().equals(ButtonType.CANCEL)) {
+        if (wasCancelled(assigneeDialogResponse)) {
             return;
         }
-
-        Optional<String> newlyAssignedAssignee = Optional.ofNullable(assigneeDialogResponse.get().getValue());
+        Optional<String> newlyAssignedAssignee = assigneeDialogResponse.get().getAssigneeLoginName();
         if (!issue.getAssignee().equals(newlyAssignedAssignee)) {
-            ui.undoController.addAction(issue, new ChangeAssigneeAction(ui.logic, issue.getAssignee(),
-                    newlyAssignedAssignee));
+            addActionIfAssigneeChanged(issue, newlyAssignedAssignee);
         }
+    }
+
+    private boolean wasCancelled(Optional<AssigneePickerDialogResponse> assigneeDialogResponse) {
+        return !assigneeDialogResponse.isPresent() ||
+                assigneeDialogResponse.get().getButtonClicked().equals(ButtonType.CANCEL);
+    }
+
+    private void addActionIfAssigneeChanged(TurboIssue issue, Optional<String> newlyAssignedAssignee) {
+        ui.undoController.addAction(issue,
+                new ChangeAssigneeAction(ui.logic, issue.getAssignee(), newlyAssignedAssignee));
     }
 }

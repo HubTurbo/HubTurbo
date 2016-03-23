@@ -2,16 +2,16 @@ package ui.components.pickers;
 
 import util.Utility;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class AssigneePickerState {
     private List<PickerAssignee> currentAssigneesList;
 
     public AssigneePickerState(List<PickerAssignee> assignees) {
-        currentAssigneesList = getResetList(assignees);
+        currentAssigneesList = cloneList(assignees);
     }
 
     public AssigneePickerState(List<PickerAssignee> assignees, String userInput) {
@@ -19,12 +19,10 @@ public class AssigneePickerState {
         processInput(userInput);
     }
 
-    // returns list with all boolean attributes of picker assignee set to false
-    private List<PickerAssignee> getResetList(List<PickerAssignee> sourceList) {
-        List<PickerAssignee> resetList = new ArrayList<>();
-        sourceList.stream()
-                .forEach(milestone -> resetList.add(new PickerAssignee(milestone)));
-        return resetList;
+    private List<PickerAssignee> cloneList(List<PickerAssignee> sourceList) {
+        return sourceList.stream()
+                .map(PickerAssignee::new)
+                .collect(Collectors.toList());
     }
 
     private void processInput(String userInput) {
@@ -33,33 +31,9 @@ public class AssigneePickerState {
         }
 
         String[] userInputWords = userInput.split(" ");
-        for (int i = 0; i < userInputWords.length; i++) {
-            String currentWord = userInputWords[i];
-            if (i < userInputWords.length - 1 || userInput.endsWith(" ")) {
-                toggleAssignee(currentWord);
-            } else {
-                filterAssignee(currentWord);
-            }
-        }
-    }
-
-    public final void toggleAssignee(String assigneeQuery) {
-        Optional<PickerAssignee> onlyMatchingAssignee = getOnlyMatchingAssignee(assigneeQuery);
-        if (!onlyMatchingAssignee.isPresent()) return;
-        currentAssigneesList.stream()
-                .forEach(assignee -> {
-                    assignee.setSelected(assignee.equals(onlyMatchingAssignee.get())
-                        && !assignee.isSelected());
-                });
-    }
-
-    private void filterAssignee(String query) {
-        currentAssigneesList.stream()
-                .forEach(assignee -> {
-                    boolean matchQuery = Utility.containsIgnoreCase(assignee.getLoginName(), query);
-                    assignee.setFaded(!matchQuery);
-                });
-        highlightFirstMatchingAssignee();
+        Stream.of(userInputWords)
+                .forEach(this::filterAssignees);
+        toggleFirstMatchingAssignee();
     }
 
     public List<PickerAssignee> getCurrentAssigneesList() {
@@ -68,44 +42,43 @@ public class AssigneePickerState {
 
     public List<PickerAssignee> getMatchingAssigneeList() {
         return currentAssigneesList.stream()
-                .filter(assignee -> !assignee.isFaded())
+                .filter(assignee -> assignee.isMatching())
                 .collect(Collectors.toList());
     }
 
-    private void highlightFirstMatchingAssignee() {
-        if (hasMatchingAssignee(currentAssigneesList)) {
-            currentAssigneesList.stream()
-                    .filter(assignee -> !assignee.isFaded())
-                    .findAny()
-                    .get()
-                    .setHighlighted(true);
-        }
+    public void toggleExactMatchAssignee(String assigneeLoginName) {
+        Optional<PickerAssignee> exactMatchAssignee = getExactMatchAssignee(assigneeLoginName);
+        exactMatchAssignee.ifPresent(this::toggleAssignee);
     }
 
-    private boolean hasMatchingAssignee(List<PickerAssignee> assigneeList) {
-        return assigneeList.stream()
-                .filter(assignee -> !assignee.isFaded())
-                .findAny()
-                .isPresent();
+    private void toggleFirstMatchingAssignee() {
+        Optional<PickerAssignee> firstMatchingAssignee = getFirstMatchingAssignee();
+        firstMatchingAssignee.ifPresent(this::toggleAssignee);
     }
 
-    private Optional<PickerAssignee> getOnlyMatchingAssignee(String query) {
-        if (!hasExactlyOneMatchingAssignee(currentAssigneesList, query)) {
-            return Optional.empty();
-        }
-        return Optional.of(getMatchingAssigneeName(currentAssigneesList, query));
+    private void toggleAssignee(PickerAssignee matchingAssignee) {
+        currentAssigneesList
+                .forEach(assignee -> assignee.setSelected(matchingAssignee.equals(assignee)
+                && !assignee.isSelected()));
     }
 
-    private boolean hasExactlyOneMatchingAssignee(List<PickerAssignee> assigneeList, String query) {
-        return assigneeList.stream()
-                .filter(assignee -> Utility.containsIgnoreCase(assignee.getLoginName(), query))
-                .count() == 1;
+    private void filterAssignees(String query) {
+        currentAssigneesList
+                .forEach(assignee -> {
+                    boolean matchQuery = Utility.containsIgnoreCase(assignee.getLoginName(), query);
+                    assignee.setMatching(matchQuery);
+                });
     }
 
-    private PickerAssignee getMatchingAssigneeName(List<PickerAssignee> assigneeList, String query) {
-        return assigneeList.stream()
-                .filter(assignee -> Utility.containsIgnoreCase(assignee.getLoginName(), query))
-                .findFirst()
-                .get();
+    private Optional<PickerAssignee> getFirstMatchingAssignee() {
+        return currentAssigneesList.stream()
+                .filter(assignee -> assignee.isMatching())
+                .findFirst();
+    }
+
+    private Optional<PickerAssignee> getExactMatchAssignee(String query) {
+        return currentAssigneesList.stream()
+                .filter(assignee -> assignee.getLoginName().equals(query))
+                .findFirst();
     }
 }

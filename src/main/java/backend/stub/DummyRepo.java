@@ -11,7 +11,6 @@ import github.TurboIssueEvent;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.eclipse.egit.github.core.*;
-
 import ui.UI;
 import util.events.testevents.ClearLogicModelEvent;
 import util.events.testevents.UpdateDummyRepoEventHandler;
@@ -198,8 +197,11 @@ public class DummyRepo implements Repo {
     }
 
     @Override
-    public Issue setAssignee(String repoId, int issueId, String issueTitle, String issueAssigneeLoginName) {
-        return getRepoState(repoId).setAssignee(issueId, issueAssigneeLoginName);
+    public Optional<String> setAssignee(String repoId, int issueId, String issueTitle,
+                                        Optional<String> issueAssigneeLoginName) {
+        Issue returnedIssue = getRepoState(repoId).setAssignee(issueId, issueAssigneeLoginName);
+        return Optional.ofNullable(returnedIssue.getAssignee())
+                .map(User::getLogin);
     }
 
     @Override

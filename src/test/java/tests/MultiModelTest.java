@@ -87,7 +87,7 @@ public class MultiModelTest {
     @Test
     public void replaceIssueAssignee_modelNotFound() {
         MultiModel models = new MultiModel(mock(Preferences.class));
-        assertEquals(Optional.empty(), models.replaceIssueAssignee("nonexistentrepo", 1, ""));
+        assertEquals(Optional.empty(), models.replaceIssueAssignee("nonexistentrepo", 1, Optional.of("")));
     }
 
     /**
@@ -227,7 +227,7 @@ public class MultiModelTest {
     public void replaceIssueAssignee_successful() {
         String repoId = "testowner/testrepo";
         int issueId = 1;
-        String assignee = "user1";
+        Optional<String> assignee = Optional.of("user1");
 
         Model mockedModel = mock(Model.class);
         when(mockedModel.getRepoId()).thenReturn(repoId);

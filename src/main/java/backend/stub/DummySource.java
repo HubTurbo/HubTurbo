@@ -64,7 +64,7 @@ public class DummySource extends RepoSource {
     }
 
     @Override
-    public CompletableFuture<Boolean> replaceIssueAssignee(TurboIssue issue, String assigneeLoginName) {
+    public CompletableFuture<Boolean> replaceIssueAssignee(TurboIssue issue, Optional<String> assigneeLoginName) {
         return addTask(new ReplaceIssueAssigneeTask(this, dummy, issue.getRepoId(),
                 issue.getId(), issue.getTitle(), assigneeLoginName)).response;
     }

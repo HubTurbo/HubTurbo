@@ -16,14 +16,14 @@ public class AssigneePickerStateTest {
     @Test
     public void toggleAssignee_noAssignee_assigneeAssigned() {
         AssigneePickerState state = getUnassignedState();
-        state.toggleAssignee("username1");
+        state.toggleExactMatchAssignee("username1");
         assertTrue(state.getCurrentAssigneesList().get(0).isSelected());
     }
 
     @Test
     public void toggleAssignee_hasAssignee_assigneeChanged() {
         AssigneePickerState state = getAssignedState();
-        state.toggleAssignee("username1");
+        state.toggleExactMatchAssignee("username1");
         assertTrue(state.getCurrentAssigneesList().get(0).isSelected());
         assertFalse(state.getCurrentAssigneesList().get(1).isSelected());
     }
@@ -31,7 +31,7 @@ public class AssigneePickerStateTest {
     @Test
     public void toggleAssignee_hasAssignee_assigneeUnassigned() {
         AssigneePickerState state = getAssignedState();
-        state.toggleAssignee("username2");
+        state.toggleExactMatchAssignee("username2");
         assertFalse(state.getCurrentAssigneesList().get(0).isSelected());
         assertFalse(state.getCurrentAssigneesList().get(1).isSelected());
     }

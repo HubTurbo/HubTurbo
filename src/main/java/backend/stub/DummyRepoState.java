@@ -470,7 +470,7 @@ public class DummyRepoState {
         toSet.removeMilestone();
     }
 
-    protected final Issue setAssignee(int issueId, String newAssigneeLoginName) {
+    protected final Issue setAssignee(int issueId, Optional<String> newAssigneeLoginName) {
         ImmutablePair<TurboIssue, IssueMetadata> mutables = produceMutables(issueId);
         TurboIssue toSet = mutables.getLeft();
         IssueMetadata metadataOfIssue = mutables.getRight();
@@ -485,14 +485,14 @@ public class DummyRepoState {
 
         eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test-nonself"),
                 IssueEventType.Assigned,
-                new Date()).setAssignedUser(new User().setLogin(newAssigneeLoginName)));
-        toSet.setAssignee(newAssigneeLoginName);
+                new Date()).setAssignedUser(new User().setLogin(newAssigneeLoginName.get())));
+        toSet.setAssignee(newAssigneeLoginName.get());
         toSet.setUpdatedAt(LocalDateTime.now());
 
         markUpdatedEvents(toSet, IssueMetadata.intermediate(eventsOfIssue, metadataOfIssue.getComments(), "", ""));
 
         Issue newIssue = new Issue();
-        newIssue.setAssignee(new User().setLogin(newAssigneeLoginName));
+        newIssue.setAssignee(new User().setLogin(newAssigneeLoginName.get()));
         return newIssue;
     }
 

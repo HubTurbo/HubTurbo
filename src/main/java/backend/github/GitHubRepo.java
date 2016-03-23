@@ -302,18 +302,21 @@ public class GitHubRepo implements Repo {
     }
 
     @Override
-    public Issue setAssignee(String repoId, int issueId, String issueTitle, String issueAssigneeLoginName)
-            throws IOException {
-
-        User issueAssignee = new User();
-        issueAssignee.setLogin(issueAssigneeLoginName);
+    public Optional<String> setAssignee(String repoId, int issueId, String issueTitle,
+                                        Optional<String> issueAssigneeLoginName) throws IOException {
 
         Issue createdIssue = new Issue();
         createdIssue.setNumber(issueId);
         createdIssue.setTitle(issueTitle);
+
+        User issueAssignee = new User();
+        issueAssigneeLoginName.ifPresent(issueAssignee::setLogin);
         createdIssue.setAssignee(issueAssignee);
 
-        return issueService.editIssue(RepositoryId.createFromId(repoId), createdIssue);
+        Issue issueReturned = issueService.editIssue(RepositoryId.createFromId(repoId), createdIssue);
+
+        return Optional.ofNullable(issueReturned.getAssignee())
+                .map(User::getLogin);
     }
 
     @Override

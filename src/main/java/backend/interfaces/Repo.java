@@ -58,7 +58,8 @@ public interface Repo {
     Optional<Integer> setMilestone(String repoId, int issueId, String issueTitle, Optional<Integer> issueMilestone)
             throws IOException;
 
-    Issue setAssignee(String repoId, int issueId, String issueTitle, String issueAssigneeLoginName) throws IOException;
+    Optional<String> setAssignee(String repoId, int issueId, String issueTitle, Optional<String> issueAssigneeLoginName)
+            throws IOException;
 
     boolean editIssueState(String repoId, int issueId, boolean isOpen) throws IOException;
 

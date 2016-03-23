@@ -48,7 +48,7 @@ public abstract class RepoSource implements TaskRunner {
 
     public abstract CompletableFuture<Boolean> replaceIssueMilestone(TurboIssue issue, Optional<Integer> milestone);
 
-    public abstract CompletableFuture<Boolean> replaceIssueAssignee(TurboIssue issue, String assignee);
+    public abstract CompletableFuture<Boolean> replaceIssueAssignee(TurboIssue issue, Optional<String> assignee);
 
     public abstract CompletableFuture<Boolean> editIssueState(TurboIssue issue, boolean isOpen);
 

@@ -333,7 +333,7 @@ public class ModelTests {
     @Test
     public void replaceIssueAssignee_issueNotFound() {
         Model model = new Model("testrepo");
-        assertEquals(Optional.empty(), model.replaceIssueAssignee(1, ""));
+        assertEquals(Optional.empty(), model.replaceIssueAssignee(1, Optional.of("")));
     }
 
     /**
@@ -412,7 +412,7 @@ public class ModelTests {
 
         Model model = new Model(repoId, issues, new ArrayList<>(),
                                 new ArrayList<>(), new ArrayList<>());
-        Optional<TurboIssue> result = model.replaceIssueAssignee(issue1.getId(), newAssignee);
+        Optional<TurboIssue> result = model.replaceIssueAssignee(issue1.getId(), Optional.of(newAssignee));
         assertEquals(1, result.get().getId());
         assertEquals(newAssignee, result.get().getAssignee().get());
     }

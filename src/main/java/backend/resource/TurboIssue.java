@@ -458,13 +458,18 @@ public class TurboIssue {
         return assignee;
     }
 
+    public void setAssignee(TurboUser assignee) {
+        setAssignee(assignee.getLoginName());
+        this.assigneeLastModifiedAt = Optional.of(LocalDateTime.now());
+    }
+
     public void setAssignee(String assignee) {
         this.assignee = Optional.ofNullable(assignee);
         this.assigneeLastModifiedAt = Optional.of(LocalDateTime.now()); 
     }
 
-    public void setAssignee(TurboUser assignee) {
-        setAssignee(assignee.getLoginName());
+    public void removeAssignee() {
+        this.assignee = Optional.empty();
         this.assigneeLastModifiedAt = Optional.of(LocalDateTime.now());
     }
 
