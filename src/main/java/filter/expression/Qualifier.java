@@ -12,18 +12,15 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import backend.resource.*;
-import filter.ParseException;
+import filter.*;
 import util.Utility;
 import backend.interfaces.IModel;
-import filter.MetaQualifierInfo;
-import filter.QualifierApplicationException;
-import filter.SemanticException;
 
 public class Qualifier implements FilterExpression {
 
     public static final Qualifier EMPTY = new Qualifier(QualifierType.EMPTY, "");
     public static final Qualifier FALSE = new Qualifier(QualifierType.FALSE, "");
-
+    public static final String USER_WARNING_ERROR_FORMAT = "Cannot find username containing %s in %s%n";
 
     private final QualifierType type;
 
@@ -356,7 +353,7 @@ public class Qualifier implements FilterExpression {
         case LABEL:
             return labelsSatisfy(model, issue);
         case AUTHOR:
-            return authorSatisfies(issue);
+            return authorSatisfies(model, issue);
         case ASSIGNEE:
             return assigneeSatisfies(model, issue);
         case INVOLVES:
@@ -846,6 +843,8 @@ public class Qualifier implements FilterExpression {
 
         if (!assignee.isPresent()) return false;
 
+        enforceUserInRepoCondition(model, issue.getRepoId(), content.get());
+
         String content = this.content.get().toLowerCase();
         String login = assignee.get().getLoginName() == null ? "" : assignee.get().getLoginName().toLowerCase();
         String name = assignee.get().getRealName() == null ? "" : assignee.get().getRealName().toLowerCase();
@@ -853,16 +852,24 @@ public class Qualifier implements FilterExpression {
         return login.contains(content) || name.contains(content);
     }
 
-    private boolean authorSatisfies(TurboIssue issue) {
+    private boolean authorSatisfies(IModel model, TurboIssue issue) {
         if (!content.isPresent()) return false;
 
-        String creator = issue.getCreator();
+        enforceUserInRepoCondition(model, issue.getRepoId(), content.get());
 
+        String creator = issue.getCreator();
         return creator.toLowerCase().contains(content.get().toLowerCase());
     }
 
+    private void enforceUserInRepoCondition(IModel model, String repoId, String userName) {
+        boolean shouldWarnUser = !model.isUserInRepo(repoId, userName);
+        if (shouldWarnUser) {
+            throw new SemanticException(String.format(USER_WARNING_ERROR_FORMAT, userName, repoId));
+        }
+    }
+
     private boolean involvesSatisfies(IModel model, TurboIssue issue) {
-        return authorSatisfies(issue) || assigneeSatisfies(model, issue);
+        return authorSatisfies(model, issue) || assigneeSatisfies(model, issue);
     }
 
     public static boolean labelMatches(String input, String candidate) {

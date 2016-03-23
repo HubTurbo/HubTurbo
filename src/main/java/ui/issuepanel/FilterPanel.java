@@ -31,7 +31,6 @@ import util.events.testevents.UIComponentFocusEvent;
 import prefs.PanelInfo;
 
 import java.util.*;
-import java.util.List;
 import java.util.stream.Collectors;
 
 /**
