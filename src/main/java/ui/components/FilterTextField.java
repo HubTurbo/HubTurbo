@@ -1,8 +1,8 @@
 package ui.components;
 
 import filter.expression.QualifierType;
+import javafx.event.ActionEvent;
 import javafx.geometry.Side;
-import javafx.scene.Node;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -79,14 +79,10 @@ public class FilterTextField extends TextField {
             if (key == null || key.isEmpty() || isModifierKeyPress) {
                 return;
             }
-            char typed = e.getCharacter().charAt(0);
-
-            if (shouldStartCompletion()) suggestion.show(this, Side.BOTTOM, 0, 0);
-
-            if (typed == '\t' && suggestion.isShowing()) {
-                suggestion.hide();
-                completeWord();
-                e.consume();
+            
+            if (Character.isAlphabetic(key.charAt(0))) {
+                suggestion.loadSuggestions(getMatchingKeywords(getCurrentWord()));
+                suggestion.show(this, Side.BOTTOM, 0, 0);
             }
             
         });
@@ -103,24 +99,34 @@ public class FilterTextField extends TextField {
                 suggestion.loadSuggestions(getMatchingKeywords(getCurrentWord()));
             }
 
-            if (e.getCode() == KeyCode.ENTER) {
-                suggestion.hide();
-                completeWord();
-                confirmEdit();
-            } else if (e.getCode() == KeyCode.ESCAPE) {
-                if (getText().equals(previousText)) {
-                    suggestion.hide();
-                    onCancel.run();
-                } else {
-                    revertEdit();
-                }
-            }
+            if (e.getCode() == KeyCode.ENTER) handleOnEnter();
+
+            if (e.getCode() == KeyCode.ESCAPE) handleOnEscape();
+            
         });
         addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             if (SHOW_DOCS.match(event)) {
                 onShowDocs.run();
             }
         });
+    }
+
+    private void handleOnEnter() {
+        if (!suggestion.isShowing()) {
+            confirmEdit();
+        } else {
+            suggestion.hide();
+            suggestion.getSelectedContent().ifPresent(this::completeWord);
+        }
+    }
+
+    private void handleOnEscape() {
+        if (getText().equals(previousText)) {
+            suggestion.hide();
+            onCancel.run();
+        } else {
+            revertEdit();
+        }
     }
 
 
@@ -140,18 +146,6 @@ public class FilterTextField extends TextField {
 
     private boolean isNavigationKey(KeyEvent e) {
         return e.getCode() == KeyCode.UP || e.getCode() == KeyCode.DOWN;
-    }
-
-    /**
-     * Completion is only started when there's effectively nothing (only whitespace)
-     * after the caret, or if there is selected text (indicating either that we are in
-     * the midst of completion, or that the user does not want the selected text and is
-     * typing to replace it)
-     *
-     * @return true if completion should be started
-     */
-    private boolean shouldStartCompletion() {
-        return getCharAfterCaret().trim().isEmpty() || !getSelectedText().isEmpty();
     }
 
     /**
@@ -199,17 +193,6 @@ public class FilterTextField extends TextField {
         }
     }
 
-    /**
-     * Returns the character following the caret as a string. The string returned
-     * is guaranteed to be of length 1, unless the caret is at the end of the field,
-     * in which case it is empty.
-     */
-    private String getCharAfterCaret() {
-        if (getCaretPosition() < getText().length()) {
-            return getText().substring(getCaretPosition(), getCaretPosition() + 1);
-        }
-        return "";
-    }
 
     /**
      * Reverts the contents of the field to its last confirmed value.
@@ -235,15 +218,20 @@ public class FilterTextField extends TextField {
     // SuggestionMenu 
     
     private final SuggestionMenu setupSuggestion() {
-        SuggestionMenu suggestion = new SuggestionMenu(MAX_SUGGESTIONS);
+        SuggestionMenu suggestion = new SuggestionMenu(MAX_SUGGESTIONS).setActionHandler(this::suggestionActionHandler);
         suggestion.loadSuggestions(keywords);
         return suggestion;
     }
 
-    private void completeWord() {
+    private void completeWord(String suggestedWord) {
         int caret = getCaretPosition();
         selectRange(getInitialCaretPosition(caret), caret);
-        suggestion.getSelectedContent().ifPresent(this::replaceSelection);
+        replaceSelection(suggestedWord);
+    }
+
+    private void suggestionActionHandler(ActionEvent event) {
+        suggestion.hide();
+        SuggestionMenu.getTextOnAction(event).ifPresent(this::completeWord);
     }
 
     /**
