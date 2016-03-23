@@ -17,8 +17,14 @@ import java.util.Optional;
 /**
  * Represents persistent user configuration. Maps to a file on disk.
  *
+ * The Preferences class is the facade of all configuration and preferences information. All preferences and config
+ * settings can be set in this class.
+ *
+ * Use either Preferences.create() or Preferences.load() to obtain a Preferences instance.
+ *
  * Overrides PMD's recommendation that this class should be final.
  * It cannot be as we need to mock it.
+ * 
  */
 public class Preferences { // NOPMD
 
@@ -29,6 +35,9 @@ public class Preferences { // NOPMD
     public static final String SESSION_CONFIG_FILENAME = "global.json";
     public static final String USER_CONFIG_FILENAME = "user.json";
 
+    private static final String DEFAULT_FILE_CONTENTS = "{}";
+
+    private final String configDirectory;
     private final String sessionConfigFileName;
     private final String userConfigFileName;
 
@@ -36,77 +45,90 @@ public class Preferences { // NOPMD
     private final UserConfig userConfig;
 
     /**
-     * Initialises a Preferences instance that contain the configurations in the config files specified
-     * @param sessionConfigFileName The file name of the session config file which stores session config values.
-     * @param userConfigFileName The file name of the user config file which stores user config values.
-     * @return The initialised Preferences instance
+     * Initialises a Preferences instance that contains the configurations in the config files specified.
+     * @param configDirectory The directory that the config files are held in.
+     * @param sessionConfigFileName The name of the session config file to load.
+     * @param userConfigFileName The name of the user config file to load.
+     * @return The initialised Preferences instance.
      */
-    public static Preferences load(String sessionConfigFileName, String userConfigFileName) {
-        return new Preferences(sessionConfigFileName, userConfigFileName, false);
+    public static Preferences load(String configDirectory, String sessionConfigFileName, String userConfigFileName) {
+        return new Preferences(configDirectory, sessionConfigFileName, userConfigFileName, false);
     }
 
     /**
-     * Initialises a Preferences instance that contain a clean slate of configuration values in the config files
-     * specified
-     * @param sessionConfigFileName The file name of the session config file which stores session config values.
-     * @param userConfigFileName The file name of the user config file which stores user config values.
-     * @return The initialised Preferences instance
+     * Initialises a Preferences instance that creates new config files.
+     * @param configDirectory The directory that the config files are held in.
+     * @param sessionConfigFileName The name of the session config file to create.
+     * @param userConfigFileName The name of the user config file to create.
+     * @return The initialised Preferences instance.
      */
-    public static Preferences create(String sessionConfigFileName, String userConfigFileName) {
-        return new Preferences(sessionConfigFileName, userConfigFileName, true);
+    public static Preferences create(String configDirectory, String sessionConfigFileName, String userConfigFileName) {
+        return new Preferences(configDirectory, sessionConfigFileName, userConfigFileName, true);
     }
 
     /**
+     * @param configDirectory The directory that the config files are held in.
      * @param sessionConfigFileName The name of the session config file
+     * @param userConfigFileName The name of the user config file
      * @param ignoreExisting True if existing config file is to be ignored.
      */
-    private Preferences(String sessionConfigFileName, String userConfigFileName, boolean ignoreExisting) {
+    private Preferences(String configDirectory,
+                        String sessionConfigFileName,
+                        String userConfigFileName,
+                        boolean ignoreExisting) {
+        this.configDirectory = configDirectory;
         this.sessionConfigFileName = sessionConfigFileName;
         this.userConfigFileName = userConfigFileName;
 
-        this.sessionConfig = loadConfig(sessionConfigFileName, SessionConfig.class, ignoreExisting);
-        this.userConfig = loadConfig(userConfigFileName, UserConfig.class, ignoreExisting);
+        if (ignoreExisting) {
+            this.sessionConfig = createConfig(DEFAULT_FILE_CONTENTS, SessionConfig.class);
+            this.userConfig = createConfig(DEFAULT_FILE_CONTENTS, UserConfig.class);
+        } else {
+            this.sessionConfig = loadConfig(configDirectory, sessionConfigFileName, SessionConfig.class);
+            this.userConfig = loadConfig(configDirectory, userConfigFileName, UserConfig.class);
+        }
+    }
+
+    /**
+     * Creates a new Config instance
+     * @param contents The contents of the object to create
+     * @param configClass The class of the Config instance to create
+     * @return The created Config instance
+     */
+    private <T> T createConfig(String contents, Class<T> configClass) {
+        return new JsonHelper().fromJsonString(contents, configClass);
     }
 
     /**
      * Loads a Config instance from a file on disk
+     * @param configDirectory The directory that the config file is held in.
      * @param configFileName The filename of the config file on disk
      * @param configClass The class of the config to load
-     * @param ignoreExisting True if ignore the config file already
      * @return The loaded Config instance
      */
-    private <T extends Config> T loadConfig(String configFileName, Class<T> configClass, boolean ignoreExisting) {
-        FileHelper configFileHelper = new FileHelper(DIRECTORY, configFileName);
-        String fileContents;
-        if (ignoreExisting) {
-            fileContents = configFileHelper.loadNewFile();
-        } else {
+    private <T> T loadConfig(String configDirectory, String configFileName, Class<T> configClass) {
+        FileHelper configFileHelper = new FileHelper(configDirectory, configFileName);
+        String fileContents = DEFAULT_FILE_CONTENTS;
+        if (configFileHelper.exists()) {
             try {
                 fileContents = configFileHelper.loadFileContents();
             } catch (IOException e) {
                 // if we can't read the file, just ignore the existing file
-                fileContents = configFileHelper.loadNewFile();
+                HTLog.error(logger, e);
+                logger.error(e.toString());
+                fileContents = DEFAULT_FILE_CONTENTS;
             }
         }
 
-        try {
-            return new JsonHelper().createConfigFromJson(fileContents, configClass);
-
-        } catch (IllegalAccessException | InstantiationException e) {
-            HTLog.error(logger, e);
-            assert false;
-            // If we cannot instantiate, it is a programmer error.
-            // Since we have to return something even after assert false, we return a null config.
-            return null;
-        }
+        return createConfig(fileContents, configClass);
     }
 
     /**
      * Saves the session and user configs to file
      */
-    public void save() {
+    private void save() {
         try {
-            saveConfig(sessionConfig, sessionConfigFileName);
+            saveConfig(sessionConfig, configDirectory, sessionConfigFileName, SessionConfig.class);
 
         } catch (IOException e) {
             HTLog.error(logger, e);
@@ -114,7 +136,7 @@ public class Preferences { // NOPMD
         }
 
         try {
-            saveConfig(userConfig, userConfigFileName);
+            saveConfig(userConfig, configDirectory, userConfigFileName, UserConfig.class);
 
         } catch (IOException e) {
             HTLog.error(logger, e);
@@ -124,19 +146,24 @@ public class Preferences { // NOPMD
 
     /**
      * Saves a Config to file
-     * @param config The config object to save
+     * @param config The config object to save.
+     * @param configDirectory The directory that the config file is held in.
      * @param configFileName The file name of the config file on disk
+     * @param configClass The class of the config object
      */
-    private void saveConfig(Config config, String configFileName) throws IOException {
+    private <T> void saveConfig(T config,
+                            String configDirectory,
+                            String configFileName,
+                            Class configClass) throws IOException {
         JsonHelper jsonHelper = new JsonHelper();
-        String jsonString = jsonHelper.createJsonFromConfig(config);
-        FileHelper fileHelper = new FileHelper(DIRECTORY, configFileName);
+        String jsonString = jsonHelper.toJsonString(config, configClass);
+        FileHelper fileHelper = new FileHelper(configDirectory, configFileName);
         fileHelper.writeFileContents(jsonString);
     }
 
-    // Last login credentials. While the main UI is running (i.e. logged in successfully), last login
-    // credentials are guaranteed to be the current user's credentials thanks to setLastLoginCredentials
-    // being called immediately after a successful login in LoginDialog.
+    /**
+     * Retrieves the last login password
+     */
     public String getLastLoginPassword() {
         return sessionConfig.getLastLoginPassword();
     }
@@ -155,20 +182,7 @@ public class Preferences { // NOPMD
      */
     public void setLastLoginCredentials(String username, String password) {
         sessionConfig.setLastLoginCredentials(username, password);
-    }
-
-    /**
-     * Retrieves a list of the last open filters
-     */
-    public List<String> getLastOpenFilters() {
-        return sessionConfig.getLastOpenFilters();
-    }
-
-    /**
-     * Retrieves a list of panel names
-     */
-    public List<String> getPanelNames() {
-        return sessionConfig.getPanelNames();
+        save();
     }
 
     /**
@@ -184,23 +198,20 @@ public class Preferences { // NOPMD
      */
     public void setPanelInfo(List<PanelInfo> panelInfo) {
         sessionConfig.setPanelInfo(panelInfo);
+        save();
     }
 
     /**
-     * Interface to configuration files
+     * Adds a board with the board name and its panels information
      */
-
-    /**
-     * Boards
-     */
-
     public void addBoard(String name, List<PanelInfo> panels) {
         assert name != null && panels != null;
         sessionConfig.addBoard(name, panels);
+        save();
     }
 
     /**
-     * Retrieves a map of all the boards
+     * Retrieves all the boards
      */
     public Map<String, List<PanelInfo>> getAllBoards() {
         return sessionConfig.getAllBoards();
@@ -219,6 +230,7 @@ public class Preferences { // NOPMD
      */
     public void removeBoard(String name) {
         sessionConfig.removeBoard(name);
+        save();
     }
 
     /**
@@ -227,11 +239,12 @@ public class Preferences { // NOPMD
      */
     public void setLastOpenBoard(String board) {
         sessionConfig.setLastOpenBoard(board);
+        save();
     }
 
     /**
      * Retrieves the name of the last open board.
-     * @return An Optional of a nullable board name
+     * @return An Optional of a board name
      */
     public Optional<String> getLastOpenBoard() {
         return sessionConfig.getLastOpenBoard();
@@ -249,7 +262,6 @@ public class Preferences { // NOPMD
             
             setLastOpenBoard(boardNames.get(index));
         }
-        
         return getLastOpenBoard();
     }
 
@@ -258,6 +270,7 @@ public class Preferences { // NOPMD
      */
     public void clearLastOpenBoard() {
         sessionConfig.clearLastOpenBoard();
+        save();
     }
 
     /**
@@ -274,11 +287,8 @@ public class Preferences { // NOPMD
      */
     public void clearAllBoards() {
         sessionConfig.clearAllBoards();
+        save();
     }
-
-    /**
-     * Session configuration
-     */
 
     /**
      * Sets the last viewed repo to the specified repo
@@ -286,6 +296,7 @@ public class Preferences { // NOPMD
      */
     public void setLastViewedRepository(String repository) {
         sessionConfig.setLastViewedRepository(repository);
+        save();
     }
 
     /**
@@ -312,20 +323,22 @@ public class Preferences { // NOPMD
      */
     public void clearMarkedReadAt(String repoId, int issue) {
         sessionConfig.clearMarkedReadAt(repoId, issue);
+        save();
     }
 
     /**
-     * Sets the marked read at for an issue in a repo, to a certain time
+     * Sets the marked read at of an issue in a repo, to a certain time
      * @param repoId The repo of the issue
      * @param issue The issue to set
      * @param time The time it was marked read
      */
     public void setMarkedReadAt(String repoId, int issue, LocalDateTime time) {
         sessionConfig.setMarkedReadAt(repoId, issue, time);
+        save();
     }
 
     /**
-     * Retrieves the marked read at for a specified issue in a repo
+     * Retrieves the marked read at of a specified issue in a repo
      * @param repoId The repo of the issue
      * @param issue The issue to retrieve the marked read at
      * @return An Optional of the marked read at
@@ -335,7 +348,7 @@ public class Preferences { // NOPMD
     }
 
     /**
-     * Retrieves the map of keyboard shortcuts
+     * Retrieves the keyboard shortcuts
      */
     public Map<String, String> getKeyboardShortcuts() {
         return sessionConfig.getKeyboardShortcuts();
@@ -347,5 +360,6 @@ public class Preferences { // NOPMD
      */
     public void setKeyboardShortcuts(Map<String, String> keyboardShortcuts) {
         sessionConfig.setKeyboardShortcuts(keyboardShortcuts);
+        save();
     }
 }

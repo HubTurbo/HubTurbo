@@ -119,12 +119,12 @@ public class UITest extends GuiTest {
         }
     }
 
-    public void clearAllTestConfigs() {
+    public static void clearAllTestConfigs() {
         clearTestConfig(TestController.TEST_DIRECTORY, TestController.TEST_SESSION_CONFIG_FILENAME);
         clearTestConfig(TestController.TEST_DIRECTORY, TestController.TEST_USER_CONFIG_FILENAME);
     }
 
-    public void clearTestConfig(String directory, String filename) {
+    private static void clearTestConfig(String directory, String filename) {
         // delete test.json if it exists
         File testConfig = new File(directory, filename);
         if (testConfig.exists() && testConfig.isFile()) {

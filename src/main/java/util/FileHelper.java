@@ -16,15 +16,14 @@ public class FileHelper {
     private static final Logger logger = LogManager.getLogger(FileHelper.class.getName());
 
     private static final String CHARSET = "UTF-8";
-    private static final String EMPTY_STRING = "";
 
     private final String fileDirectory;
     private final String fileName;
 
     /**
-     * Initialise the FileHelper with the directory and the file name
-     * @param fileDirectory the directory that the config file is located in
-     * @param fileName the name of the config file
+     * Initialises the FileHelper with the directory and the file name
+     * @param fileDirectory the directory that the file is located in
+     * @param fileName the name of the file
      */
     public FileHelper(String fileDirectory, String fileName) {
         this.fileName = fileName;
@@ -32,46 +31,42 @@ public class FileHelper {
     }
 
     /**
-     * Returns the File representation at the config file path
+     * Returns the File representation at the file path
      */
     private Path getFilePath() {
         return Paths.get(fileDirectory, fileName);
     }
 
     /**
-     * Attempts to create the config directory if it does not exist.
+     * Attempts to create the directory if it does not exist.
+     * @throws IOException When the directory cannot be created
      */
     private void createDirectoryIfNonExistent() throws IOException {
         File directory = new File(fileDirectory);
         boolean directoryExists = directory.exists() && directory.isDirectory();
         if (!directoryExists) {
             if (directory.mkdirs()) {
-                logger.info("Config directory created: " + directory.toString());
+                logger.info("Directory created: " + directory.toString());
             } else {
-                logger.error("Could not create config file directory");
+                logger.error("Could not create file directory");
                 throw new IOException();
             }
         }
     }
 
-    /**
-     * Loads the content of a new file
-     * @return The String representation of the contents in a new file
-     */
-    public String loadNewFile() {
-        return EMPTY_STRING;
+    public boolean exists() {
+        return Files.exists(getFilePath());
     }
 
     /**
-     * Load the contents of the file into a String
-     * @return The String representation of the contents of the config file
+     * Loads the contents of the file into a String
+     * @return The String representation of the contents of the file
      */
     public String loadFileContents() throws IOException {
-        Path configFilePath = getFilePath();
-        logger.info("Load starting: " + configFilePath.toAbsolutePath());
-
-        String contents = new String(Files.readAllBytes(configFilePath), CHARSET);
-        logger.info("Load successful: " + configFilePath.toAbsolutePath());
+        Path filePath = getFilePath();
+        logger.info("Load starting: " + filePath.toAbsolutePath());
+        String contents = new String(Files.readAllBytes(filePath), CHARSET);
+        logger.info("Load successful: " + filePath.toAbsolutePath());
         return contents;
     }
 
@@ -81,10 +76,10 @@ public class FileHelper {
      */
     public void writeFileContents(String fileContents) throws IOException {
         createDirectoryIfNonExistent();
-        Path configFilePath = getFilePath();
-        logger.info("Write starting: " + configFilePath.toAbsolutePath());
-        Files.write(configFilePath, fileContents.getBytes(CHARSET));
-        logger.info("Write successful: " + configFilePath.toAbsolutePath());
+        Path filePath = getFilePath();
+        logger.info("Write starting: " + filePath.toAbsolutePath());
+        Files.write(filePath, fileContents.getBytes(CHARSET));
+        logger.info("Write successful: " + filePath.toAbsolutePath());
     }
 
 }

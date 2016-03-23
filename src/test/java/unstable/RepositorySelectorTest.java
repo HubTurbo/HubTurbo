@@ -14,7 +14,6 @@ import org.loadui.testfx.utils.FXTestUtils;
 import javafx.scene.control.ComboBox;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
-import prefs.ConfigFile;
 import prefs.SessionConfig;
 import prefs.Preferences;
 import ui.TestController;
@@ -52,18 +51,15 @@ public class RepositorySelectorTest extends UITest {
     public void beforeStageStarts() {
         // setup test json with last viewed repo "dummy/dummy"
         // obviously the json for that repo doesn't exist
-        SessionConfig sessionConfig = new SessionConfig();
-        sessionConfig.setLastLoginCredentials("test", "test");
-        sessionConfig.setLastViewedRepository("dummy/dummy");
-        ConfigFile sessionConfigFile =
-                new ConfigFile(Preferences.DIRECTORY, TestController.TEST_SESSION_CONFIG_FILENAME);
-        sessionConfigFile.saveConfig(sessionConfig);
+        Preferences prefs = TestController.createTestPreferences();
+        prefs.setLastLoginCredentials("test", "test");
+        prefs.setLastViewedRepository("dummy/dummy");
     }
 
     @Test
     public void repositorySelectorTest() {
         // check if test json is present
-        File testConfig = new File(Preferences.DIRECTORY, TestController.TEST_SESSION_CONFIG_FILENAME);
+        File testConfig = new File(TestController.TEST_DIRECTORY, TestController.TEST_SESSION_CONFIG_FILENAME);
         boolean testConfigExists = testConfig.exists() && testConfig.isFile();
         if (!testConfigExists) {
             fail();

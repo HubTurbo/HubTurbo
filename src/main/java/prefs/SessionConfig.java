@@ -18,10 +18,10 @@ import java.util.stream.Collectors;
 import java.util.Optional;
 
 /**
- * Abstractions for the contents of the session config file.
+ * Abstraction for session and app-defined settings.
  */
 @SuppressWarnings("unused")
-public class SessionConfig implements Config {
+public class SessionConfig {
 
     private static final Logger logger = LogManager.getLogger(SessionConfig.class.getName());
 

@@ -3,14 +3,13 @@ package util;
 import com.google.gson.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import prefs.Config;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 /**
- * A helper that manages conversion from Config files to JSON Strings, and vice versa.
+ * A helper that manages conversion from objects to JSON Strings, and vice versa.
  */
 public class JsonHelper {
     private static final Logger logger = LogManager.getLogger(JsonHelper.class.getName());
@@ -25,7 +24,7 @@ public class JsonHelper {
     }
 
     /**
-     * Configures the gson object that will serialise and deserialise json data
+     * Configures the gson object that will serialise and deserialise JSON data
      */
     private void setupGson() {
         gson = new GsonBuilder()
@@ -45,32 +44,28 @@ public class JsonHelper {
     }
 
     /**
-     * Creates a specific Config subclass instance from a JSON-formatted String
-     * @param jsonString The String in JSON format that contains the Config values
-     * @param configClass The class of Config to create from the JSON
-     * @return The Config instance of the specified class
+     * Creates an instance of T from a JSON-formatted String
+     * @param json The JSON-formatted string representation of an instance of T
+     * @param instanceClass The class of the object to create from the JSON string
+     * @param <T> The generic type to create an instance of
+     * @return The instance of T with the specified values in the JSON string
      */
-    public <T extends Config> T createConfigFromJson(String jsonString, Class<T> configClass)
-            throws IllegalAccessException, InstantiationException {
-
-        if (jsonString.isEmpty()) {
-            logger.warn("Empty json string supplied, creating new Config instance");
-            return configClass.newInstance();
-        } else {
-            T createdConfig = gson.fromJson(jsonString, configClass);
-            logger.info("Config successfully created");
-            return createdConfig;
-        }
+    public <T> T fromJsonString(String json, Class<T> instanceClass) {
+        T createdInstance = gson.fromJson(json, instanceClass);
+        logger.info("Instance successfully created: " + instanceClass.toString());
+        return createdInstance;
     }
 
     /**
-     * Creates a JSON-formatted string from the values in a Config instance
-     * @param config The Config object to be converted into the JSON string
-     * @return The JSON-formatted string that contains the values of the given Config
+     * Creates a JSON-formatted string from the values in a T instance
+     * @param instance The T object to be converted into the JSON string
+     * @param instanceClass The class of the object
+     * @param <T> The generic type to create an instance of
+     * @return The JSON-formatted string that contains the values of the given T instance
      */
-    public String createJsonFromConfig(Config config) {
-        String json = gson.toJson(config, config.getClass());
-        logger.info("Successfully created json");
+    public <T> String toJsonString(T instance, Class<T> instanceClass) {
+        String json = gson.toJson(instance, instanceClass);
+        logger.info("Successfully created json of: " + instanceClass.toString());
         return json;
     }
 }

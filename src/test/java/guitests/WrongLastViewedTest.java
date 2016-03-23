@@ -4,8 +4,6 @@ import backend.RepoIO;
 import javafx.scene.control.ComboBox;
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
-import prefs.ConfigFile;
-import prefs.SessionConfig;
 import prefs.Preferences;
 import tests.TestUtils;
 import ui.TestController;
@@ -32,12 +30,10 @@ public class WrongLastViewedTest extends UITest {
 
         // setup test json with last viewed repo "test/test"
         // but we create a repo json file for "test2/test2" instead and see if it gets loaded
-        SessionConfig sessionConfig = new SessionConfig();
-        sessionConfig.setLastLoginCredentials("test", "test");
-        sessionConfig.setLastViewedRepository("test/test");
-        ConfigFile sessionConfigFile =
-                new ConfigFile(Preferences.DIRECTORY, TestController.TEST_SESSION_CONFIG_FILENAME);
-        sessionConfigFile.saveConfig(sessionConfig);
+        Preferences prefs = TestController.createTestPreferences();
+        prefs.setLastLoginCredentials("test", "test");
+        prefs.setLastViewedRepository("test/test");
+
         RepoIO testIO = TestController.createTestingRepoIO(Optional.empty());
         testIO.setRepoOpControl(TestUtils.createRepoOpControlWithEmptyModels(testIO));
         try {

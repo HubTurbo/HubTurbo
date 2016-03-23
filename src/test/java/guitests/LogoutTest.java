@@ -16,7 +16,7 @@ import static org.junit.Assert.fail;
 
 public class LogoutTest extends UITest {
 
-    String configFileDirectory = Preferences.DIRECTORY;
+    String configFileDirectory = TestController.TEST_DIRECTORY;
     String testConfigFileName = TestController.TEST_SESSION_CONFIG_FILENAME;
 
     @Override

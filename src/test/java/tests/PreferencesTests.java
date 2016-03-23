@@ -1,12 +1,17 @@
 package tests;
 
+import guitests.UITest;
 import org.junit.Test;
 import prefs.SessionConfig;
 import prefs.PanelInfo;
 import prefs.Preferences;
 import ui.TestController;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,14 +19,14 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 public class PreferencesTests {
+
     /**
      * Tests that Preferences' clearLastOpenBoard method calls SessionConfig's clearLastOpenBoard once
      */
     @Test
     public void testClearLastOpenBoard() {
         SessionConfig sessionConfig = mock(SessionConfig.class);
-        Preferences prefs =
-                Preferences.load(TestController.TEST_SESSION_CONFIG_FILENAME, TestController.TEST_USER_CONFIG_FILENAME);
+        Preferences prefs = TestController.createTestPreferences();
 
         try {
             setSessionConfigField(prefs, sessionConfig);
@@ -45,8 +50,7 @@ public class PreferencesTests {
         List<PanelInfo> expected = new ArrayList<>();
         when(sessionConfig.getBoardPanels("board")).thenReturn(expected);
 
-        Preferences prefs =
-                Preferences.load(TestController.TEST_SESSION_CONFIG_FILENAME, TestController.TEST_USER_CONFIG_FILENAME);
+        Preferences prefs = TestController.createTestPreferences();
         try {
             setSessionConfigField(prefs, sessionConfig);
             prefs.clearLastOpenBoard();

@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.loadui.testfx.controls.Commons.hasText;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -15,6 +16,8 @@ import org.loadui.testfx.utils.FXTestUtils;
 import guitests.UITest;
 import javafx.application.Platform;
 import prefs.Preferences;
+import prefs.SessionConfig;
+import prefs.UserConfig;
 import ui.TestController;
 import ui.components.KeyboardShortcuts;
 
@@ -63,12 +66,12 @@ public class KeyboardShortcutsConfigTest extends UITest {
         testPref.setKeyboardShortcuts(keyboardShortcuts);
         reloadPrefs(testPref);
         Platform.runLater(() -> KeyboardShortcuts.loadKeyboardShortcuts(testPref));
-        waitUntilNodeAppears(hasText("Invalid key specified for MARK_AS_READ"
-                + " or it has already been used for some other shortcut. "));
+        waitUntilNodeAppears(hasText("Invalid key specified for MARK_AS_READ" +
+                " or it has already been used for some other shortcut. "));
         click("Use default key");
         reloadPrefs(testPref);
         assertEquals(KeyboardShortcuts.getDefaultKeyboardShortcuts().get("MARK_AS_READ"),
-                     testPref.getKeyboardShortcuts().get("MARK_AS_READ"));
+                testPref.getKeyboardShortcuts().get("MARK_AS_READ"));
     }
 
     @Test
@@ -84,7 +87,7 @@ public class KeyboardShortcutsConfigTest extends UITest {
         click("Use default key");
         reloadPrefs(testPref);
         assertEquals(KeyboardShortcuts.getDefaultKeyboardShortcuts().get("MARK_AS_READ"),
-                     testPref.getKeyboardShortcuts().get("MARK_AS_READ"));
+                testPref.getKeyboardShortcuts().get("MARK_AS_READ"));
     }
 
     @Test
@@ -96,23 +99,52 @@ public class KeyboardShortcutsConfigTest extends UITest {
         testPref.setKeyboardShortcuts(keyboardShortcuts);
         reloadPrefs(testPref);
         Platform.runLater(() -> KeyboardShortcuts.loadKeyboardShortcuts(testPref));
-        waitUntilNodeAppears(hasText("Invalid key specified for MARK_AS_UNREAD"
-                + " or it has already been used for some other shortcut. "));
+        waitUntilNodeAppears(hasText("Invalid key specified for MARK_AS_UNREAD" +
+                " or it has already been used for some other shortcut. "));
         click("Use default key");
         reloadPrefs(testPref);
         assertEquals(KeyboardShortcuts.getDefaultKeyboardShortcuts().get("MARK_AS_UNREAD"),
-                     testPref.getKeyboardShortcuts().get("MARK_AS_UNREAD"));
+                testPref.getKeyboardShortcuts().get("MARK_AS_UNREAD"));
     }
 
     private static void reloadPrefs(Preferences prefs) {
-        prefs.save();
-        String loadSessionConfig = "loadSessionConfig";
+        String loadConfigMethodString = "loadConfig";
+        String sessionConfigFieldString = "sessionConfig";
+        String userConfigFieldString = "userConfig";
         try {
-            Method method = Preferences.class.getDeclaredMethod(loadSessionConfig);
-            method.setAccessible(true);
-            method.invoke(prefs);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            fail(String.format("Problem invoking private method; does %s still exist?", loadSessionConfig));
+            Method loadConfigMethod =
+                    Preferences.class.getDeclaredMethod(loadConfigMethodString,
+                            String.class,
+                            String.class,
+                            Class.class);
+            Field sessionConfigField = Preferences.class.getDeclaredField(sessionConfigFieldString);
+            Field userConfigField = Preferences.class.getDeclaredField(userConfigFieldString);
+
+            loadConfigMethod.setAccessible(true);
+            sessionConfigField.setAccessible(true);
+            userConfigField.setAccessible(true);
+            sessionConfigField.set(prefs,
+                    loadConfigMethod.invoke(prefs,
+                            TestController.TEST_DIRECTORY,
+                            TestController.TEST_SESSION_CONFIG_FILENAME,
+                            SessionConfig.class));
+            userConfigField.set(prefs,
+                    loadConfigMethod.invoke(prefs,
+                            TestController.TEST_DIRECTORY,
+                            TestController.TEST_USER_CONFIG_FILENAME,
+                            UserConfig.class));
+
+        } catch (NoSuchMethodException e) {
+            fail(String.format("Problem invoking private method; does %s still exist? %s",
+                    loadConfigMethodString,
+                    e.toString()));
+        } catch (NoSuchFieldException e) {
+            fail(String.format("Problem accessing private field; do %s and %s still exist? %s",
+                    sessionConfigFieldString,
+                    userConfigFieldString,
+                    e.toString()));
+        } catch (IllegalAccessException | InvocationTargetException e){
+            fail(String.format("Problem with invoking or accessing. %s", e.toString()));
         }
     }
 }

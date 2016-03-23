@@ -22,6 +22,7 @@ import util.events.ShowRenamePanelEvent;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -130,7 +131,7 @@ public class UseSessionConfigsTest extends UITest {
         click("Quit");
 
         // ...and check if the test JSON is still there...
-        File testConfig = new File(Preferences.DIRECTORY, TestController.TEST_SESSION_CONFIG_FILENAME);
+        File testConfig = new File(TestController.TEST_DIRECTORY, TestController.TEST_SESSION_CONFIG_FILENAME);
         if (!(testConfig.exists() && testConfig.isFile())) {
             fail();
         }
@@ -163,8 +164,16 @@ public class UseSessionConfigsTest extends UITest {
         assertEquals("Dummy 2 panel", dummyBoard.get(2).getPanelName());
 
         // Panels
-        List<String> lastOpenFilters = testPref.getLastOpenFilters();
-        List<String> lastOpenPanelNames = testPref.getPanelNames();
+        List<String> lastOpenFilters =
+                testPref.getPanelInfo()
+                        .stream()
+                        .map(PanelInfo::getPanelFilter)
+                        .collect(Collectors.toList());
+        List<String> lastOpenPanelNames =
+                testPref.getPanelInfo()
+                        .stream()
+                        .map(PanelInfo::getPanelName)
+                        .collect(Collectors.toList());
 
         assertEquals("is:open", lastOpenFilters.get(0));
         assertEquals("is:issue", lastOpenFilters.get(1));
