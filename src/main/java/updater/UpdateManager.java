@@ -62,12 +62,32 @@ public class UpdateManager {
     private final UpdateProgressWindow updateProgressWindow;
     private final UI ui;
     private boolean isUserWantsImmediateUpdate;
+    private boolean hasToClearCache;
 
     public UpdateManager(UI ui, UpdateProgressWindow updateProgressWindow) {
         this.ui = ui;
         this.updateProgressWindow = updateProgressWindow;
         this.isUserWantsImmediateUpdate = false;
         loadUpdateConfig();
+    }
+
+    public void runMigration() {
+        Version currentVersion = Version.getCurrentVersion();
+        Version lastUsedVersion = updateConfig.getLastUsedHtVersion();
+
+        hasToClearCache = false;
+
+        if (currentVersion.getMajor() != lastUsedVersion.getMajor()) {
+            hasToClearCache = true;
+        }
+
+        // TODO Here run preference migration
+
+        updateConfig.setLastUsedHtVersion(currentVersion);
+    }
+
+    public boolean isCacheToBeCleared() {
+        return hasToClearCache;
     }
 
     /**

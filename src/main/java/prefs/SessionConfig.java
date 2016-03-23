@@ -25,6 +25,7 @@ public class SessionConfig {
 
     private static final Logger logger = LogManager.getLogger(SessionConfig.class.getName());
 
+    private boolean isFirstRun = true;
     private List<PanelInfo> lastSessionPanels = new ArrayList<>();
     private String lastViewedRepository = "";
     private String lastLoginUsername = "";
@@ -33,6 +34,14 @@ public class SessionConfig {
     private final Map<String, List<PanelInfo>> savedBoards = new LinkedHashMap<>();
     private final Map<String, Map<Integer, LocalDateTime>> markedReadTimes = new HashMap<>();
     private Map<String, String> keyboardShortcuts = new HashMap<>();
+
+    public boolean isHtFirstRun() {
+        return isFirstRun;
+    }
+
+    public void setFirstRunStatus(boolean isFirstRun) {
+        this.isFirstRun = isFirstRun;
+    }
 
     public Map<String, String> getKeyboardShortcuts() {
         return new HashMap<>(keyboardShortcuts);

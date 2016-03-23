@@ -171,9 +171,6 @@ public class UI extends Application implements EventDispatcher {
     }
 
     private void showMainWindow(String repoId) {
-        //We infer this is the first time HT is being used if there are no repo data stored at the start up.
-        //This check needs to be done at the very beginning of the startup, before HT downloads any repo data.
-        boolean isAFirstTimeUser = logic.getStoredRepos().isEmpty();
         logic.openPrimaryRepository(repoId);
         logic.setDefaultRepo(repoId);
         repoSelector.setText(repoId);
@@ -197,7 +194,8 @@ public class UI extends Application implements EventDispatcher {
         // Should only be called after panels have been initialized
         ensureSelectedPanelHasFocus();
         initialisePickers();
-        if (isAFirstTimeUser && TestController.shouldOpenSampleBoard()) {
+        if (prefs.isHtFirstRun() && TestController.shouldOpenSampleBoard()){
+            prefs.setFirstRunStatus(false);
             createAndLoadSampleBoard();
         }
     }
@@ -242,6 +240,12 @@ public class UI extends Application implements EventDispatcher {
         // we can pass them in the form of an array.
         logic = new Logic(uiManager, prefs, Optional.empty(), Optional.empty());
         // TODO clear cache if necessary
+        // clear cache - i.e. delete store
+        // reload cache
+        if (updateManager.isCacheToBeCleared()) {
+            logic.redownloadCache();
+        }
+
         refreshTimer = new TickingTimer("Refresh Timer", REFRESH_PERIOD,
                                         status::updateTimeToRefresh, logic::refresh, TimeUnit.SECONDS);
         refreshTimer.start();

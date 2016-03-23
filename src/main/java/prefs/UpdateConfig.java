@@ -10,8 +10,17 @@ import java.util.List;
  */
 public class UpdateConfig {
 
+    private Version lastUsedHtVersion;
     private boolean isLastAppUpdateDownloadSuccessful = false;
     private List<Version> versionsPreviouslyDownloaded = new ArrayList<>(); // NOPMD - not made final for gson
+
+    public void setLastUsedHtVersion(Version version) {
+        this.lastUsedHtVersion = version;
+    }
+
+    public Version getLastUsedHtVersion() {
+        return this.lastUsedHtVersion;
+    }
 
     /**
      * Sets last app update download status

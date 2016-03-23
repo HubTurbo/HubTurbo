@@ -148,6 +148,12 @@ public class Logic {
             }
             return Futures.unit(false);
         }
+
+        return openRepositoryFromSource(repoId, isPrimaryRepository, () -> notifyRepoOpened(panel));
+    }
+
+    private CompletableFuture<Boolean> openRepositoryFromSource(String repoId, boolean isPrimaryRepository,
+                                                                Runnable eventToTrigger) {
         models.queuePendingRepository(repoId);
         return isRepositoryValid(repoId).thenCompose(valid -> {
             if (!valid) {
@@ -161,7 +167,7 @@ public class Logic {
             return repoOpControl.openRepository(repoId)
                     .thenApply(models::addPending)
                     .thenRun(this::refreshUI)
-                    .thenRun(() -> notifyRepoOpened(panel))
+                    .thenRun(eventToTrigger)
                     .thenCompose(n -> getRateLimitResetTime())
                     .thenApply(this::updateRemainingRate)
                     .thenApply(rateLimits -> true)
@@ -555,5 +561,27 @@ public class Logic {
      */
     public MultiModel getModels() {
         return models;
+    }
+
+    public void redownloadCache() {
+        logger.info("Redownloading Cache");
+
+        Set<String> storedRepos = getStoredRepos();
+
+        if (prefs.getLastViewedRepository().isPresent()) {
+            String primaryRepoId = prefs.getLastViewedRepository().get().generateId();
+
+            storedRepos.remove(primaryRepoId);
+            repoIO.removeRepository(primaryRepoId).thenCombine(openRepositoryFromSource(primaryRepoId, true,
+                    () -> Platform.runLater(() -> UI.events.triggerEvent(new UnusedStoredReposChangedEvent()))),
+                    (a, b) -> null);
+        }
+        
+        for (String repoId : storedRepos) {
+            logger.info("Redownloading " + repoId);
+            repoIO.removeRepository(repoId).thenCombine(openRepositoryFromSource(repoId, false,
+                            () -> Platform.runLater(() -> UI.events.triggerEvent(new UnusedStoredReposChangedEvent()))),
+                    (a, b) -> null);
+        }
     }
 }

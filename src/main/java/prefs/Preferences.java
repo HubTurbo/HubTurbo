@@ -155,6 +155,15 @@ public class Preferences { // NOPMD
         FileHelper.writeFileContents(configDirectory, configFileName, jsonString);
     }
 
+    public boolean isHtFirstRun() {
+        return sessionConfig.isHtFirstRun();
+    }
+
+    public void setFirstRunStatus(boolean isFirstRun) {
+        sessionConfig.setFirstRunStatus(isFirstRun);
+        save();
+    }
+
     public String getLastLoginPassword() {
         return sessionConfig.getLastLoginPassword();
     }
