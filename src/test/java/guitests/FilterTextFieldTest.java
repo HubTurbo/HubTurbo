@@ -5,6 +5,7 @@ import static junit.framework.TestCase.assertTrue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.junit.After;
 import org.junit.Test;
 
 import javafx.scene.input.KeyCode;
@@ -25,31 +26,89 @@ public class FilterTextFieldTest extends UITest {
     }
 
     @Test
-    public void inputsTest() {
+    public void completion_validPrefixes_match() {
         FilterTextField field = getFirstPanelField();
-        testCompletions(field);
-        testSpaces(field);
+        // Basic completion
+        clearField();
+        type("cou").push(KeyCode.TAB);
+        waitAndAssertEquals("count", field::getText);
+
+        // Completion does not only work for alternating keys typed
+        clearField();
+        type("c");
+        waitAndAssertEquals("losed", field::getSelectedText);
+        type("l");
+        waitAndAssertEquals("osed", field::getSelectedText);
+        type("o");
+        waitAndAssertEquals("sed", field::getSelectedText);
+        type(KeyCode.TAB);
+        waitAndAssertEquals("", field::getSelectedText);
+        waitAndAssertEquals("closed", field::getText);
+
+        // Completion with selection
+        clearField();
+        type("cou").push(KeyCode.TAB);
+        push(KeyCode.LEFT);
+        for (int i = 0; i < 3; i++) {
+            field.selectBackward();
+        }
+        // c[oun]t
+        type("lo").push(KeyCode.TAB); // 'c' + 'lo' is a prefix of 'closed'
+        waitAndAssertEquals("closedt", field::getText);
     }
 
     @Test
-    public void revertTest() {
+    public void inputHandleSpaces_fieldNotEmpty_allowSpaces() {
+        FilterTextField field = getFirstPanelField();
+        // Consecutive spaces allowed
+        clearField();
+        type("cou").push(KeyCode.TAB);
+        type("   ");
+        waitAndAssertEquals("count   ", field::getText);
+
+        // Insertion of spaces before spaces
+        clearField();
+        type("assi").push(KeyCode.TAB);
+        type(" c").push(KeyCode.BACK_SPACE); // cancel completion
+        push(KeyCode.LEFT, 2);
+        type(" ");
+        waitAndAssertEquals("assignee  c", field::getText);
+
+        // Insertion of spaces after spaces
+        clearField();
+        type("assi").push(KeyCode.TAB);
+        type(" c").push(KeyCode.BACK_SPACE); // cancel completion
+        push(KeyCode.LEFT);
+        type(" ");
+        waitAndAssertEquals("assignee  c", field::getText);
+
+        // Insertion of spaces with trailing spaces
+        clearField();
+        type("assignee ");
+        push(KeyCode.LEFT, 2);
+        type(" ");
+        push(KeyCode.LEFT, 8);
+        type(" ");
+        waitAndAssertEquals(" assigne e ", field::getText);
+    }
+
+    @Test
+    public void revertTextEdit_overwritePrevFilterText_revertPrev() {
         FilterTextField field = getFirstPanelField();
 
-        clearField();
         type("assi").push(KeyCode.TAB);
         push(KeyCode.ENTER);
 
         clearField();
         type("test");
-        awaitCondition(() -> field.getText().equals("test"));
+        waitAndAssertEquals("test", field::getText);
 
         push(KeyCode.ESCAPE);
-
-        awaitCondition(() -> field.getText().equals("assignee"));
+        waitAndAssertEquals("assignee", field::getText);
     }
 
     @Test
-    public void cancelTest() {
+    public void detectCancelEvent_noMoreReverts_detected() {
         FilterTextField field = getFirstPanelField();
         AtomicInteger toggle = new AtomicInteger(0);
         field.setOnCancel(toggle::getAndIncrement);
@@ -61,13 +120,13 @@ public class FilterTextFieldTest extends UITest {
 
         clearField();
         type("test");
-        awaitCondition(() -> field.getText().equals("test"));
+        waitAndAssertEquals("test", field::getText);
 
         push(KeyCode.ESCAPE);
-        awaitCondition(() -> toggle.get() % 2 == 0);
+        waitAndAssertEquals(0, () -> toggle.get() % 2);
 
         push(KeyCode.ESCAPE);
-        awaitCondition(() -> toggle.get() % 2 == 1);
+        waitAndAssertEquals(1, () -> toggle.get() % 2);
     }
 
     @Test
@@ -96,69 +155,6 @@ public class FilterTextFieldTest extends UITest {
 
         // Tests if semantic errors apply invalid filter style
         testInvalidFilterStyleAppliedAfterEnter("is:invalid");
-    }
-
-    private void testSpaces(FilterTextField field) {
-        // Consecutive spaces allowed
-        clearField();
-        type("cou").push(KeyCode.TAB);
-        type("   ");
-        awaitCondition(() -> field.getText().equals("count   "));
-
-        // Insertion of spaces before spaces
-        clearField();
-        type("assi").push(KeyCode.TAB);
-        type(" c").push(KeyCode.BACK_SPACE); // cancel completion
-        push(KeyCode.LEFT, 2);
-        type(" ");
-        awaitCondition(() -> field.getText().equals("assignee  c"));
-
-        // Insertion of spaces after spaces
-        clearField();
-        type("assi").push(KeyCode.TAB);
-        type(" c").push(KeyCode.BACK_SPACE); // cancel completion
-        push(KeyCode.LEFT);
-        type(" ");
-        awaitCondition(() -> field.getText().equals("assignee  c"));
-
-        // Insertion of spaces with trailing spaces
-        clearField();
-        type("assignee ");
-        push(KeyCode.LEFT, 2);
-        type(" ");
-        push(KeyCode.LEFT, 8);
-        type(" ");
-        awaitCondition(() -> field.getText().equals(" assigne e "));
-    }
-
-    private void testCompletions(FilterTextField field) {
-        // Basic completion
-        clearField();
-        type("cou").push(KeyCode.TAB);
-        awaitCondition(() -> field.getText().equals("count"));
-
-        // Completion does not only work for alternating keys typed
-        clearField();
-        type("c");
-        awaitCondition(() -> field.getSelectedText().equals("losed"));
-        type("l");
-        awaitCondition(() -> field.getSelectedText().equals("osed"));
-        type("o");
-        awaitCondition(() -> field.getSelectedText().equals("sed"));
-        type(KeyCode.TAB);
-        awaitCondition(() -> field.getSelectedText().equals(""));
-        awaitCondition(() -> field.getText().equals("closed"));
-
-        // Completion with selection
-        clearField();
-        type("cou").push(KeyCode.TAB);
-        push(KeyCode.LEFT);
-        for (int i = 0; i < 3; i++) {
-            field.selectBackward();
-        }
-        // c[oun]t
-        type("lo").push(KeyCode.TAB); // 'c' + 'lo' is a prefix of 'closed'
-        awaitCondition(() -> field.getText().equals("closedt"));
     }
 
     private FilterTextField getFirstPanelField() {
@@ -190,7 +186,8 @@ public class FilterTextFieldTest extends UITest {
         assertTrue(field.getStyle().contains(FilterTextField.INVALID_FILTER_STYLE));
     }
 
-    private void clearField() {
+    @After
+    public void clearField() {
         selectAll();
         push(KeyCode.BACK_SPACE);
     }
