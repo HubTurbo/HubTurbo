@@ -69,4 +69,49 @@ The general workflow is to switch back and forth between the two windows,
 staying in the panel view as much as possible to take advantage of extra productivity features 
 provided by HubTurbo (e.g. keyboard shortcuts), and going to the browser view for working with issue details when necessary.
 
+## Try Some Features 
 
+Now that you are familiar with HubTurbo's UI and workflow, let's try some of its features.
+
+### Editing the Sample Board 
+
+When you launch HubTurbo for the first time, a Sample Board will be shown. We can try some features of HubTurbo using this Sample Board. 
+
+<img src="images/gettingStarted/sampleBoard.png" width="800">
+
+**Edit a filter** 
+
+One useful feature of HubTurbo is filtering. You can obtain a panel that contains issues that you are interested in by changing its filter. For example, if you want to view all the open issues of HubTurbo, replace the contents of the first panel's text field with `repo:hubturbo/hubturbo is:issue is:open` and <kbd>enter</kbd>.
+
+<img src="images/gettingStarted/editAFilter.png" width="500"> 
+
+**Rename a panel**
+
+After changing the filter of the first panel, you may wish to rename the panel to describe its contents correctly. To do so, simply click on the pencil icon <img src="images/gettingStarted/pencilIcon.png" width="20"> at the top right corner of panel, type the new name of the panel in the text field that appears and press <kbd>enter</kbd>. For example,   
+
+<img src="images/gettingStarted/renameAPanel.png" width="500"> 
+
+**Save your changes**
+
+To save the changes you made to Sample Board, please click `Boards > Save`. 
+
+### Access Another Repository 
+
+To access another repository in HubTurbo, simply type `<Owner of repository>/<Repository name>` in the default repository dropdown and press <kbd>enter</kbd>. HubTurbo will then take a few moments to show the issues of the repository. 
+
+For example, if you would like to view the issues of `repoABC` which is owned by `organisationABC`, you will need to type `organisationABC/repoABC`. 
+
+<img src="images/gettingStarted/openAnotherRepo.png" width="500"> 
+
+### Generate A Milestones Board 
+
+To aid in tracking the progress of you project, you can generate a Milestones Board that lists issues according to their milestones. You can do so by clicking `Boards > Auto-create > Milestones`. 
+
+<img src="images/gettingStarted/createMilestonesBoard.png" width="500">
+
+Please visit this [link](boards.md) to learn more about other useful boards you can auto-create in HubTurbo. 
+
+
+
+
+ 
