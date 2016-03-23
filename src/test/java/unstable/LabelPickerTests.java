@@ -12,7 +12,6 @@ import org.junit.Test;
 import backend.resource.TurboIssue;
 import ui.IdGenerator;
 import ui.UI;
-import ui.listpanel.ListPanelCell;
 import util.events.ShowLabelPickerEvent;
 
 import static org.junit.Assert.assertEquals;

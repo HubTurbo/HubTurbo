@@ -408,50 +408,97 @@ public class UITest extends GuiTest {
         }
     }
 
+    /**
+     * Clicks the repository selector's ComboBox
+     */
     public void clickRepositorySelector() {
         click(IdGenerator.getRepositorySelectorIdForTest());
     }
 
+    /**
+     * Gets the repository selector's ComboBox
+     */
     public ComboBox getRepositorySelector() {
         return find(IdGenerator.getRepositorySelectorIdForTest());
     }
 
+    /**
+     * Clicks the label picker's TextField
+     */
     public void clickLabelPickerTextField() {
         click(IdGenerator.getLabelPickerTextFieldId());
     }
 
+    /**
+     * Gets the label picker's TextField
+     */
     public TextField getLabelPickerTextField() {
         return find(IdGenerator.getLabelPickerTextFieldIdForTest());
     }
 
+    /**
+     * Clicks the FilterTextField of the panel at {@code panelIndex}
+     * @param panelIndex
+     */
     public void clickFilterTextFieldAtPanel(int panelIndex) {
         click(IdGenerator.getPanelFilterTextFieldIdForTest(panelIndex));
     }
 
+    /**
+     * Gets the FilterTextField of the panel at {@code panelIndex}
+     * @param panelIndex
+     */
     public FilterTextField getFilterTextFieldAtPanel(int panelIndex) {
         return find(IdGenerator.getPanelFilterTextFieldIdForTest(panelIndex));
     }
 
+    /**
+     * Clicks the issue with id {@code issueId} at panel {@code panelIndex}
+     * @param panelIndex
+     * @param issueId
+     */
     public void clickIssue(int panelIndex, int issueId) {
         click(IdGenerator.getPanelCellIdForTest(panelIndex, issueId));
     }
 
+    /**
+     * Right clicks the issue with id {@code issueId} at panel {@code panelIndex}
+     * @param panelIndex
+     * @param issueId
+     */
     public void rightClickIssue(int panelIndex, int issueId) {
         rightClick(IdGenerator.getPanelCellIdForTest(panelIndex, issueId));
     }
 
+    /**
+     * Clicks the panel {@code panelIndex}
+     * @param panelIndex
+     */
     public void clickPanel(int panelIndex) {
         click(IdGenerator.getPanelIdForTest(panelIndex));
     }
 
+    /**
+     * Right clicks the panel {@code panelIndex}
+     * @param panelIndex
+     */
     public void rightClickPanel(int panelIndex) {
         rightClick(IdGenerator.getPanelIdForTest(panelIndex));
     }
 
+    /**
+     * Gets the panel {@code panelIndex}
+     * @param panelIndex
+     */
     public ListPanel getPanel(int panelIndex) {
         return find(IdGenerator.getPanelIdForTest(panelIndex));
     }
 
+    /**
+     * Gets the issue cell of issue {@code issueId} at panel {@code panelIndex}
+     * @param panelIndex
+     * @param issueId
+     */
     public ListPanelCell getIssueCell(int panelIndex, int issueId) {
         return find(IdGenerator.getPanelCellIdForTest(panelIndex, issueId));
     }
