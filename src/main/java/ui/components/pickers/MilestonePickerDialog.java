@@ -17,6 +17,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * This class handles the display of milestone selection status and the user's inputs
+ */
 public class MilestonePickerDialog extends Dialog<MilestonePickerDialogResponse> {
     private static final String OCTICON_ARROW = "\uf03e";
     private static final String DIALOG_TITLE = "Select Milestone";
@@ -31,6 +34,7 @@ public class MilestonePickerDialog extends Dialog<MilestonePickerDialogResponse>
      * The issue and the originalMilestones list provided should come from the same repository
      */
     public MilestonePickerDialog(Stage stage, TurboIssue issue, List<TurboMilestone> milestones) {
+        assert areFromSameRepo(issue, milestones);
         initOwner(stage);
         setTitle(DIALOG_TITLE);
         setupButtons(getDialogPane());
@@ -43,6 +47,11 @@ public class MilestonePickerDialog extends Dialog<MilestonePickerDialogResponse>
         getExistingMilestone(originalMilestones)
                 .map(PickerMilestone::getTitle)
                 .ifPresent(this::fillInputFieldWithMilestoneName);
+    }
+
+    private boolean areFromSameRepo(TurboIssue issue, List<TurboMilestone> milestones) {
+        if (milestones.isEmpty()) return true;
+        return issue.getRepoId().equals(milestones.get(0).getRepoId());
     }
 
     private void fillInputFieldWithMilestoneName(String milestoneName) {

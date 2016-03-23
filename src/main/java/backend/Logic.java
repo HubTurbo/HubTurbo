@@ -274,10 +274,9 @@ public class Logic {
      * Replaces existing milestone with the newMilestone in the issue object, the UI, and the server, in that order.
      * Server update is done after the local update to reduce the lag between the user action and the UI response
      *
-     * @param issue The issue object containing the repoid and issue id of the relevant issue
-     *              whose milestone is to be replaced
+     * @param issue The issue object whose milestone is to be replaced
      * @param newMilestone The new milestone to be assigned to the issue
-     * @return true if milestone replacements locally and on GitHub were successful, false otherwise.
+     * @return true if milestone replacements locally and on GitHub were successful
      */
     public CompletableFuture<Boolean> replaceIssueMilestone(TurboIssue issue, Optional<Integer> newMilestone) {
         logger.info("Changing milestone for " + issue + " in models");

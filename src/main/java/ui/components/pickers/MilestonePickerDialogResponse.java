@@ -4,6 +4,9 @@ import javafx.scene.control.ButtonType;
 
 import java.util.Optional;
 
+/**
+ * This class contains the result of MilestonePickerDialog
+ */
 public class MilestonePickerDialogResponse {
     private final ButtonType buttonClicked;
     private final Optional<Integer> milestoneId;

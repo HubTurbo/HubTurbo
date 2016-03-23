@@ -3,6 +3,9 @@ package ui.components.pickers;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.StackPane;
 
+/**
+ * This class shows the progress of a milestone using a progress bar
+ */
 public class MilestoneProgressBar extends StackPane {
     private final ProgressBar bar = new ProgressBar();
 
@@ -15,5 +18,4 @@ public class MilestoneProgressBar extends StackPane {
         bar.setMaxWidth(40);
         getChildren().setAll(bar);
     }
-
 }

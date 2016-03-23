@@ -12,6 +12,9 @@ import util.events.ShowMilestonePickerEventHandler;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * This class facilitates the handling of a MilestonePickerDialog
+ */
 public class MilestonePicker {
     private final UI ui;
     private final Stage stage;
@@ -22,6 +25,14 @@ public class MilestonePicker {
         ui.registerEvent((ShowMilestonePickerEventHandler) e -> Platform.runLater(() -> showMilestonePicker(e.issue)));
     }
 
+    /**
+     * Shows a MilestonePickerDialog, then waits for its result
+     *
+     * If the resulting milestone obtained from the dialog is different from the original,
+     * it will automatically trigger a milestone change both locally and on the server
+     *
+     * @param issue
+     */
     private void showMilestonePicker(TurboIssue issue) {
         List<TurboMilestone> milestones = ui.logic.getRepo(issue.getRepoId()).getMilestones();
         Optional<MilestonePickerDialogResponse> milestoneDialogResponse =

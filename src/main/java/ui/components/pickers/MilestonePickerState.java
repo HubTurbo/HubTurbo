@@ -2,12 +2,15 @@ package ui.components.pickers;
 
 import util.Utility;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * This class handles the state and logic of the MilestonePickerDialog,
+ * which determine the result of the user's input
+ */
 public class MilestonePickerState {
     private List<PickerMilestone> currentMilestonesList;
 
@@ -70,16 +73,12 @@ public class MilestonePickerState {
                         && !listMilestone.isSelected()));
     }
 
-    /**
-     * Gets the current list of milestones
-     * @return
-     */
     public List<PickerMilestone> getCurrentMilestonesList() {
         return this.currentMilestonesList;
     }
 
     /**
-     * Gets the list of milestones that matches the current query i.e. not faded
+     * Gets the list of milestones that matches the current query
      * @return
      */
     public List<PickerMilestone> getMatchingMilestonesList() {
@@ -92,7 +91,7 @@ public class MilestonePickerState {
         currentMilestonesList
                 .forEach(milestone -> {
                     boolean matchQuery = Utility.containsIgnoreCase(milestone.getTitle(), query);
-                    if (!milestone.isMatching()) milestone.isMatching(!matchQuery);
+                    if (!milestone.isMatching()) milestone.setMatching(!matchQuery);
                 });
     }
 
