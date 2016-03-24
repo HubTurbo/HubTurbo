@@ -78,7 +78,7 @@ public class ListPanel extends FilterPanel {
     private static final MenuItem changeMilestoneMenuItem = new MenuItem();
     private static final String CHANGE_MILESTONE_MENU_ITEM_TEXT = "Change milestone (M)";
     private static final MenuItem changeAssigneeMenuItem = new MenuItem();
-    private static final String changeAssigneeMenuItemText = "Change Assignee";
+    private static final String CHANGE_ASSIGNEE_MENU_ITEM_TEXT = "Change Assignee (A)";
 
     private static final MenuItem closeReopenIssueMenuItem = new MenuItem();
     private static final String closeIssueMenuItemText = "Close issue (C)";
@@ -336,9 +336,7 @@ public class ListPanel extends FilterPanel {
                 }
             }
             if (MANAGE_ASSIGNEES.match(event) && ui.getBrowserComponent().isCurrentUrlIssue()) {
-                ui.getBrowserComponent().openPrTab(getCurrentlySelectedIssue(), PrTab.DISCUSSION);
-                ui.getBrowserComponent().waitUntilDiscussionPageLoaded();
-                ui.getBrowserComponent().manageAssignees(event.getCode().toString());
+                changeAssignee();
             }
             if (SHOW_MILESTONES.match(event)) {
                 if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
@@ -415,7 +413,7 @@ public class ListPanel extends FilterPanel {
             getSelectedElement().ifPresent(this::changeMilestone);
         });
 
-        changeAssigneeMenuItem.setText(changeAssigneeMenuItemText);
+        changeAssigneeMenuItem.setText(CHANGE_ASSIGNEE_MENU_ITEM_TEXT);
         changeAssigneeMenuItem.setOnAction(e -> {
             changeAssignee();
         });

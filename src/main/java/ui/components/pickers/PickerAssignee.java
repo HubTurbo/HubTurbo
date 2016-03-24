@@ -89,6 +89,7 @@ public class PickerAssignee extends TurboUser implements Comparable<PickerAssign
     }
 
     private ImageView getAvatarImageView(){
+        if (getAvatarURL().isEmpty()) return new ImageView();
         return new ImageView(new Image(getAvatarURL(), AVATAR_SIZE, AVATAR_SIZE, true, true, true));
     }
 

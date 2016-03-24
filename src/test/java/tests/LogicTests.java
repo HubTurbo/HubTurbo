@@ -464,14 +464,7 @@ public class LogicTests {
 
     private void mockMultiModelReplaceIssueAssignee(Optional<TurboIssue> replaceResult,
                                                     Optional<Model> modelLookUpResult) {
-        when(mockedMultiModel.replaceIssueAssignee(anyString(), anyInt(), anyString()))
-                .thenReturn(replaceResult);
-        when(mockedMultiModel.getModelById(anyString())).thenReturn(modelLookUpResult);
-    }
-
-    private void mockMultiModelReplaceIssueAssignee(Optional<TurboIssue> replaceResult,
-                                                    Optional<Model> modelLookUpResult) {
-        when(mockedMultiModel.replaceIssueAssignee(anyString(), anyInt(), anyString()))
+        when(mockedMultiModel.replaceIssueAssignee(anyString(), anyInt(), any(Optional.class)))
                 .thenReturn(replaceResult);
         when(mockedMultiModel.getModelById(anyString())).thenReturn(modelLookUpResult);
     }

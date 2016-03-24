@@ -378,6 +378,7 @@ public class Logic {
 
         logger.error("Unable to update model on server");
         revertLocalMilestoneReplace(originalIssue.get());
+        return false;
     }
 
     /**
@@ -397,8 +398,7 @@ public class Logic {
             return true;
         }
 
-        //TODO yy change remove isUpdateSuccessful from log msg
-        logger.error("Unable to update model on server " + isUpdateSuccessful);
+        logger.error("Unable to update model on server");
         revertLocalAssigneeReplace(originalIssue.get());
         return false;
     }

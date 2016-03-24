@@ -42,10 +42,10 @@ public class AssigneePickerDialog extends Dialog<AssigneePickerDialogResponse> {
 
         getExistingAssignee(originalAssignees)
                 .map(PickerAssignee::getLoginName)
-                .ifPresent(this::fillInputFieldWithAssigneeLoginName);
+                .ifPresent(this::fillTextFieldWithAssigneeLoginName);
     }
 
-    private void fillInputFieldWithAssigneeLoginName(String assigneeLoginName) {
+    private void fillTextFieldWithAssigneeLoginName(String assigneeLoginName) {
         textField.setText(assigneeLoginName);
     }
 
@@ -107,7 +107,7 @@ public class AssigneePickerDialog extends Dialog<AssigneePickerDialogResponse> {
         assignedAssigneePane = createAssignedAssigneeGroup();
         matchingAssigneesBox = createMatchingAssigneeBox();
         matchingAssigneePane = createMatchingAssigneePane();
-        textField = new TextField();
+        textField = createTextField();
 
         assigneeDialogBox.getChildren().add(new Label(ASSIGNED_ASSIGNEE));
         assigneeDialogBox.getChildren().add(assignedAssigneePane);
@@ -223,6 +223,12 @@ public class AssigneePickerDialog extends Dialog<AssigneePickerDialogResponse> {
         matchingAssigneePane.setMinHeight(200);
         matchingAssigneePane.setContent(matchingAssigneesBox);
         return matchingAssigneePane;
+    }
+
+    private TextField createTextField() {
+        TextField textField = new TextField();
+        textField.setId("assigneePickerTextField");
+        return textField;
     }
 
     private Label createNoMatchingAssigneeLabel() {
