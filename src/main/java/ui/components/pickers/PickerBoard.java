@@ -1,13 +1,14 @@
 package ui.components.pickers;
 
-import backend.resource.TurboLabel;
-
 import com.sun.javafx.tk.FontLoader;
 import com.sun.javafx.tk.Toolkit;
 
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.control.Tooltip;
+import javafx.scene.layout.VBox;
+import ui.UI;
 
 /**
  * This class is to represent a label in LabelPickerDialog
@@ -15,26 +16,41 @@ import javafx.scene.control.Tooltip;
  * It contains attributes such as selected, highlighted, removed and faded in order
  * to produce the appropriate styled node through getNode()
  */
-public class PickerBoard {
+public class PickerBoard extends VBox {
+
+    @FXML
+    private Label name;
 
     private String boardName;
     private boolean isHighlighted;
-    private boolean isFaded;
 
     public PickerBoard(String boardName) {
         this.boardName = boardName;
         isHighlighted = false;
-        isFaded = false;
+
+        loadView();
     }
 
-    public String getStyle() {
-        String colour = "b1cfeb";
-        int r = Integer.parseInt(colour.substring(0, 2), 16);
-        int g = Integer.parseInt(colour.substring(2, 4), 16);
-        int b = Integer.parseInt(colour.substring(4, 6), 16);
-        double luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-        boolean bright = luminance > 128;
-        return "-fx-background-color: #" + colour + "; -fx-text-fill: " + (bright ? "black;" : "white;");
+    private void loadView() {
+        try {
+            FXMLLoader loader = new FXMLLoader(UI.class.getResource("fxml/PickerBoardItem.fxml"));
+            loader.setRoot(this);
+            loader.setController(this);
+            loader.load();
+
+            name.setText(boardName);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setBoardName(String boardName) {
+        this.boardName = boardName;
+        name.setText(boardName);
+    }
+
+    public String getBoardName() {
+        return boardName;
     }
 
     public Node getNode() {
@@ -42,7 +58,6 @@ public class PickerBoard {
         Label label = new Label(boardName);
         label.getStyleClass().add("labels");
         String style = getStyle() + (isHighlighted ? " -fx-border-color: black; -fx-font-weight: bold;" : "");
-        style += (isFaded ? " -fx-opacity: 40%;" : ""); // change opacity if needed
         label.setStyle(style);
 
         FontLoader fontLoader = Toolkit.getToolkit().getFontLoader();
@@ -55,11 +70,6 @@ public class PickerBoard {
 
     public PickerBoard highlighted(boolean isHighlighted) {
         this.isHighlighted = isHighlighted;
-        return this;
-    }
-
-    public PickerBoard faded(boolean isFaded) {
-        this.isFaded = isFaded;
         return this;
     }
 

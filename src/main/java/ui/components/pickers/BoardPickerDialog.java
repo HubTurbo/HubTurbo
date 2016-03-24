@@ -1,6 +1,9 @@
 package ui.components.pickers;
 
 import javafx.application.Platform;
+import javafx.beans.Observable;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -29,6 +32,7 @@ public class BoardPickerDialog extends Dialog<String> {
     private static final String DIALOG_TITLE = "Switch to board...";
 
     private List<String> boards;
+    private ObservableList<PickerBoard> pickerBoards;
     private BoardPickerState state;
     private Optional<String> suggestion = Optional.empty();
     private ButtonType confirmButtonType;
@@ -43,13 +47,14 @@ public class BoardPickerDialog extends Dialog<String> {
     private TextField queryField;
 
     @FXML
-    private VBox boardList;
+    private ListView<PickerBoard> boardList;
 
     @FXML
     private VBox boardNames;
 
     BoardPickerDialog(List<String> boards, Stage stage) {
         this.boards = boards;
+        this.pickerBoards = FXCollections.observableArrayList();
 
         initUI(stage);
         Platform.runLater(queryField::requestFocus);
@@ -66,6 +71,7 @@ public class BoardPickerDialog extends Dialog<String> {
         setMainLayout();
         createButtons();
 
+        boardList.setItems(pickerBoards);
         state = new BoardPickerState(new HashSet<>(boards), "");
         populateBoards(state);
     }
@@ -94,7 +100,6 @@ public class BoardPickerDialog extends Dialog<String> {
 
         setResultConverter(dialogButton -> {
             if (dialogButton == confirmButtonType) {
-                // Ensures the last keyword in the query is toggled after confirmation
                 return suggestion.orElse(null);
             }
             return null;
@@ -102,28 +107,29 @@ public class BoardPickerDialog extends Dialog<String> {
     }
 
     private void populateBoards(BoardPickerState state) {
-        boardNames.getChildren().clear();
-        boards.stream()
-                    .map(boardName -> {
-                        PickerBoard pb = new PickerBoard(boardName);
-                        pb.faded(!state.getMatchedBoards().contains(boardName));
-                        pb.highlighted(suggestion.isPresent() && suggestion.get().equals(boardName));
-                        return pb;
-                    })
-                    .forEach(boardName -> boardNames.getChildren().add(getPickerBoardNode(boardName)));
+        pickerBoards.clear();
+
+        state.getMatchedBoards().stream()
+                .sorted(String::compareToIgnoreCase)
+                .map(PickerBoard::new)
+                .forEach(pickerBoard -> {
+                    suggestion.ifPresent(suggestion -> {
+                        pickerBoard.highlighted(suggestion.equals(pickerBoard.getBoardName()));
+                    });
+                    pickerBoard.setPrefHeight(40);
+                    pickerBoard.setOnMouseClicked(e -> handleBoardClick(pickerBoard));
+                    pickerBoards.add(pickerBoard);
+                });
 
         getDialogPane().getScene().getWindow().sizeToScene();
         if (suggestion.isPresent()) {
             getDialogPane().lookupButton(confirmButtonType).setDisable(false);
+            boardList.getSelectionModel().select(0);
+            System.out.println(boardList.getHeight());
+            boardList.getItems().forEach(item -> System.out.println(item.getHeight()));
         } else {
             getDialogPane().lookupButton(confirmButtonType).setDisable(true);
         }
-    }
-
-    private final Node getPickerBoardNode(PickerBoard board) {
-        Node node = board.getNode();
-        node.setOnMouseClicked(e -> handleBoardClick(board));
-        return node;
     }
 
     private final void handleUserInput(String query) {
@@ -133,6 +139,7 @@ public class BoardPickerDialog extends Dialog<String> {
     }
 
     private void handleBoardClick(PickerBoard board) {
-        // TODO
+        suggestion = Optional.of(board.getBoardName());
+        getDialogPane().lookupButton(confirmButtonType).setDisable(false);
     }
 }

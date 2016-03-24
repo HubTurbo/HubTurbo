@@ -65,10 +65,10 @@ class BoardPickerState {
     }
 
     private void updateSuggestion() {
-        if (!matchedBoards.isEmpty()) {
-            suggestion = matchedBoards.stream().min(String::compareToIgnoreCase);
-        } else {
+        if (matchedBoards.isEmpty() || matchedBoards.size() == boards.size()) {
             suggestion = Optional.empty();
+        } else {
+            suggestion = matchedBoards.stream().min(String::compareToIgnoreCase);
         }
     }
 
