@@ -23,6 +23,8 @@ import filter.expression.Qualifier;
 import filter.expression.QualifierType;
 import prefs.Preferences;
 
+import static filter.expression.Qualifier.USER_WARNING_ERROR_FORMAT;
+
 public class FilterEvalTests {
 
     @Rule
@@ -80,7 +82,7 @@ public class FilterEvalTests {
 
     @Test
     public void satisfiesId_invalidInputs_throwSemanticException() {
-        verifySemanticException(QualifierType.ID, "id:something");
+        verifyQualifierContentError(QualifierType.ID, "id:something");
     }
 
     @Test
@@ -96,7 +98,7 @@ public class FilterEvalTests {
 
     @Test
     public void satisfiesId_invalidCompoundIdInputs_throwSemanticException() {
-        verifySemanticException(QualifierType.ID, "id:test/test#something");
+        verifyQualifierContentError(QualifierType.ID, "id:test/test#something");
     }
 
     private void testForPresenceOfKeywords(String prefix, TurboIssue issue) {
@@ -142,7 +144,7 @@ public class FilterEvalTests {
 
     @Test
     public void satisfiesIn_invalidInputs_throwSemanticException() {
-        verifySemanticException(QualifierType.IN, "in:something test");
+        verifyQualifierContentError(QualifierType.IN, "in:something test");
     }
 
     private void testMilestoneParsing(String milestoneQualifier, TurboIssue issue, IModel model) {
@@ -473,15 +475,14 @@ public class FilterEvalTests {
     @Test
     public void satisfiesAuthor_validInputs() {
         TurboIssue issue = new TurboIssue(REPO, 1, "", "bob", null, false);
+        IModel model = TestUtils.modelWith(issue, new TurboUser("test/test", "bob"));
 
-        assertTrue(matches("author:BOB", issue));
-        assertTrue(matches("author:bob", issue));
-        assertFalse(matches("author:alice", issue));
-        assertTrue(matches("author:o", issue));
-        assertFalse(matches("author:lic", issue));
+        assertTrue(Qualifier.process(model, Parser.parse("author:BOB"), issue));
+        assertTrue(Qualifier.process(model, Parser.parse("author:bob"), issue));
+        assertTrue(Qualifier.process(model, Parser.parse("author:o"), issue));
 
         // test: qualifier alias
-        assertTrue(matches("au:bob", issue));
+        assertTrue(Qualifier.process(model, Parser.parse("au:bob"), issue));
     }
 
     @Test
@@ -530,8 +531,8 @@ public class FilterEvalTests {
 
     @Test
     public void satisfiesState_invalidInputs_throwSemanticException() {
-        verifySemanticException(QualifierType.STATE, "state:something");
-        verifySemanticException(QualifierType.STATE, "state:1");
+        verifyQualifierContentError(QualifierType.STATE, "state:something");
+        verifyQualifierContentError(QualifierType.STATE, "state:1");
     }
 
     @Test
@@ -580,8 +581,8 @@ public class FilterEvalTests {
 
     @Test
     public void satisfiesHasConditions_invalidInputs_throwSemanticException() {
-        verifySemanticException(QualifierType.HAS, "has:something");
-        verifySemanticException(QualifierType.HAS, "has:2011-1-1");
+        verifyQualifierContentError(QualifierType.HAS, "has:something");
+        verifyQualifierContentError(QualifierType.HAS, "has:2011-1-1");
     }
 
     @Test
@@ -624,7 +625,7 @@ public class FilterEvalTests {
 
     @Test
     public void satisfiesNoConditions_invalidInputs_throwSemanticException() {
-        verifySemanticException(QualifierType.NO, "no:something");
+        verifyQualifierContentError(QualifierType.NO, "no:something");
     }
 
     @Test
@@ -649,8 +650,8 @@ public class FilterEvalTests {
 
     @Test
     public void satisfiesType_invalidInputs_throwSemanticException() {
-        verifySemanticException(QualifierType.TYPE, "type:something");
-        verifySemanticException(QualifierType.TYPE, "type:2011-1-1");
+        verifyQualifierContentError(QualifierType.TYPE, "type:something");
+        verifyQualifierContentError(QualifierType.TYPE, "type:2011-1-1");
     }
 
     @Test
@@ -726,8 +727,8 @@ public class FilterEvalTests {
 
     @Test
     public void satisfiesIs_invalidInputs_throwSemanticException() {
-        verifySemanticException(QualifierType.IS, "is:something");
-        verifySemanticException(QualifierType.IS, "is:2011-1-1");
+        verifyQualifierContentError(QualifierType.IS, "is:something");
+        verifyQualifierContentError(QualifierType.IS, "is:2011-1-1");
     }
 
     @Test
@@ -745,7 +746,7 @@ public class FilterEvalTests {
 
     @Test
     public void satisfiesCreationDate_invalidInputs_throwSemanticException() {
-        verifySemanticException(QualifierType.CREATED, "created:nondate");
+        verifyQualifierContentError(QualifierType.CREATED, "created:nondate");
     }
 
     @Test
@@ -775,7 +776,7 @@ public class FilterEvalTests {
 
     @Test
     public void satisfiesUpdatedHours_invalidInputs_throwSemanticException() {
-        verifySemanticException(QualifierType.UPDATED, "updated:nondate");
+        verifyQualifierContentError(QualifierType.UPDATED, "updated:nondate");
     }
 
     @Test
@@ -791,10 +792,10 @@ public class FilterEvalTests {
 
     @Test
     public void satisfiesRepo_invalidInputs_throwSemanticException() {
-        verifySemanticException(QualifierType.REPO, "repo:2011-1-1");
+        verifyQualifierContentError(QualifierType.REPO, "repo:2011-1-1");
         
         // test: compound id lookup
-        verifySemanticException(QualifierType.REPO, "id:2011#1");
+        verifyQualifierContentError(QualifierType.REPO, "id:2011#1");
     }
 
     @Test
@@ -824,6 +825,40 @@ public class FilterEvalTests {
         assertFalse(Qualifier.labelMatches(".", "p.high"));
     }
 
+    @Test
+    public void processQualifier_useInvalidUsername_getUsernameWarning() {
+        TurboUser user = new TurboUser(REPO, "fox", "charlie");
+        IModel model = TestUtils.singletonModel(new Model(REPO,
+                                                            new ArrayList<>(),
+                                                            new ArrayList<>(),
+                                                            new ArrayList<>(),
+                                                            new ArrayList<>(Arrays.asList(user))));
+        verifySemanticException(model, "involves:bob", String.format(USER_WARNING_ERROR_FORMAT, "bob", REPO));
+        verifySemanticException(model, "involves:foxx", String.format(USER_WARNING_ERROR_FORMAT, "bob", REPO));
+        verifySemanticException(model, "author:alice", String.format(USER_WARNING_ERROR_FORMAT, "alice", REPO));
+    }
+
+    @Test
+    public void processQualifier() {
+        TurboUser user1 = new TurboUser(REPO, "alice", "Alice");
+        TurboUser user2 = new TurboUser(REPO, "bob", "Bob");
+        TurboUser user3 = new TurboUser(REPO, "fox", "Charlie");
+        TurboIssue issue1 = new TurboIssue(REPO, 1, "title", "alice", LocalDateTime.now(), false);
+        TurboIssue issue2 = new TurboIssue(REPO, 1, "title", "bob", LocalDateTime.now(), false);
+        issue1.setAssignee(user3);
+        IModel model = TestUtils.singletonModel(new Model(REPO,
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>(Arrays.asList(user1, user2, user3))));
+        assertTrue(Qualifier.process(model, Parser.parse("assignee:ox"), issue1));
+        assertTrue(Qualifier.process(model, Parser.parse("author:alice"), issue1));
+        assertFalse(Qualifier.process(model, Parser.parse("assignee:charlie"), issue2));
+        assertTrue(Qualifier.process(model, Parser.parse("author:bob"), issue2));
+        assertTrue(Qualifier.process(model, Parser.parse("author:bob"), issue2));
+    }
+
+
     /**
      * Tests the filter string in the context of an empty model
      */
@@ -835,11 +870,15 @@ public class FilterEvalTests {
      * Confirms that the input causes a Semantic Exception to be thrown
      * with correct error message. Test fails if it doesn't.
      */
-    private void verifySemanticException(QualifierType type, String invalidInput) {
-        TurboIssue issue = new TurboIssue(REPO, 1, "1");
+    private void verifySemanticException(IModel model, String input, String warningMessage) {
+        TurboIssue issue = new TurboIssue(REPO, 1, "title");
         thrown.expect(SemanticException.class);
-        thrown.expectMessage(
-            String.format(SemanticException.ERROR_MESSAGE, type, type.getDescriptionOfValidInputs()));
-        matches(invalidInput, issue);
+        thrown.expectMessage(warningMessage);
+        Qualifier.process(model, Parser.parse(input), issue);
+    }
+
+    private void verifyQualifierContentError(QualifierType type, String invalidInput) {
+        verifySemanticException(empty, invalidInput, String.format(SemanticException.ERROR_MESSAGE,
+                                                                    type, type.getDescriptionOfValidInputs()));
     }
 }

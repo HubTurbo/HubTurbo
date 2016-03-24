@@ -4,6 +4,7 @@ import backend.RepoIO;
 import backend.json.JSONStoreStub;
 import backend.resource.Model;
 import backend.resource.MultiModel;
+import backend.resource.TurboUser;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import prefs.Preferences;
@@ -75,6 +76,50 @@ public class MultiModelTest {
     public void replaceIssueLabels_modelNotFound() {
         MultiModel models = new MultiModel(mock(Preferences.class));
         assertEquals(Optional.empty(), models.replaceIssueLabels("nonexistentrepo", 1, new ArrayList<>()));
+    }
+
+    @Test
+    public void isUserInRepo_queryExistingUser_userFound() {
+        MultiModel models = new MultiModel(mock(Preferences.class));
+
+        final String REPO = "dummy/dummy";
+
+        TurboUser user1 = new TurboUser(REPO, "alice", "Alice");
+        TurboUser user2 = new TurboUser(REPO, "bob", "Fox");
+        List<TurboUser> users = Arrays.asList(user1, user2);
+
+        Model mockedModel = mock(Model.class);
+        when(mockedModel.getRepoId()).thenReturn(REPO);
+        when(mockedModel.getUsers()).thenReturn(users);
+
+        models.queuePendingRepository(REPO);
+        models.addPending(mockedModel);
+
+        assertTrue(models.isUserInRepo(REPO, "aLICE"));
+        assertTrue(models.isUserInRepo(REPO, "bob"));
+        assertTrue(models.isUserInRepo(REPO, "fO"));
+        assertTrue(models.isUserInRepo(REPO, ""));
+    }
+
+    @Test
+    public void isUserInRepo_queryNonExistingUser_userNotFound() {
+        MultiModel models = new MultiModel(mock(Preferences.class));
+
+        final String REPO = "dummy/dummy";
+
+        TurboUser user1 = new TurboUser(REPO, "alice", "Alice");
+        TurboUser user2 = new TurboUser(REPO, "bob", "Fox");
+        List<TurboUser> users = Arrays.asList(user1, user2);
+
+        Model mockedModel = mock(Model.class);
+        when(mockedModel.getRepoId()).thenReturn(REPO);
+        when(mockedModel.getUsers()).thenReturn(users);
+
+        models.queuePendingRepository(REPO);
+        models.addPending(mockedModel);
+
+        assertFalse(models.isUserInRepo(REPO, "bot"));
+        assertFalse(models.isUserInRepo(REPO, "alices"));
     }
 
     /**

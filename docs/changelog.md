@@ -1,6 +1,16 @@
 
 # Changelog
 
+# V3.24.0
+
+- Tips are now shown to first-time users
+- Issue cards are now more compact
+- Stats are shown at the bottom of panels
+- Milestone sorting is now more consistent
+- Filter field is now more tolerant of invalid syntax while editing
+- Fixed F1 hotkey not working when filter field is in focus
+- Fixed PR navigation hotkeys
+
 # V3.23.0
 
 - A warning will now be shown to users on unsupported Java versions

@@ -16,4 +16,8 @@ public class SemanticException extends FilterException {
         super(String.format(ERROR_MESSAGE, type, type.getDescriptionOfValidInputs()));
     }
 
+    public SemanticException(String message) {
+        super(message);
+    }
+
 }
