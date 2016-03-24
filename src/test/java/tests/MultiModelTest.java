@@ -78,6 +78,17 @@ public class MultiModelTest {
         assertEquals(Optional.empty(), models.replaceIssueLabels("nonexistentrepo", 1, new ArrayList<>()));
     }
 
+    /**
+     * Tests that {@code editIssueState} returns Optional.empty() if the model for the
+     * issue given in the argument can't be found
+     */
+    @Test
+    public void editIssueState_modelNotFound() {
+        MultiModel models = new MultiModel(mock(Preferences.class));
+        assertEquals(Optional.empty(), models.editIssueState("nonexistentrepo", 1, true));
+        assertEquals(Optional.empty(), models.editIssueState("nonexistentrepo", 1, false));
+    }
+
     @Test
     public void isUserInRepo_queryExistingUser_userFound() {
         MultiModel models = new MultiModel(mock(Preferences.class));
@@ -174,5 +185,29 @@ public class MultiModelTest {
 
         models.replaceIssueMilestone(repoId, issueId, milestoneId);
         verify(mockedModel).replaceIssueMilestone(issueId, milestoneId);
+    }
+
+    /**
+     * Tests that {@code editIssueState} called the Model with the same id as the argument
+     * repoId and invoke editIssueState on that Model
+     */
+    @Test
+    public void editIssueState_successful() {
+        String repoId = "testowner/testrepo";
+        int issueId = 1;
+
+        Model mockedModel = mock(Model.class);
+        when(mockedModel.getRepoId()).thenReturn(repoId);
+        when(mockedModel.getIssues()).thenReturn(new ArrayList<>());
+
+        MultiModel models = new MultiModel(mock(Preferences.class));
+        models.queuePendingRepository(repoId);
+        models.addPending(mockedModel);
+
+        models.editIssueState(repoId, issueId, true);
+        verify(mockedModel).editIssueState(issueId, true);
+
+        models.editIssueState(repoId, issueId, false);
+        verify(mockedModel).editIssueState(issueId, false);
     }
 }

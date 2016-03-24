@@ -24,6 +24,8 @@ import java.util.concurrent.Executors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -162,6 +164,37 @@ public class RepoOpControlTest {
         RepoOpControl repoOpControl = new RepoOpControl(mock(RepoIO.class), models);
         TurboIssue result = repoOpControl.replaceIssueLabelsLocally(returnedIssue, new ArrayList<>()).join().get();
         assertEquals(returnedIssue, result);
+    }
+
+    /**
+     * Tests that {@code editIssueStateLocally} calls @{code editIssueState} method from models
+     * and return corresponding result
+     */
+    @Test
+    public void editIssueStateLocally() throws ExecutionException, InterruptedException {
+        MultiModel models = mock(MultiModel.class);
+        TurboIssue returnedIssue = new TurboIssue("testrepo/testrepo", 1, "Issue title");
+        when(models.editIssueState("testrepo/testrepo", 1, false))
+                .thenReturn(Optional.of(returnedIssue));
+        RepoOpControl repoOpControl = new RepoOpControl(mock(RepoIO.class), models);
+        TurboIssue result = repoOpControl.editIssueStateLocally(returnedIssue, false).join().get();
+        assertEquals(returnedIssue, result);
+    }
+
+    /**
+     * Tests that {@code editIssueStateOnServer} calls @{code editIssueState} method from RepoIO
+     * and return corresponding success/failure state
+     */
+    @Test
+    public void editIssueStateOnServer() throws ExecutionException, InterruptedException {
+        RepoIO mockedRepoIO = mock(RepoIO.class);
+        when(mockedRepoIO.editIssueState(any(TurboIssue.class), anyBoolean()))
+                .thenReturn(CompletableFuture.completedFuture(true));
+
+        TurboIssue returnedIssue = new TurboIssue("testrepo/testrepo", 1, "Issue title");
+        RepoOpControl repoOpControl = new RepoOpControl(mockedRepoIO, mock(MultiModel.class));
+        boolean result = repoOpControl.editIssueStateOnServer(returnedIssue, false).join();
+        assertEquals(true, result);
     }
 
     /**

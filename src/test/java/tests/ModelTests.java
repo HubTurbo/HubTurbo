@@ -335,4 +335,42 @@ public class ModelTests {
         assertEquals(1, result.get().getId());
         assertEquals(newLabels, result.get().getLabels());
     }
+
+    /**
+     * Tests that {@code editIssueState} returns Optional.empty() if the model for the
+     * issue given in the argument can't be found
+     */
+    @Test
+    public void editIssueState_issueNotFound() {
+        Model model = new Model("testrepo");
+        assertEquals(Optional.empty(), model.editIssueState(1, true));
+        assertEquals(Optional.empty(), model.editIssueState(1, false));
+    }
+
+    /**
+     * Tests that {@code editIssueState} finds issue with the right id and successfully modify the issue's labels
+     */
+    @Test
+    public void editIssueState_successful() {
+        String repoId = "testowner/testrepo";
+        Optional<TurboIssue> result;
+
+        TurboIssue issue1 = LogicTests.createOpenIssue();
+        TurboIssue issue2 = LogicTests.createClosedIssue();
+        List<TurboIssue> issues = Arrays.asList(issue2, issue1);
+        Model model = new Model(repoId, issues, new ArrayList<TurboLabel>(),
+                new ArrayList<TurboMilestone>(), new ArrayList<TurboUser>());
+
+        result = model.editIssueState(issue1.getId(), false);
+        assertEquals(issue1.getId(), result.get().getId());
+        assertEquals(false, result.get().isOpen());
+
+        result = model.editIssueState(issue2.getId(), true);
+        assertEquals(issue2.getId(), result.get().getId());
+        assertEquals(true, result.get().isOpen());
+
+        result = model.editIssueState(issue2.getId(), true);
+        assertEquals(issue2.getId(), result.get().getId());
+        assertEquals(true, result.get().isOpen());
+    }
 }
