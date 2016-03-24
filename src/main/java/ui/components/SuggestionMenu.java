@@ -37,10 +37,10 @@ public class SuggestionMenu extends ContextMenu {
         selected = Optional.empty();
         searchResult.stream().limit(maxEntries).forEach(this::addMenuItem);
 
+        selected = searchResult.stream().findFirst();
         // Sets focus on first item and select it as default suggestion
         if (isShowing() && !searchResult.isEmpty()) {
             getSkin().getNode().lookup(".menu-item").requestFocus();
-            selected = searchResult.stream().findFirst();
         }
     }
 
@@ -59,7 +59,6 @@ public class SuggestionMenu extends ContextMenu {
         CustomMenuItem item = new CustomMenuItem(label, false);
         item.setText(content);
         getItems().add(item);
-        item.setId(content);
         item.setOnAction(this.actionHandler);
         assert getItems().size() <= maxEntries;
     }

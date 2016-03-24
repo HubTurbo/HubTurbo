@@ -1,7 +1,6 @@
 package ui.components;
 
 import filter.expression.QualifierType;
-import javafx.event.ActionEvent;
 import javafx.geometry.Side;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -80,11 +79,14 @@ public class FilterTextField extends TextField {
                 return;
             }
             
-            if (Character.isAlphabetic(key.charAt(0))) {
+            char typed = key.charAt(0);
+            
+            if (typed == '\t' && suggestion.isShowing()) {
+                suggestion.hide();
+            } else {
                 suggestion.loadSuggestions(getMatchingKeywords(getCurrentWord()));
                 suggestion.show(this, Side.BOTTOM, 0, 0);
             }
-            
         });
         setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.TAB) {
@@ -112,17 +114,15 @@ public class FilterTextField extends TextField {
     }
 
     private void handleOnEnter() {
-        if (!suggestion.isShowing()) {
-            confirmEdit();
-        } else {
+        if (suggestion.getSelectedContent().isPresent()) {
             suggestion.hide();
-            suggestion.getSelectedContent().ifPresent(this::completeWord);
+        } else {
+            confirmEdit();
         }
     }
 
     private void handleOnEscape() {
         if (getText().equals(previousText)) {
-            suggestion.hide();
             onCancel.run();
         } else {
             revertEdit();
@@ -218,7 +218,8 @@ public class FilterTextField extends TextField {
     // SuggestionMenu 
     
     private final SuggestionMenu setupSuggestion() {
-        SuggestionMenu suggestion = new SuggestionMenu(MAX_SUGGESTIONS).setActionHandler(this::suggestionActionHandler);
+        SuggestionMenu suggestion = new SuggestionMenu(MAX_SUGGESTIONS);
+        suggestion.setOnHidden(e -> suggestion.getSelectedContent().ifPresent(this::completeWord));
         suggestion.loadSuggestions(keywords);
         return suggestion;
     }
@@ -229,10 +230,6 @@ public class FilterTextField extends TextField {
         replaceSelection(suggestedWord);
     }
 
-    private void suggestionActionHandler(ActionEvent event) {
-        suggestion.hide();
-        SuggestionMenu.getTextOnAction(event).ifPresent(this::completeWord);
-    }
 
     /**
      * Sets the contents of the field and acts as if it was confirmed by the user.
