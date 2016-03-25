@@ -196,6 +196,7 @@ public class MenuControl extends MenuBar {
         Optional<ButtonType> response = dlg.showAndWait();
 
         if (response.isPresent() && response.get().getButtonData() == ButtonData.OK_DONE) {
+            prefs.setLastDeletedBoardIndex(boardName);
             prefs.removeBoard(boardName);
             if (prefs.getLastOpenBoard().isPresent() &&
                 prefs.getLastOpenBoard().get().equals(boardName)) {

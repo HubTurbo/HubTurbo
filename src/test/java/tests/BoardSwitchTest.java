@@ -45,6 +45,31 @@ public class BoardSwitchTest {
     }
 
     @Test
+    public void deletedBoardOpenSwitchTest() {
+        Preferences testPrefs = TestController.createTestPreferences();
+
+        List<PanelInfo> board1 = new ArrayList<>();
+        List<PanelInfo> board2 = new ArrayList<>();
+        List<PanelInfo> board3 = new ArrayList<>();
+
+        testPrefs.addBoard(BOARDNAME1, board1);
+        testPrefs.addBoard(BOARDNAME2, board2);
+        testPrefs.addBoard(BOARDNAME3, board3);
+
+        testPrefs.setLastOpenBoard(BOARDNAME2);
+        testPrefs.removeBoard(BOARDNAME2);
+
+        testPrefs.switchBoard();
+        assertEquals(BOARDNAME3, testPrefs.getLastOpenBoard().get());
+
+        testPrefs.switchBoard();
+        assertEquals(BOARDNAME1, testPrefs.getLastOpenBoard().get());
+
+        testPrefs.switchBoard();
+        assertEquals(BOARDNAME3, testPrefs.getLastOpenBoard().get());
+    }
+
+    @Test
     public void noBoardSwitchTest() {
         Preferences testPrefs = TestController.createTestPreferences();
 
@@ -65,7 +90,7 @@ public class BoardSwitchTest {
         testPrefs.addBoard(BOARDNAME3, board3);
 
         testPrefs.switchBoard();
-        assertEquals(false, testPrefs.getLastOpenBoard().isPresent());
+        assertEquals(true, testPrefs.getLastOpenBoard().isPresent());
     }
 
     @Test
