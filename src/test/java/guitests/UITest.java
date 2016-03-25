@@ -3,8 +3,10 @@ package guitests;
 import static com.google.common.io.Files.getFileExtension;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -63,7 +65,7 @@ public class UITest extends FxRobot {
     protected static final SettableFuture<Stage> STAGE_FUTURE = SettableFuture.create();
     private static final Map<Character, KeyCode> specialCharsMap = getSpecialCharsMap();
     
-    // Sets property to run tests headless
+    // Sets properties to run tests headless
     static {
         if (Boolean.getBoolean("headless")) {
             System.setProperty("java.awt.robot", "true");
@@ -128,16 +130,19 @@ public class UITest extends FxRobot {
     }
 
     public static void clearTestFolder() {
+        Path testDirectory = Paths.get(RepoStore.TEST_DIRECTORY);
+
         try {
-            if (Files.exists(Paths.get(RepoStore.TEST_DIRECTORY))) {
-                Files.walk(Paths.get(RepoStore.TEST_DIRECTORY), 1)
-                    .filter(Files::isRegularFile)
-                    .filter(p ->
-                        getFileExtension(String.valueOf(p.getFileName())).equalsIgnoreCase("json") ||
-                            getFileExtension(String.valueOf(p.getFileName())).equalsIgnoreCase("json-err")
-                    )
-                    .forEach(p -> new File(p.toAbsolutePath().toString()).delete());
+            if (!Files.exists(testDirectory)) {
+                throw new FileNotFoundException(testDirectory.toString());
             }
+            Files.walk(Paths.get(RepoStore.TEST_DIRECTORY), 1)
+                .filter(Files::isRegularFile)
+                .filter(p ->
+                    getFileExtension(String.valueOf(p.getFileName())).equalsIgnoreCase("json") ||
+                        getFileExtension(String.valueOf(p.getFileName())).equalsIgnoreCase("json-err")
+                )
+                .forEach(p -> new File(p.toAbsolutePath().toString()).delete());
         } catch (IOException e) {
             e.printStackTrace();
         }

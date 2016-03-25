@@ -1,4 +1,4 @@
-package unstable;
+package guitests;
 
 import static org.junit.Assert.assertEquals;
 
@@ -11,8 +11,11 @@ import org.junit.Test;
 import org.loadui.testfx.GuiTest;
 import org.testfx.api.FxToolkit;
 
+<<<<<<< HEAD:src/test/java/unstable/ModelUpdateUITest.java
 import guitests.UITest;
 import ui.IdGenerator;
+=======
+>>>>>>> Confirms rate of failure for tests that only fail on Travis:src/test/java/guitests/ModelUpdateUITest.java
 import ui.UI;
 import ui.listpanel.ListPanel;
 import util.PlatformEx;

@@ -1,9 +1,8 @@
-package unstable;
+package guitests;
 
 import org.junit.Test;
 import org.loadui.testfx.GuiTest;
 
-import guitests.UITest;
 import javafx.scene.input.KeyCode;
 import ui.IdGenerator;
 import ui.UI;

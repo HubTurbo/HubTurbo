@@ -1,11 +1,10 @@
-package unstable;
+package guitests;
 
 import javafx.scene.input.KeyCode;
 
 import org.junit.Test;
 import org.loadui.testfx.GuiTest;
 
-import guitests.UITest;
 import ui.UI;
 import ui.components.KeyboardShortcuts;
 import util.events.*;

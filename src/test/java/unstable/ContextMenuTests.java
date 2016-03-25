@@ -18,7 +18,6 @@ import ui.IdGenerator;
 import ui.components.FilterTextField;
 import ui.listpanel.ListPanel;
 
-
 public class ContextMenuTests extends UITest {
 
     private static final int EVENT_DELAY = 1000;

@@ -1,10 +1,9 @@
-package unstable;
+package guitests;
 
 import javafx.scene.input.KeyCode;
 import org.junit.Test;
 import org.testfx.api.FxToolkit;
 
-import guitests.UITest;
 import ui.UI;
 import util.GitHubURL;
 import util.events.IssueCreatedEvent;

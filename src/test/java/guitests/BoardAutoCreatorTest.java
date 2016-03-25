@@ -1,4 +1,4 @@
-package unstable;
+package guitests;
 
 import static org.junit.Assert.assertEquals;
 import static org.loadui.testfx.Assertions.assertNodeExists;
@@ -14,7 +14,6 @@ import javafx.scene.input.KeyCombination;
 import org.junit.Before;
 import org.junit.Test;
 
-import guitests.UITest;
 import prefs.PanelInfo;
 import prefs.Preferences;
 import ui.BoardAutoCreator;

@@ -1,4 +1,4 @@
-package unstable;
+package guitests;
 
 import javafx.application.Platform;
 import javafx.collections.ObservableList;

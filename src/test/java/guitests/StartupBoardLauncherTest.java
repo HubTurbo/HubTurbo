@@ -18,7 +18,6 @@ import java.util.concurrent.TimeoutException;
 
 import static org.junit.Assert.assertEquals;
 import static ui.BoardAutoCreator.SAMPLE_BOARD;
-import static unstable.BoardAutoCreatorTest.verifyBoard;
 
 public class StartupBoardLauncherTest extends UITest {
 
@@ -44,7 +43,7 @@ public class StartupBoardLauncherTest extends UITest {
         assertEquals(Arrays.asList(new String[] { SAMPLE_BOARD }), boardNames);
 
         //Verifies the panel details of the sample board created.
-        verifyBoard(panelControl, BoardAutoCreator.getSamplePanelDetails());
+        BoardAutoCreatorTest.verifyBoard(panelControl, BoardAutoCreator.getSamplePanelDetails());
     }
 
     private int countPanelsShown() throws InterruptedException, ExecutionException {
