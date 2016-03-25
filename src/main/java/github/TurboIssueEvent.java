@@ -90,9 +90,10 @@ public class TurboIssueEvent {
         assert type == IssueEventType.Milestoned || type == IssueEventType.Demilestoned;
         return milestoneTitle;
     }
-    public void setMilestoneTitle(String milestoneTitle) {
+    public TurboIssueEvent setMilestoneTitle(String milestoneTitle) {
         assert type == IssueEventType.Milestoned || type == IssueEventType.Demilestoned;
         this.milestoneTitle = milestoneTitle;
+        return this;
     }
     public String getRenamedFrom() {
         assert type == IssueEventType.Renamed;

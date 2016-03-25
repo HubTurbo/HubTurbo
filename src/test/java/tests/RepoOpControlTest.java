@@ -23,6 +23,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -31,6 +32,8 @@ public class RepoOpControlTest {
     private static final Logger logger = LogManager.getLogger(RepoOpControlTest.class.getName());
 
     private static final String REPO = "test/test";
+    private static final TurboIssue issue = new TurboIssue(REPO, 1, "Issue 1");
+    private static final Optional<Integer> milestone = Optional.of(1);
 
     private final Executor executor = Executors.newCachedThreadPool();
 
@@ -128,6 +131,25 @@ public class RepoOpControlTest {
         assertEquals(3, counter.getMax());
     }
 
+    @Test
+    public void replaceIssueMilestoneLocally() throws ExecutionException, InterruptedException {
+        int issueId = 1;
+        Optional<Integer> milestoneId = Optional.of(1);
+        MultiModel models = mock(MultiModel.class);
+
+        TurboIssue returnedIssue = new TurboIssue("testrepo/testrepo", issueId, "Issue title");
+        returnedIssue.setMilestoneById(1);
+
+        when(models.replaceIssueMilestone("testrepo/testrepo", issueId, milestoneId))
+                .thenReturn(Optional.of(returnedIssue));
+
+        RepoOpControl repoOpControl = new RepoOpControl(mock(RepoIO.class), models);
+        Optional<TurboIssue> result = repoOpControl.replaceIssueMilestoneLocally(returnedIssue, milestoneId).join();
+        
+        assertTrue(result.isPresent());
+        assertEquals(returnedIssue, result.get());
+    }
+
     /**
      * Tests that replaceIssueLabelsLocally calls replaceIssueLabels method from models and return corresponding result
      */
@@ -149,6 +171,9 @@ public class RepoOpControlTest {
     private RepoIO stubbedRepoIO(AtomicMaxInteger counter) {
 
         RepoIO stub = mock(RepoIO.class);
+
+        when(stub.replaceIssueMilestone(issue, milestone))
+                .then(invocation -> createResult(counter, new TurboIssue("dummy/dummy", 1, "Issue title")));
 
         when(stub.openRepository(REPO))
             .then(invocation -> createResult(counter, new Model(REPO)));
@@ -173,7 +198,6 @@ public class RepoOpControlTest {
      * Creates a result value which completes after a short delay, to simulate an async task.
      */
     private <T> CompletableFuture<T> createResult(AtomicMaxInteger counter, T value) {
-
         CompletableFuture<T> result = new CompletableFuture<>();
 
         executor.execute(() -> {

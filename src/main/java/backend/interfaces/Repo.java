@@ -16,6 +16,7 @@ import org.eclipse.egit.github.core.PullRequest;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 public interface Repo {
 
@@ -41,6 +42,9 @@ public interface Repo {
 
     boolean isRepositoryValid(String repoId);
     List<Label> setLabels(String repoId, int issueId, List<String> labels) throws IOException;
+
+    Optional<Integer> setMilestone(String repoId, int issueId, String issueTitle, Optional<Integer> issueMilestone)
+            throws IOException;
     ImmutablePair<Integer, Long> getRateLimitResetTime() throws IOException;
 
 }

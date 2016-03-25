@@ -9,9 +9,7 @@ import github.IssueEventType;
 import github.TurboIssueEvent;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
-import org.eclipse.egit.github.core.Comment;
-import org.eclipse.egit.github.core.Label;
-import org.eclipse.egit.github.core.User;
+import org.eclipse.egit.github.core.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -398,6 +396,53 @@ public class DummyRepoState {
         markUpdatedEvents(toSet, IssueMetadata.intermediate(eventsOfIssue, metadataOfIssue.getComments(), "", ""));
 
         return newLabels.stream().map(new Label()::setName).collect(Collectors.toList());
+    }
+
+    protected final Issue setMilestone(int issueId, Optional<Integer> milestone) {
+        ImmutablePair<TurboIssue, IssueMetadata> mutables = produceMutables(issueId);
+        TurboIssue issueToSet = mutables.getLeft();
+        IssueMetadata metadataOfIssue = mutables.getRight();
+        List<TurboIssueEvent> eventsOfIssue = metadataOfIssue.getEvents();
+
+        // demilestone the issue, then set issue milestone using the new milestone
+        issueToSet.getMilestone()
+                .ifPresent(issueMilestone -> removeMilestoneFromIssue(issueMilestone, issueToSet, eventsOfIssue));
+        milestone
+                .ifPresent(newMilestone -> setMilestoneForIssue(newMilestone, issueToSet, eventsOfIssue));
+
+        issueToSet.setUpdatedAt(LocalDateTime.now());
+        // Replace originals with copies, and queue them up to be retrieved
+        markUpdatedEvents(issueToSet, IssueMetadata.intermediate(eventsOfIssue, metadataOfIssue.getComments(), "", ""));
+
+        Issue serverIssue = new Issue();
+        milestone.ifPresent(newMilestone -> serverIssue.setMilestone(new Milestone().setNumber(newMilestone)));
+        return serverIssue;
+    }
+
+    /**
+     * Sets milestone for an issue, after triggering a 'Milestoned' TurboIssueEvent for it
+     * @param milestone
+     * @param toSet
+     * @param eventsOfIssue
+     */
+    private void setMilestoneForIssue(int milestone, TurboIssue toSet, List<TurboIssueEvent> eventsOfIssue) {
+        eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test"),
+                IssueEventType.Milestoned,
+                new Date()).setMilestoneTitle(milestones.get(milestone).getTitle()));
+        toSet.setMilestoneById(milestone);
+    }
+
+    /**
+     * Removes the milestone of an issue, after triggerign a 'Demilestoned' TurboIssueEvent for it
+     * @param milestoneOfIssue
+     * @param toSet
+     * @param eventsOfIssue
+     */
+    private void removeMilestoneFromIssue(int milestoneOfIssue, TurboIssue toSet, List<TurboIssueEvent> eventsOfIssue) {
+        eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test"),
+                IssueEventType.Demilestoned,
+                new Date()).setMilestoneTitle(milestones.get(milestoneOfIssue).getTitle()));
+        toSet.removeMilestone();
     }
 
     protected TurboIssue commentOnIssue(String author, String commentText, int issueId) {

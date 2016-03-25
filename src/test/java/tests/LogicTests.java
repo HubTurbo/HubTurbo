@@ -52,7 +52,88 @@ public class LogicTests {
     }
 
     /**
-     * Tests that replaceIssueLabelsOnServer succeed when both models and repoIO succeeded
+     * Tests that replaceIssueMilestone succeeds when both models and repoIO succeed
+     */
+    @Test
+    public void replaceIssueMilestone_successful() throws ExecutionException, InterruptedException {
+        TurboIssue issue = createIssueWithMilestone(1, Optional.of(0));
+        mockRepoIOReplaceIssueMilestoneResult(true);
+        mockMultiModelReplaceIssueMilestone(Optional.of(issue), Optional.empty());
+
+        assertTrue(logic.replaceIssueMilestone(issue, Optional.of(1)).get());
+    }
+
+    /**
+     * Tests that replaceIssueMilestone fails when model's replaceIssueMilestone returns an empty result
+     */
+    @Test
+    public void replaceIssueMilestone_modelsEmpty_unsuccessful() throws ExecutionException, InterruptedException {
+        TurboIssue issue = createIssueWithMilestone(1, Optional.of(0));
+        mockRepoIOReplaceIssueMilestoneResult(true);
+        mockMultiModelReplaceIssueMilestone(Optional.empty(), Optional.empty());
+
+        assertFalse(logic.replaceIssueMilestone(issue, Optional.of(1)).get());
+    }
+
+    /**
+     * Tests that replaceIssueMilestone fails when repoIO fails to update labels
+     */
+    @Test
+    public void replaceIssueMilestone_repoIOFails_unsuccessful() throws ExecutionException, InterruptedException {
+        TurboIssue issue = createIssueWithMilestone(1, Optional.empty());
+        mockRepoIOReplaceIssueMilestoneResult(false);
+        mockMultiModelReplaceIssueMilestone(Optional.of(issue), Optional.empty());
+
+        assertFalse(logic.replaceIssueMilestone(issue, Optional.of(1)).get());
+    }
+
+    /**
+     * Tests that {@link MultiModel#replaceIssueMilestone(String, int, Optional<Integer>)} is first called with the
+     * new milestone then reverted back to original milestone when repoIO fails to update milestone
+     */
+    @Test
+    public void replaceIssueMilestone_repoIOFails_revert() throws ExecutionException, InterruptedException {
+        Optional<Integer> originalMilestone = Optional.empty();
+        Optional<Integer> newMilestone = Optional.of(1);
+
+        TurboIssue issue = createIssueWithMilestone(1, originalMilestone);
+        mockRepoIOReplaceIssueMilestoneResult(false);
+        mockMultiModelReplaceIssueMilestone(Optional.of(issue), Optional.empty());
+
+        logic.replaceIssueMilestone(issue, newMilestone).get();
+
+        InOrder inOrder = inOrder(mockedMultiModel);
+        inOrder.verify(mockedMultiModel).replaceIssueMilestone(issue.getRepoId(), issue.getId(), newMilestone);
+        inOrder.verify(mockedMultiModel).replaceIssueMilestone(issue.getRepoId(), issue.getId(), originalMilestone);
+    }
+
+    /**
+     * Tests that no revert is taken place if the issue's milestone is modified elsewhere after
+     * {@link Logic#replaceIssueMilestone(TurboIssue, Optional<Integer>)} is called
+     */
+    @Test
+    public void replaceIssueMilestone_timeNotMatched_noRevert() throws ExecutionException, InterruptedException {
+        Optional<Integer> originalMilestone = Optional.empty();
+        Optional<Integer> newMilestone = Optional.of(1);
+
+        TurboIssue issue = createIssueWithMilestone(1, originalMilestone);
+        TurboIssue modifiedIssue = TestUtils.delayThenGet(
+                10, () -> createIssueWithMilestone(1, originalMilestone));
+
+        Model mockedModel = mock(Model.class);
+        when(mockedModel.replaceIssueMilestone(issue.getId(), newMilestone)).thenReturn(Optional.of(issue));
+        when(mockedModel.getIssueById(issue.getId())).thenReturn(Optional.of(modifiedIssue));
+        mockRepoIOReplaceIssueMilestoneResult(false);
+        mockMultiModelReplaceIssueMilestone(Optional.of(issue), Optional.of(mockedModel));
+
+        logic.replaceIssueMilestone(issue, newMilestone).get();
+
+        verify(mockedMultiModel, atMost(1))
+                .replaceIssueMilestone(anyString(), anyInt(), any(Optional.class));
+    }
+
+    /**
+     * Tests that replaceIssueLabels succeeds when both model and repoIO succeed
      */
     @Test
     public void replaceIssueLabels_successful() throws ExecutionException, InterruptedException {
@@ -64,10 +145,10 @@ public class LogicTests {
     }
 
     /**
-     * Tests that replaceIssueLabelsOnServer failed when models return empty result
+     * Tests that replaceIssueLabels fails when model's replaceIssueLabels returns an empty result
      */
     @Test
-    public void replaceIssueLabels_modelsEmpty() throws ExecutionException, InterruptedException {
+    public void replaceIssueLabels_modelsEmpty_unsuccessful() throws ExecutionException, InterruptedException {
         TurboIssue issue = createIssueWithLabels(1, Arrays.asList("label1", "label2"));
         mockRepoIOReplaceIssueLabelsResult(true);
         mockMultiModelReplaceIssueLabels(Optional.empty(), Optional.empty());
@@ -76,10 +157,10 @@ public class LogicTests {
     }
 
     /**
-     * Tests that replaceIssueLabelsOnServer failed when repoIO failed to update labels
+     * Tests that replaceIssueLabels fails when repoIO fails to update labels
      */
     @Test
-    public void replaceIssueLabels_repoIOUnsuccessful() throws ExecutionException, InterruptedException {
+    public void replaceIssueLabels_repoIOFails_unsuccessful() throws ExecutionException, InterruptedException {
         TurboIssue issue = createIssueWithLabels(1, Arrays.asList("label1", "label2"));
         mockRepoIOReplaceIssueLabelsResult(false);
         mockMultiModelReplaceIssueLabels(Optional.of(issue), Optional.empty());
@@ -92,7 +173,7 @@ public class LogicTests {
      * new labels then revert back to original labels when repoIO failed to update labels
      */
     @Test
-    public void replaceIssueLabels_repoIOUnsuccessful_revert() throws ExecutionException, InterruptedException {
+    public void replaceIssueLabels_repoIOFails_revert() throws ExecutionException, InterruptedException {
         List<String> originalLabels = Arrays.asList("label1", "label2");
         List<String> newLabels = Arrays.asList("label3", "label4");
 
@@ -137,6 +218,11 @@ public class LogicTests {
                 .thenReturn(CompletableFuture.completedFuture(replaceResult));
     }
 
+    private void mockRepoIOReplaceIssueMilestoneResult(boolean replaceResult) {
+        when(mockedRepoIO.replaceIssueMilestone(any(TurboIssue.class), any(Optional.class)))
+                .thenReturn(CompletableFuture.completedFuture(replaceResult));
+    }
+
     private void mockMultiModelReplaceIssueLabels(Optional<TurboIssue> replaceResult,
                                                   Optional<Model> modelLookUpResult) {
         when(mockedMultiModel.replaceIssueLabels(anyString(), anyInt(), anyListOf(String.class)))
@@ -144,9 +230,24 @@ public class LogicTests {
         when(mockedMultiModel.getModelById(anyString())).thenReturn(modelLookUpResult);
     }
 
+    private void mockMultiModelReplaceIssueMilestone(Optional<TurboIssue> replaceResult,
+                                                  Optional<Model> modelLookUpResult) {
+        when(mockedMultiModel.replaceIssueMilestone(anyString(), anyInt(), any(Optional.class)))
+                .thenReturn(replaceResult);
+        when(mockedMultiModel.getModelById(anyString())).thenReturn(modelLookUpResult);
+    }
+
     public static TurboIssue createIssueWithLabels(int issueId, List<String> labels) {
         TurboIssue issue = new TurboIssue("testowner/testrepo", issueId, "Issue title");
         issue.setLabels(labels);
+        return issue;
+    }
+
+    public static TurboIssue createIssueWithMilestone(int issueId, Optional<Integer> milestone) {
+        TurboIssue issue = new TurboIssue("testowner/testrepo", issueId, "Issue title");
+        if (milestone.isPresent()) {
+            issue.setMilestoneById(milestone.get());
+        }
         return issue;
     }
 }

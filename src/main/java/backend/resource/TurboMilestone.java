@@ -170,7 +170,7 @@ public class TurboMilestone {
         return description;
     }
     public void setDescription(String description) {
-        this.description = description;
+        this.description = description == null ? "" : description;
     }
     public boolean isOpen() {
         return isOpen;

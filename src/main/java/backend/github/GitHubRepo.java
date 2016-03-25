@@ -13,6 +13,8 @@ import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.*;
 import org.eclipse.egit.github.core.client.*;
+import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.Milestone;
 import org.eclipse.egit.github.core.service.CollaboratorService;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.eclipse.egit.github.core.service.MilestoneService;
@@ -257,6 +259,26 @@ public class GitHubRepo implements Repo {
                         .map(labelName -> new Label().setName(labelName))
                         .collect(Collectors.toList())
         );
+    }
+
+    @Override
+    public Optional<Integer> setMilestone(String repoId, int issueId, String issueTitle,
+                                          Optional<Integer> issueMilestone) throws IOException {
+        // github api requires at least id and title
+        Issue createdIssue = new Issue();
+        createdIssue.setNumber(issueId);
+        createdIssue.setTitle(issueTitle);
+
+        Milestone gitHubMilestone = new Milestone();
+        // set milestone number to the desired milestone id
+        // simply don't set a number to demilestone
+        issueMilestone.ifPresent(gitHubMilestone::setNumber);
+        createdIssue.setMilestone(gitHubMilestone);
+
+        Issue returnedIssue = issueService.editIssue(RepositoryId.createFromId(repoId), createdIssue);
+
+        return Optional.ofNullable(returnedIssue.getMilestone())
+                .map(Milestone::getNumber);
     }
 
     @Override

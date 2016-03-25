@@ -12,6 +12,7 @@ import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 public class ModelTests {
 
@@ -274,7 +275,7 @@ public class ModelTests {
     }
 
     /**
-     * Tests that replaceIssueLabelsOnServer returns Optional.empty() if the model for the
+     * Tests that replaceIssueLabels returns Optional.empty() if the model for the
      * issue given in the argument can't be found
      */
     @Test
@@ -284,7 +285,38 @@ public class ModelTests {
     }
 
     /**
-     * Tests that replaceIssueLabelsOnServer finds issue with the right id and successfully modify the issue's labels
+     * Tests that replaceIssueMilestone returns Optional.empty() if the model for the
+     * issue given in the argument can't be found
+     */
+    @Test
+    public void replaceIssueMilestone_issueNotFound() {
+        Model model = new Model("testrepo");
+        assertEquals(Optional.empty(), model.replaceIssueMilestone(1, Optional.of(1)));
+    }
+
+    /**
+     * Tests that replaceIssueMilestone finds issue with the right id and successfully modify the issue's milestone
+     */
+    @Test
+    public void replaceIssueMilestone_successful() {
+        Optional<Integer> milestoneIdReplacement = Optional.of(1);
+        String repoId = "testowner/testrepo";
+
+        TurboIssue issue1 = LogicTests.createIssueWithMilestone(1, Optional.of(0));
+        TurboIssue issue2 = LogicTests.createIssueWithMilestone(2, Optional.of(1));
+        TurboIssue issue3 = LogicTests.createIssueWithMilestone(3, Optional.of(1));
+        List<TurboIssue> issues = Arrays.asList(issue3, issue2, issue1);
+
+        Model model = new Model(repoId, issues, new ArrayList<TurboLabel>(),
+                new ArrayList<TurboMilestone>(), new ArrayList<TurboUser>());
+        Optional<TurboIssue> result = model.replaceIssueMilestone(issue1.getId(), milestoneIdReplacement);
+        assertEquals(1, result.get().getId());
+        assertTrue(result.get().getMilestone().isPresent());
+        assertEquals(milestoneIdReplacement, result.get().getMilestone());
+    }
+
+    /**
+     * Tests that replaceIssueLabels finds issue with the right id and successfully modify the issue's labels
      */
     @Test
     public void replaceIssueLabels_successful() {

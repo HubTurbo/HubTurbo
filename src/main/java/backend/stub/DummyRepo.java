@@ -10,17 +10,12 @@ import github.ReviewComment;
 import github.TurboIssueEvent;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
-import org.eclipse.egit.github.core.Comment;
-import org.eclipse.egit.github.core.Label;
-import org.eclipse.egit.github.core.PullRequest;
+import org.eclipse.egit.github.core.*;
 import ui.UI;
 import util.events.testevents.ClearLogicModelEvent;
 import util.events.testevents.UpdateDummyRepoEventHandler;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class DummyRepo implements Repo {
 
@@ -180,6 +175,14 @@ public class DummyRepo implements Repo {
     @Override
     public List<Label> setLabels(String repoId, int issueId, List<String> labels) {
         return getRepoState(repoId).setLabels(issueId, labels);
+    }
+
+    @Override
+    public Optional<Integer> setMilestone(String repoId, int issueId, String issueTitle,
+                                          Optional<Integer> issueMilestone) {
+        Issue returnedIssue = getRepoState(repoId).setMilestone(issueId, issueMilestone);
+        return Optional.ofNullable(returnedIssue.getMilestone())
+                .map(Milestone::getNumber);
     }
 
     @Override
