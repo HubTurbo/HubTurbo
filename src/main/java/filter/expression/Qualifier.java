@@ -353,7 +353,7 @@ public class Qualifier implements FilterExpression {
         case LABEL:
             return labelsSatisfy(model, issue);
         case AUTHOR:
-            return authorSatisfies(model, issue);
+            return authorSatisfies(issue);
         case ASSIGNEE:
             return assigneeSatisfies(model, issue);
         case INVOLVES:
@@ -427,6 +427,28 @@ public class Qualifier implements FilterExpression {
             assert false : "Missing case for " + type;
             break;
         }
+    }
+
+    @Override
+    public List<String> getWarnings(IModel model, TurboIssue issue) {
+        // implement only for author, assignee, and involves for now
+        // TODO: implement for other types as well?
+        switch (type) {
+            case AUTHOR:
+            case ASSIGNEE:
+            case INVOLVES:
+                return getWarningsForTypeAuthorOrAssignee(model, issue);
+            default:
+                return new ArrayList<>();
+        }
+    }
+
+    private List<String> getWarningsForTypeAuthorOrAssignee(IModel model, TurboIssue issue) {
+        List<String> result = new ArrayList<>();
+        if (content.isPresent() && model.isUserInRepo(issue.getRepoId(), content.get())) {
+            result.add(String.format(USER_WARNING_ERROR_FORMAT, content.get(), issue.getRepoId()));
+        }
+        return result;
     }
 
     @Override
@@ -843,8 +865,6 @@ public class Qualifier implements FilterExpression {
 
         if (!assignee.isPresent()) return false;
 
-        enforceUserInRepoCondition(model, issue.getRepoId(), content.get());
-
         String content = this.content.get().toLowerCase();
         String login = assignee.get().getLoginName() == null ? "" : assignee.get().getLoginName().toLowerCase();
         String name = assignee.get().getRealName() == null ? "" : assignee.get().getRealName().toLowerCase();
@@ -852,24 +872,15 @@ public class Qualifier implements FilterExpression {
         return login.contains(content) || name.contains(content);
     }
 
-    private boolean authorSatisfies(IModel model, TurboIssue issue) {
+    private boolean authorSatisfies(TurboIssue issue) {
         if (!content.isPresent()) return false;
-
-        enforceUserInRepoCondition(model, issue.getRepoId(), content.get());
 
         String creator = issue.getCreator();
         return creator.toLowerCase().contains(content.get().toLowerCase());
     }
 
-    private void enforceUserInRepoCondition(IModel model, String repoId, String userName) {
-        boolean shouldWarnUser = !model.isUserInRepo(repoId, userName);
-        if (shouldWarnUser) {
-            throw new SemanticException(String.format(USER_WARNING_ERROR_FORMAT, userName, repoId));
-        }
-    }
-
     private boolean involvesSatisfies(IModel model, TurboIssue issue) {
-        return authorSatisfies(model, issue) || assigneeSatisfies(model, issue);
+        return authorSatisfies(issue) || assigneeSatisfies(model, issue);
     }
 
     public static boolean labelMatches(String input, String candidate) {

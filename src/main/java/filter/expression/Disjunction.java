@@ -63,6 +63,15 @@ public class Disjunction implements FilterExpression {
     }
 
     @Override
+    public List<String> getWarnings(IModel model, TurboIssue issue) {
+        List<String> leftWarnings = left.getWarnings(model, issue);
+        List<String> rightWarnings = right.getWarnings(model, issue);
+        List<String> result = leftWarnings;
+        result.addAll(rightWarnings);
+        return result;
+    }
+
+    @Override
     public List<QualifierType> getQualifierTypes() {
         ArrayList<QualifierType> list = new ArrayList<>();
         list.addAll(left.getQualifierTypes());
