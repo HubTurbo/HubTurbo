@@ -7,6 +7,9 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.text.Font;
 
+import java.util.List;
+import java.util.Optional;
+
 /**
  * This class handles the statuses and appearance of the milestones in MilestonePickerDialog
  */
@@ -97,6 +100,47 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
         milestone.getStyleClass().add("labels-removed"); // add strikethrough
     }
 
+    public static Optional<PickerMilestone> getExistingMilestone(List<PickerMilestone> milestoneList) {
+        return milestoneList.stream()
+                .filter(PickerMilestone::isExisting)
+                .findAny();
+    }
+
+    public static Optional<PickerMilestone> getSelectedMilestone(List<PickerMilestone> milestoneList) {
+        return milestoneList.stream()
+                .filter(PickerMilestone::isSelected)
+                .findAny();
+    }
+
+    /**
+     * Gets the default milestone
+     * If there is an existing milestone, default milestone is the existing milestone
+     * Else it is the first open milestone that is not overdue
+     * Precondition: sortedMilestoneList needs to be sorted in its natural order
+     *
+     * @param sortedMilestoneList
+     * @return
+     */
+    public static Optional<PickerMilestone> getDefaultMilestone(List<PickerMilestone> sortedMilestoneList) {
+        return PickerMilestone.getExistingMilestone(sortedMilestoneList)
+                .map(Optional::of)
+                .orElse(PickerMilestone.getNextOpenMilestone(sortedMilestoneList));
+
+    }
+
+    /**
+     * Gets the the first PickerMilestone that is open and not overdue
+     * Precondition: sortedMilestoneList needs to be sorted in its natural order
+     *
+     * @param sortedMilestoneList
+     * @return Optional of first PickerMilestone that is open and not overdue
+     */
+    private static Optional<PickerMilestone> getNextOpenMilestone(List<PickerMilestone> sortedMilestoneList) {
+        return sortedMilestoneList.stream()
+                .filter(milestone -> !milestone.isOverdue() && milestone.isOpen())
+                .findFirst();
+    }
+
     public void setSelected(boolean isSelected) {
         this.isSelected = isSelected;
     }
@@ -132,15 +176,17 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
             return this.isOpen() ? -1 : 1;
         }
 
-        if (this.getDueDate().equals(milestone.getDueDate())) return 0;
+        // milestones ordered according to their titles if due dates are the same
+        if (this.getDueDate().equals(milestone.getDueDate())) {
+            return this.getTitle().compareTo(milestone.getTitle());
+        }
 
         // milestones with due dates are smaller
         if (!this.getDueDate().isPresent()) return 1;
         if (!milestone.getDueDate().isPresent()) return -1;
 
         // milestones with earlier due dates are smaller
-        return this.getDueDate().get()
-                .isBefore(milestone.getDueDate().get()) ? -1 : 1;
+        return this.getDueDate().get().isBefore(milestone.getDueDate().get()) ? -1 : 1;
     }
 
     @Override
