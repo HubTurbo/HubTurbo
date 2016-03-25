@@ -15,6 +15,7 @@ import ui.issuepanel.FilterPanel;
 import util.Futures;
 import util.HTLog;
 import util.events.FilterExceptionEvent;
+import util.events.FilterWarningEvent;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -149,6 +150,16 @@ public class UpdateController {
                         .collect(Collectors.toList());
 
                 List<GuiElement> processedElements = produceGuiElements(models, processedIssues);
+
+                List<String> warnings = allModelIssues.stream()
+                        .map(issue -> filterExprNoAlias.getWarnings(models, issue))
+                        .flatMap(List::stream)
+                        .distinct()
+                        .collect(Collectors.toList());
+
+                if (!warnings.isEmpty()) {
+                    Platform.runLater(() -> UI.events.triggerEvent(new FilterWarningEvent(filterExpr, warnings)));
+                }
 
                 processed.put(filterExpr, processedElements);
             } catch (FilterException e) {

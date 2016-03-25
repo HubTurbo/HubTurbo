@@ -445,7 +445,7 @@ public class Qualifier implements FilterExpression {
 
     private List<String> getWarningsForTypeAuthorOrAssignee(IModel model, TurboIssue issue) {
         List<String> result = new ArrayList<>();
-        if (content.isPresent() && model.isUserInRepo(issue.getRepoId(), content.get())) {
+        if (content.isPresent() && !model.isUserInRepo(issue.getRepoId(), content.get())) {
             result.add(String.format(USER_WARNING_ERROR_FORMAT, content.get(), issue.getRepoId()));
         }
         return result;
