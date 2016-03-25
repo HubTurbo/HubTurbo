@@ -35,7 +35,7 @@ public class UndoController {
         if (undoBuffer.isPresent()) {
             TurboIssue issue = undoBuffer.get().getKey();
             Action<TurboIssue> action = undoBuffer.get().getValue();
-            action.undo(issue).thenApply(success -> showErrorDialogOnFailure(success, issue, action));
+            action.undo(issue).thenApply(success -> handleActionResult(issue, action, success, true));
             undoBuffer = Optional.empty();
         }
     }
@@ -48,26 +48,38 @@ public class UndoController {
      */
     public void addAction(TurboIssue issue, Action<TurboIssue> action) {
         undoBuffer = Optional.of(new Pair<>(issue, action));
-        action.act(issue).thenApply(success -> showErrorDialogOnFailure(success, issue, action));
+        action.act(issue).thenApply(success -> handleActionResult(issue, action, success, false));
+    }
+
+    private boolean handleActionResult(TurboIssue issue, Action<TurboIssue> action, Boolean success,
+                                           boolean isUndo) {
+        if (!success) {
+            showErrorDialog(issue, action);
+            return success;
+        }
+        if (!isUndo) {
+            showNotification(issue.getId(), issue.getTitle(), action.getDescription());
+            return success;
+        }
+        return success;
+    }
+
+    private void showNotification(int issueId, String issueTitle, String actionDescription) {
         Notification notification = new Notification(createInfoOcticon(),
-                action.getDescription() + " for #" + issue.getId() + ": " + issue.getTitle(),
+                actionDescription + " for #" + issueId + ": " + issueTitle,
                 "Undo", this::undoCallback);
         notificationController.showNotification(notification);
     }
 
-    private boolean showErrorDialogOnFailure(Boolean success, TurboIssue issue, Action action) {
-        if (!success) {
-            // if not successful, show error dialog
-            Platform.runLater(() -> DialogMessage.showErrorDialog(
-                    "GitHub Write Error",
-                    String.format(
-                            "An error occurred while attempting to %s on:\n\n%s\n\n"
-                                    + "Please check if you have write permissions to %s.",
-                            action.getDescription(), issue, issue.getRepoId()
-                    )
-            ));
-        }
-        return success;
+    private void showErrorDialog(TurboIssue issue, Action action) {
+        Platform.runLater(() -> DialogMessage.showErrorDialog(
+                "GitHub Write Error",
+                String.format(
+                        "An error occurred while attempting to %s on:\n\n%s\n\n"
+                                + "Please check if you have write permissions to %s.",
+                        action.getDescription(), issue, issue.getRepoId()
+                )
+        ));
     }
 
     private Label createInfoOcticon() {
