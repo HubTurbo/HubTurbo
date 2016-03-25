@@ -431,8 +431,6 @@ public class Qualifier implements FilterExpression {
 
     @Override
     public List<String> getWarnings(IModel model, TurboIssue issue) {
-        // implement only for author, assignee, and involves for now
-        // TODO: implement for other types as well?
         switch (type) {
             case AUTHOR:
             case ASSIGNEE:

@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.Rule;
@@ -833,9 +834,25 @@ public class FilterEvalTests {
                                                             new ArrayList<>(),
                                                             new ArrayList<>(),
                                                             new ArrayList<>(Arrays.asList(user))));
-        verifySemanticException(model, "involves:bob", String.format(USER_WARNING_ERROR_FORMAT, "bob", REPO));
-        verifySemanticException(model, "involves:foxx", String.format(USER_WARNING_ERROR_FORMAT, "bob", REPO));
-        verifySemanticException(model, "author:alice", String.format(USER_WARNING_ERROR_FORMAT, "alice", REPO));
+        verifyUserWarning(model, "involves:bOb", Arrays.asList(String.format(
+                                                                            USER_WARNING_ERROR_FORMAT, "bOb", REPO)));
+        verifyUserWarning(model, "involves:foxX", Arrays.asList(String.format(
+                                                                            USER_WARNING_ERROR_FORMAT, "foxX", REPO)));
+        verifyUserWarning(model, "author:alice", Arrays.asList(String.format(
+                                                                            USER_WARNING_ERROR_FORMAT, "alice", REPO)));
+    }
+
+    @Test
+    public void processQualifier_useValidUsername_noUsernameWarning() {
+        TurboUser user = new TurboUser(REPO, "fox", "charlie");
+        IModel model = TestUtils.singletonModel(new Model(REPO,
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>(),
+                new ArrayList<>(Arrays.asList(user))));
+        verifyUserWarning(model, "involves:fOX", new ArrayList<>());
+        verifyUserWarning(model, "assignee:FOX", new ArrayList<>());
+        verifyUserWarning(model, "assignee:CHAR", new ArrayList<>());
     }
 
     @Test
@@ -880,5 +897,12 @@ public class FilterEvalTests {
     private void verifyQualifierContentError(QualifierType type, String invalidInput) {
         verifySemanticException(empty, invalidInput, String.format(SemanticException.ERROR_MESSAGE,
                                                                     type, type.getDescriptionOfValidInputs()));
+    }
+
+    private void verifyUserWarning(IModel model, String input, List<String> expectedWarnings) {
+        TurboIssue issue = new TurboIssue(REPO, 1, "title");
+        FilterExpression filterExpr = Parser.parse(input);
+        List<String> warnings = filterExpr.getWarnings(model, issue);
+        assertEquals(expectedWarnings, warnings);
     }
 }
