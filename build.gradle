@@ -19,7 +19,7 @@ allprojects {
 
     apply plugin: 'checkstyle'
     checkstyle {
-        toolVersion = "6.16.1"
+        toolVersion = "6.17"
     }
 
     apply plugin: 'findbugs'
