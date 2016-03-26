@@ -1,7 +1,5 @@
 package ui.components.pickers;
 
-import util.Utility;
-
 import java.util.*;
 import java.util.stream.IntStream;
 
