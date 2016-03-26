@@ -18,9 +18,27 @@ public class IssuePickerStateTest {
     public void determineState_addMatchedLabels() {
         IssuePickerState state = setupState("dummy/dummy", Arrays.asList("test", "hello"), "test");
 
-        assertEquals(1, state.getSelectedIssues().size());
+        assertTrue(state.getSelectedIssue().isPresent());
     }
 
+    @Test
+    public void determineState_partialMatch_issueNotAdded() {
+        IssuePickerState state = setupState("dummy/dummy", Arrays.asList("test issue bug"), "bug feature");
+        assertFalse(state.getSelectedIssue().isPresent());
+    }
+
+    @Test
+    public void getSelectedIssue_emptyQuery_suggestionNotPresent() {
+        IssuePickerState state = setupState("dummy/dummy", Arrays.asList("test issue bug"), "");
+        assertFalse(state.getSelectedIssue().isPresent());
+    }
+
+    /**
+     * @param repoId
+     * @param issueTitles
+     * @param userInput
+     * @return issue picker state constructed from issue titles and user input
+     */
     private IssuePickerState setupState(String repoId, List<String> issueTitles, String userInput) {
         return new IssuePickerState(getTestIssues(repoId, issueTitles), userInput);
     }

@@ -1,6 +1,5 @@
 package ui.components.issuepicker;
 
-import java.util.List;
 import java.util.Optional;
 
 import backend.resource.MultiModel;
@@ -19,7 +18,7 @@ public class IssuePicker {
             Platform.runLater(() -> showIssuePicker(ui.logic.getModels())));
     }
 
-    private Optional<List<String>> showIssuePicker(MultiModel models) {
+    private Optional<String> showIssuePicker(MultiModel models) {
         IssuePickerDialog issuePickerDialog = new IssuePickerDialog(stage, models);
         return issuePickerDialog.showAndWait();
 

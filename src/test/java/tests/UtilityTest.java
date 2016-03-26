@@ -176,11 +176,11 @@ public class UtilityTest {
     
     @Test
     public void containsIgnoreCaseMultipleWords_partialMatchingQueries() {
-        assertFalse(Utility.containsIgnoreCaseMultipleWords("this is", Arrays.asList("is", "me")));
+        assertFalse(Utility.containsIgnoreCase("this is", Arrays.asList("is", "me")));
     }
 
     @Test
     public void containsIgnoreCaseMultipleWords_allMatchingQueries() {
-        assertTrue(Utility.containsIgnoreCaseMultipleWords("this is me", Arrays.asList("is", "me")));
+        assertTrue(Utility.containsIgnoreCase("this is me", Arrays.asList("is", "me")));
     }
 }
