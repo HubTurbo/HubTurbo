@@ -100,12 +100,24 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
         milestone.getStyleClass().add("labels-removed"); // add strikethrough
     }
 
+    /**
+     * Gets the existing milestone from the milestoneList
+     *
+     * @param milestoneList
+     * @return Optional of existing milestone
+     */
     public static Optional<PickerMilestone> getExistingMilestone(List<PickerMilestone> milestoneList) {
         return milestoneList.stream()
                 .filter(PickerMilestone::isExisting)
                 .findAny();
     }
 
+    /**
+     * Gets the selected milestone from the milestoneList
+     *
+     * @param milestoneList
+     * @return Optional of selected milestone
+     */
     public static Optional<PickerMilestone> getSelectedMilestone(List<PickerMilestone> milestoneList) {
         return milestoneList.stream()
                 .filter(PickerMilestone::isSelected)
@@ -113,13 +125,13 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
     }
 
     /**
-     * Gets the default milestone
+     * Gets the default milestone from the sortedMilestoneList
      * If there is an existing milestone, default milestone is the existing milestone
      * Else it is the first open milestone that is not overdue
      * Precondition: sortedMilestoneList needs to be sorted in its natural order
      *
      * @param sortedMilestoneList
-     * @return
+     * @return Optional of default milestone
      */
     public static Optional<PickerMilestone> getDefaultMilestone(List<PickerMilestone> sortedMilestoneList) {
         return PickerMilestone.getExistingMilestone(sortedMilestoneList)
@@ -129,7 +141,7 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
     }
 
     /**
-     * Gets the the first PickerMilestone that is open and not overdue
+     * Gets the the first PickerMilestone that is open and not overdue from the sortedMilestoneList
      * Precondition: sortedMilestoneList needs to be sorted in its natural order
      *
      * @param sortedMilestoneList

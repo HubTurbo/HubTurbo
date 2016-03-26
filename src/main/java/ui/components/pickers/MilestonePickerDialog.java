@@ -105,10 +105,7 @@ public class MilestonePickerDialog extends Dialog<MilestonePickerDialogResponse>
         setResultConverter((dialogButton) -> {
             List<PickerMilestone> finalList = state.getCurrentMilestonesList();
             Optional<PickerMilestone> selectedMilestone = PickerMilestone.getSelectedMilestone(finalList);
-            if (selectedMilestone.isPresent()) {
-                return new MilestonePickerDialogResponse(dialogButton, Optional.of(selectedMilestone.get().getId()));
-            }
-            return new MilestonePickerDialogResponse(dialogButton, Optional.empty());
+            return new MilestonePickerDialogResponse(dialogButton, selectedMilestone.map(PickerMilestone::getId));
         });
     }
 
