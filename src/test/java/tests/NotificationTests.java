@@ -17,10 +17,11 @@ public class NotificationTests {
     NotificationController notificationController;
     UndoController undoController;
     Action<TurboIssue> action;
-    
+
     @Before
     public void initComponents() {
-        // required so notification construction won't fail
+        // UndoController's showNotification constructs a Notification object, which fails
+        // if JavaFX Runtime is not started. Instantiating a JFXPanel resolves this.
         new JFXPanel();
 
         action = mock(Action.class);

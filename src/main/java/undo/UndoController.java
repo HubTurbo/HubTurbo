@@ -51,8 +51,17 @@ public class UndoController {
         action.act(issue).thenApply(success -> handleActionResult(issue, action, success, false));
     }
 
+    /**
+     * Possibly shows a notification or an error dialog depending on {@code success} and {@code isUndo}.
+     *
+     * @param issue the TurboIssue acted on
+     * @param action the Action that acted on the issue
+     * @param success whether the action was successful
+     * @param isUndo whether action is an undo
+     * @return {@code success}
+     */
     private boolean handleActionResult(TurboIssue issue, Action<TurboIssue> action, Boolean success,
-                                           boolean isUndo) {
+                                       boolean isUndo) {
         if (!success) {
             showErrorDialog(issue, action);
             return success;
@@ -64,6 +73,13 @@ public class UndoController {
         return success;
     }
 
+    /**
+     * Shows a notification with a summary of the completed action.
+     * The notification contains a runnable which reverts the last action done.
+     * @param issueId
+     * @param issueTitle
+     * @param actionDescription
+     */
     private void showNotification(int issueId, String issueTitle, String actionDescription) {
         Notification notification = new Notification(createInfoOcticon(),
                 actionDescription + " for #" + issueId + ": " + issueTitle,
@@ -71,6 +87,11 @@ public class UndoController {
         notificationController.showNotification(notification);
     }
 
+    /**
+     * Shows an error dialog with a summary of the attempted action
+     * @param issue
+     * @param action
+     */
     private void showErrorDialog(TurboIssue issue, Action action) {
         Platform.runLater(() -> DialogMessage.showErrorDialog(
                 "GitHub Write Error",
