@@ -18,7 +18,7 @@ public class RangeTest extends UITest {
         click("#dummy/dummy_col0_filterTextField");
         press(KeyCode.ENTER).release(KeyCode.ENTER);
         sleep(EVENT_DELAY);
-        assertEquals(DummyRepoState.noOfDummyIssues - 5, ((ListPanel) find("#dummy/dummy_col0")).getIssuesCount());
+        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES - 5, ((ListPanel) find("#dummy/dummy_col0")).getIssuesCount());
     }
 
     @Test

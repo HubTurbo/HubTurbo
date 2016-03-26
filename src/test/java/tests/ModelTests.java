@@ -149,7 +149,7 @@ public class ModelTests {
         // Resources
         // Issues
         ArrayList<Integer> issueIds = new ArrayList<>();
-        for (int i = 1; i <= DummyRepoState.noOfDummyIssues; i++) {
+        for (int i = 1; i <= DummyRepoState.NO_OF_DUMMY_ISSUES; i++) {
             issueIds.add(i);
         }
         Collections.sort(issueIds); // 1, 2..10
@@ -162,7 +162,7 @@ public class ModelTests {
 
         // Labels
         ArrayList<String> labelNames = new ArrayList<>();
-        for (int i = 1; i <= DummyRepoState.noOfDummyIssues; i++) {
+        for (int i = 1; i <= DummyRepoState.NO_OF_DUMMY_ISSUES; i++) {
             labelNames.add("Label " + i);
         }
         Collections.sort(labelNames); // Label 1, Label 10..12, Label 2..9
@@ -178,7 +178,7 @@ public class ModelTests {
 
         // Milestones
         ArrayList<Integer> milestoneIds = new ArrayList<>();
-        for (int i = 1; i <= DummyRepoState.noOfDummyIssues; i++) {
+        for (int i = 1; i <= DummyRepoState.NO_OF_DUMMY_ISSUES; i++) {
             milestoneIds.add(i);
         }
         Collections.sort(milestoneIds); // 1, 2..10
@@ -194,7 +194,7 @@ public class ModelTests {
 
         // Users
         ArrayList<String> userLogins = new ArrayList<>();
-        for (int i = 1; i <= DummyRepoState.noOfDummyIssues; i++) {
+        for (int i = 1; i <= DummyRepoState.NO_OF_DUMMY_ISSUES; i++) {
             userLogins.add("User " + i);
         }
         Collections.sort(userLogins); // User 1, User 10, User 2..9
@@ -219,7 +219,7 @@ public class ModelTests {
             modelUpdated.getIssueById(-1);
         } catch (AssertionError ignored) {}
 
-        assertEquals(Optional.<TurboIssue>empty(), modelUpdated.getIssueById(DummyRepoState.noOfDummyIssues + 1));
+        assertEquals(Optional.<TurboIssue>empty(), modelUpdated.getIssueById(DummyRepoState.NO_OF_DUMMY_ISSUES + 1));
         assertEquals("Issue 10", modelUpdated.getIssueById(10).get().getTitle());
 
         // Labels
@@ -232,7 +232,7 @@ public class ModelTests {
         } catch (AssertionError ignored) {}
 
         assertEquals(Optional.<TurboLabel>empty(),
-                modelUpdated.getLabelByActualName("Label " + (DummyRepoState.noOfDummyIssues + 1)));
+                modelUpdated.getLabelByActualName("Label " + (DummyRepoState.NO_OF_DUMMY_ISSUES + 1)));
         assertEquals("Label 10", modelUpdated.getLabelByActualName("Label 10").get().getFullName());
 
         // Milestones
@@ -253,11 +253,11 @@ public class ModelTests {
         } catch (AssertionError ignored) {}
 
         assertEquals(Optional.<TurboMilestone>empty(),
-                modelUpdated.getMilestoneById(DummyRepoState.noOfDummyIssues + 1));
+                modelUpdated.getMilestoneById(DummyRepoState.NO_OF_DUMMY_ISSUES + 1));
         assertEquals("Milestone 10", modelUpdated.getMilestoneById(10).get().getTitle());
 
         assertEquals(Optional.<TurboMilestone>empty(),
-                modelUpdated.getMilestoneByTitle("Milestone " + (DummyRepoState.noOfDummyIssues + 1)));
+                modelUpdated.getMilestoneByTitle("Milestone " + (DummyRepoState.NO_OF_DUMMY_ISSUES + 1)));
         assertEquals("Milestone 10", modelUpdated.getMilestoneByTitle("Milestone 10").get().getTitle());
 
         // Users
@@ -270,7 +270,7 @@ public class ModelTests {
         } catch (AssertionError ignored) {}
 
         assertEquals(Optional.<TurboUser>empty(),
-                modelUpdated.getUserByLogin("User " + (DummyRepoState.noOfDummyIssues + 1)));
+                modelUpdated.getUserByLogin("User " + (DummyRepoState.NO_OF_DUMMY_ISSUES + 1)));
         assertEquals("User 10", modelUpdated.getUserByLogin("User 10").get().getLoginName());
     }
 

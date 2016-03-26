@@ -32,7 +32,7 @@ public class ModelUpdateUITest extends UITest {
         addIssue();
         FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssuesCount);
         PlatformEx.runAndWait(countIssues);
-        assertEquals(DummyRepoState.noOfDummyIssues + 1, countIssues.get().intValue());
+        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES + 1, countIssues.get().intValue());
     }
 
     @Test
@@ -44,7 +44,7 @@ public class ModelUpdateUITest extends UITest {
         addIssue();
         FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssuesCount);
         PlatformEx.runAndWait(countIssues);
-        assertEquals(DummyRepoState.noOfDummyIssues + 3, countIssues.get().intValue());
+        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES + 3, countIssues.get().intValue());
     }
 
     @Test
@@ -54,7 +54,7 @@ public class ModelUpdateUITest extends UITest {
         resetRepo();
         FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssuesCount);
         PlatformEx.runAndWait(countIssues);
-        assertEquals(DummyRepoState.noOfDummyIssues, countIssues.get().intValue());
+        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES, countIssues.get().intValue());
     }
 
     @Test
@@ -66,7 +66,7 @@ public class ModelUpdateUITest extends UITest {
         deleteIssue(1);
         FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssuesCount);
         PlatformEx.runAndWait(countIssues);
-        assertEquals(DummyRepoState.noOfDummyIssues + 1, countIssues.get().intValue());
+        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES + 1, countIssues.get().intValue());
     }
 
     @Test
@@ -80,7 +80,7 @@ public class ModelUpdateUITest extends UITest {
         deleteIssue(2);
         FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssuesCount);
         PlatformEx.runAndWait(countIssues);
-        assertEquals(DummyRepoState.noOfDummyIssues + 1, countIssues.get().intValue());
+        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES + 1, countIssues.get().intValue());
     }
 
     // TODO no way to check correctness of these events as of yet as they are not reflected on the UI
