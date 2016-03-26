@@ -24,9 +24,9 @@ public class CollaboratorServiceEx extends CollaboratorService {
 
     /**
      * Gets the list of collaborators using CollaboratorService
-     * Then iterate through the list to get each collaborator using USerService
+     * Then iterate through the list to get each collaborator using UserService
      * This is done because the GitHub response for GET /repos/:owner/:repo/collaborators
-     * does not return a User with all the attributes of the user
+     * returns users with some of their attributes missing
      *
      * @param repository
      * @return list of collaborators
@@ -35,7 +35,7 @@ public class CollaboratorServiceEx extends CollaboratorService {
     @Override
     public List<User> getCollaborators(IRepositoryIdProvider repository) throws IOException {
         return super.getCollaborators(repository).stream()
-                .map( user -> {
+                .map(user -> {
                    try {
                        return userService.getUser(user.getLogin());
                    } catch (IOException e) {
