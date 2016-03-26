@@ -18,8 +18,9 @@ public class PickerRepository implements Comparable<PickerRepository> {
 
     private static final int REPO_LABEL_PREFERRED_WIDTH = 340;
     private static final Insets DEFAULT_REPO_LABEL_PADDING = new Insets(1);
-    private static final String SELECTED_REPO_LABEL_STYLE = "-fx-background-color: lightgreen; -fx-border-color:black;";
-    private static final String DEFAULT_REPO_LABEL_STYLE = "-fx-background-color: lightblue;";
+
+    public static final String SELECTED_REPO_LABEL_STYLE = "-fx-background-color: lightgreen; -fx-border-color:black;";
+    public static final String DEFAULT_REPO_LABEL_STYLE = "-fx-background-color: lightblue;";
 
     public PickerRepository(String repositoryId) {
         this.repositoryId = repositoryId;
