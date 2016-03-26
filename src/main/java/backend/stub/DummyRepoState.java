@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 public class DummyRepoState {
 
-    public static final int noOfDummyIssues = 12;
+    public static final int NO_OF_DUMMY_ISSUES = 12;
     private final String dummyRepoId;
 
     private final TreeMap<Integer, TurboIssue> issues = new TreeMap<>();
@@ -48,7 +48,7 @@ public class DummyRepoState {
     }
 
     private void initializeRepoEntities() {
-        for (int i = 0; i < noOfDummyIssues; i++) {
+        for (int i = 0; i < NO_OF_DUMMY_ISSUES; i++) {
             TurboIssue dummyIssue;
             // Issue #7 is a PR
             switch (i) {
@@ -100,7 +100,7 @@ public class DummyRepoState {
         }
 
         // Odd issues are assigned label 1, even issues are assigned label 2
-        for (int i = 1; i <= noOfDummyIssues; i++) {
+        for (int i = 1; i <= NO_OF_DUMMY_ISSUES; i++) {
             issues.get(i).addLabel((i % 2 == 0) ? "Label 2" : "Label 1");
         }
 

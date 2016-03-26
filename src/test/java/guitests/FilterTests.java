@@ -26,7 +26,7 @@ public class FilterTests extends UITest{
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
 
-        assertEquals(DummyRepoState.noOfDummyIssues, issuePanel.getIssuesCount());
+        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES, issuePanel.getIssuesCount());
     }
 
     @Test
@@ -40,7 +40,7 @@ public class FilterTests extends UITest{
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
 
-        assertEquals(DummyRepoState.noOfDummyIssues, issuePanel.getIssuesCount());
+        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES, issuePanel.getIssuesCount());
     }
 
     @Test
@@ -54,7 +54,7 @@ public class FilterTests extends UITest{
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
 
-        assertEquals(DummyRepoState.noOfDummyIssues, issuePanel.getIssuesCount());
+        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES, issuePanel.getIssuesCount());
     }
 
     @Test
@@ -87,7 +87,7 @@ public class FilterTests extends UITest{
         push(KeyCode.BACK_SPACE);
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
-        assertEquals(DummyRepoState.noOfDummyIssues, issuePanel2.getIssuesCount());
+        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES, issuePanel2.getIssuesCount());
         assertEquals(1, issuePanel.getIssuesCount());
 
         pushKeys(new KeyCodeCombination(KeyCode.W, KeyCombination.SHORTCUT_DOWN));
@@ -167,7 +167,7 @@ public class FilterTests extends UITest{
         type("count:15");
         push(KeyCode.ENTER);
 
-        assertEquals(DummyRepoState.noOfDummyIssues, issuePanel.getIssuesCount());
+        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES, issuePanel.getIssuesCount());
 
         //multiple count qualifiers
         click("#dummy/dummy_col0_filterTextField");
@@ -175,7 +175,7 @@ public class FilterTests extends UITest{
         type("count:6 count:9");
         push(KeyCode.ENTER);
 
-        assertEquals(DummyRepoState.noOfDummyIssues, issuePanel.getIssuesCount());
+        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES, issuePanel.getIssuesCount());
 
         // Not-a-number
 
@@ -184,7 +184,7 @@ public class FilterTests extends UITest{
         type("count:abcd");
         push(KeyCode.ENTER);
 
-        assertEquals(DummyRepoState.noOfDummyIssues, issuePanel.getIssuesCount());
+        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES, issuePanel.getIssuesCount());
 
         // Test with sort qualifier as the second qualifier
 
@@ -213,7 +213,7 @@ public class FilterTests extends UITest{
         type("count:-1");
         push(KeyCode.ENTER);
 
-        assertEquals(DummyRepoState.noOfDummyIssues, issuePanel.getIssuesCount());
+        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES, issuePanel.getIssuesCount());
     }
 
     private void checkCurrWithResult(String milestoneAlias, String currString, ListPanel issuePanel,
