@@ -64,26 +64,24 @@ public class RepositoryPickerDialog extends Dialog<String> {
         matchingRepositoryListScrollPane.setFitToHeight(true);
         matchingRepositoryListScrollPane.setFitToWidth(true);
         mainLayout.getChildren().addAll(userInputTextField, matchingRepositoryListScrollPane);
-
-        initialiseDefaultValues();
     }
 
     private void registerEventHandlers() {
         userInputTextField.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.DOWN) {
-                state.selectNextMatchingRepository();
+                state.selectNextSuggestedRepository();
                 e.consume();
             } else if (e.getCode() == KeyCode.UP) {
-                state.selectPreviousMatchingRepository();
+                state.selectPreviousSuggestedRepository();
                 e.consume();
             }
-            updateMatchingRepositoryList();
+            updateSuggestedRepositoryList();
         });
     }
 
-    private void updateMatchingRepositoryList() {
+    private void updateSuggestedRepositoryList() {
         matchingRepositoryList.getChildren().clear();
-        List<PickerRepository> matchingRepositories = state.getMatchingRepositories();
+        List<PickerRepository> matchingRepositories = state.getSuggestedRepositories();
         matchingRepositories.stream()
                 .forEach(repo -> {
                     Node repoLabel = repo.getNode();
@@ -91,10 +89,6 @@ public class RepositoryPickerDialog extends Dialog<String> {
                     matchingRepositoryList.setMargin(repoLabel, DEFAULT_LABEL_MARGIN);
                     repoLabel.setOnMouseClicked(e -> handleMouseClick(repo.getRepositoryId()));
                 });
-    }
-
-    private void initialiseDefaultValues() {
-        updateUserQuery("");
     }
 
     private void createMatchingRepositoriesList() {
@@ -108,14 +102,14 @@ public class RepositoryPickerDialog extends Dialog<String> {
 
     private void handleMouseClick(String repositoryId) {
         userInputTextField.setDisable(true);
-        state.setSelectedRepositoryInMatchingList(repositoryId);
-        updateMatchingRepositoryList();
+        state.setSelectedRepositoryInSuggestedList(repositoryId);
+        updateSuggestedRepositoryList();
     }
 
     private void updateUserQuery(String query) {
         matchingRepositoryList.getChildren().clear();
         state.processUserQuery(query);
-        updateMatchingRepositoryList();
+        updateSuggestedRepositoryList();
     }
 
     private void createUserInputTextField() {
