@@ -623,9 +623,9 @@ public class Qualifier implements FilterExpression {
     }
 
     public static Comparator<TurboIssue> getSortComparator(IModel model,
-            String key,
-            boolean inverted,
-            boolean isSortableByNonSelfUpdates) {
+                                                           String key,
+                                                           boolean inverted,
+                                                           boolean isSortableByNonSelfUpdates) {
         Comparator<TurboIssue> comparator = (a, b) -> 0;
 
         boolean isLabelGroup = false;

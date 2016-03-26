@@ -39,7 +39,7 @@ public class PageHeaderIterator implements Iterable<String>, Iterator<String> {
     private HttpURLConnection lastConnection;
 
     public PageHeaderIterator(GitHubRequest request, GitHubClientEx client,
-            String headerField) {
+                              String headerField) {
         this.request = request;
         this.client = client;
         this.headerField = headerField;

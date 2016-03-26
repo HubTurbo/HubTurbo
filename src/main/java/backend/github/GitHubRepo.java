@@ -59,7 +59,7 @@ public class GitHubRepo implements Repo {
 
     @Override
     public ImmutableTriple<List<TurboIssue>, String, Date> getUpdatedIssues(String repoId,
-            String eTag, Date lastCheckTime) {
+                                                                            String eTag, Date lastCheckTime) {
 
         IssueUpdateService issueUpdateService = new IssueUpdateService(client, eTag, lastCheckTime);
         List<Issue> updatedItems = issueUpdateService.getUpdatedItems(RepositoryId.createFromId(repoId));
@@ -198,8 +198,8 @@ public class GitHubRepo implements Repo {
 
     @Override
     public ImmutablePair<List<TurboIssueEvent>, String> getUpdatedEvents(String repoId,
-            int issueId,
-            String currentETag) {
+                                                                         int issueId,
+                                                                         String currentETag) {
         try {
             GitHubEventsResponse eventsResponse = issueService.getIssueEvents(
                     RepositoryId.createFromId(repoId), issueId, currentETag);

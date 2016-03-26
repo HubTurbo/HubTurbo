@@ -23,7 +23,7 @@ public class LabelServiceEx extends LabelService {
     }
 
     public void deleteLabelFromIssue(IRepositoryIdProvider repository, String issueId,
-            Label label) throws IOException {
+                                     Label label) throws IOException {
 
 //        Github api format: DELETE /repos/:owner/:repo/issues/:number/labels/:name
         String repoId = getId(repository);
@@ -36,7 +36,7 @@ public class LabelServiceEx extends LabelService {
     }
 
     public List<Label> addLabelsToIssue(IRepositoryIdProvider repository,
-            String issueId, List<Label> labels) throws IOException {
+                                        String issueId, List<Label> labels) throws IOException {
         String repoId = getId(repository);
         return addLabelsToIssue(repoId, issueId, labels);
     }

@@ -114,8 +114,8 @@ public class UpdateService<T> extends GitHubService {
     }
 
     private ArrayList<T> downloadUpdatedItems(IRepositoryIdProvider repoId,
-            String resourceDesc,
-            Optional<String> updatedETags) throws IOException {
+                                              String resourceDesc,
+                                              Optional<String> updatedETags) throws IOException {
         ArrayList<T> result = new ArrayList<>();
 
         if (!updatedETags.isPresent() || updatedETags.get().equals(lastETags)) {

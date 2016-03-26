@@ -103,9 +103,9 @@ public class MultiModel implements IModel {
      */
     public synchronized Optional<TurboIssue> replaceIssueLabels(String repoId, int issueId, List<String> labels) {
         Optional<Model> modelLookUpResult = getModelById(repoId);
-        return Utility.safeFlatMapOptional(modelLookUpResult,
-            (model) -> model.replaceIssueLabels(issueId, labels),
-            () -> logger.error("Model " + repoId + " not found in models"));
+        return Utility.safeFlatMapOptional(modelLookUpResult, (model) -> {
+            return model.replaceIssueLabels(issueId, labels);
+        }, () -> logger.error("Model " + repoId + " not found in models"));
     }
 
     /**
@@ -118,9 +118,9 @@ public class MultiModel implements IModel {
     public synchronized Optional<TurboIssue> replaceIssueMilestone(String repoId, int issueId,
                                                                    Optional<Integer> milestone) {
         Optional<Model> modelLookUpResult = getModelById(repoId);
-        return Utility.safeFlatMapOptional(modelLookUpResult,
-                (model) -> model.replaceIssueMilestone(issueId, milestone),
-                () -> logger.error("Model " + repoId + " not found in models"));
+        return Utility.safeFlatMapOptional(modelLookUpResult, (model) -> {
+            return model.replaceIssueMilestone(issueId, milestone);
+        }, () -> logger.error("Model " + repoId + " not found in models"));
     }
 
     /**
@@ -157,9 +157,9 @@ public class MultiModel implements IModel {
     }
 
     private static LocalDateTime reconcileCreationDate(LocalDateTime lastNonSelfUpdate,
-            LocalDateTime creationTime,
-            String currentUser,
-            String issueCreator) {
+                                                       LocalDateTime creationTime,
+                                                       String currentUser,
+                                                       String issueCreator) {
         // If current user is same as issue creator, we do not consider creation of issue
         // as an issue update.
         if (currentUser.equalsIgnoreCase(issueCreator)) return lastNonSelfUpdate;
@@ -191,7 +191,7 @@ public class MultiModel implements IModel {
         List<TurboUser> usersOfRepo = getUsersOfRepo(repoId);
         return usersOfRepo.stream()
                 .filter(userOfRepo -> userOfRepo.getRealName().toLowerCase().contains(userName.toLowerCase()) ||
-                                        userOfRepo.getLoginName().toLowerCase().contains(userName.toLowerCase()))
+                        userOfRepo.getLoginName().toLowerCase().contains(userName.toLowerCase()))
                 .findFirst()
                 .isPresent();
     }

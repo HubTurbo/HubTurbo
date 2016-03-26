@@ -153,7 +153,7 @@ public class JavaVersionTest {
     }
 
     private void verifyJavaVersionParsedCorrectly(String versionString, int verDiscard, int verMajor, int verMinor,
-            int verUpdate, int verBuild) {
+                                                  int verUpdate, int verBuild) {
         JavaVersion expectedVersion = new JavaVersion(verDiscard, verMajor, verMinor, verUpdate, verBuild);
         JavaVersion javaVersion = JavaVersion.fromString(versionString);
         assertEquals(expectedVersion, javaVersion);

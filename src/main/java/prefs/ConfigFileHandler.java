@@ -95,16 +95,16 @@ public class ConfigFileHandler {
         gson = new GsonBuilder()
                 .setPrettyPrinting()
                 .registerTypeAdapter(LocalDateTime.class,
-                        (JsonSerializer<LocalDateTime>) (src, typeOfSrc, context) -> {
-                            Instant instant = src.atZone(ZoneId.systemDefault()).toInstant();
-                            long epochMilli = instant.toEpochMilli();
-                            return new JsonPrimitive(epochMilli);
-                        }
+                    (JsonSerializer<LocalDateTime>) (src, typeOfSrc, context) -> {
+                        Instant instant = src.atZone(ZoneId.systemDefault()).toInstant();
+                        long epochMilli = instant.toEpochMilli();
+                        return new JsonPrimitive(epochMilli);
+                    }
                 ).registerTypeAdapter(LocalDateTime.class,
-                        (JsonDeserializer<LocalDateTime>) (json, typeOfT, context) -> {
-                            Instant instant = Instant.ofEpochMilli(json.getAsJsonPrimitive().getAsLong());
-                            return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
-                        }
+                    (JsonDeserializer<LocalDateTime>) (json, typeOfT, context) -> {
+                        Instant instant = Instant.ofEpochMilli(json.getAsJsonPrimitive().getAsLong());
+                        return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+                    }
                 ).create();
     }
 }

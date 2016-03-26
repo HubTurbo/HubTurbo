@@ -18,7 +18,7 @@ public class ListPanelCell extends ListCell<GuiElement> {
     private GuiElement guiElement;
 
     public ListPanelCell(ListPanel parent,
-            int parentPanelIndex, HashSet<Integer> issuesWithNewComments) {
+                         int parentPanelIndex, HashSet<Integer> issuesWithNewComments) {
         super();
         this.parent = parent;
         this.parentPanelIndex = parentPanelIndex;

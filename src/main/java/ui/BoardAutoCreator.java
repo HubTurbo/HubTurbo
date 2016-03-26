@@ -28,7 +28,7 @@ public class BoardAutoCreator {
     private static final String TIPS_REPO_NAME = "HubTurbo/TipsRepo";
     public static final String SAMPLE_BOARD_DIALOG = String.format("%s has been created and loaded.", SAMPLE_BOARD);
 
-    public static final Map<String, String> getSamplePanelDetails(){
+    public static final Map<String, String> getSamplePanelDetails() {
         Map<String, String> panelMap = new LinkedHashMap<>();
         panelMap.put("Latest tips",
                 String.format("repo:%s is:open label:\"latest-tips\"", TIPS_REPO_NAME));
@@ -157,7 +157,7 @@ public class BoardAutoCreator {
     }
 
     private List<PanelInfo> generatePanelInfoFromTurboUsers(List<TurboUser> users,
-            String nameTemplate, String filterTemplate) {
+                                                            String nameTemplate, String filterTemplate) {
         return users.stream()
                 .map(user -> new PanelInfo(String.format(nameTemplate, user.getFriendlierName()),
                         String.format(filterTemplate, user.getLoginName())))

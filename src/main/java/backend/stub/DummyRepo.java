@@ -105,7 +105,7 @@ public class DummyRepo implements Repo {
 
     @Override
     public ImmutableTriple<List<TurboIssue>, String, Date>
-        getUpdatedIssues(String repoId, String eTag, Date lastCheckTime) {
+            getUpdatedIssues(String repoId, String eTag, Date lastCheckTime) {
 
         return getRepoState(repoId).getUpdatedIssues(eTag, lastCheckTime);
     }
@@ -152,7 +152,7 @@ public class DummyRepo implements Repo {
 
     @Override
     public ImmutablePair<List<TurboIssueEvent>, String>
-        getUpdatedEvents(String repoId, int issueId, String currentETag) {
+            getUpdatedEvents(String repoId, int issueId, String currentETag) {
 
         ImmutablePair<List<TurboIssueEvent>, String> result = getRepoState(repoId).getEvents(issueId, currentETag);
 

@@ -22,7 +22,7 @@ public class UIManager {
     }
 
     public void update(Map<FilterExpression, List<GuiElement>> elementsToShow,
-            List<TurboUser> users) {
+                       List<TurboUser> users) {
         Platform.runLater(() ->
                 ui.triggerEvent(new ModelUpdatedEvent(elementsToShow, users)));
     }

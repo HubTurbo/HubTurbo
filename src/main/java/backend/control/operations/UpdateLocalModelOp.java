@@ -24,7 +24,7 @@ public class UpdateLocalModelOp implements RepoOp<Model> {
     private static final Logger logger = HTLog.get(UpdateLocalModelOp.class);
 
     public UpdateLocalModelOp(MultiModel models, GitHubModelUpdatesData updates,
-            CompletableFuture<Model> result) {
+                              CompletableFuture<Model> result) {
         this.models = models;
         this.updates = updates;
         this.result = result;

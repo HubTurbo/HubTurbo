@@ -170,17 +170,17 @@ public class FilterParserTests {
     public void parse_disjunctionShorthand_validAST() {
 
         assertEquals(Parser.parse("label:a;b;c"),
-            new Disjunction(
                 new Disjunction(
-                    new Qualifier(LABEL, "a"),
-                    new Qualifier(LABEL, "b")),
-                new Qualifier(LABEL, "c")));
+                        new Disjunction(
+                                new Qualifier(LABEL, "a"),
+                                new Qualifier(LABEL, "b")),
+                        new Qualifier(LABEL, "c")));
 
         assertEquals(Parser.parse("~label:a;b"),
-            new Negation(
-                new Disjunction(
-                    new Qualifier(LABEL, "a"),
-                    new Qualifier(LABEL, "b"))));
+                new Negation(
+                        new Disjunction(
+                                new Qualifier(LABEL, "a"),
+                                new Qualifier(LABEL, "b"))));
     }
 
     @Test
@@ -222,32 +222,32 @@ public class FilterParserTests {
     @Test
     public void parse_numberOperators_validAST() {
         assertEquals(Parser.parse("updated:<24"),
-            new Qualifier(UPDATED, new NumberRange(null, 24, true)));
+                new Qualifier(UPDATED, new NumberRange(null, 24, true)));
         assertEquals(Parser.parse("updated:<=24"),
-            new Qualifier(UPDATED, new NumberRange(null, 24)));
+                new Qualifier(UPDATED, new NumberRange(null, 24)));
         assertEquals(Parser.parse("updated:>=24"),
-            new Qualifier(UPDATED, new NumberRange(24, null)));
+                new Qualifier(UPDATED, new NumberRange(24, null)));
         assertEquals(Parser.parse("updated:>24"),
-            new Qualifier(UPDATED, new NumberRange(24, null, true)));
+                new Qualifier(UPDATED, new NumberRange(24, null, true)));
         assertNotEquals(Parser.parse("updated:<24"),
-            new Qualifier(UPDATED, new NumberRange(24, null, true)));
+                new Qualifier(UPDATED, new NumberRange(24, null, true)));
 
         assertEquals(Parser.parse("updated:24"),
-            new Qualifier(UPDATED, 24));
+                new Qualifier(UPDATED, 24));
         assertNotEquals(Parser.parse("updated:25"),
-            new Qualifier(UPDATED, 24));
+                new Qualifier(UPDATED, 24));
     }
 
     @Test
     public void parse_numberRanges_validAST() {
         assertEquals(Parser.parse("updated:1 .. 24"),
-            new Qualifier(UPDATED, new NumberRange(1, 24, false)));
+                new Qualifier(UPDATED, new NumberRange(1, 24, false)));
         assertEquals(Parser.parse("updated:1 .. *"),
-            new Qualifier(UPDATED, new NumberRange(1, null)));
+                new Qualifier(UPDATED, new NumberRange(1, null)));
 
         // Parsing currently requires a space between operand and operator
         assertEquals(Parser.parse("updated:1..2"),
-            new Qualifier(UPDATED, "1..2"));
+                new Qualifier(UPDATED, "1..2"));
     }
 
     @Test
@@ -317,38 +317,38 @@ public class FilterParserTests {
     @Test
     public void parse_dateOperators_validAST() {
         assertEquals(Parser.parse("created:<2014-06-01"),
-            new Qualifier(CREATED, new DateRange(null, LocalDate.of(2014, 6, 1), true)));
+                new Qualifier(CREATED, new DateRange(null, LocalDate.of(2014, 6, 1), true)));
 
         assertEquals(Parser.parse("created : <= 2014-06-01"),
-            new Qualifier(CREATED, new DateRange(null, LocalDate.of(2014, 6, 1))));
+                new Qualifier(CREATED, new DateRange(null, LocalDate.of(2014, 6, 1))));
 
         assertEquals(Parser.parse("created : > 2014-06-01"),
-            new Qualifier(CREATED, new DateRange(LocalDate.of(2014, 6, 1), null, true)));
+                new Qualifier(CREATED, new DateRange(LocalDate.of(2014, 6, 1), null, true)));
 
         assertEquals(Parser.parse("created : >= 2014-06-01"),
-            new Qualifier(CREATED, new DateRange(LocalDate.of(2014, 6, 1), null)));
+                new Qualifier(CREATED, new DateRange(LocalDate.of(2014, 6, 1), null)));
 
         assertNotEquals(Parser.parse("created : <= 2014-06-01"),
-            new Qualifier(CREATED, new DateRange(LocalDate.of(2014, 6, 1), null)));
+                new Qualifier(CREATED, new DateRange(LocalDate.of(2014, 6, 1), null)));
     }
 
     @Test
     public void parse_dates_validAST() {
         assertEquals(Parser.parse("created   :   2014-6-1"),
-            new Qualifier(CREATED, LocalDate.of(2014, 6, 1)));
+                new Qualifier(CREATED, LocalDate.of(2014, 6, 1)));
 
         assertEquals(Parser.parse("created   :   2014-06-01"),
-            new Qualifier(CREATED, LocalDate.of(2014, 6, 1)));
+                new Qualifier(CREATED, LocalDate.of(2014, 6, 1)));
 
         assertEquals(Parser.parse("a created   :   2014-06-01 b"),
-            new Conjunction(
                 new Conjunction(
-                    new Qualifier(KEYWORD, "a"),
-                    new Qualifier(CREATED, LocalDate.of(2014, 6, 1))),
-                new Qualifier(KEYWORD, "b")));
+                        new Conjunction(
+                                new Qualifier(KEYWORD, "a"),
+                                new Qualifier(CREATED, LocalDate.of(2014, 6, 1))),
+                        new Qualifier(KEYWORD, "b")));
 
         assertNotEquals(new Qualifier(CREATED, LocalDate.of(2014, 6, 2)),
-            new Qualifier(CREATED, LocalDate.of(2014, 6, 1)));
+                new Qualifier(CREATED, LocalDate.of(2014, 6, 1)));
     }
 
     @Test
@@ -420,7 +420,7 @@ public class FilterParserTests {
         assertEquals(Parser.parse("sort:~id, NOT repo"),
                 new Qualifier(SORT, Arrays.asList(new SortKey("id", true), new SortKey("repo", true))));
         assertNotEquals(Parser.parse("sort:~repo, NOT id"),
-            new Qualifier(SORT, Arrays.asList(new SortKey("id", true), new SortKey("repo", true))));
+                new Qualifier(SORT, Arrays.asList(new SortKey("id", true), new SortKey("repo", true))));
     }
 
     @Test

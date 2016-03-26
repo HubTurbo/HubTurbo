@@ -22,7 +22,7 @@ public class IssueServiceEx extends IssueService {
     }
 
     private HttpURLConnection createIssuePostConnection(IRepositoryIdProvider repository,
-            int issueId) throws IOException {
+                                                        int issueId) throws IOException {
 
         StringBuilder uri = new StringBuilder(SEGMENT_REPOS);
         uri.append('/').append(repository.generateId())

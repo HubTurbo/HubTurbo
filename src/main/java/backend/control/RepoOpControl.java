@@ -52,7 +52,7 @@ public final class RepoOpControl {
      * @return
      */
     public CompletableFuture<Model> updateLocalModel(GitHubModelUpdatesData updates,
-            boolean syncOperation) {
+                                                     boolean syncOperation) {
         init(updates.getRepoId());
         CompletableFuture<Model> result = new CompletableFuture<>();
         UpdateLocalModelOp op = new UpdateLocalModelOp(models, updates, result);

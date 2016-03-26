@@ -29,7 +29,7 @@ public final class UpdateDummyRepoEvent extends Event {
      * @param updateText The text to update the element with, if necessary.
      */
     private UpdateDummyRepoEvent(UpdateType updateType, String repoId, int itemId, String idString, String updateText,
-            String actor) {
+                                 String actor) {
         this.updateType = updateType;
         this.repoId = repoId;
         this.itemId = itemId;

@@ -28,8 +28,8 @@ public class Model implements IBaseModel {
      * Standard constructor.
      */
     public Model(String repoId, List<TurboIssue> issues,
-            List<TurboLabel> labels, List<TurboMilestone> milestones, List<TurboUser> users,
-            UpdateSignature updateSignature) {
+                 List<TurboLabel> labels, List<TurboMilestone> milestones, List<TurboUser> users,
+                 UpdateSignature updateSignature) {
 
         this.updateSignature = updateSignature;
         this.repoId = repoId;
@@ -44,7 +44,7 @@ public class Model implements IBaseModel {
      * a model is first downloaded.
      */
     public Model(String repoId, List<TurboIssue> issues,
-            List<TurboLabel> labels, List<TurboMilestone> milestones, List<TurboUser> users) {
+                 List<TurboLabel> labels, List<TurboMilestone> milestones, List<TurboUser> users) {
 
         this.updateSignature = UpdateSignature.EMPTY;
         this.repoId = repoId;
@@ -204,13 +204,10 @@ public class Model implements IBaseModel {
      */
     public synchronized Optional<TurboIssue> replaceIssueLabels(int issueId, List<String> labels) {
         Optional<TurboIssue> issueLookUpResult = getIssueById(issueId);
-        return Utility.safeFlatMapOptional(issueLookUpResult,
-            (issue) -> {
-                issue.setLabels(labels);
-                return Optional.of(new TurboIssue(issue));
-            },
-            () -> logger.error("Issue " + issueId + " not found in model for " + repoId)
-        );
+        return Utility.safeFlatMapOptional(issueLookUpResult, (issue) -> {
+            issue.setLabels(labels);
+            return Optional.of(new TurboIssue(issue));
+        }, () -> logger.error("Issue " + issueId + " not found in model for " + repoId));
     }
 
     /**
@@ -221,16 +218,14 @@ public class Model implements IBaseModel {
      */
     public synchronized Optional<TurboIssue> replaceIssueMilestone(int issueId, Optional<Integer> milestone) {
         Optional<TurboIssue> issueLookUpResult = getIssueById(issueId);
-        return Utility.safeFlatMapOptional(issueLookUpResult,
-                (issue) -> {
-                    if (!milestone.isPresent()) {
-                        issue.removeMilestone();
-                    } else {
-                        issue.setMilestoneById(milestone.get());
-                    }
-                    return Optional.of(new TurboIssue(issue));
-                },
-                () -> logger.error("Issue " + issueId + " not found in model for " + repoId));
+        return Utility.safeFlatMapOptional(issueLookUpResult, (issue) -> {
+            if (!milestone.isPresent()) {
+                issue.removeMilestone();
+            } else {
+                issue.setMilestoneById(milestone.get());
+            }
+            return Optional.of(new TurboIssue(issue));
+        }, () -> logger.error("Issue " + issueId + " not found in model for " + repoId));
     }
 
     /**

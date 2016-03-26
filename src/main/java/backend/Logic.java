@@ -322,8 +322,8 @@ public class Logic {
      * @return true if the server update is successful
      */
     private boolean handleIssueLabelsUpdateResult(boolean isUpdateSuccessful,
-            Optional<TurboIssue> locallyModifiedIssue,
-            List<String> originalLabels) {
+                                                  Optional<TurboIssue> locallyModifiedIssue,
+                                                  List<String> originalLabels) {
         if (!locallyModifiedIssue.isPresent()) {
             logger.error("Unable to replace issue labels locally");
             return false;

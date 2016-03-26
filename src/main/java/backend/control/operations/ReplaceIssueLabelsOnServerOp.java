@@ -19,7 +19,7 @@ public class ReplaceIssueLabelsOnServerOp implements RepoOp<Boolean> {
     private final CompletableFuture<Boolean> result;
 
     public ReplaceIssueLabelsOnServerOp(RepoIO repoIO, CompletableFuture<Boolean> result,
-            TurboIssue issue, List<String> labels) {
+                                        TurboIssue issue, List<String> labels) {
         this.repoIO = repoIO;
         this.result = result;
 

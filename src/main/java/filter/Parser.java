@@ -120,7 +120,7 @@ public final class Parser {
             break;
         default:
             throw new ParseException(String.format(
-                "Encountered %s, which cannot start an expression", token));
+                    "Encountered %s, which cannot start an expression", token));
         }
 
         if (lookAhead().getType() == TokenType.EOF) {
@@ -252,7 +252,7 @@ public final class Parser {
                 throw new IncompleteInputException();
             } else {
                 throw new ParseException(String.format(
-                    "Qualifier %s must be given an input", type));
+                        "Qualifier %s must be given an input", type));
             }
         } else {
             throw new ParseException(String.format(

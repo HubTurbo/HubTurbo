@@ -207,7 +207,7 @@ public class ListPanel extends FilterPanel {
     private void updateFooter() {
 
         updateFooterPanelStatsDetails();
-        if (issuesCount == 0){
+        if (issuesCount == 0) {
             hideFooterPanelStatsDetails(true);
         } else {
             hideFooterPanelStatsDetails(false);

@@ -128,8 +128,8 @@ public final class TestUtils {
      * @return
      */
     public static HttpRequest createMockServerRequest(String method, int page,
-            String repoStringId, String repoNumericId,
-            String apiSegments) {
+                                                      String repoStringId, String repoNumericId,
+                                                      String apiSegments) {
         String repoSegment = page == 1 ? "/repos/" + repoStringId : "/repositories/" + repoNumericId;
         String path = API_PREFIX + repoSegment + apiSegments;
 

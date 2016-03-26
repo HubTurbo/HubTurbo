@@ -98,7 +98,7 @@ public class TurboMilestone {
     }
 
     public static List<TurboMilestone> filterMilestonesOfRepos(List<TurboMilestone> milestones,
-            List<String> repoIds) {
+                                                               List<String> repoIds) {
         return milestones.stream()
                 .filter(ms -> repoIds.contains(ms.getRepoId().toLowerCase()))
                 .collect(Collectors.toList());

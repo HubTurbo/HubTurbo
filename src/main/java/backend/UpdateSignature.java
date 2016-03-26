@@ -27,7 +27,7 @@ public class UpdateSignature {
     }
 
     public UpdateSignature(String issuesETag, String labelsETag, String milestonesETag, String collaboratorsETag,
-            Date lastCheckTime) {
+                           Date lastCheckTime) {
 
         this.issuesETag = issuesETag;
         this.labelsETag = labelsETag;

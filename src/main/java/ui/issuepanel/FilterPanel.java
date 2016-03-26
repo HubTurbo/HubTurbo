@@ -126,13 +126,13 @@ public abstract class FilterPanel extends AbstractPanel {
 
     private Node createFilterBox() {
         filterTextField = new FilterTextField(Parser::check)
-            .setOnCancel(this::requestFocus)
-            .setOnShowDocs(ui.getBrowserComponent()::showFilterDocs)
-            .setOnConfirm((text) -> {
-                Platform.runLater(() -> ui.triggerEvent(new ApplyingFilterEvent(this)));
-                applyStringFilter(text);
-                return text;
-            });
+                .setOnCancel(this::requestFocus)
+                .setOnShowDocs(ui.getBrowserComponent()::showFilterDocs)
+                .setOnConfirm((text) -> {
+                    Platform.runLater(() -> ui.triggerEvent(new ApplyingFilterEvent(this)));
+                    applyStringFilter(text);
+                    return text;
+                });
         filterTextField.setId(guiController.getDefaultRepo() + "_col" + panelIndex + "_filterTextField");
         filterTextField.setMinWidth(388);
         filterTextField.setMaxWidth(388);

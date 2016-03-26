@@ -55,7 +55,7 @@ public class ListPanelCard extends VBox {
      * @param issuesWithNewComments
      */
     public ListPanelCard(GuiElement guiElement, FilterPanel parentPanel,
-            HashSet<Integer> issuesWithNewComments) {
+                         HashSet<Integer> issuesWithNewComments) {
         this.guiElement = guiElement;
         this.parentPanel = parentPanel;
         this.issueDetails = createDetailsPane();
@@ -132,7 +132,7 @@ public class ListPanelCard extends VBox {
      * @return
      */
     private static Node layoutEvents(GuiElement guiElement,
-            List<TurboIssueEvent> events, List<Comment> comments) {
+                                     List<TurboIssueEvent> events, List<Comment> comments) {
         TurboIssue issue = guiElement.getIssue();
 
         VBox result = new VBox();

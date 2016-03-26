@@ -350,7 +350,7 @@ public class LogicTests {
     }
 
     private void mockMultiModelReplaceIssueLabels(Optional<TurboIssue> replaceResult,
-            Optional<Model> modelLookUpResult) {
+                                                  Optional<Model> modelLookUpResult) {
         when(mockedMultiModel.replaceIssueLabels(anyString(), anyInt(), anyListOf(String.class)))
                 .thenReturn(replaceResult);
         when(mockedMultiModel.getModelById(anyString())).thenReturn(modelLookUpResult);

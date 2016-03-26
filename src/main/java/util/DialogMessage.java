@@ -18,7 +18,7 @@ public final class DialogMessage {
     }
 
     public static boolean showYesNoWarningDialog(String title, String header, String message,
-            String yesButtonLabel, String noButtonLabel) {
+                                                 String yesButtonLabel, String noButtonLabel) {
 
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle(title);

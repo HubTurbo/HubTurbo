@@ -55,7 +55,7 @@ public final class IssueMetadata {
      * is filled in later.
      */
     public static IssueMetadata intermediate(List<TurboIssueEvent> events, List<Comment> comments,
-            String eventsETag, String commentsETag) {
+                                             String eventsETag, String commentsETag) {
         return new IssueMetadata(events, comments, false, eventsETag, commentsETag);
     }
 
@@ -73,7 +73,7 @@ public final class IssueMetadata {
      * Reconciles a newly-updated metadata instance against older data.
      */
     public IssueMetadata reconcile(LocalDateTime nonSelfUpdatedAt,
-            List<TurboIssueEvent> existingEvents, String existingETag) {
+                                   List<TurboIssueEvent> existingEvents, String existingETag) {
         List<TurboIssueEvent> newEvents;
         if (existingETag.equals(eventsETag)) {
             newEvents = new ArrayList<>(existingEvents);
@@ -87,7 +87,7 @@ public final class IssueMetadata {
      * Intermediate metadata constructor (no user provided, empty computed properties)
      */
     private IssueMetadata(List<TurboIssueEvent> events, List<Comment> comments,
-            boolean isLatest, String eventsETag, String commentsETag) {
+                          boolean isLatest, String eventsETag, String commentsETag) {
         this.events = new ArrayList<>(events);
         this.comments = new ArrayList<>(comments);
         this.isLatest = isLatest;
@@ -103,8 +103,8 @@ public final class IssueMetadata {
      * Full metadata constructor (user provided, computed properties present)
      */
     private IssueMetadata(List<TurboIssueEvent> events, List<Comment> comments,
-            boolean isLatest, String eventsETag, String commentsETag,
-            String user) {
+                          boolean isLatest, String eventsETag, String commentsETag,
+                          String user) {
         this(events, comments, isLatest, eventsETag, commentsETag,
                 computeNonSelfUpdatedAt(events, comments, user), user);
     }
@@ -113,8 +113,8 @@ public final class IssueMetadata {
      * Full metadata constructor with nonSelfUpdateTime left out
      */
     private IssueMetadata(List<TurboIssueEvent> events, List<Comment> comments,
-            boolean isLatest, String eventsETag, String commentsETag,
-            LocalDateTime nonSelfUpdatedAt, String user) {
+                          boolean isLatest, String eventsETag, String commentsETag,
+                          LocalDateTime nonSelfUpdatedAt, String user) {
         this.events = new ArrayList<>(events);
         this.comments = new ArrayList<>(comments);
         this.isLatest = isLatest;
@@ -127,7 +127,7 @@ public final class IssueMetadata {
     }
 
     private static LocalDateTime computeNonSelfUpdatedAt(List<TurboIssueEvent> events, List<Comment> comments,
-            String user) {
+                                                         String user) {
         Date result = new Date(0);
         for (TurboIssueEvent event : events) {
             if (isEventByOthers(event, user) && event.getDate().after(result)) {

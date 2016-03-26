@@ -326,8 +326,8 @@ public final class Utility {
      * @return
      */
     public static <T, U> Optional<U> safeFlatMapOptional(Optional<T> optional,
-            Function<? super T, Optional<U>> mapper,
-            Runnable ifEmpty) {
+                                                         Function<? super T, Optional<U>> mapper,
+                                                         Runnable ifEmpty) {
         if (optional.isPresent()) {
             return mapper.apply(optional.get());
         }

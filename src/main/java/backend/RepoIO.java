@@ -48,7 +48,7 @@ public class RepoIO {
      * @param storeDirectory optional directory for storing repos. Default value is in RepoStore.
      */
     public RepoIO(Optional<RepoSource> repoSource, Optional<JSONStore> jsonStore,
-            Optional<String> storeDirectory) {
+                  Optional<String> storeDirectory) {
         this.repoSource = repoSource.orElseGet(() -> new GitHubSource());
         storeDirectory.ifPresent((dir) -> RepoStore.changeDirectory(dir));
         this.jsonStore = jsonStore.orElseGet(() -> new JSONStore());

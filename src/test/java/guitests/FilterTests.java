@@ -217,7 +217,7 @@ public class FilterTests extends UITest {
     }
 
     private void checkCurrWithResult(String milestoneAlias, String currString, ListPanel issuePanel,
-            int milestoneNumber) {
+                                     int milestoneNumber) {
         click("#dummy/dummy_col0_filterTextField");
         selectAll();
         type(milestoneAlias + ":" + currString);

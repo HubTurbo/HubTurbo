@@ -558,8 +558,8 @@ public class QualifierTests {
      * Ensures that TurboIssues are ordered in a particular way given some sorting criteria
      */
     private void assertSorted(List<TurboIssue> issues, List<Integer> expectedIds,
-            IModel model, String sortCriteria,
-            boolean isInverted, boolean isNonSelfUpdate) {
+                              IModel model, String sortCriteria,
+                              boolean isInverted, boolean isNonSelfUpdate) {
         Collections.sort(issues,
                 Qualifier.getSortComparator(model, sortCriteria, isInverted, isNonSelfUpdate));
 

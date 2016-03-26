@@ -187,7 +187,7 @@ public class UpdateController {
      * @return The comparator to use.
      */
     private Comparator<TurboIssue> determineComparator(FilterExpression filterExpr,
-            boolean hasUpdatedQualifier) {
+                                                       boolean hasUpdatedQualifier) {
         MultiModel models = logic.getModels();
         for (Qualifier metaQualifier : filterExpr.find(Qualifier::isMetaQualifier)) {
             // Only take into account the first sort qualifier found

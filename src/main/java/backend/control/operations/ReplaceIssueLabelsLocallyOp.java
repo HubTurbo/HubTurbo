@@ -21,7 +21,7 @@ public class ReplaceIssueLabelsLocallyOp implements RepoOp<Optional<TurboIssue>>
     private static final Logger logger = HTLog.get(UpdateLocalModelOp.class);
 
     public ReplaceIssueLabelsLocallyOp(MultiModel models, TurboIssue issue, List<String> newlabels,
-            CompletableFuture<Optional<TurboIssue>> result) {
+                                       CompletableFuture<Optional<TurboIssue>> result) {
         this.models = models;
         this.issue = issue;
         this.newLabels = newlabels;

@@ -831,11 +831,11 @@ public class FilterEvalTests {
         TurboUser user = new TurboUser(REPO, "fox", "charlie");
         IModel model = TestUtils.singletonModel(createModelFromUsers(REPO, user));
         verifyUserWarning(model, "involves:bOb",
-                            Arrays.asList(String.format(USER_WARNING_ERROR_FORMAT, "bOb", REPO)));
+                          Arrays.asList(String.format(USER_WARNING_ERROR_FORMAT, "bOb", REPO)));
         verifyUserWarning(model, "involves:foxX",
-                            Arrays.asList(String.format(USER_WARNING_ERROR_FORMAT, "foxX", REPO)));
+                          Arrays.asList(String.format(USER_WARNING_ERROR_FORMAT, "foxX", REPO)));
         verifyUserWarning(model, "author:alice",
-                            Arrays.asList(String.format(USER_WARNING_ERROR_FORMAT, "alice", REPO)));
+                          Arrays.asList(String.format(USER_WARNING_ERROR_FORMAT, "alice", REPO)));
     }
 
     @Test
@@ -884,7 +884,7 @@ public class FilterEvalTests {
 
     private void verifyQualifierContentError(QualifierType type, String invalidInput) {
         verifySemanticException(empty, invalidInput, String.format(SemanticException.ERROR_MESSAGE,
-                                                                    type, type.getDescriptionOfValidInputs()));
+                type, type.getDescriptionOfValidInputs()));
     }
 
     private void verifyUserWarning(IModel model, String input, List<String> expectedWarnings) {

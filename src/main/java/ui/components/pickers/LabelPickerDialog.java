@@ -106,21 +106,21 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     }
 
     private final void populateAssignedLabels(List<TurboLabel> initialLabels, List<TurboLabel> removedLabels,
-            List<TurboLabel> addedLabels, Optional<TurboLabel> suggestion) {
+                                              List<TurboLabel> addedLabels, Optional<TurboLabel> suggestion) {
         assignedLabels.getChildren().clear();
         populateInitialLabels(initialLabels, removedLabels, suggestion);
         populateToBeAddedLabels(addedLabels, suggestion);
     }
 
     private final void populateInitialLabels(List<TurboLabel> initialLabels, List<TurboLabel> removedLabels,
-            Optional<TurboLabel> suggestion) {
+                                             Optional<TurboLabel> suggestion) {
         initialLabels.stream()
                 .forEach(label -> assignedLabels.getChildren()
                         .add(processInitialLabel(label, removedLabels, suggestion)));
     }
 
     private final Node processInitialLabel(TurboLabel initialLabel, List<TurboLabel> removedLabels,
-            Optional<TurboLabel> suggestion) {
+                                           Optional<TurboLabel> suggestion) {
         TurboLabel repoInitialLabel = TurboLabel.getFirstMatchingTurboLabel(allLabels, initialLabel.getFullName());
         if (!removedLabels.contains(initialLabel)) {
             if (suggestion.isPresent() && initialLabel.equals(suggestion.get())) {
@@ -191,14 +191,14 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     }
 
     private final void populateFeedbackLabels(List<TurboLabel> assignedLabels, List<TurboLabel> matchedLabels,
-            Optional<TurboLabel> suggestion) {
+                                              Optional<TurboLabel> suggestion) {
         feedbackLabels.getChildren().clear();
         populateGroupLabels(assignedLabels, matchedLabels, suggestion);
         populateGrouplessLabels(assignedLabels, matchedLabels, suggestion);
     }
 
     private final void populateGroupLabels(List<TurboLabel> finalLabels, List<TurboLabel> matchedLabels,
-            Optional<TurboLabel> suggestion) {
+                                           Optional<TurboLabel> suggestion) {
 
         Map<String, FlowPane> groupContent = getGroupContent(finalLabels, matchedLabels, suggestion);
         groupContent.entrySet().forEach(entry -> {
@@ -208,7 +208,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     }
 
     private final Map<String, FlowPane> getGroupContent(List<TurboLabel> finalLabels, List<TurboLabel> matchedLabels,
-            Optional<TurboLabel> suggestion) {
+                                                        Optional<TurboLabel> suggestion) {
         Map<String, FlowPane> groupContent = new HashMap<>();
         allLabels.stream().sorted()
                 .filter(label -> label.isInGroup())
@@ -224,7 +224,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     }
 
     private final void populateGrouplessLabels(List<TurboLabel> finalLabels, List<TurboLabel> matchedLabels,
-            Optional<TurboLabel> suggestion) {
+                                               Optional<TurboLabel> suggestion) {
         FlowPane groupless = createGroupPane(GROUPLESS_PAD);
         allLabels.stream()
                 .filter(label -> !label.isInGroup())
@@ -235,7 +235,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     }
 
     private final Node processMatchedLabel(TurboLabel repoLabel, List<TurboLabel> matchedLabels,
-            List<TurboLabel> assignedLabels, Optional<TurboLabel> suggestion) {
+                                           List<TurboLabel> assignedLabels, Optional<TurboLabel> suggestion) {
 
         return getPickerLabelNode(
                 new PickerLabel(TurboLabel.getFirstMatchingTurboLabel(allLabels, repoLabel.getFullName()), false)

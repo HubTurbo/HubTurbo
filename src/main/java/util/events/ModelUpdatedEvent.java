@@ -14,7 +14,7 @@ public class ModelUpdatedEvent extends Event {
     public final List<TurboUser> users; // User names are used as autocomplete keywords for filters.
 
     public ModelUpdatedEvent(Map<FilterExpression, List<GuiElement>> elementsToShow,
-            List<TurboUser> users) {
+                             List<TurboUser> users) {
         this.elementsToShow = elementsToShow;
         this.users = users;
     }

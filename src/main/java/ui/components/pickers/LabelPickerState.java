@@ -25,8 +25,8 @@ public class LabelPickerState {
     }
 
     private LabelPickerState(List<TurboLabel> initialLabels, List<TurboLabel> addedLabels,
-            List<TurboLabel> removedLabels, List<TurboLabel> matchedLabels,
-            List<TurboLabel> allLabels, OptionalInt currentSuggestionIndex) {
+                             List<TurboLabel> removedLabels, List<TurboLabel> matchedLabels,
+                             List<TurboLabel> allLabels, OptionalInt currentSuggestionIndex) {
         this.initialLabels = initialLabels;
         this.addedLabels = addedLabels;
         this.removedLabels = removedLabels;

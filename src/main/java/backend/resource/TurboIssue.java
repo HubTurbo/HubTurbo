@@ -92,7 +92,7 @@ public class TurboIssue {
      * Immutable-conscious constructor.
      */
     public TurboIssue(String repoId, int id, String title,
-            String creator, LocalDateTime createdAt, boolean isPullRequest) {
+                      String creator, LocalDateTime createdAt, boolean isPullRequest) {
         this.id = id;
         this.creator = creator;
         this.createdAt = createdAt;
@@ -289,7 +289,7 @@ public class TurboIssue {
      * @return a new list of issues
      */
     public static List<TurboIssue> combineWithPullRequests(List<TurboIssue> issues,
-            List<PullRequest> pullRequests) {
+                                                           List<PullRequest> pullRequests) {
         List<TurboIssue> issuesCopy = new ArrayList<>(issues);
 
         for (PullRequest pullRequest : pullRequests) {

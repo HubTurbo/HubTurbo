@@ -40,7 +40,7 @@ public abstract class RepoSource implements TaskRunner {
     public abstract CompletableFuture<GitHubModelUpdatesData> downloadModelUpdates(Model model);
 
     public abstract CompletableFuture<Map<Integer, IssueMetadata>> downloadMetadata(String repoId,
-            List<TurboIssue> issues);
+                                                                                    List<TurboIssue> issues);
 
     public abstract CompletableFuture<Boolean> isRepositoryValid(String repoId);
 
