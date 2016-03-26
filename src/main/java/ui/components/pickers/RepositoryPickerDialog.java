@@ -19,14 +19,14 @@ import java.util.*;
 public class RepositoryPickerDialog extends Dialog<String> {
 
     private static final String REPO_PICKER_TITLE = "Pick another repository";
-    private static final int DEFAULT_MATCHING_REPO_LIST_HEIGHT = 350;
-    private static final int DEFAULT_MATCHING_REPO_LIST_WIDTH = 350;
+    private static final int DEFAULT_SUGGESTED_REPO_LIST_HEIGHT = 350;
+    private static final int DEFAULT_SUGGESTED_REPO_LIST_WIDTH = 350;
     private static final int SPACING_BETWEEN_NODES = 10;
     private static final Insets DEFAULT_PADDING = new Insets(10);
     private static final Insets DEFAULT_LABEL_MARGIN = new Insets(2);
 
     private VBox mainLayout;
-    private VBox matchingRepositoryList;
+    private VBox suggestedRepositoryList;
     private TextField userInputTextField;
     private RepositoryPickerState state;
 
@@ -39,8 +39,13 @@ public class RepositoryPickerDialog extends Dialog<String> {
 
         initialiseDialog(stage);
         createButtons();
+        initialiseDefaultValues();
 
         Platform.runLater(() -> userInputTextField.requestFocus());
+    }
+
+    private void initialiseDefaultValues() {
+        updateUserQuery("");
     }
 
     private void initialiseDialog(Stage stage) {
@@ -56,14 +61,14 @@ public class RepositoryPickerDialog extends Dialog<String> {
         mainLayout = new VBox(SPACING_BETWEEN_NODES);
         mainLayout.setPadding(DEFAULT_PADDING);
 
-        createMatchingRepositoriesList();
+        createSuggestedRepositoriesList();
         createUserInputTextField();
         registerEventHandlers();
 
-        ScrollPane matchingRepositoryListScrollPane = new ScrollPane(matchingRepositoryList);
-        matchingRepositoryListScrollPane.setFitToHeight(true);
-        matchingRepositoryListScrollPane.setFitToWidth(true);
-        mainLayout.getChildren().addAll(userInputTextField, matchingRepositoryListScrollPane);
+        ScrollPane suggestedRepositoryListScrollPane = new ScrollPane(suggestedRepositoryList);
+        suggestedRepositoryListScrollPane.setFitToHeight(true);
+        suggestedRepositoryListScrollPane.setFitToWidth(true);
+        mainLayout.getChildren().addAll(userInputTextField, suggestedRepositoryListScrollPane);
     }
 
     private void registerEventHandlers() {
@@ -80,24 +85,24 @@ public class RepositoryPickerDialog extends Dialog<String> {
     }
 
     private void updateSuggestedRepositoryList() {
-        matchingRepositoryList.getChildren().clear();
-        List<PickerRepository> matchingRepositories = state.getSuggestedRepositories();
-        matchingRepositories.stream()
+        suggestedRepositoryList.getChildren().clear();
+        List<PickerRepository> suggestedRepositories = state.getSuggestedRepositories();
+        suggestedRepositories.stream()
                 .forEach(repo -> {
                     Node repoLabel = repo.getNode();
-                    matchingRepositoryList.getChildren().add(repoLabel);
-                    matchingRepositoryList.setMargin(repoLabel, DEFAULT_LABEL_MARGIN);
+                    suggestedRepositoryList.getChildren().add(repoLabel);
+                    suggestedRepositoryList.setMargin(repoLabel, DEFAULT_LABEL_MARGIN);
                     repoLabel.setOnMouseClicked(e -> handleMouseClick(repo.getRepositoryId()));
                 });
     }
 
-    private void createMatchingRepositoriesList() {
-        matchingRepositoryList = new VBox();
-        matchingRepositoryList.setPadding(DEFAULT_PADDING);
-        matchingRepositoryList.setId("matchingRepositoryList");
-        matchingRepositoryList.setStyle("-fx-background-color: white; -fx-border-color:black;");
-        matchingRepositoryList.setPrefHeight(DEFAULT_MATCHING_REPO_LIST_HEIGHT);
-        matchingRepositoryList.setPrefWidth(DEFAULT_MATCHING_REPO_LIST_WIDTH);
+    private void createSuggestedRepositoriesList() {
+        suggestedRepositoryList = new VBox();
+        suggestedRepositoryList.setPadding(DEFAULT_PADDING);
+        suggestedRepositoryList.setId("suggestedRepositoryList");
+        suggestedRepositoryList.setStyle("-fx-background-color: white; -fx-border-color:black;");
+        suggestedRepositoryList.setPrefHeight(DEFAULT_SUGGESTED_REPO_LIST_HEIGHT);
+        suggestedRepositoryList.setPrefWidth(DEFAULT_SUGGESTED_REPO_LIST_WIDTH);
     }
 
     private void handleMouseClick(String repositoryId) {
@@ -107,7 +112,7 @@ public class RepositoryPickerDialog extends Dialog<String> {
     }
 
     private void updateUserQuery(String query) {
-        matchingRepositoryList.getChildren().clear();
+        suggestedRepositoryList.getChildren().clear();
         state.processUserQuery(query);
         updateSuggestedRepositoryList();
     }
