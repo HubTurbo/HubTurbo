@@ -10,8 +10,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 /**
- * This class is used as an entry point to RepositoryPicker. It registers the event
- * (ShowRepositoryPickerEventHandler) to the UI.
+ * This class represents an entry point to RepositoryPicker by handling operations related to RepositoryPickerDialog.
  */
 public class RepositoryPicker {
 

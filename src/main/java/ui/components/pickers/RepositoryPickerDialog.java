@@ -58,7 +58,7 @@ public class RepositoryPickerDialog extends Dialog<String> {
 
         createMatchingRepositoriesList();
         createUserInputTextField();
-        createHandlers();
+        registerEventHandlers();
 
         ScrollPane matchingRepositoryListScrollPane = new ScrollPane(matchingRepositoryList);
         matchingRepositoryListScrollPane.setFitToHeight(true);
@@ -68,7 +68,7 @@ public class RepositoryPickerDialog extends Dialog<String> {
         initialiseDefaultValues();
     }
 
-    private void createHandlers() {
+    private void registerEventHandlers() {
         userInputTextField.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.DOWN) {
                 state.selectNextMatchingRepository();
@@ -114,7 +114,7 @@ public class RepositoryPickerDialog extends Dialog<String> {
 
     private void updateUserQuery(String query) {
         matchingRepositoryList.getChildren().clear();
-        state.updateUserQuery(query);
+        state.processUserQuery(query);
         updateMatchingRepositoryList();
     }
 

@@ -6,10 +6,10 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.Border;
 
 /**
- * This class is used to represent a repo in RepositoryPicker.
+ * This class represents a repository in RepositoryPicker.
  *
- * It contains selected attribute to indicate whether the repo is selected.
- * These attributes are used in order to produce appropriate label through getNode()
+ * It handles the appearance of repository by storing whether the repository is currently selected by the user and
+ * providing a way to get the visual representation of the repo.
  */
 public class PickerRepository implements Comparable<PickerRepository> {
 

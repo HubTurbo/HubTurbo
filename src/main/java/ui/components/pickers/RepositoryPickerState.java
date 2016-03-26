@@ -1,12 +1,13 @@
 package ui.components.pickers;
 
-import org.controlsfx.control.spreadsheet.Picker;
-
 import java.util.*;
 import java.util.stream.IntStream;
 
 /**
- * A class used to store the list of repositories, used by RepositoryPicker.
+ * This class represents a state in RepositoryPicker which stores the list of existing repositories and currently
+ * selected repository and handles the logic related to RepositoryPickerDialog.
+ *
+ * It is guaranteed that at any given time, there will be exactly one selected repository.
  */
 public class RepositoryPickerState {
 
@@ -14,12 +15,13 @@ public class RepositoryPickerState {
     private final List<PickerRepository> matchingRepositories = new ArrayList<>();
 
     public RepositoryPickerState(Set<String> storedRepositories) {
+        assert !storedRepositories.isEmpty() : "There should be at least one existing repository";
         storedRepositories.stream()
                 .forEach(repo -> repositories.add(new PickerRepository(repo)));
         Collections.sort(repositories);
     }
 
-    public void updateUserQuery(String query) {
+    public void processUserQuery(String query) {
         clearRepositorySelection();
         updateMatchingRepositories(query);
     }
@@ -75,7 +77,10 @@ public class RepositoryPickerState {
 
     /**
      * Updates List<PickerRepository> matchingRepositories so that it contains PickerRepositories that match
-     * the user's input
+     * the user's input.
+     *
+     * If there is no existing repository that matches the user's query exactly and the user's query is not empty,
+     * it adds the user's query to the list of matching repositories so that the user can pick a new repository.
      */
     private void updateMatchingRepositories(String query) {
         matchingRepositories.clear();
