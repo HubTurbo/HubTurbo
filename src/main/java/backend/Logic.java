@@ -432,10 +432,12 @@ public class Logic {
         boolean isCurrentStateModifiedOriginalState = originalStateModifiedAt.isEqual(currentStateModifiedAt);
 
         if (isCurrentStateModifiedOriginalState) {
-            logger.info("Reverting state for issue " + currentIssue);
-            models.editIssueState(currentIssue.getRepoId(), currentIssue.getId(), isOpenOriginally);
-            refreshUI();
+            return;
         }
+
+        logger.info("Reverting state for issue " + currentIssue);
+        models.editIssueState(currentIssue.getRepoId(), currentIssue.getId(), isOpenOriginally);
+        refreshUI();
     }
 
     /**
@@ -457,9 +459,10 @@ public class Logic {
         localStateEditFuture.thenRun(this::refreshUI);
 
         return repoOpControl.editIssueStateOnServer(issue, isOpen)
-                .thenCombine(localStateEditFuture,
-                             (isUpdateSuccessful, locallyModifiedIssue) -> handleIssueStateUpdateResult(
-                                     isUpdateSuccessful, locallyModifiedIssue, isOpenOriginally));
+                .thenCombine(localStateEditFuture, (isUpdateSuccessful, locallyModifiedIssue) -> {
+                    return handleIssueStateUpdateResult(
+                            isUpdateSuccessful, locallyModifiedIssue, isOpenOriginally);
+                });
     }
 
     /**
