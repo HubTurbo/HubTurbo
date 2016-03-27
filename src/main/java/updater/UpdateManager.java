@@ -40,9 +40,8 @@ public class UpdateManager {
 
     // Directories and file names
     private static final String UPDATE_DIRECTORY = "updates";
-    // TODO change to release branch on merging with master
     private static final String UPDATE_DATA_SERVER_LINK =
-            "https://raw.githubusercontent.com/HubTurbo/HubTurbo/1271-updater-data/HubTurboUpdate.json";
+            "https://raw.githubusercontent.com/HubTurbo/HubTurbo/master/HubTurboUpdate.json";
     private static final String UPDATE_DATA_LOCAL_PATH = UPDATE_DIRECTORY + File.separator + "HubTurbo.json";
     private static final String APP_NAME = "HubTurbo.jar";
     private static final String UPDATE_APP_PATH = UPDATE_DIRECTORY + File.separator + APP_NAME;
@@ -230,9 +229,9 @@ public class UpdateManager {
         logger.info("Downloading update data");
         try {
             FileDownloader fileDownloader = new FileDownloader(
-                    new URI(UPDATE_DATA_SERVER_LINK),
-                    new File(UPDATE_DATA_LOCAL_PATH),
-                    a -> {});
+                new URI(UPDATE_DATA_SERVER_LINK),
+                new File(UPDATE_DATA_LOCAL_PATH),
+                a -> {});
             return fileDownloader.download();
         } catch (URISyntaxException e) {
             logger.error(ERROR_DOWNLOAD_UPDATE_DATA, e);
