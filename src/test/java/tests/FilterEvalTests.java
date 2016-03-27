@@ -834,22 +834,22 @@ public class FilterEvalTests {
                                                             new ArrayList<>(),
                                                             new ArrayList<>(),
                                                             new ArrayList<>(Arrays.asList(user))));
-        verifyUserWarning(model, "involves:bOb", Arrays.asList(String.format(
-                                                                            USER_WARNING_ERROR_FORMAT, "bOb", REPO)));
-        verifyUserWarning(model, "involves:foxX", Arrays.asList(String.format(
-                                                                            USER_WARNING_ERROR_FORMAT, "foxX", REPO)));
-        verifyUserWarning(model, "author:alice", Arrays.asList(String.format(
-                                                                            USER_WARNING_ERROR_FORMAT, "alice", REPO)));
+        verifyUserWarning(model, "involves:bOb",
+                            Arrays.asList(String.format(USER_WARNING_ERROR_FORMAT, "bOb", REPO)));
+        verifyUserWarning(model, "involves:foxX",
+                            Arrays.asList(String.format(USER_WARNING_ERROR_FORMAT, "foxX", REPO)));
+        verifyUserWarning(model, "author:alice",
+                            Arrays.asList(String.format(USER_WARNING_ERROR_FORMAT, "alice", REPO)));
     }
 
     @Test
     public void processQualifier_useValidUsername_noUsernameWarning() {
         TurboUser user = new TurboUser(REPO, "fox", "charlie");
         IModel model = TestUtils.singletonModel(new Model(REPO,
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new ArrayList<>(Arrays.asList(user))));
+                                                            new ArrayList<>(),
+                                                            new ArrayList<>(),
+                                                            new ArrayList<>(),
+                                                            new ArrayList<>(Arrays.asList(user))));
         verifyUserWarning(model, "involves:fOX", new ArrayList<>());
         verifyUserWarning(model, "assignee:FOX", new ArrayList<>());
         verifyUserWarning(model, "assignee:CHAR", new ArrayList<>());
@@ -864,10 +864,10 @@ public class FilterEvalTests {
         TurboIssue issue2 = new TurboIssue(REPO, 1, "title", "bob", LocalDateTime.now(), false);
         issue1.setAssignee(user3);
         IModel model = TestUtils.singletonModel(new Model(REPO,
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new ArrayList<>(Arrays.asList(user1, user2, user3))));
+                                                            new ArrayList<>(),
+                                                            new ArrayList<>(),
+                                                            new ArrayList<>(),
+                                                            new ArrayList<>(Arrays.asList(user1, user2, user3))));
         assertTrue(Qualifier.process(model, Parser.parse("assignee:ox"), issue1));
         assertTrue(Qualifier.process(model, Parser.parse("author:alice"), issue1));
         assertFalse(Qualifier.process(model, Parser.parse("assignee:charlie"), issue2));
