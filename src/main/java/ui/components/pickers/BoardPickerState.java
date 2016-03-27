@@ -38,6 +38,7 @@ class BoardPickerState {
         if (keyword.isEmpty()) {
             matchAllBoards();
         }
+
         updateMatchedBoards();
         updateSuggestion();
     }
@@ -54,8 +55,8 @@ class BoardPickerState {
                         if (prefixes.length > parts.length) {
                             return false;
                         }
-                        for (int i = 0; i < prefixes.length; i++) {
-                            if (!parts[i].startsWith(prefixes[i])) {
+                        for (String prefix : prefixes) {
+                            if (!board.matches(String.format("(?i:.*\\b%s.*)", prefix))) {
                                 return false;
                             }
                         }

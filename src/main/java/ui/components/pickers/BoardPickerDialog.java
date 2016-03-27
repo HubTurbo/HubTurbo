@@ -1,16 +1,12 @@
 package ui.components.pickers;
 
 import javafx.application.Platform;
-import javafx.beans.Observable;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.Pane;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -22,6 +18,9 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalInt;
+
+import static javafx.scene.input.KeyCode.*;
 
 /**
  * @author Liu Xinan
@@ -31,30 +30,22 @@ public class BoardPickerDialog extends Dialog<String> {
     private static final Logger logger = HTLog.get(BoardPickerDialog.class);
     private static final String DIALOG_TITLE = "Switch to board...";
 
-    private List<String> boards;
-    private ObservableList<PickerBoard> pickerBoards;
+    private final List<String> boards;
     private BoardPickerState state;
     private Optional<String> suggestion = Optional.empty();
-    private ButtonType confirmButtonType;
+    private Button confirmButton;
 
     @FXML
     private VBox mainLayout;
 
     @FXML
-    private Label title;
-
-    @FXML
     private TextField queryField;
 
     @FXML
-    private ListView<PickerBoard> boardList;
-
-    @FXML
-    private VBox boardNames;
+    private VBox boardList;
 
     BoardPickerDialog(List<String> boards, Stage stage) {
         this.boards = boards;
-        this.pickerBoards = FXCollections.observableArrayList();
 
         initUI(stage);
         Platform.runLater(queryField::requestFocus);
@@ -68,10 +59,9 @@ public class BoardPickerDialog extends Dialog<String> {
 
     private void initUI(Stage stage) {
         initializeDialog(stage);
-        setMainLayout();
+        setDialogPaneContent();
         createButtons();
 
-        boardList.setItems(pickerBoards);
         state = new BoardPickerState(new HashSet<>(boards), "");
         populateBoards(state);
     }
@@ -82,12 +72,16 @@ public class BoardPickerDialog extends Dialog<String> {
         setTitle(DIALOG_TITLE);
     }
 
+    private void setDialogPaneContent() {
+        setMainLayout();
+        getDialogPane().setContent(mainLayout);
+    }
+
     private void setMainLayout() {
         FXMLLoader loader = new FXMLLoader(UI.class.getResource("fxml/BoardPickerView.fxml"));
         loader.setController(this);
         try {
             mainLayout = loader.load();
-            getDialogPane().setContent(mainLayout);
         } catch (IOException e) {
             logger.error("Failed to load FXML. " + e.getMessage());
             close();
@@ -95,8 +89,10 @@ public class BoardPickerDialog extends Dialog<String> {
     }
 
     private void createButtons() {
-        confirmButtonType = new ButtonType("Confirm", ButtonBar.ButtonData.OK_DONE);
+        ButtonType confirmButtonType = new ButtonType("Confirm", ButtonBar.ButtonData.OK_DONE);
         getDialogPane().getButtonTypes().addAll(confirmButtonType, ButtonType.CANCEL);
+
+        confirmButton = (Button) getDialogPane().lookupButton(confirmButtonType);
 
         setResultConverter(dialogButton -> {
             if (dialogButton == confirmButtonType) {
@@ -107,28 +103,27 @@ public class BoardPickerDialog extends Dialog<String> {
     }
 
     private void populateBoards(BoardPickerState state) {
-        pickerBoards.clear();
+        boardList.getChildren().clear();
 
         state.getMatchedBoards().stream()
                 .sorted(String::compareToIgnoreCase)
                 .map(PickerBoard::new)
                 .forEach(pickerBoard -> {
                     suggestion.ifPresent(suggestion -> {
-                        pickerBoard.highlighted(suggestion.equals(pickerBoard.getBoardName()));
+                        pickerBoard.setHighlighted(suggestion.equals(pickerBoard.getBoardName()));
                     });
-                    pickerBoard.setPrefHeight(40);
                     pickerBoard.setOnMouseClicked(e -> handleBoardClick(pickerBoard));
-                    pickerBoards.add(pickerBoard);
+                    boardList.getChildren().add(pickerBoard);
                 });
 
-        getDialogPane().getScene().getWindow().sizeToScene();
+        updateConfirmButton();
+    }
+
+    private void updateConfirmButton() {
         if (suggestion.isPresent()) {
-            getDialogPane().lookupButton(confirmButtonType).setDisable(false);
-            boardList.getSelectionModel().select(0);
-            System.out.println(boardList.getHeight());
-            boardList.getItems().forEach(item -> System.out.println(item.getHeight()));
+            confirmButton.setDisable(false);
         } else {
-            getDialogPane().lookupButton(confirmButtonType).setDisable(true);
+            confirmButton.setDisable(true);
         }
     }
 
@@ -140,6 +135,7 @@ public class BoardPickerDialog extends Dialog<String> {
 
     private void handleBoardClick(PickerBoard board) {
         suggestion = Optional.of(board.getBoardName());
-        getDialogPane().lookupButton(confirmButtonType).setDisable(false);
+        queryField.setText(suggestion.get());
+        updateConfirmButton();
     }
 }
