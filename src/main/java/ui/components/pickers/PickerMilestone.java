@@ -11,8 +11,8 @@ import javafx.scene.text.Font;
  * This class handles the statuses and appearance of the milestones in MilestonePickerDialog
  */
 public class PickerMilestone extends TurboMilestone implements Comparable<PickerMilestone> {
-    public static final String OPEN_COLOUR = "#84BE54";
-    public static final String CLOSE_COLOUR = "#AD3E27";
+    public static final String OPEN_COLOUR = "#A5EEA5";
+    public static final String CLOSE_COLOUR = "#FCA6B0";
     private static final int SMALL_LABEL_FONT = 12;
     private static final int BIG_LABEL_FONT = 16;
 
