@@ -13,26 +13,22 @@ public class EditIssueStateAction implements Action<TurboIssue> {
     private static final String DESCRIPTION_REOPENED = "Reopened";
     private static final String DESCRIPTION_CLOSED = "Closed";
     private final Logic logic;
-    private final boolean open;
+    private final boolean isOpen;
 
     /**
      * Take in the new state, as well as the logic used to update the state.
      *
      * @param logic
-     * @param open Whether we want to set the new state to open or not
+     * @param isOpen Whether we want to set the new state to open or not
      */
-    public EditIssueStateAction(Logic logic, boolean open) {
+    public EditIssueStateAction(Logic logic, boolean isOpen) {
         this.logic = logic;
-        this.open = open;
+        this.isOpen = isOpen;
     }
 
     @Override
     public String getDescription() {
-        if (open) {
-            return DESCRIPTION_REOPENED;
-        } else {
-            return DESCRIPTION_CLOSED;
-        }
+        return isOpen ? DESCRIPTION_REOPENED : DESCRIPTION_CLOSED;
     }
 
     /**
@@ -43,7 +39,7 @@ public class EditIssueStateAction implements Action<TurboIssue> {
      */
     @Override
     public CompletableFuture<Boolean> act(TurboIssue issue) {
-        return logic.editIssueState(issue, open);
+        return logic.editIssueState(issue, isOpen);
     }
 
     /**
@@ -54,6 +50,6 @@ public class EditIssueStateAction implements Action<TurboIssue> {
      */
     @Override
     public CompletableFuture<Boolean> undo(TurboIssue issue) {
-        return logic.editIssueState(issue, !open);
+        return logic.editIssueState(issue, !isOpen);
     }
 }

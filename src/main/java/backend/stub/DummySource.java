@@ -59,8 +59,8 @@ public class DummySource extends RepoSource {
                 milestone)).response;
     }
 
-    public CompletableFuture<Boolean> editIssueState(TurboIssue issue, boolean open) {
-        return addTask(new EditIssueStateTask(this, dummy, issue.getRepoId(), issue.getId(), open)).response;
+    public CompletableFuture<Boolean> editIssueState(TurboIssue issue, boolean isOpen) {
+        return addTask(new EditIssueStateTask(this, dummy, issue.getRepoId(), issue.getId(), isOpen)).response;
     }
 
     @Override

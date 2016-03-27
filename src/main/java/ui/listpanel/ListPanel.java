@@ -574,26 +574,26 @@ public class ListPanel extends FilterPanel {
         }
     }
 
-    private void confirmCloseReopen(GuiElement element, boolean open) {
-        ConfirmCloseReopenDialog dialog = new ConfirmCloseReopenDialog(mainStage, open);
+    private void confirmCloseOrReopenIssue(GuiElement element, boolean isOpen) {
+        ConfirmCloseOrReopenIssueDialog dialog = new ConfirmCloseOrReopenIssueDialog(mainStage, isOpen);
         Optional<ButtonType> response = dialog.showAndWait();
         response.ifPresent(res -> {
             if (res == ButtonType.OK) {
                 ui.undoController.addAction(element.getIssue(),
-                        new EditIssueStateAction(ui.logic, open));
+                        new EditIssueStateAction(ui.logic, isOpen));
             }
         });
     }
 
     private void closeIssue() {
         getSelectedElement().ifPresent(element -> {
-            confirmCloseReopen(element, false);
+            confirmCloseOrReopenIssue(element, false);
         });
     }
 
     private void reopenIssue() {
         getSelectedElement().ifPresent(element -> {
-            confirmCloseReopen(element, true);
+            confirmCloseOrReopenIssue(element, true);
         });
     }
 

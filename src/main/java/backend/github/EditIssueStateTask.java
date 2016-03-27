@@ -12,21 +12,19 @@ public class EditIssueStateTask extends GitHubRepoTask<Boolean> {
 
     private final String repoId;
     private final int issueId;
-    private final boolean open;
+    private final boolean isOpen;
 
-    public EditIssueStateTask(TaskRunner taskRunner, Repo repo, String repoId, int issueId, boolean open) {
+    public EditIssueStateTask(TaskRunner taskRunner, Repo repo, String repoId, int issueId, boolean isOpen) {
         super(taskRunner, repo);
         this.repoId = repoId;
         this.issueId = issueId;
-        this.open = open;
+        this.isOpen = isOpen;
     }
 
     @Override
     public void run() {
         try {
-            response.complete(
-                    repo.editIssueState(repoId, issueId, open)
-            );
+            response.complete(repo.editIssueState(repoId, issueId, isOpen));
         } catch (IOException e) {
             response.complete(false);
         }

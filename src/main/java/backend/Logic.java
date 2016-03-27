@@ -394,9 +394,8 @@ public class Logic {
     }
 
     /**
-     * Edit the state of an issue on GitHub
-     * Handles the result of updating an issue's state on server. Current implementation includes
-     * reverting back to the original state locally if the server update failed.
+     * Reverting back to the original state locally if the server update failed.
+     *
      * @param isUpdateSuccessful
      * @param locallyModifiedIssue
      * @param isOpenOriginally
@@ -420,7 +419,7 @@ public class Logic {
     }
 
     /**
-     * Set the state of the issue in the {@link Logic#models} corresponding to {@code modifiedIssue} to
+     * Sets the state of the issue in the {@link Logic#models} corresponding to {@code modifiedIssue} to
      * {@code isOpenOriginally} if the current state on the issue is assigned at the same time as {@code modifiedIssue}
      * @param modifiedIssue
      * @param isOpenOriginally
@@ -429,9 +428,10 @@ public class Logic {
         TurboIssue currentIssue = getIssue(modifiedIssue.getRepoId(), modifiedIssue.getId()).orElse(modifiedIssue);
         LocalDateTime originalStateModifiedAt = modifiedIssue.getStateLastModifiedAt();
         LocalDateTime currentStateModifiedAt = currentIssue.getStateLastModifiedAt();
-        boolean isCurrentStateModifiedOriginalState = originalStateModifiedAt.isEqual(currentStateModifiedAt);
+        boolean isCurrentStateModifiedFromOriginalState = originalStateModifiedAt.isEqual(currentStateModifiedAt);
 
-        if (isCurrentStateModifiedOriginalState) {
+        if (!isCurrentStateModifiedFromOriginalState) {
+            logger.warn("Not reverting state for issue " + currentIssue + " as it is modified somewhere else.");
             return;
         }
 
@@ -441,7 +441,7 @@ public class Logic {
     }
 
     /**
-     * Edit the open/closed state in the issue object, the UI, and the server, in that order.
+     * Edits the open/closed state in the issue object, the UI, and the server, in that order.
      * Server update is done after the local update to reduce the lag between the user action and the UI response.
      *
      * @param issue The issue whose state is to be updated

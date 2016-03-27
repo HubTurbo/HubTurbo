@@ -281,18 +281,23 @@ public class GitHubRepo implements Repo {
                 .map(Milestone::getNumber);
     }
 
-    public boolean editIssueState(String repoId, int issueId, boolean open) throws IOException {
+    /**
+     * Calls GitHub to change the open/close state of an issue.
+     *
+     * @param repoId
+     * @param issueId
+     * @param isOpen
+     * @return {@code true} if success, {@code false} otherwise
+     * @throws IOException
+     */
+    public boolean editIssueState(String repoId, int issueId, boolean isOpen) throws IOException {
         Issue updatedIssue = issueService.editIssueState(
                 RepositoryId.createFromId(repoId),
                 issueId,
-                open
+                isOpen
         );
-        // Return `true` upon success, or `false` otherwise.
-        if (open) {
-            return updatedIssue.getState().equals(IssueService.STATE_OPEN);
-        } else {
-            return updatedIssue.getState().equals(IssueService.STATE_CLOSED);
-        }
+
+        return updatedIssue.getState().equals(isOpen ? IssueService.STATE_OPEN : IssueService.STATE_CLOSED);
     }
 
     @Override

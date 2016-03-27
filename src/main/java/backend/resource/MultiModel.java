@@ -122,7 +122,7 @@ public class MultiModel implements IModel {
     }
 
     /**
-     * Set the open/closed state of an issue specified by {@code issueId} in {@code repoId} to {@code isOpen}
+     * Sets the open/closed state of an issue specified by {@code issueId} in {@code repoId} to {@code isOpen}
      *
      * @param repoId
      * @param issueId

@@ -74,8 +74,8 @@ public class GitHubSource extends RepoSource {
     }
 
     @Override
-    public CompletableFuture<Boolean> editIssueState(TurboIssue issue, boolean open) {
-        return addTask(new EditIssueStateTask(this, gitHub, issue.getRepoId(), issue.getId(), open)).response;
+    public CompletableFuture<Boolean> editIssueState(TurboIssue issue, boolean isOpen) {
+        return addTask(new EditIssueStateTask(this, gitHub, issue.getRepoId(), issue.getId(), isOpen)).response;
     }
 
     @Override

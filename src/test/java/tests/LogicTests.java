@@ -360,6 +360,7 @@ public class LogicTests {
                                                   Optional<Model> modelLookUpResult) {
         when(mockedMultiModel.replaceIssueMilestone(anyString(), anyInt(), any(Optional.class)))
                 .thenReturn(replaceResult);
+        when(mockedMultiModel.getModelById(anyString())).thenReturn(modelLookUpResult);
     }
 
     private void mockRepoIOEditIssueStateResult(boolean editResult) {

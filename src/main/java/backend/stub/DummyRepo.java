@@ -190,8 +190,8 @@ public class DummyRepo implements Repo {
                 .map(Milestone::getNumber);
     }
 
-    public boolean editIssueState(String repoId, int issueId, boolean open) throws IOException {
-        return getRepoState(repoId).editIssueState(issueId, open);
+    public boolean editIssueState(String repoId, int issueId, boolean isOpen) throws IOException {
+        return getRepoState(repoId).editIssueState(issueId, isOpen);
     }
 
     @Override

@@ -232,7 +232,7 @@ public class Model implements IBaseModel {
     }
 
     /**
-     * Set the open/closed state of an issue specified by {@code issueId} with {@code isOpen}
+     * Sets the open/closed state of an issue specified by {@code issueId} with {@code isOpen}
      *
      * @param issueId
      * @param isOpen
