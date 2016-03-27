@@ -139,6 +139,7 @@ public class IssuePickerDialog extends Dialog<String> {
         issuepickerQueryField.setDisable(true);
         Platform.runLater(card::requestFocus);
         populateSelectedIssues(Optional.of(issue));
+        populateSuggestedIssues(state.getSuggestedIssues(), Optional.of(issue));
     }
 
     // UI helper methods

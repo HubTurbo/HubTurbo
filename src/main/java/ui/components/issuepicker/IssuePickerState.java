@@ -7,7 +7,7 @@ import java.util.Optional;
 import backend.resource.TurboIssue;
 
 /**
- * This class is used to represent the state of the issue picker. 
+ * Represents the state of the issue picker. 
  */
 public class IssuePickerState {
 
@@ -33,7 +33,6 @@ public class IssuePickerState {
     public List<TurboIssue> getSuggestedIssues() {
         return suggestedIssues;
     }
-
 
     /**
      * Sets issues based on given user input

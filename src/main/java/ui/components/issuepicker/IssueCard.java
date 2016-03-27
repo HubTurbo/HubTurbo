@@ -93,30 +93,29 @@ public class IssueCard extends VBox {
         issueDetails.getChildren().clear();
         TurboIssue issue = guiElement.getIssue();
 
-        if (issue.isPullRequest()) {
-            Label icon = new Label(OCTICON_PULL_REQUEST);
-            icon.getStyleClass().addAll("octicon", "issue-pull-request-icon");
-            issueDetails.getChildren().add(icon);
-        }
+        addPullRequestIcon(issue);
+        addCommentIcon(issue);
+        addLabels();
+        addMilestoneIcon(issue);
 
-        if (issue.getCommentCount() > 0){
-            Label commentIcon = new Label(OCTICON_COMMENT);
-            commentIcon.getStyleClass().addAll("octicon", "comments-label-button");
-            Label commentCount = new Label(Integer.toString(issue.getCommentCount()));
+        createAuthorBox(issue);
+        createAssigneeBox(issue);
+    }
 
-            issueDetails.getChildren().add(commentIcon);
-            issueDetails.getChildren().add(commentCount);
-        }
-
+    private void addLabels() {
         for (TurboLabel label : guiElement.getLabels()) {
             issueDetails.getChildren().add(label.getNode());
         }
+    }
 
-        if (issue.getMilestone().isPresent() && guiElement.getMilestone().isPresent()) {
-            TurboMilestone milestone = guiElement.getMilestone().get();
-            issueDetails.getChildren().add(new Label(milestone.getTitle()));
+    private void createAssigneeBox(TurboIssue issue) {
+        if (issue.getAssignee().isPresent()) {
+            HBox assigneeBox = createDisplayUserBox(guiElement.getAssignee(), issue.getAssignee().get());
+            authorAssigneeBox.getChildren().add(assigneeBox);
         }
+    }
 
+    private void createAuthorBox(TurboIssue issue) {
         if (issue.isPullRequest()) {
             HBox authorBox = createDisplayUserBox(guiElement.getAuthor(), issue.getCreator());
             authorAssigneeBox.getChildren().add(authorBox);
@@ -126,10 +125,31 @@ public class IssueCard extends VBox {
                 authorAssigneeBox.getChildren().add(rightArrow);
             }
         }
+    }
 
-        if (issue.getAssignee().isPresent()) {
-            HBox assigneeBox = createDisplayUserBox(guiElement.getAssignee(), issue.getAssignee().get());
-            authorAssigneeBox.getChildren().add(assigneeBox);
+    private void addMilestoneIcon(TurboIssue issue) {
+        if (issue.getMilestone().isPresent() && guiElement.getMilestone().isPresent()) {
+            TurboMilestone milestone = guiElement.getMilestone().get();
+            issueDetails.getChildren().add(new Label(milestone.getTitle()));
+        }
+    }
+
+    private void addCommentIcon(TurboIssue issue) {
+        if (issue.getCommentCount() > 0){
+            Label commentIcon = new Label(OCTICON_COMMENT);
+            commentIcon.getStyleClass().addAll("octicon", "comments-label-button");
+            Label commentCount = new Label(Integer.toString(issue.getCommentCount()));
+
+            issueDetails.getChildren().add(commentIcon);
+            issueDetails.getChildren().add(commentCount);
+        }
+    }
+
+    private void addPullRequestIcon(TurboIssue issue) {
+        if (issue.isPullRequest()) {
+            Label icon = new Label(OCTICON_PULL_REQUEST);
+            icon.getStyleClass().addAll("octicon", "issue-pull-request-icon");
+            issueDetails.getChildren().add(icon);
         }
     }
 

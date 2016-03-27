@@ -7,9 +7,9 @@ Press <kbd>Ctrl</kbd> + <kbd>I</kbd> to `launch` the issue picker.
 ![](images/pickers/issue_picker_main.png?raw=true)
 
 The `Issue Picker` is divided into 3 main sections:
- 1. `Selected issues pane` : shows issues that will be selected upon confirmation 
+ 1. `Selected issues area` : shows issues that will be selected upon confirmation 
  2. `Query field`     : enter your query here to filter all issues in current repository 
- 3. `Suggested issues pane`: lists all issues that matches your query. 
+ 3. `Suggested issues area`: lists all issues that matches your query. 
  
 ### Selecting issues
 Typing in the text field will highlight the issue that matches the query. 
