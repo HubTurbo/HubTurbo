@@ -441,6 +441,10 @@ public class Qualifier implements FilterExpression {
         }
     }
 
+    /**
+     * If the user referred in the qualifier is not a contributor of the repository of the TurboIssue,
+     * it returns a List<String> containing a warning that explains so, or an empty List<String> otherwise.
+     */
     private List<String> getWarningsForTypeAuthorOrAssignee(IModel model, TurboIssue issue) {
         List<String> result = new ArrayList<>();
         if (content.isPresent() && !model.isUserInRepo(issue.getRepoId(), content.get())) {
