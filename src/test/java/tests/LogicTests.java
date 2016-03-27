@@ -213,6 +213,132 @@ public class LogicTests {
                 .replaceIssueLabels(anyString(), anyInt(), anyListOf(String.class));
     }
 
+    /**
+     * Tests that {@code editIssueState} succeed when both models and repoIO succeeded
+     */
+    @Test
+    public void editIssueState_successful() throws ExecutionException, InterruptedException {
+        mockRepoIOEditIssueStateResult(true);
+
+        TurboIssue openIssue = createOpenIssue();
+        mockMultiModelEditIssueState(Optional.of(openIssue), Optional.empty());
+        assertTrue(logic.editIssueState(openIssue, true).get());
+        assertTrue(logic.editIssueState(openIssue, false).get());
+
+        TurboIssue closedIssue = createClosedIssue();
+        mockMultiModelEditIssueState(Optional.of(closedIssue), Optional.empty());
+        assertTrue(logic.editIssueState(closedIssue, true).get());
+        assertTrue(logic.editIssueState(closedIssue, false).get());
+    }
+
+    /**
+     * Tests that {@code editIssueState} failed when models return empty result
+     */
+    @Test
+    public void editIssueState_modelsEmpty() throws ExecutionException, InterruptedException {
+        mockRepoIOEditIssueStateResult(true);
+        mockMultiModelEditIssueState(Optional.empty(), Optional.empty());
+
+        TurboIssue openIssue = createOpenIssue();
+        assertFalse(logic.editIssueState(openIssue, false).get());
+        assertFalse(logic.editIssueState(openIssue, true).get());
+
+        TurboIssue closedIssue = createClosedIssue();
+        assertFalse(logic.editIssueState(closedIssue, false).get());
+        assertFalse(logic.editIssueState(closedIssue, true).get());
+    }
+
+    /**
+     * Tests that {@code editIssueState} failed when repoIO failed to update labels
+     */
+    @Test
+    public void editIssueState_repoIOUnsuccessful() throws ExecutionException, InterruptedException {
+        mockRepoIOEditIssueStateResult(false);
+
+        TurboIssue openIssue = createOpenIssue();
+        mockMultiModelEditIssueState(Optional.of(openIssue), Optional.empty());
+        assertFalse(logic.editIssueState(openIssue, false).get());
+        assertFalse(logic.editIssueState(openIssue, true).get());
+
+        TurboIssue closedIssue = createClosedIssue();
+        mockMultiModelEditIssueState(Optional.of(closedIssue), Optional.empty());
+        assertFalse(logic.editIssueState(closedIssue, false).get());
+        assertFalse(logic.editIssueState(closedIssue, true).get());
+    }
+
+    /**
+     * Tests that {@link MultiModel#editIssueState(String, int, boolean)} is first called with the
+     * new open/closed state then revert back to original state when repoIO failed to update labels
+     */
+    @Test
+    public void editIssueState_repoIOUnsuccessful_revert() throws ExecutionException, InterruptedException {
+        boolean wasOpen;
+        boolean isOpen;
+        InOrder inOrder = inOrder(mockedMultiModel);
+
+        TurboIssue openIssue = createOpenIssue();
+        wasOpen = openIssue.isOpen();
+        isOpen = !wasOpen;
+        mockRepoIOEditIssueStateResult(false);
+        mockMultiModelEditIssueState(Optional.of(openIssue), Optional.empty());
+
+        logic.editIssueState(openIssue, isOpen).get();
+
+        inOrder.verify(mockedMultiModel).editIssueState(openIssue.getRepoId(), openIssue.getId(), isOpen);
+        inOrder.verify(mockedMultiModel).editIssueState(openIssue.getRepoId(), openIssue.getId(), wasOpen);
+
+        TurboIssue closedIssue = createClosedIssue();
+        wasOpen = closedIssue.isOpen();
+        isOpen = !wasOpen;
+        mockRepoIOEditIssueStateResult(false);
+        mockMultiModelEditIssueState(Optional.of(closedIssue), Optional.empty());
+
+        logic.editIssueState(closedIssue, isOpen).get();
+
+        inOrder.verify(mockedMultiModel).editIssueState(closedIssue.getRepoId(), closedIssue.getId(), isOpen);
+        inOrder.verify(mockedMultiModel).editIssueState(closedIssue.getRepoId(), closedIssue.getId(), wasOpen);
+    }
+
+    /**
+     * Tests that no revert is taken place if the issue's open/closed state is modified elsewhere after
+     * {@link Logic#editIssueState(TurboIssue, boolean)} is called
+     */
+    @Test
+    public void editIssueState_timeNotMatched_noRevert() throws ExecutionException, InterruptedException {
+        boolean wasOpen;
+        boolean isOpen;
+        Model mockedModel = mock(Model.class);
+        mockRepoIOEditIssueStateResult(false);
+
+        TurboIssue openIssue = createOpenIssue();
+        wasOpen = openIssue.isOpen();
+        isOpen = !wasOpen;
+        TurboIssue modifiedOpenIssue = TestUtils.delayThenGet(10, LogicTests::createOpenIssue);
+
+        when(mockedModel.editIssueState(openIssue.getId(), isOpen)).thenReturn(Optional.of(openIssue));
+        when(mockedModel.getIssueById(openIssue.getId())).thenReturn(Optional.of(modifiedOpenIssue));
+        mockMultiModelEditIssueState(Optional.of(openIssue), Optional.of(mockedModel));
+
+        logic.editIssueState(openIssue, isOpen).get();
+
+        verify(mockedMultiModel, atMost(1))
+                .editIssueState(anyString(), anyInt(), anyBoolean());
+
+        TurboIssue closedIssue = createClosedIssue();
+        wasOpen = closedIssue.isOpen();
+        isOpen = !wasOpen;
+        TurboIssue modifiedClosedIssue = TestUtils.delayThenGet(10, LogicTests::createClosedIssue);
+
+        when(mockedModel.editIssueState(closedIssue.getId(), isOpen)).thenReturn(Optional.of(closedIssue));
+        when(mockedModel.getIssueById(closedIssue.getId())).thenReturn(Optional.of(modifiedClosedIssue));
+        mockMultiModelEditIssueState(Optional.of(closedIssue), Optional.of(mockedModel));
+
+        logic.editIssueState(closedIssue, isOpen).get();
+
+        verify(mockedMultiModel, atMost(2))
+                .editIssueState(anyString(), anyInt(), anyBoolean());
+    }
+
     private void mockRepoIOReplaceIssueLabelsResult(boolean replaceResult) {
         when(mockedRepoIO.replaceIssueLabels(any(TurboIssue.class), anyListOf(String.class)))
                 .thenReturn(CompletableFuture.completedFuture(replaceResult));
@@ -237,6 +363,19 @@ public class LogicTests {
         when(mockedMultiModel.getModelById(anyString())).thenReturn(modelLookUpResult);
     }
 
+    private void mockRepoIOEditIssueStateResult(boolean editResult) {
+        when(mockedRepoIO.editIssueState(any(TurboIssue.class), anyBoolean()))
+                .thenReturn(CompletableFuture.completedFuture(editResult));
+    }
+
+    private void mockMultiModelEditIssueState(Optional<TurboIssue> editResult,
+                                              Optional<Model> modelLookUpResult) {
+
+        when(mockedMultiModel.editIssueState(anyString(), anyInt(), anyBoolean()))
+                .thenReturn(editResult);
+        when(mockedMultiModel.getModelById(anyString())).thenReturn(modelLookUpResult);
+    }
+
     public static TurboIssue createIssueWithLabels(int issueId, List<String> labels) {
         TurboIssue issue = new TurboIssue("testowner/testrepo", issueId, "Issue title");
         issue.setLabels(labels);
@@ -248,6 +387,18 @@ public class LogicTests {
         if (milestone.isPresent()) {
             issue.setMilestoneById(milestone.get());
         }
+        return issue;
+    }
+
+    public static TurboIssue createClosedIssue() {
+        TurboIssue issue = new TurboIssue("testowner/testrepo", 2, "Issue title");
+        issue.setOpen(false);
+        return issue;
+    }
+
+    public static TurboIssue createOpenIssue() {
+        TurboIssue issue = new TurboIssue("testowner/testrepo", 3, "Issue title");
+        issue.setOpen(true);
         return issue;
     }
 }

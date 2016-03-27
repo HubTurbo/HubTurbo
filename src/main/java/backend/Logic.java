@@ -384,13 +384,85 @@ public class Logic {
         LocalDateTime originalMilestoneModifiedAt = originalIssue.getMilestoneLastModifiedAt();
         LocalDateTime currentMilestoneAssignedAt = currentIssue.getMilestoneLastModifiedAt();
         boolean isCurrentMilestoneModifiedFromOriginalMilestone = originalMilestoneModifiedAt
-                                                                    .isEqual(currentMilestoneAssignedAt);
+                .isEqual(currentMilestoneAssignedAt);
 
         if (!isCurrentMilestoneModifiedFromOriginalMilestone) return;
 
         logger.info("Reverting milestone for issue " + currentIssue);
         models.replaceIssueMilestone(currentIssue.getRepoId(), currentIssue.getId(), originalIssue.getMilestone());
         refreshUI();
+    }
+
+    /**
+     * Reverting back to the original state locally if the server update failed.
+     *
+     * @param isUpdateSuccessful
+     * @param locallyModifiedIssue
+     * @param isOpenOriginally
+     * @return
+     */
+    private boolean handleIssueStateUpdateResult(boolean isUpdateSuccessful,
+                                                 Optional<TurboIssue> locallyModifiedIssue,
+                                                 boolean isOpenOriginally) {
+        if (!locallyModifiedIssue.isPresent()) {
+            logger.error("Unable to edit issue state locally");
+            return false;
+        }
+
+        if (isUpdateSuccessful) {
+            return true;
+        }
+
+        logger.error("Unable to update model on server");
+        revertLocalStateEdit(locallyModifiedIssue.get(), isOpenOriginally);
+        return false;
+    }
+
+    /**
+     * Sets the state of the issue in the {@link Logic#models} corresponding to {@code modifiedIssue} to
+     * {@code isOpenOriginally} if the current state on the issue is assigned at the same time as {@code modifiedIssue}
+     * @param modifiedIssue
+     * @param isOpenOriginally
+     */
+    private void revertLocalStateEdit(TurboIssue modifiedIssue, boolean isOpenOriginally) {
+        TurboIssue currentIssue = getIssue(modifiedIssue.getRepoId(), modifiedIssue.getId()).orElse(modifiedIssue);
+        LocalDateTime originalStateModifiedAt = modifiedIssue.getStateLastModifiedAt();
+        LocalDateTime currentStateModifiedAt = currentIssue.getStateLastModifiedAt();
+        boolean isCurrentStateModifiedFromOriginalState = originalStateModifiedAt.isEqual(currentStateModifiedAt);
+
+        if (!isCurrentStateModifiedFromOriginalState) {
+            logger.warn("Not reverting state for issue " + currentIssue + " as it is modified somewhere else.");
+            return;
+        }
+
+        logger.info("Reverting state for issue " + currentIssue);
+        models.editIssueState(currentIssue.getRepoId(), currentIssue.getId(), isOpenOriginally);
+        refreshUI();
+    }
+
+    /**
+     * Edits the open/closed state in the issue object, the UI, and the server, in that order.
+     * Server update is done after the local update to reduce the lag between the user action and the UI response.
+     *
+     * @param issue The issue whose state is to be updated
+     * @param isOpen The new state for the issue
+     * @return True for success, false otherwise
+     */
+    public CompletableFuture<Boolean> editIssueState(TurboIssue issue, boolean isOpen) {
+        boolean isOpenOriginally = issue.isOpen();
+
+        String action = isOpen ? "Reopening" : "Closing";
+        logger.info(String.format("%s %s on GitHub", action, issue));
+
+        CompletableFuture<Optional<TurboIssue>> localStateEditFuture =
+                repoOpControl.editIssueStateLocally(issue, isOpen);
+        localStateEditFuture.thenRun(this::refreshUI);
+
+        return repoOpControl.editIssueStateOnServer(issue, isOpen)
+                .thenCombine(localStateEditFuture, (isUpdateSuccessful, locallyModifiedIssue) -> {
+                    return handleIssueStateUpdateResult(
+                            isUpdateSuccessful, locallyModifiedIssue, isOpenOriginally);
+                });
     }
 
     /**

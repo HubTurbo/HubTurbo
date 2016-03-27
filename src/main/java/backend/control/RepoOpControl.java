@@ -70,6 +70,20 @@ public final class RepoOpControl {
         return result;
     }
 
+    public CompletableFuture<Boolean> editIssueStateOnServer(TurboIssue issue, boolean isOpen) {
+        init(issue.getRepoId());
+        CompletableFuture<Boolean> result = new CompletableFuture<>();
+        enqueue(new EditIssueStateOnServerOp(repoIO, result, issue, isOpen));
+        return result;
+    }
+
+    public CompletableFuture<Optional<TurboIssue>> editIssueStateLocally(TurboIssue issue, boolean isOpen) {
+        init(issue.getRepoId());
+        CompletableFuture<Optional<TurboIssue>> result = new CompletableFuture<>();
+        enqueue(new EditIssueStateLocallyOp(models, result, issue, isOpen));
+        return result;
+    }
+
     public CompletableFuture<Boolean> replaceIssueLabelsOnServer(TurboIssue issue, List<String> labels) {
         init(issue.getRepoId());
         CompletableFuture<Boolean> result = new CompletableFuture<>();

@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import filter.expression.QualifierType;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCodeCombination;
@@ -22,6 +23,7 @@ import javafx.scene.text.Text;
 import javafx.scene.paint.Color;
 
 import javafx.scene.text.TextFlow;
+import javafx.stage.Stage;
 import org.apache.logging.log4j.Logger;
 
 import ui.GUIController;
@@ -31,6 +33,7 @@ import ui.components.IssueListView;
 import ui.components.KeyboardShortcuts;
 import ui.issuepanel.FilterPanel;
 import ui.issuepanel.PanelControl;
+import undo.actions.EditIssueStateAction;
 import util.GithubPageElements;
 import util.HTLog;
 import util.KeyPress;
@@ -49,6 +52,8 @@ public class ListPanel extends FilterPanel {
     private int issuesCount = 0;
     private int closedIssuesCount = 0;
     private int openIssuesCount = 0;
+
+    private final Stage mainStage;
 
     private final IssueListView listView;
     private final HashMap<Integer, Integer> issueCommentCounts = new HashMap<>();
@@ -78,10 +83,17 @@ public class ListPanel extends FilterPanel {
     private static final MenuItem changeMilestoneMenuItem = new MenuItem();
     private static final String CHANGE_MILESTONE_MENU_ITEM_TEXT = "Change milestone (M)";
 
-    public ListPanel(UI ui, GUIController guiController, PanelControl parentPanelControl, int panelIndex) {
+    private static final MenuItem closeReopenIssueMenuItem = new MenuItem();
+    private static final String closeIssueMenuItemText = "Close issue (C)";
+    private static final String reopenIssueMenuItemText = "Reopen issue (O)";
+
+    public ListPanel(UI ui, GUIController guiController, Stage mainStage,
+                     PanelControl parentPanelControl, int panelIndex) {
         super(ui, guiController, parentPanelControl, panelIndex);
         this.ui = ui;
         this.guiController = guiController;
+        this.mainStage = mainStage;
+
         listView = new IssueListView();
         setupListView();
         getChildren().add(listView);
@@ -248,6 +260,12 @@ public class ListPanel extends FilterPanel {
             if (KeyboardShortcuts.markAsUnread.match(event)) {
                 markAsUnread();
             }
+            if (KeyboardShortcuts.closeIssue.match(event)) {
+                closeIssue();
+            }
+            if (KeyboardShortcuts.reopenIssue.match(event)) {
+                reopenIssue();
+            }
             if (SHOW_DOCS.match(event)) {
                 ui.getBrowserComponent().showDocs();
             }
@@ -391,6 +409,16 @@ public class ListPanel extends FilterPanel {
             }
         });
 
+        closeReopenIssueMenuItem.setOnAction(e -> {
+            String menuItemText = closeReopenIssueMenuItem.getText();
+
+            if (menuItemText.equals(closeIssueMenuItemText)) {
+                closeIssue();
+            } else if (menuItemText.equals(reopenIssueMenuItemText)) {
+                reopenIssue();
+            }
+        });
+
         changeLabelsMenuItem.setText(CHANGE_LABELS_MENU_ITEM_TEXT);
         changeLabelsMenuItem.setOnAction(e -> {
             changeLabels();
@@ -411,8 +439,11 @@ public class ListPanel extends FilterPanel {
             markAllItemsBelow(!READ);
         });
         
-        contextMenu.getItems().addAll(markAsReadUnreadMenuItem, markAllBelowAsReadMenuItem,
-                markAllBelowAsUnreadMenuItem, changeLabelsMenuItem, changeMilestoneMenuItem);
+        contextMenu.getItems().addAll(markAsReadUnreadMenuItem,
+                                      markAllBelowAsReadMenuItem, markAllBelowAsUnreadMenuItem,
+                                      changeLabelsMenuItem,
+                                      changeMilestoneMenuItem,
+                                      closeReopenIssueMenuItem);
         contextMenu.setOnShowing(e -> updateContextMenu(contextMenu));
         listView.setContextMenu(contextMenu);
 
@@ -421,6 +452,7 @@ public class ListPanel extends FilterPanel {
 
     private ContextMenu updateContextMenu(ContextMenu contextMenu) {
         updateMarkAsReadUnreadMenuItem();
+        updateCloseReopenIssueMenuItem();
         updateChangeLabelsMenuItem();
         updateChangeMilestoneMenuItem();
 
@@ -475,6 +507,25 @@ public class ListPanel extends FilterPanel {
         return issuesCount;
     }
 
+    private MenuItem updateCloseReopenIssueMenuItem() {
+        Optional<GuiElement> item = listView.getSelectedItem();
+        if (!item.isPresent()) {
+            closeReopenIssueMenuItem.setDisable(true);
+            return closeReopenIssueMenuItem;
+        }
+
+        closeReopenIssueMenuItem.setDisable(false);
+        TurboIssue selectedIssue = item.get().getIssue();
+
+        if (selectedIssue.isOpen()) {
+            closeReopenIssueMenuItem.setText(closeIssueMenuItemText);
+        } else {
+            closeReopenIssueMenuItem.setText(reopenIssueMenuItemText);
+        }
+
+        return closeReopenIssueMenuItem;
+    }
+    
     public Optional<GuiElement> getSelectedElement() {
         return listView.getSelectedItem();
     }
@@ -521,6 +572,29 @@ public class ListPanel extends FilterPanel {
 
             parentPanelControl.refresh();
         }
+    }
+
+    private void confirmCloseOrReopenIssue(GuiElement element, boolean isOpen) {
+        ConfirmCloseOrReopenIssueDialog dialog = new ConfirmCloseOrReopenIssueDialog(mainStage, isOpen);
+        Optional<ButtonType> response = dialog.showAndWait();
+        response.ifPresent(res -> {
+            if (res == ButtonType.OK) {
+                ui.undoController.addAction(element.getIssue(),
+                        new EditIssueStateAction(ui.logic, isOpen));
+            }
+        });
+    }
+
+    private void closeIssue() {
+        getSelectedElement().ifPresent(element -> {
+            confirmCloseOrReopenIssue(element, false);
+        });
+    }
+
+    private void reopenIssue() {
+        getSelectedElement().ifPresent(element -> {
+            confirmCloseOrReopenIssue(element, true);
+        });
     }
 
     private void changeLabels() {

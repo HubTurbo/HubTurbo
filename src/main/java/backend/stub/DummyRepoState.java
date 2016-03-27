@@ -329,6 +329,23 @@ public class DummyRepoState {
         return toRename;
     }
 
+    public boolean editIssueState(int issueId, boolean isOpen) {
+        ImmutablePair<TurboIssue, IssueMetadata> mutables = produceMutables(issueId);
+        TurboIssue toEdit = mutables.getLeft();
+        IssueMetadata metadataOfIssue = mutables.getRight();
+        List<TurboIssueEvent> eventsOfIssue = metadataOfIssue.getEvents();
+
+        eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test-nonself"),
+                isOpen ? IssueEventType.Reopened : IssueEventType.Closed,
+                new Date()));
+        toEdit.setOpen(isOpen);
+        toEdit.setUpdatedAt(LocalDateTime.now());
+
+        markUpdatedEvents(toEdit, IssueMetadata.intermediate(eventsOfIssue, metadataOfIssue.getComments(), "", ""));
+
+        return true;
+    }
+
     protected TurboMilestone updateMilestone(int itemId, String updateText) {
         TurboMilestone milestoneToUpdate = milestones.get(itemId);
 

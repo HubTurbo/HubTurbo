@@ -63,10 +63,11 @@ public class TurboIssue {
     private IssueMetadata metadata;
     private Optional<LocalDateTime> markedReadAt;
 
-    /* This field records the most recently modified time of the issue's labels. Any method that updates
+    /* This field records the most recently modified time of the issue's labels or state. Any method that updates
        the labels must also update this field. If this is empty, updatedAt time is used instead */
     private Optional<LocalDateTime> labelsLastModifiedAt = Optional.empty();
     private Optional<LocalDateTime> milestoneLastModifiedAt = Optional.empty();
+    private Optional<LocalDateTime> stateLastModifiedAt = Optional.empty();
 
     @SuppressWarnings("unused")
     private void ______CONSTRUCTORS______() {}
@@ -399,6 +400,7 @@ public class TurboIssue {
 
     public void setOpen(boolean isOpen) {
         this.isOpen = isOpen;
+        stateLastModifiedAt = Optional.of(LocalDateTime.now());
     }
 
     public Optional<String> getAssignee() {
@@ -428,6 +430,10 @@ public class TurboIssue {
 
     public LocalDateTime getMilestoneLastModifiedAt() {
         return this.milestoneLastModifiedAt.orElse(getUpdatedAt());
+    }
+
+    public LocalDateTime getStateLastModifiedAt() {
+        return stateLastModifiedAt.orElse(getUpdatedAt());
     }
 
     public void addLabel(String label) {

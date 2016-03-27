@@ -248,7 +248,7 @@ public class UI extends Application implements EventDispatcher {
         mainStage = stage;
         stage.setMaximized(false);
 
-        panels = new PanelControl(this, prefs);
+        panels = new PanelControl(this, mainStage, prefs);
         guiController = new GUIController(this, panels, apiBox);
 
         Scene scene = new Scene(createRootNode());

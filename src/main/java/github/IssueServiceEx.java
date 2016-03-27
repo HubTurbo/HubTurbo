@@ -41,15 +41,10 @@ public class IssueServiceEx extends IssueService {
         return returnedIssue;
     }
 
-    public Issue editIssueState(IRepositoryIdProvider repository, int issueId, boolean open) throws IOException {
+    public Issue editIssueState(IRepositoryIdProvider repository, int issueId, boolean isOpen) throws IOException {
         HttpURLConnection connection = createIssuePostConnection(repository, issueId);
         HashMap<Object, Object> data = new HashMap<>();
-        String state;
-        if (open) {
-            state = STATE_OPEN;
-        } else {
-            state = STATE_CLOSED;
-        }
+        String state = isOpen ? STATE_OPEN : STATE_CLOSED;
         data.put(FILTER_STATE, state);
         return ghClient.sendJson(connection, data, Issue.class);
     }

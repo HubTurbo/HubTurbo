@@ -231,6 +231,21 @@ public class Model implements IBaseModel {
                 () -> logger.error("Issue " + issueId + " not found in model for " + repoId));
     }
 
+    /**
+     * Sets the open/closed state of an issue specified by {@code issueId} with {@code isOpen}
+     *
+     * @param issueId
+     * @param isOpen
+     * @return the modified TurboIssue if successful
+     */
+    public synchronized Optional<TurboIssue> editIssueState(int issueId, boolean isOpen) {
+        Optional<TurboIssue> issueLookUpResult = getIssueById(issueId);
+        return Utility.safeFlatMapOptional(issueLookUpResult, issue -> {
+            issue.setOpen(isOpen);
+            return Optional.of(new TurboIssue(issue));
+        }, () -> logger.error("Issue " + issueId + " not found in model for " + repoId));
+    }
+
     @SuppressWarnings("unused")
     private void ______BOILERPLATE______() {}
 

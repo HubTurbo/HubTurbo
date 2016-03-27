@@ -179,6 +179,22 @@ public class KeyboardShortcutsTest extends UITest {
         assertEquals(false, issuePanel.getSelectedElement().get().getIssue().isCurrentlyRead());
         clearSelectedIssueId();
 
+        // close issue
+        push(getKeyCode("CLOSE_ISSUE"));
+        push(KeyCode.ENTER);
+        waitUntilNodeAppears("Undo");
+        assertEquals(true, issuePanel.getSelectedElement().isPresent());
+        assertEquals(false, issuePanel.getSelectedElement().get().getIssue().isOpen());
+        clearSelectedIssueId();
+
+        // reopen issue
+        push(getKeyCode("REOPEN_ISSUE"));
+        push(KeyCode.ENTER);
+        waitUntilNodeAppears("Undo");
+        assertEquals(true, issuePanel.getSelectedElement().isPresent());
+        assertEquals(true, issuePanel.getSelectedElement().get().getIssue().isOpen());
+        clearSelectedIssueId();
+
         // testing corner case for mark as read where there is only one issue displayed
         click("#dummy/dummy_col1_filterTextField");
         type("id:5");

@@ -16,6 +16,11 @@ import util.events.testevents.ClearLogicModelEvent;
 import util.events.testevents.UpdateDummyRepoEventHandler;
 
 import java.util.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 public class DummyRepo implements Repo {
 
@@ -183,6 +188,10 @@ public class DummyRepo implements Repo {
         Issue returnedIssue = getRepoState(repoId).setMilestone(issueId, issueMilestone);
         return Optional.ofNullable(returnedIssue.getMilestone())
                 .map(Milestone::getNumber);
+    }
+
+    public boolean editIssueState(String repoId, int issueId, boolean isOpen) throws IOException {
+        return getRepoState(repoId).editIssueState(issueId, isOpen);
     }
 
     @Override
