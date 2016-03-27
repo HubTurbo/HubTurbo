@@ -106,6 +106,7 @@ public abstract class FilterPanel extends AbstractPanel {
         ui.registerEvent((ApplyingFilterEventHandler) this::startLoadingAnimationIfApplicable);
         ui.registerEvent((AppliedFilterEventHandler) this::stopLoadingAnimationIfApplicable);
         ui.registerEvent((FilterExceptionEventHandler) this::handleFilterException);
+        ui.registerEvent((FilterWarningEventHandler) this::handleFilterWarning);
     }
 
     private final ModelUpdatedEventHandler onModelUpdate = e -> {
@@ -227,9 +228,18 @@ public abstract class FilterPanel extends AbstractPanel {
 
     protected abstract void stopLoadingAnimationIfApplicable(AppliedFilterEvent e);
 
+    private void handleFilterWarning(FilterWarningEvent e) {
+        if (!e.filterExpr.equals(getCurrentFilterExpression())) return;
+        showWarning(e.warnings.get(0));
+    }
+
     private void handleFilterException(FilterExceptionEvent e) {
         if (!e.filterExpr.equals(getCurrentFilterExpression())) return;
         emptyFilterAndShowError(e.exceptionMessage);
+    }
+
+    private void showWarning(String warning) {
+        UI.status.displayMessage(getUniquePanelName(panelMenuBar.getPanelName()) + ": " + warning);
     }
 
     private void emptyFilterAndShowError(String exceptionMessage) {

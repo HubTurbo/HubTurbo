@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.Rule;
@@ -828,14 +829,22 @@ public class FilterEvalTests {
     @Test
     public void processQualifier_useInvalidUsername_getUsernameWarning() {
         TurboUser user = new TurboUser(REPO, "fox", "charlie");
-        IModel model = TestUtils.singletonModel(new Model(REPO,
-                                                            new ArrayList<>(),
-                                                            new ArrayList<>(),
-                                                            new ArrayList<>(),
-                                                            new ArrayList<>(Arrays.asList(user))));
-        verifySemanticException(model, "involves:bob", String.format(USER_WARNING_ERROR_FORMAT, "bob", REPO));
-        verifySemanticException(model, "involves:foxx", String.format(USER_WARNING_ERROR_FORMAT, "bob", REPO));
-        verifySemanticException(model, "author:alice", String.format(USER_WARNING_ERROR_FORMAT, "alice", REPO));
+        IModel model = TestUtils.singletonModel(createModelFromUsers(REPO, user));
+        verifyUserWarning(model, "involves:bOb",
+                            Arrays.asList(String.format(USER_WARNING_ERROR_FORMAT, "bOb", REPO)));
+        verifyUserWarning(model, "involves:foxX",
+                            Arrays.asList(String.format(USER_WARNING_ERROR_FORMAT, "foxX", REPO)));
+        verifyUserWarning(model, "author:alice",
+                            Arrays.asList(String.format(USER_WARNING_ERROR_FORMAT, "alice", REPO)));
+    }
+
+    @Test
+    public void processQualifier_useValidUsername_noUsernameWarning() {
+        TurboUser user = new TurboUser(REPO, "fox", "charlie");
+        IModel model = TestUtils.singletonModel(createModelFromUsers(REPO, user));
+        verifyUserWarning(model, "involves:fOX", new ArrayList<>());
+        verifyUserWarning(model, "assignee:FOX", new ArrayList<>());
+        verifyUserWarning(model, "assignee:CHAR", new ArrayList<>());
     }
 
     @Test
@@ -846,11 +855,7 @@ public class FilterEvalTests {
         TurboIssue issue1 = new TurboIssue(REPO, 1, "title", "alice", LocalDateTime.now(), false);
         TurboIssue issue2 = new TurboIssue(REPO, 1, "title", "bob", LocalDateTime.now(), false);
         issue1.setAssignee(user3);
-        IModel model = TestUtils.singletonModel(new Model(REPO,
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new ArrayList<>(Arrays.asList(user1, user2, user3))));
+        IModel model = TestUtils.singletonModel(createModelFromUsers(REPO, user1, user2, user3));
         assertTrue(Qualifier.process(model, Parser.parse("assignee:ox"), issue1));
         assertTrue(Qualifier.process(model, Parser.parse("author:alice"), issue1));
         assertFalse(Qualifier.process(model, Parser.parse("assignee:charlie"), issue2));
@@ -880,5 +885,16 @@ public class FilterEvalTests {
     private void verifyQualifierContentError(QualifierType type, String invalidInput) {
         verifySemanticException(empty, invalidInput, String.format(SemanticException.ERROR_MESSAGE,
                                                                     type, type.getDescriptionOfValidInputs()));
+    }
+
+    private void verifyUserWarning(IModel model, String input, List<String> expectedWarnings) {
+        TurboIssue issue = new TurboIssue(REPO, 1, "title");
+        FilterExpression filterExpr = Parser.parse(input);
+        List<String> warnings = filterExpr.getWarnings(model, issue);
+        assertEquals(expectedWarnings, warnings);
+    }
+
+    private Model createModelFromUsers(String name, TurboUser... users) {
+        return new Model(name, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), Arrays.asList(users));
     }
 }
