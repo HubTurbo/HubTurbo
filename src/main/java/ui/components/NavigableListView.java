@@ -7,6 +7,7 @@ import org.apache.logging.log4j.Logger;
 
 import static ui.components.KeyboardShortcuts.FIRST_ISSUE;
 import static ui.components.KeyboardShortcuts.LAST_ISSUE;
+import ui.components.KeyboardShortcuts.KeyboardShortcutKey;
 
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -166,9 +167,11 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
                 }
             }
             if (e.getCode() == KeyCode.UP || e.getCode() == KeyCode.DOWN ||
-                    KeyboardShortcuts.upIssue.match(e) || KeyboardShortcuts.downIssue.match(e)) {
+                    KeyboardShortcuts.getKeyboardShortcut(KeyboardShortcutKey.UP_ISSUE).match(e) ||
+                    KeyboardShortcuts.getKeyboardShortcut(KeyboardShortcutKey.DOWN_ISSUE).match(e)) {
                 e.consume();
-                handleUpDownKeys(e.getCode() == KeyCode.DOWN || KeyboardShortcuts.downIssue.match(e));
+                handleUpDownKeys(e.getCode() == KeyCode.DOWN ||
+                        KeyboardShortcuts.getKeyboardShortcut(KeyboardShortcutKey.DOWN_ISSUE).match(e));
                 assert selectedIndex.isPresent() : "handleUpDownKeys doesn't set selectedIndex!";
                 if (!e.isShiftDown()) {
                     logger.info("Enter key selection on item index " + selectedIndex.get());

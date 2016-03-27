@@ -242,10 +242,11 @@ public class ListPanel extends FilterPanel {
         addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             // Temporary fix for now since markAsRead and Show Related Issue/PR have same keys.
             // Will only work if the key for markAsRead is not the default key E.
-            if (KeyboardShortcuts.markAsRead.match(event) && !SHOW_RELATED_ISSUE_OR_PR.match(event)) {
+            if (KeyboardShortcuts.getKeyboardShortcut(KeyboardShortcutKey.MARK_AS_READ).match(event) &&
+                    !SHOW_RELATED_ISSUE_OR_PR.match(event)) {
                 markAsRead();
             }
-            if (KeyboardShortcuts.markAsUnread.match(event)) {
+            if (KeyboardShortcuts.getKeyboardShortcut(KeyboardShortcutKey.MARK_AS_UNREAD).match(event)) {
                 markAsUnread();
             }
             if (SHOW_DOCS.match(event)) {
@@ -277,14 +278,16 @@ public class ListPanel extends FilterPanel {
                 ui.getBrowserComponent().showContributors();
                 event.consume();
             }
-            if (KeyboardShortcuts.scrollToTop.match(event)) {
+            if (KeyboardShortcuts.getKeyboardShortcut(KeyboardShortcutKey.SCROLL_TO_TOP).match(event)) {
                 ui.getBrowserComponent().scrollToTop();
             }
-            if (KeyboardShortcuts.scrollToBottom.match(event)) {
+            if (KeyboardShortcuts.getKeyboardShortcut(KeyboardShortcutKey.SCROLL_TO_BOTTOM).match(event)) {
                 ui.getBrowserComponent().scrollToBottom();
             }
-            if (KeyboardShortcuts.scrollUp.match(event) || KeyboardShortcuts.scrollDown.match(event)) {
-                ui.getBrowserComponent().scrollPage(KeyboardShortcuts.scrollDown.match(event));
+            if (KeyboardShortcuts.getKeyboardShortcut(KeyboardShortcutKey.SCROLL_UP).match(event) ||
+                    KeyboardShortcuts.getKeyboardShortcut(KeyboardShortcutKey.SCROLL_DOWN).match(event)) {
+                ui.getBrowserComponent().scrollPage(
+                        KeyboardShortcuts.getKeyboardShortcut(KeyboardShortcutKey.SCROLL_DOWN).match(event));
             }
             if (GOTO_MODIFIER.match(event)) {
                 KeyPress.setLastKeyPressedCodeAndTime(event.getCode());
@@ -361,7 +364,7 @@ public class ListPanel extends FilterPanel {
                 if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
                     showRelatedIssueOrPR();
                 // only for default. can remove if default key for MARK_AS_READ_CHANGES
-                } else if (KeyboardShortcuts.markAsRead.match(event)) {
+                } else if (KeyboardShortcuts.getKeyboardShortcut(KeyboardShortcutKey.MARK_AS_READ).match(event)) {
                     markAsRead();
                 }
             }

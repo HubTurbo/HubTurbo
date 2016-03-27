@@ -34,24 +34,11 @@ public final class KeyboardShortcuts {
     private static Map<String, String> keyboardShortcuts = null;
     private static Set<KeyCodeCombination> assignedKeys = null;
 
-    // customizable keyboard shortcuts
-    // ui.listpanel.ListPanel
-    public static KeyCodeCombination markAsRead;
-    public static KeyCodeCombination markAsUnread;
-
-    public static KeyCodeCombination scrollToTop;
-    public static KeyCodeCombination scrollToBottom;
-    public static KeyCodeCombination scrollUp;
-    public static KeyCodeCombination scrollDown;
-
-    //ui.issuepanel.PanelControl
-    public static KeyCodeCombination leftPanel;
-    public static KeyCodeCombination rightPanel;
-
-    // ui.components.NavigableListView
-    static KeyCodeCombination upIssue;
-    static KeyCodeCombination downIssue;
-
+    // key lookup for customizable keyboard shortcuts
+    public enum KeyboardShortcutKey {
+        MARK_AS_READ, MARK_AS_UNREAD, SCROLL_TO_TOP, SCROLL_TO_BOTTOM,
+        SCROLL_UP, SCROLL_DOWN, LEFT_PANEL, RIGHT_PANEL, UP_ISSUE, DOWN_ISSUE;
+    }
     // non-customizable keyboard shortcuts
     // ui.listpanel.ListPanel
     public static final KeyCodeCombination JUMP_TO_FIRST_ISSUE =
@@ -177,17 +164,31 @@ public final class KeyboardShortcuts {
         assignedKeys.add(MANAGE_ASSIGNEES);
     }
 
-    private static void getKeyboardShortcutsFromHashMap() {
-        markAsRead = getKeyCodeCombination("MARK_AS_READ");
-        markAsUnread = getKeyCodeCombination("MARK_AS_UNREAD");
-        scrollToTop = getKeyCodeCombination("SCROLL_TO_TOP");
-        scrollToBottom = getKeyCodeCombination("SCROLL_TO_BOTTOM");
-        scrollUp = getKeyCodeCombination("SCROLL_UP");
-        scrollDown = getKeyCodeCombination("SCROLL_DOWN");
-        leftPanel = getKeyCodeCombination("LEFT_PANEL");
-        rightPanel = getKeyCodeCombination("RIGHT_PANEL");
-        upIssue = getKeyCodeCombination("UP_ISSUE");
-        downIssue = getKeyCodeCombination("DOWN_ISSUE");
+    public static KeyCodeCombination getKeyboardShortcut(KeyboardShortcutKey key) {
+        switch (key) {
+            case MARK_AS_READ:
+                return getKeyCodeCombination("Mark_AS_READ");
+            case MARK_AS_UNREAD:
+                return getKeyCodeCombination("MARK_AS_UNREAD");
+            case SCROLL_TO_TOP:
+                return getKeyCodeCombination("SCROLL_TO_TOP");
+            case SCROLL_TO_BOTTOM:
+                return getKeyCodeCombination("SCROLL_TO_BOTTOM");
+            case SCROLL_UP:
+                return getKeyCodeCombination("SCROLL_UP");
+            case SCROLL_DOWN:
+                return getKeyCodeCombination("SCROLL_DOWN");
+            case LEFT_PANEL:
+                return getKeyCodeCombination("LEFT_PANEL");
+            case RIGHT_PANEL:
+                return getKeyCodeCombination("RIGHT_PANEL");
+            case UP_ISSUE:
+                return getKeyCodeCombination("UP_ISSUE");
+            case DOWN_ISSUE:
+                return getKeyCodeCombination("DOWN_ISSUE");
+            default:
+                return null;
+        }
     }
 
     public static void loadKeyboardShortcuts(Preferences prefs) {
@@ -214,7 +215,6 @@ public final class KeyboardShortcuts {
             keyboardShortcuts = prefs.getKeyboardShortcuts();
         }
         addNonCustomizableShortcutKeys();
-        getKeyboardShortcutsFromHashMap();
         prefs.setKeyboardShortcuts(keyboardShortcuts);
     }
 

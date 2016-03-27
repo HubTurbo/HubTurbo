@@ -13,6 +13,7 @@ import prefs.PanelInfo;
 import ui.GUIController;
 import ui.UI;
 import ui.components.KeyboardShortcuts;
+import ui.components.KeyboardShortcuts.KeyboardShortcutKey;
 import ui.listpanel.ListPanel;
 import util.events.*;
 
@@ -251,8 +252,9 @@ public class PanelControl extends HBox {
     }
     private void setupKeyEvents() {
         addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            if (KeyboardShortcuts.rightPanel.match(event) || KeyboardShortcuts.leftPanel.match(event)) {
-                handleKeys(KeyboardShortcuts.rightPanel.match(event));
+            if (KeyboardShortcuts.getKeyboardShortcut(KeyboardShortcutKey.RIGHT_PANEL).match(event) ||
+                    KeyboardShortcuts.getKeyboardShortcut(KeyboardShortcutKey.LEFT_PANEL).match(event)) {
+                handleKeys(KeyboardShortcuts.getKeyboardShortcut(KeyboardShortcutKey.RIGHT_PANEL).match(event));
                 assert currentlySelectedPanel.isPresent() : "handleKeys doesn't set selectedIndex!";
             }
         });
