@@ -412,28 +412,28 @@ public class UITest extends GuiTest {
      * Clicks the repository selector's ComboBox
      */
     public void clickRepositorySelector() {
-        click(IdGenerator.getRepositorySelectorIdForTest());
+        click(IdGenerator.getRepositorySelectorIdReference());
     }
 
     /**
      * Gets the repository selector's ComboBox
      */
     public ComboBox getRepositorySelector() {
-        return find(IdGenerator.getRepositorySelectorIdForTest());
+        return find(IdGenerator.getRepositorySelectorIdReference());
     }
 
     /**
      * Clicks the label picker's TextField
      */
     public void clickLabelPickerTextField() {
-        click(IdGenerator.getLabelPickerTextFieldId());
+        click(IdGenerator.getLabelPickerTextFieldIdReference());
     }
 
     /**
      * Gets the label picker's TextField
      */
     public TextField getLabelPickerTextField() {
-        return find(IdGenerator.getLabelPickerTextFieldIdForTest());
+        return find(IdGenerator.getLabelPickerTextFieldIdReference());
     }
 
     /**
@@ -441,7 +441,7 @@ public class UITest extends GuiTest {
      * @param panelIndex
      */
     public void clickFilterTextFieldAtPanel(int panelIndex) {
-        click(IdGenerator.getPanelFilterTextFieldIdForTest(panelIndex));
+        click(IdGenerator.getPanelFilterTextFieldIdReference(panelIndex));
     }
 
     /**
@@ -449,7 +449,7 @@ public class UITest extends GuiTest {
      * @param panelIndex
      */
     public FilterTextField getFilterTextFieldAtPanel(int panelIndex) {
-        return find(IdGenerator.getPanelFilterTextFieldIdForTest(panelIndex));
+        return find(IdGenerator.getPanelFilterTextFieldIdReference(panelIndex));
     }
 
     /**
@@ -458,7 +458,7 @@ public class UITest extends GuiTest {
      * @param issueId
      */
     public void clickIssue(int panelIndex, int issueId) {
-        click(IdGenerator.getPanelCellIdForTest(panelIndex, issueId));
+        click(IdGenerator.getPanelCellIdReference(panelIndex, issueId));
     }
 
     /**
@@ -467,7 +467,7 @@ public class UITest extends GuiTest {
      * @param issueId
      */
     public void rightClickIssue(int panelIndex, int issueId) {
-        rightClick(IdGenerator.getPanelCellIdForTest(panelIndex, issueId));
+        rightClick(IdGenerator.getPanelCellIdReference(panelIndex, issueId));
     }
 
     /**
@@ -475,7 +475,7 @@ public class UITest extends GuiTest {
      * @param panelIndex
      */
     public void clickPanel(int panelIndex) {
-        click(IdGenerator.getPanelIdForTest(panelIndex));
+        click(IdGenerator.getPanelIdReference(panelIndex));
     }
 
     /**
@@ -483,7 +483,7 @@ public class UITest extends GuiTest {
      * @param panelIndex
      */
     public void rightClickPanel(int panelIndex) {
-        rightClick(IdGenerator.getPanelIdForTest(panelIndex));
+        rightClick(IdGenerator.getPanelIdReference(panelIndex));
     }
 
     /**
@@ -491,7 +491,7 @@ public class UITest extends GuiTest {
      * @param panelIndex
      */
     public ListPanel getPanel(int panelIndex) {
-        return find(IdGenerator.getPanelIdForTest(panelIndex));
+        return find(IdGenerator.getPanelIdReference(panelIndex));
     }
 
     /**
@@ -500,7 +500,7 @@ public class UITest extends GuiTest {
      * @param issueId
      */
     public ListPanelCell getIssueCell(int panelIndex, int issueId) {
-        return find(IdGenerator.getPanelCellIdForTest(panelIndex, issueId));
+        return find(IdGenerator.getPanelCellIdReference(panelIndex, issueId));
     }
 
     /**

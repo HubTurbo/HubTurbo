@@ -17,7 +17,7 @@ public class ValidLoginTest extends UITest {
 
     @Test
     public void validLoginTest() throws InterruptedException {
-        TextField repoOwnerField = find(IdGenerator.getLoginDialogOwnerFieldIdForTest());
+        TextField repoOwnerField = find(IdGenerator.getLoginDialogOwnerFieldIdReference());
         click(repoOwnerField);
         selectAll();
         type("test").push(KeyCode.TAB);
@@ -25,7 +25,7 @@ public class ValidLoginTest extends UITest {
         type("test").push(KeyCode.TAB);
         type("test");
         click("Sign in");
-        ComboBox<String> repositorySelector = findOrWaitFor(IdGenerator.getRepositorySelectorIdForTest());
+        ComboBox<String> repositorySelector = findOrWaitFor(IdGenerator.getRepositorySelectorIdReference());
         awaitCondition(() -> "test/test".equals(repositorySelector.getValue()));
     }
 }

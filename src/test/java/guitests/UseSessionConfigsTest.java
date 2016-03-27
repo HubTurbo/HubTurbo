@@ -51,7 +51,7 @@ public class UseSessionConfigsTest extends UITest {
         pushKeys(KeyCode.TAB);
         type("test");
         click("Sign in");
-        ComboBox<String> repositorySelector = findOrWaitFor(IdGenerator.getRepositorySelectorIdForTest());
+        ComboBox<String> repositorySelector = findOrWaitFor(IdGenerator.getRepositorySelectorIdReference());
         waitForValue(repositorySelector);
         assertEquals("dummy/dummy", repositorySelector.getValue());
 
@@ -63,7 +63,7 @@ public class UseSessionConfigsTest extends UITest {
 
         // Somehow the text field cannot be populated by typing on the CI, use setText instead.
         // TODO find out why
-        ((TextField) find(IdGenerator.getBoardNameInputFieldIdForTest())).setText("Empty Board");
+        ((TextField) find(IdGenerator.getBoardNameInputFieldIdReference())).setText("Empty Board");
         click("OK");
 
         PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(0)));
@@ -124,7 +124,7 @@ public class UseSessionConfigsTest extends UITest {
         click("Save as");
 
         // Text field cannot be populated by typing on the CI, use setText instead
-        ((TextField) find(IdGenerator.getBoardNameInputFieldIdForTest())).setText("Dummy Board");
+        ((TextField) find(IdGenerator.getBoardNameInputFieldIdReference())).setText("Dummy Board");
         click("OK");
 
         // Then exit program...

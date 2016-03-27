@@ -67,7 +67,7 @@ public class RepositorySelectorTest extends UITest {
 
         // now we check if the login dialog pops up because the "dummy/dummy" json
         // doesn't exist and there are no other valid repo json files
-        assertNodeExists(IdGenerator.getLoginDialogOwnerFieldIdForTest());
+        assertNodeExists(IdGenerator.getLoginDialogOwnerFieldIdReference());
         type("dummy").push(KeyCode.TAB);
         type("dummy").push(KeyCode.ENTER);
         ComboBox<String> comboBox = getRepositorySelector();

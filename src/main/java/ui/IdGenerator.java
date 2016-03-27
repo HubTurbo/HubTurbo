@@ -28,7 +28,7 @@ public final class IdGenerator {
     }
 
     public static String getLabelPickerTextFieldId() {
-        return "queryField";
+        return "labelPickerTextField";
     }
 
     public static String getPanelCloseButtonId(int panelIndex) {
@@ -48,78 +48,78 @@ public final class IdGenerator {
     }
 
     public static String getBoardNameInputFieldId() {
-        return "boardnameinput";
+        return "boardNameInput";
     }
 
     public static String getBoardNameSaveButtonId() {
-        return "boardsavebutton";
+        return "boardSaveButton";
     }
 
     public static String getApiBoxId() {
         return "apiBox";
     }
 
-    public static String getPanelCellIdForTest(int panelIndex, int issueId) {
+    public static String getPanelCellIdReference(int panelIndex, int issueId) {
         return "#" + getPanelCellId(panelIndex, issueId);
     }
 
-    public static String getPanelFilterTextFieldIdForTest(int panelIndex) {
+    public static String getPanelFilterTextFieldIdReference(int panelIndex) {
         return "#" + getPanelFilterTextFieldId(panelIndex);
     }
 
-    public static String getPanelRenameTextFieldIdForTest(int panelIndex) {
+    public static String getPanelRenameTextFieldIdReference(int panelIndex) {
         return "#" + getPanelRenameTextFieldId(panelIndex);
     }
 
-    public static String getRepositorySelectorIdForTest() {
+    public static String getRepositorySelectorIdReference() {
         return "#" + getRepositorySelectorId();
     }
 
-    public static String getPanelNameAreaIdForTest(int panelIndex) {
+    public static String getPanelNameAreaIdReference(int panelIndex) {
         return "#" + getPanelNameAreaId(panelIndex);
     }
 
-    public static String getPanelIdForTest(int panelIndex) {
+    public static String getPanelIdReference(int panelIndex) {
         return "#" + getPanelId(panelIndex);
     }
 
-    public static String getLabelPickerTextFieldIdForTest() {
+    public static String getLabelPickerTextFieldIdReference() {
         return "#" + getLabelPickerTextFieldId();
     }
 
-    public static String getPanelCloseButtonIdForTest(int panelIndex) {
+    public static String getPanelCloseButtonIdReference(int panelIndex) {
         return "#" + getPanelCloseButtonId(panelIndex);
     }
 
-    public static String getPanelRenameButtonIdForTest(int panelIndex) {
+    public static String getPanelRenameButtonIdReference(int panelIndex) {
         return "#" + getPanelRenameButtonId(panelIndex);
     }
 
-    public static String getOcticonButtonIdForTest(int panelIndex, String octiconCssName) {
+    public static String getOcticonButtonIdReference(int panelIndex, String octiconCssName) {
         return "#" + getOcticonButtonId(panelIndex, octiconCssName);
     }
 
-    public static String getLoginDialogOwnerFieldIdForTest() {
+    public static String getLoginDialogOwnerFieldIdReference() {
         return "#" + getLoginDialogOwnerFieldId();
     }
 
-    public static String getBoardNameInputFieldIdForTest() {
+    public static String getBoardNameInputFieldIdReference() {
         return "#" + getBoardNameInputFieldId();
     }
 
-    public static String getBoardNameSaveButtonIdForTest() {
+    public static String getBoardNameSaveButtonIdReference() {
         return "#" + getBoardNameSaveButtonId();
     }
 
-    public static String getAssignedLabelsPaneIdForTest() {
+    public static String getAssignedLabelsPaneIdReference() {
         return "#assignedLabels";
     }
 
-    public static String getLabelPickerQueryFieldIdForTest() {
+    public static String getLabelPickerQueryFieldIdReference() {
         return "#queryField";
     }
 
-    public static String getApiBoxIdForTest() {
+    public static String getApiBoxIdReference() {
         return "#" + getApiBoxId();
     }
 }

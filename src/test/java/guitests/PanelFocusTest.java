@@ -115,7 +115,7 @@ public class PanelFocusTest extends UITest {
         pushKeys(KeyCode.DOWN);
         pushKeys(KeyCode.DOWN);
         pushKeys(KeyCode.ENTER);
-        ((TextField) find(IdGenerator.getBoardNameInputFieldIdForTest())).setText("Board 1");
+        ((TextField) find(IdGenerator.getBoardNameInputFieldIdReference())).setText("Board 1");
         click("OK");
         awaitCondition(() -> 1 == panelControl.getNumberOfSavedBoards());
         // 2. Create a new panel so that scroll bar is on the left

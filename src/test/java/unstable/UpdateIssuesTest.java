@@ -24,7 +24,7 @@ public class UpdateIssuesTest extends UITest {
 
     @Test
     public void updateIssues() throws InterruptedException, ExecutionException {
-        Label apiBox = find(IdGenerator.getApiBoxIdForTest());
+        Label apiBox = find(IdGenerator.getApiBoxIdReference());
         resetRepo();
 
         clickFilterTextFieldAtPanel(0);

@@ -83,9 +83,9 @@ public class PanelRenameTest extends UITest {
         // Expected: Close button should not appear once rename box is opened and while edits are being made.
         //           It should appear once the rename box is closed and the edits are done.
         pushKeys(CREATE_RIGHT_PANEL);
-        String panelCloseButtonId = IdGenerator.getPanelCloseButtonIdForTest(3);
-        String panelRenameTextFieldId =  IdGenerator.getPanelRenameTextFieldIdForTest(3);
-        String panelNameAreaId = IdGenerator.getPanelNameAreaIdForTest(3);
+        String panelCloseButtonId = IdGenerator.getPanelCloseButtonIdReference(3);
+        String panelRenameTextFieldId =  IdGenerator.getPanelRenameTextFieldIdReference(3);
+        String panelNameAreaId = IdGenerator.getPanelNameAreaIdReference(3);
         waitUntilNodeAppears(panelCloseButtonId);
         boolean isPresentBeforeEdit = exists(panelCloseButtonId);
         PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(3)));
@@ -114,7 +114,7 @@ public class PanelRenameTest extends UITest {
         pushKeys(CREATE_RIGHT_PANEL);
         PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(4)));
         type("Renamed panel with confirm tick");
-        click(IdGenerator.getOcticonButtonIdForTest(4, "confirmButton"));
+        click(IdGenerator.getOcticonButtonIdReference(4, "confirmButton"));
         FilterPanel panel4 = (FilterPanel) panels.getPanel(4);
         Text panelNameText4 = panel4.getNameText();
         assertEquals("Renamed panel with confirm tick", panelNameText4.getText());
@@ -124,7 +124,7 @@ public class PanelRenameTest extends UITest {
         pushKeys(CREATE_RIGHT_PANEL);
         PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(5)));
         type("Renamed panel with undo");
-        click(IdGenerator.getOcticonButtonIdForTest(5, "undoButton"));
+        click(IdGenerator.getOcticonButtonIdReference(5, "undoButton"));
         FilterPanel panel5 = (FilterPanel) panels.getPanel(5);
         Text panelNameText5 = panel5.getNameText();
         assertEquals("Panel", panelNameText5.getText());

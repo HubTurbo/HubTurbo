@@ -80,7 +80,7 @@ public class RemovableRepoListAndModelsTest extends UITest {
         // we check that only 1 repo is in use
         noOfUsedRepo = 1;
         totalRepoInSystem = 1;
-        assertNodeExists(IdGenerator.getLoginDialogOwnerFieldIdForTest());
+        assertNodeExists(IdGenerator.getLoginDialogOwnerFieldIdReference());
         type("dummy").push(KeyCode.TAB).type("dummy").push(KeyCode.ENTER);
         assertEquals(noOfUsedRepo, ui.getCurrentlyUsedRepos().size());
         assertEquals(noOfUsedRepo, ui.logic.getOpenRepositories().size());

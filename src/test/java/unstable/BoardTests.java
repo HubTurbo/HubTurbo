@@ -22,8 +22,8 @@ import util.Utility;
 
 public class BoardTests extends UITest {
 
-    private static final String boardNameInputId = IdGenerator.getBoardNameInputFieldIdForTest();
-    private static final String boardNameSaveButtonId = IdGenerator.getBoardNameSaveButtonIdForTest();
+    private static final String boardNameInputId = IdGenerator.getBoardNameInputFieldIdReference();
+    private static final String boardNameSaveButtonId = IdGenerator.getBoardNameSaveButtonIdReference();
 
     /**
      * The initial state is one panel with no filter, and no saved boards
