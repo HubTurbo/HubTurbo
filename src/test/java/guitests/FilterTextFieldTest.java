@@ -34,18 +34,6 @@ public class FilterTextFieldTest extends UITest {
         type("cou").push(KeyCode.TAB);
         waitAndAssertEquals("count", field::getText);
 
-        // Completion does not only work for alternating keys typed
-        clearField();
-        type("c");
-        waitAndAssertEquals("losed", field::getSelectedText);
-        type("l");
-        waitAndAssertEquals("osed", field::getSelectedText);
-        type("o");
-        waitAndAssertEquals("sed", field::getSelectedText);
-        type(KeyCode.TAB);
-        waitAndAssertEquals("", field::getSelectedText);
-        waitAndAssertEquals("closed", field::getText);
-
         // Completion with selection
         clearField();
         type("cou").push(KeyCode.TAB);
@@ -71,17 +59,9 @@ public class FilterTextFieldTest extends UITest {
         clearField();
         type("assi").push(KeyCode.TAB);
         type(" c").push(KeyCode.BACK_SPACE); // cancel completion
-        push(KeyCode.LEFT, 2);
-        type(" ");
-        waitAndAssertEquals("assignee  c", field::getText);
-
-        // Insertion of spaces after spaces
-        clearField();
-        type("assi").push(KeyCode.TAB);
-        type(" c").push(KeyCode.BACK_SPACE); // cancel completion
         push(KeyCode.LEFT);
         type(" ");
-        waitAndAssertEquals("assignee  c", field::getText);
+        waitAndAssertEquals("assignee  ", field::getText);
 
         // Insertion of spaces with trailing spaces
         clearField();

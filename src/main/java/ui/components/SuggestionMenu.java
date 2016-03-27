@@ -33,15 +33,8 @@ public class SuggestionMenu extends ContextMenu {
      */
     public void loadSuggestions(List<String> searchResult) {
         getItems().clear();
-        // Resets selection for every new trigger 
-        selected = Optional.empty();
         searchResult.stream().limit(maxEntries).forEach(this::addMenuItem);
-
         selected = searchResult.stream().findFirst();
-        // Sets focus on first item and select it as default suggestion
-        if (isShowing() && !searchResult.isEmpty()) {
-            getSkin().getNode().lookup(".menu-item").requestFocus();
-        }
     }
 
     /**

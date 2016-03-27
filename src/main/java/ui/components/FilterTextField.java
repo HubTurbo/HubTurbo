@@ -1,6 +1,7 @@
 package ui.components;
 
 import filter.expression.QualifierType;
+import javafx.event.ActionEvent;
 import javafx.geometry.Side;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -46,8 +47,11 @@ public class FilterTextField extends TextField {
     };
     private Function<String, String> onConfirm = (s) -> s;
 
- // For reverting edits
+    // For reverting edits
     private String previousText = "";
+
+    // Shows that is navigating the suggestion menu
+    private boolean isNavigating = false;
 
     // The list of keywords which will be used in completion
     private List<String> keywords = new ArrayList<>(QualifierType.getCompletionKeywords());
@@ -83,6 +87,7 @@ public class FilterTextField extends TextField {
             
             if (typed == '\t' && suggestion.isShowing()) {
                 suggestion.hide();
+                suggestion.getSelectedContent().ifPresent(this::completeWord);
             } else {
                 suggestion.loadSuggestions(getMatchingKeywords(getCurrentWord()));
                 suggestion.show(this, Side.BOTTOM, 0, 0);
@@ -97,14 +102,15 @@ public class FilterTextField extends TextField {
         setOnKeyReleased(e -> {
             e.consume();
 
-            if (suggestion.isShowing() && !isNavigationKey(e)) {
-                suggestion.loadSuggestions(getMatchingKeywords(getCurrentWord()));
-            }
-
             if (e.getCode() == KeyCode.ENTER) handleOnEnter();
 
             if (e.getCode() == KeyCode.ESCAPE) handleOnEscape();
-            
+
+            isNavigating = e.getCode() == KeyCode.UP || e.getCode() == KeyCode.DOWN;
+
+            if (suggestion.isShowing() && !isNavigating) {
+                suggestion.loadSuggestions(getMatchingKeywords(getCurrentWord()));
+            }
         });
         addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             if (SHOW_DOCS.match(event)) {
@@ -114,8 +120,9 @@ public class FilterTextField extends TextField {
     }
 
     private void handleOnEnter() {
-        if (suggestion.getSelectedContent().isPresent()) {
+        if (isNavigating) {
             suggestion.hide();
+            suggestion.getSelectedContent().ifPresent(this::completeWord);
         } else {
             confirmEdit();
         }
@@ -142,10 +149,6 @@ public class FilterTextField extends TextField {
      */
     public final void setStyleForInvalidFilter() {
         this.setStyle(INVALID_FILTER_STYLE);
-    }
-
-    private boolean isNavigationKey(KeyEvent e) {
-        return e.getCode() == KeyCode.UP || e.getCode() == KeyCode.DOWN;
     }
 
     /**
@@ -198,7 +201,6 @@ public class FilterTextField extends TextField {
      * Reverts the contents of the field to its last confirmed value.
      */
     private void revertEdit() {
-        System.out.println(previousText);
         setText(previousText);
         positionCaret(getLength());
         selectAll();
@@ -218,18 +220,26 @@ public class FilterTextField extends TextField {
     // SuggestionMenu 
     
     private final SuggestionMenu setupSuggestion() {
-        SuggestionMenu suggestion = new SuggestionMenu(MAX_SUGGESTIONS);
-        suggestion.setOnHidden(e -> suggestion.getSelectedContent().ifPresent(this::completeWord));
+        SuggestionMenu suggestion = new SuggestionMenu(MAX_SUGGESTIONS).setActionHandler(this::menuItemHandler);
         suggestion.loadSuggestions(keywords);
         return suggestion;
     }
 
+    /**
+     * Replaces current word with suggested word
+     * @param suggestedWord
+     */
     private void completeWord(String suggestedWord) {
         int caret = getCaretPosition();
         selectRange(getInitialCaretPosition(caret), caret);
         replaceSelection(suggestedWord);
     }
 
+
+    private void menuItemHandler(ActionEvent event) {
+        SuggestionMenu.getTextOnAction(event).ifPresent(this::completeWord);
+        suggestion.hide();
+    }
 
     /**
      * Sets the contents of the field and acts as if it was confirmed by the user.
