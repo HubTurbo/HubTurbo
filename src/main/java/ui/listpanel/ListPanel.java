@@ -568,7 +568,7 @@ public class ListPanel extends FilterPanel {
         Optional<GuiElement> item = listView.getSelectedItem();
         if (item.isPresent()) {
             TurboIssue issue = item.get().getIssue();
-            issue.markAsUnread(ui.prefs);
+            issue.markAsUnread(UI.prefs);
 
             parentPanelControl.refresh();
         }

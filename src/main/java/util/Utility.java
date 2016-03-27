@@ -265,6 +265,16 @@ public final class Utility {
         return source.toLowerCase().contains(query.toLowerCase());
     }
 
+    /**
+     * Checks that the source contains all words in queries
+     * @param source
+     * @param queries
+     * @return
+     */
+    public static boolean containsIgnoreCase(String source, List<String> queries) {
+        return queries.stream().allMatch(query -> Utility.containsIgnoreCase(source, query));
+    }
+
     public static boolean startsWithIgnoreCase(String source, String query) {
         return source.toLowerCase().startsWith(query.toLowerCase());
     }
@@ -316,6 +326,6 @@ public final class Utility {
         ifEmpty.run();
         return Optional.empty();
     }
-
+    
     private Utility() {}
 }
