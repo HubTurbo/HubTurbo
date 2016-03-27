@@ -33,10 +33,9 @@ public class UpdateProgressWindow {
 
     public void showWindow() {
         Platform.runLater(() -> {
-                    window.show();
-                    window.toFront();
-                }
-        );
+            window.show();
+            window.toFront();
+        });
     }
 
     public void hideWindow() {

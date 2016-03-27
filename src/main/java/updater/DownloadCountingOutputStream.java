@@ -30,8 +30,8 @@ public class DownloadCountingOutputStream extends CountingOutputStream {
 
     public void addListener(Consumer<Double> listener) {
         percentageDownloaded.addListener(
-                (ObservableValue<? extends Number> observable, Number oldValue, Number newValue) ->
-                        listener.accept(newValue.doubleValue()));
+            (ObservableValue<? extends Number> observable, Number oldValue, Number newValue) ->
+                listener.accept(newValue.doubleValue()));
     }
 
     /**

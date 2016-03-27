@@ -3,11 +3,14 @@ package tests;
 import org.junit.Test;
 import updater.HtDownloadLink;
 import updater.UpdateData;
+import util.JsonFileConverter;
 import util.Version;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -18,6 +21,21 @@ public class UpdateDataTest {
     public void updateDataConstructor_noArgsConstructor_expectNoNullPointerExceptionOnMethodCall() {
         UpdateData updateData = new UpdateData();
         updateData.getLatestUpdateDownloadLinkForCurrentVersion();
+    }
+
+    @Test
+    public void updateDataServerFile_readFromServerFile_ensureAllDataCanBeFound() {
+        File serverUpdataDataJsonFile = new File("HubTurboUpdate.json");
+        JsonFileConverter serverUpdataDataJsonConverter = new JsonFileConverter(serverUpdataDataJsonFile);
+
+        Optional<UpdateData> serverUpdateData = serverUpdataDataJsonConverter.loadFromFile(UpdateData.class);
+        assertTrue(serverUpdateData.isPresent());
+
+        Optional<HtDownloadLink> downloadLink = serverUpdateData.get().getLatestUpdateDownloadLinkForCurrentVersion();
+        assertTrue(downloadLink.isPresent());
+        assertTrue(downloadLink.get().getDownloadLinkUrl() != null);
+        assertTrue(downloadLink.get().getVersion() != null);
+
     }
 
     /**

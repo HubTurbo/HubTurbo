@@ -12,11 +12,7 @@ import java.util.Optional;
  */
 public class UpdateData {
 
-    private List<HtDownloadLink> downloadLinks; // NOPMD - not made final for gson
-
-    public UpdateData() {
-        downloadLinks = new ArrayList<>();
-    }
+    private List<HtDownloadLink> downloadLinks = new ArrayList<>(); // NOPMD - not made final for gson
 
     /**
      * Gets HtDownloadLink for HT to update to.

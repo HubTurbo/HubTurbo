@@ -2,11 +2,11 @@
   "downloadLinks": [
     {
       "version": {
-        "major": 4,
-        "minor": 22,
+        "major": 3,
+        "minor": 25,
         "patch": 0
       },
-      "downloadLinkUrl": "https://github.com/HubTurbo/HubTurbo/releases/download/V3.22.0/resource-v3.22.0.jar"
+      "downloadLinkUrl": "https://github.com/HubTurbo/HubTurbo/releases/download/V3.25.0/resource-v3.25.0.jar"
     }
   ]
 }

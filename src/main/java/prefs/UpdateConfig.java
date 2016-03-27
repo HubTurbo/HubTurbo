@@ -10,12 +10,8 @@ import java.util.List;
  */
 public class UpdateConfig {
 
-    private boolean isLastAppUpdateDownloadSuccessful;
-    private List<Version> versionsPreviouslyDownloaded; // NOPMD - not made final for gson
-
-    public UpdateConfig() {
-        versionsPreviouslyDownloaded = new ArrayList<>();
-    }
+    private boolean isLastAppUpdateDownloadSuccessful = false;
+    private List<Version> versionsPreviouslyDownloaded = new ArrayList<>(); // NOPMD - not made final for gson
 
     /**
      * Sets last app update download status
