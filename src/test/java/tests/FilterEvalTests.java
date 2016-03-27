@@ -829,11 +829,7 @@ public class FilterEvalTests {
     @Test
     public void processQualifier_useInvalidUsername_getUsernameWarning() {
         TurboUser user = new TurboUser(REPO, "fox", "charlie");
-        IModel model = TestUtils.singletonModel(new Model(REPO,
-                                                            new ArrayList<>(),
-                                                            new ArrayList<>(),
-                                                            new ArrayList<>(),
-                                                            new ArrayList<>(Arrays.asList(user))));
+        IModel model = TestUtils.singletonModel(createModelFromUsers(REPO, user));
         verifyUserWarning(model, "involves:bOb",
                             Arrays.asList(String.format(USER_WARNING_ERROR_FORMAT, "bOb", REPO)));
         verifyUserWarning(model, "involves:foxX",
@@ -845,11 +841,7 @@ public class FilterEvalTests {
     @Test
     public void processQualifier_useValidUsername_noUsernameWarning() {
         TurboUser user = new TurboUser(REPO, "fox", "charlie");
-        IModel model = TestUtils.singletonModel(new Model(REPO,
-                                                            new ArrayList<>(),
-                                                            new ArrayList<>(),
-                                                            new ArrayList<>(),
-                                                            new ArrayList<>(Arrays.asList(user))));
+        IModel model = TestUtils.singletonModel(createModelFromUsers(REPO, user));
         verifyUserWarning(model, "involves:fOX", new ArrayList<>());
         verifyUserWarning(model, "assignee:FOX", new ArrayList<>());
         verifyUserWarning(model, "assignee:CHAR", new ArrayList<>());
@@ -863,11 +855,7 @@ public class FilterEvalTests {
         TurboIssue issue1 = new TurboIssue(REPO, 1, "title", "alice", LocalDateTime.now(), false);
         TurboIssue issue2 = new TurboIssue(REPO, 1, "title", "bob", LocalDateTime.now(), false);
         issue1.setAssignee(user3);
-        IModel model = TestUtils.singletonModel(new Model(REPO,
-                                                            new ArrayList<>(),
-                                                            new ArrayList<>(),
-                                                            new ArrayList<>(),
-                                                            new ArrayList<>(Arrays.asList(user1, user2, user3))));
+        IModel model = TestUtils.singletonModel(createModelFromUsers(REPO, user1, user2, user3));
         assertTrue(Qualifier.process(model, Parser.parse("assignee:ox"), issue1));
         assertTrue(Qualifier.process(model, Parser.parse("author:alice"), issue1));
         assertFalse(Qualifier.process(model, Parser.parse("assignee:charlie"), issue2));
@@ -904,5 +892,9 @@ public class FilterEvalTests {
         FilterExpression filterExpr = Parser.parse(input);
         List<String> warnings = filterExpr.getWarnings(model, issue);
         assertEquals(expectedWarnings, warnings);
+    }
+
+    private Model createModelFromUsers(String name, TurboUser... users) {
+        return new Model(name, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), Arrays.asList(users));
     }
 }

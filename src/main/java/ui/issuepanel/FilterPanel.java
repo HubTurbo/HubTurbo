@@ -230,7 +230,6 @@ public abstract class FilterPanel extends AbstractPanel {
 
     private void handleFilterWarning(FilterWarningEvent e) {
         if (!e.filterExpr.equals(getCurrentFilterExpression())) return;
-        //TODO: display all warnings since we can't display all of them now
         showWarning(e.warnings.get(0));
     }
 
