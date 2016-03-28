@@ -61,10 +61,7 @@ public class CollaboratorServiceExTests {
         mockServer.when(
                 request()
                     .withPath(TestUtils.API_PREFIX + "/repos/hubturbo/tests/collaborators")
-        ).respond(
-                response()
-                    .withBody(sampleCollaborators)
-        );
+        ).respond(response().withBody(sampleCollaborators));
 
         Type listOfUsers = new TypeToken<List<User>>() {}.getType();
         List<User> expectedCollaborators = new Gson().fromJson(sampleCollaborators, listOfUsers);

@@ -36,12 +36,12 @@ public class CollaboratorServiceEx extends CollaboratorService {
     public List<User> getCollaborators(IRepositoryIdProvider repository) throws IOException {
         return super.getCollaborators(repository).stream()
                 .map(user -> {
-                   try {
-                       return userService.getUser(user.getLogin());
-                   } catch (IOException e) {
-                       logger.warn("Unable to get full details for user " + user.getLogin());
-                       return user;
-                   }
+                    try {
+                        return userService.getUser(user.getLogin());
+                    } catch (IOException e) {
+                        logger.warn("Unable to get full details for user " + user.getLogin());
+                        return user;
+                    }
                 }).collect(Collectors.toList());
     }
 }
