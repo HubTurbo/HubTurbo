@@ -470,8 +470,9 @@ public class UITest extends FxRobot {
      * Traverses a generic Menu represented "current" as its root, looking for a chain of nodes
      * with given names and triggering their associated action.
      */
-    private void traverseMenu(MenuItem current, String... names) {
-        for (int i = 1; i < names.length; i++) {
+    private void traverseMenu(MenuItem root, String... names) {
+        MenuItem current = root;
+        for (int i = 0; i < names.length; i++) {
             final int j = i;
             if (!(current instanceof Menu)) {
                 throw new IllegalArgumentException(
