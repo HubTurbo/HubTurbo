@@ -7,6 +7,8 @@ import static ui.components.KeyboardShortcuts.MINIMIZE_WINDOW;
 import static ui.components.KeyboardShortcuts.SWITCH_BOARD;
 import filter.expression.QualifierType;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import ui.GUIController;
 import ui.GuiElement;
 import ui.components.PanelMenuBar;
@@ -26,12 +28,14 @@ import javafx.scene.input.KeyEvent;
 import ui.TestController;
 import ui.UI;
 import ui.components.FilterTextField;
+import util.DialogMessage;
 import util.events.*;
 import util.events.testevents.UIComponentFocusEvent;
 import prefs.PanelInfo;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
 
 /**
  * A FilterPanel is an AbstractPanel meant for containing issues and an accompanying filter text field,
@@ -85,7 +89,7 @@ public abstract class FilterPanel extends AbstractPanel {
             }
         });
     }
-    
+
     private void setFocusToFilterBox() {
         if (TestController.isTestMode()) {
             ui.triggerEvent(new UIComponentFocusEvent(UIComponentFocusEvent.EventType.FILTER_BOX));
@@ -131,7 +135,16 @@ public abstract class FilterPanel extends AbstractPanel {
                 Platform.runLater(() -> ui.triggerEvent(new ApplyingFilterEvent(this)));
                 applyStringFilter(text);
                 return text;
-            });
+            })
+            .setOnUnsavedChanges(() ->
+                DialogMessage.showYesNoWarningDialog(
+                        "Warning",
+                        "Panel Change",
+                        "Would you like to update your current panel to the new input?",
+                        "New Input",
+                        "Quit"));
+
+
         filterTextField.setId(guiController.getDefaultRepo() + "_col" + panelIndex + "_filterTextField");
         filterTextField.setMinWidth(388);
         filterTextField.setMaxWidth(388);

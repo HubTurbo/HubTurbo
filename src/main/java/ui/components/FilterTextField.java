@@ -1,17 +1,21 @@
 package ui.components;
 
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.IndexRange;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
+import util.DialogMessage;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,6 +39,7 @@ public class FilterTextField extends TextField {
     // Callback functions
     private Runnable onCancel = () -> {};
     private Runnable onShowDocs = () -> {};
+    private Supplier<Boolean> onUnsavedChanges = () -> false;
     private Function<String, String> onConfirm = (s) -> s;
 
     // For reverting edits
@@ -102,6 +107,11 @@ public class FilterTextField extends TextField {
         addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             if (SHOW_DOCS.match(event)) {
                 onShowDocs.run();
+            }
+        });
+        focusedProperty().addListener((value, wasFocused, isFocused) -> {
+            if (!isFocused) {
+                checkDifference();
             }
         });
     }
@@ -279,9 +289,30 @@ public class FilterTextField extends TextField {
     }
 
     /**
+     * Sets the 'onUnsavedChanges' callback, which will be called when the user triggers the 
+     */
+    public FilterTextField setOnUnsavedChanges(Supplier <Boolean> onUnsavedChanges) {
+        this.onUnsavedChanges = onUnsavedChanges;
+        return this;
+    }
+
+    /**
      * Sets the list of words to be used as completion candidates.
      */
     public void setCompletionKeywords(List<String> words) {
         keywords = new ArrayList<>(words);
+    }
+
+    /**
+     * Sets the contents of the field after user confirmation.
+     */
+    public void checkDifference() {
+        if (!getText().equals(previousText)) {
+            if (onUnsavedChanges.get()) {
+                confirmEdit();
+            } else {
+                revertEdit();
+            }
+        }
     }
 }
