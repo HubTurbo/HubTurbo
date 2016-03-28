@@ -11,8 +11,11 @@ import javafx.scene.text.Font;
  * This class handles the statuses and appearance of the milestones in MilestonePickerDialog
  */
 public class PickerMilestone extends TurboMilestone implements Comparable<PickerMilestone> {
+
     public static final String OPEN_COLOUR = "#A5EEA5";
-    public static final String CLOSE_COLOUR = "#FCA6B0";
+    public static final String CLOSED_COLOUR = "#FCA6B0";
+    public static final String OVERDUE_COLOUR = "#FFD76E";
+
     private static final int SMALL_LABEL_FONT = 12;
     private static final int BIG_LABEL_FONT = 16;
 
@@ -38,21 +41,21 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
 
     public Node getNode() {
         Label milestone = createLabel();
-        setOpenStatusColour(milestone);
+        setStatusColour(milestone);
         if (isSelected) setSelectedInUI(milestone);
         return milestone;
     }
 
     public Node getExistingMilestoneNode() {
         Label milestone = createCustomLabel(SMALL_LABEL_FONT);
-        setOpenStatusColour(milestone);
+        setStatusColour(milestone);
         setRemovedInUI(milestone);
         return milestone;
     }
 
     public Node getNewlyAssignedMilestoneNode() {
         Label milestone = createCustomLabel(BIG_LABEL_FONT);
-        setOpenStatusColour(milestone);
+        setStatusColour(milestone);
         if (isSelected) setHighlightedInUI(milestone);
         return milestone;
     }
@@ -77,8 +80,9 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
         milestone.getStyleClass().add("labels");
     }
 
-    private void setOpenStatusColour(Label milestone) {
-        milestone.setStyle("-fx-background-color: " + (isOpen() ? OPEN_COLOUR : CLOSE_COLOUR) + ";");
+    private void setStatusColour(Label milestone) {
+        String colour = isOpen() ? (isOverdue() ? OVERDUE_COLOUR : OPEN_COLOUR) : CLOSED_COLOUR;
+        milestone.setStyle("-fx-background-color: " + colour + ";");
     }
 
     private void setHighlightedInUI(Label milestone) {
