@@ -13,7 +13,12 @@ public class BoardPicker {
     private final UI ui;
     private final Stage stage;
 
-    // A BoardPicker is created by trigger a ShowBoardPickerEvent.
+    /**
+     * A BoardPicker is created by trigger a ShowBoardPickerEvent.
+     *
+     * @param ui
+     * @param stage
+     */
     public BoardPicker(UI ui, Stage stage) {
         this.ui = ui;
         this.stage = stage;

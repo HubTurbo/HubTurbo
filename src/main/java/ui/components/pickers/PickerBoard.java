@@ -7,10 +7,9 @@ import javafx.scene.layout.HBox;
 import ui.UI;
 
 /**
- * This class is to represent a label in LabelPickerDialog
+ * Represent a candidate board UI element in the candidate list of BoardPickerDialog
  *
- * It contains attributes such as selected, highlighted, removed and faded in order
- * to produce the appropriate styled node through getNode()
+ * It contains the board name, and a method to toggle its highlighted state.
  */
 public class PickerBoard extends HBox {
 
