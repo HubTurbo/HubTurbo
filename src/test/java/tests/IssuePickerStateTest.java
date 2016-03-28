@@ -45,7 +45,7 @@ public class IssuePickerStateTest {
 
     private List<TurboIssue> getTestIssues(String repoId, List<String> issueTitles) {
         return IntStream.range(0, issueTitles.size())
-            .mapToObj(index -> new TurboIssue(repoId, index + 1, issueTitles.get(index)))
-            .collect(Collectors.toList());
+                .mapToObj(index -> new TurboIssue(repoId, index + 1, issueTitles.get(index)))
+                .collect(Collectors.toList());
     }
 }

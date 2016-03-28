@@ -37,8 +37,8 @@ public class GitHubResponsesTest {
         // We parse the input stream string here.
         GitHubResponse testResponse = new GitHubResponse(null, testEvents);
         GitHubEventsResponse testEventsResponse = new GitHubEventsResponse(testResponse,
-                gitHubEventsResponseJsonStream(),
-                "");
+                                                                           gitHubEventsResponseJsonStream(),
+                                                                           "");
         List<TurboIssueEvent> issueEvents = testEventsResponse.getTurboIssueEvents();
 
         // Will fail if the GitHubEventsResponse constructor doesn't parse properly.

@@ -153,7 +153,7 @@ public class ScreenManagerTests {
         Region stageBounds = ScreenManager.getStageBounds(screenBoundsList);
 
         assertEquals(bigScreenBound.getWidth() + mediumScreenBound.getWidth() + smallScreenBound.getWidth(),
-                stageBounds.getMaxWidth(), 0.0);
+                     stageBounds.getMaxWidth(), 0.0);
         assertEquals(bigScreenBound.getHeight(), stageBounds.getMaxHeight(), 0.0);
         assertEquals(smallScreenBound.getHeight(), stageBounds.getMinHeight(), 0.0);
     }

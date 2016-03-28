@@ -236,8 +236,9 @@ public final class KeyboardShortcuts {
             if (keyCode != null && !assignedKeys.contains(new KeyCodeCombination(keyCode))) {
                 keyCodeCombi = new KeyCodeCombination(keyCode);
             } else {
-                logger.warn("Invalid key specified for " + keyboardShortcut +
-                        " or it has already been used for some other shortcut. ");
+                logger.warn("Invalid key specified for "
+                        + keyboardShortcut
+                        + " or it has already been used for some other shortcut. ");
                 if (DialogMessage.showYesNoWarningDialog(
                         "Warning",
                         "Invalid key specified for " + keyboardShortcut +

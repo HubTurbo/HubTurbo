@@ -89,8 +89,8 @@ public class Logic {
         UI.status.displayMessage(message);
 
         Futures.sequence(models.toModels().stream()
-                .map((model) -> repoIO.updateModel(model, true))
-                .collect(Collectors.toList()))
+                                 .map((model) -> repoIO.updateModel(model, true))
+                                 .collect(Collectors.toList()))
                 .thenRun(this::refreshUI)
                 .thenCompose(n -> getRateLimitResetTime())
                 .thenApply(this::updateRemainingRate)
@@ -273,7 +273,7 @@ public class Logic {
      * Replaces existing milestone with the newMilestone in the issue object, the UI, and the server, in that order.
      * Server update is done after the local update to reduce the lag between the user action and the UI response
      *
-     * @param issue The issue object whose milestone is to be replaced
+     * @param issue        The issue object whose milestone is to be replaced
      * @param newMilestone The new milestone to be assigned to the issue
      * @return true if milestone replacements locally and on GitHub were successful
      */
@@ -339,12 +339,13 @@ public class Logic {
     /**
      * Handles the result of updating an issue's milestone on server.
      * Locally reverts back to the original milestone if the server update fails.
+     *
      * @param isUpdateSuccessful
      * @param originalIssue
      * @return true if the server update is successful
      */
     private boolean handleIssueMilestoneUpdateOnServerResult(boolean isUpdateSuccessful,
-                                                          Optional<TurboIssue> originalIssue) {
+                                                             Optional<TurboIssue> originalIssue) {
         if (!originalIssue.isPresent()) {
             logger.error("Unable to replace issue milestone locally");
             return false;
@@ -424,6 +425,7 @@ public class Logic {
     /**
      * Sets the state of the issue in the {@link Logic#models} corresponding to {@code modifiedIssue} to
      * {@code isOpenOriginally} if the current state on the issue is assigned at the same time as {@code modifiedIssue}
+     *
      * @param modifiedIssue
      * @param isOpenOriginally
      */
@@ -447,7 +449,7 @@ public class Logic {
      * Edits the open/closed state in the issue object, the UI, and the server, in that order.
      * Server update is done after the local update to reduce the lag between the user action and the UI response.
      *
-     * @param issue The issue whose state is to be updated
+     * @param issue  The issue whose state is to be updated
      * @param isOpen The new state for the issue
      * @return True for success, false otherwise
      */

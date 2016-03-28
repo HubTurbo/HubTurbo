@@ -32,15 +32,15 @@ public class IssueCard extends VBox {
     private static final String OCTICON_COMMENT = "\uf02b";
     private static final String OCTICON_ARROW_RIGHT = "\uf03e";
     private static final Background FOCUSED_BACKGROUND = new Background(
-        new BackgroundFill(Color.CORNFLOWERBLUE, CornerRadii.EMPTY, Insets.EMPTY));
+            new BackgroundFill(Color.CORNFLOWERBLUE, CornerRadii.EMPTY, Insets.EMPTY));
     private static final Background DEFAULT_BACKGROUND = new Background(
-        new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY));
+            new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY));
 
     private final GuiElement guiElement;
     private final FlowPane issueDetails = new FlowPane();
     private final HBox authorAssigneeBox = new HBox();
 
-    public IssueCard(GuiElement guiElement, boolean isFocus){
+    public IssueCard(GuiElement guiElement, boolean isFocus) {
         this.guiElement = guiElement;
         this.setFocused(isFocus);
         setup();
@@ -73,7 +73,7 @@ public class IssueCard extends VBox {
 
     private void setupMainIssueCard() {
         this.backgroundProperty().bind(Bindings.when(this.focusedProperty())
-            .then(FOCUSED_BACKGROUND).otherwise(DEFAULT_BACKGROUND));
+                                               .then(FOCUSED_BACKGROUND).otherwise(DEFAULT_BACKGROUND));
         this.setStyle("-fx-border-color:black; -fx-border-style:hidden hidden solid hidden; ");
     }
 
@@ -135,7 +135,7 @@ public class IssueCard extends VBox {
     }
 
     private void addCommentIcon(TurboIssue issue) {
-        if (issue.getCommentCount() > 0){
+        if (issue.getCommentCount() > 0) {
             Label commentIcon = new Label(OCTICON_COMMENT);
             commentIcon.getStyleClass().addAll("octicon", "comments-label-button");
             Label commentCount = new Label(Integer.toString(issue.getCommentCount()));
@@ -156,6 +156,7 @@ public class IssueCard extends VBox {
     /**
      * Creates a box that displays a label of userName
      * The avatar that belongs to the user will be prepended if TurboUser has it
+     *
      * @param user
      * @param userName
      * @return
@@ -182,6 +183,7 @@ public class IssueCard extends VBox {
 
     /**
      * Attempts to get the TurboUser's avatar
+     *
      * @param user
      * @return ImageView that contains the avatar image if it exists or an empty ImageView if it doesn't exist
      */

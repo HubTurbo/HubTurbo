@@ -47,10 +47,10 @@ public class FilterApplyTests {
         issue = new TurboIssue(REPO, 1, "");
         TurboLabel label2 = new TurboLabel(REPO, "bbcc");
         IModel model = TestUtils.singletonModel(new Model(REPO,
-                new ArrayList<>(Arrays.asList(issue)),
-                new ArrayList<>(Arrays.asList(label, label2)),
-                new ArrayList<>(),
-                new ArrayList<>()));
+                                                          new ArrayList<>(Arrays.asList(issue)),
+                                                          new ArrayList<>(Arrays.asList(label, label2)),
+                                                          new ArrayList<>(),
+                                                          new ArrayList<>()));
 
         try {
             new Qualifier(LABEL, "aa").applyTo(issue, model);
@@ -64,10 +64,10 @@ public class FilterApplyTests {
         issue = new TurboIssue(REPO, 1, "");
         label2 = new TurboLabel(REPO, "bbcc");
         model = TestUtils.singletonModel(new Model(REPO,
-                new ArrayList<>(Arrays.asList(issue)),
-                new ArrayList<>(Arrays.asList(label, label2)),
-                new ArrayList<>(),
-                new ArrayList<>()));
+                                                   new ArrayList<>(Arrays.asList(issue)),
+                                                   new ArrayList<>(Arrays.asList(label, label2)),
+                                                   new ArrayList<>(),
+                                                   new ArrayList<>()));
 
         try {
             new Qualifier(LABEL, "bb").applyTo(issue, model);
@@ -109,10 +109,10 @@ public class FilterApplyTests {
         issue = new TurboIssue(REPO, 1, "");
         TurboMilestone milestone2 = new TurboMilestone(REPO, 9, "v2");
         IModel model = TestUtils.singletonModel(new Model(REPO,
-                new ArrayList<>(Arrays.asList(issue)),
-                new ArrayList<>(),
-                new ArrayList<>(Arrays.asList(milestone, milestone2)),
-                new ArrayList<>()));
+                                                          new ArrayList<>(Arrays.asList(issue)),
+                                                          new ArrayList<>(),
+                                                          new ArrayList<>(Arrays.asList(milestone, milestone2)),
+                                                          new ArrayList<>()));
 
         try {
             new Qualifier(MILESTONE, "1").applyTo(issue, model);
@@ -126,10 +126,10 @@ public class FilterApplyTests {
         issue = new TurboIssue(REPO, 1, "");
         milestone2 = new TurboMilestone(REPO, 9, "v2");
         model = TestUtils.singletonModel(new Model(REPO,
-                new ArrayList<>(Arrays.asList(issue)),
-                new ArrayList<>(),
-                new ArrayList<>(Arrays.asList(milestone, milestone2)),
-                new ArrayList<>()));
+                                                   new ArrayList<>(Arrays.asList(issue)),
+                                                   new ArrayList<>(),
+                                                   new ArrayList<>(Arrays.asList(milestone, milestone2)),
+                                                   new ArrayList<>()));
 
         try {
             new Qualifier(MILESTONE, "v").applyTo(issue, model);
@@ -171,10 +171,10 @@ public class FilterApplyTests {
         issue = new TurboIssue(REPO, 1, "");
         TurboUser assignee2 = new TurboUser(REPO, "bbcc");
         IModel model = TestUtils.singletonModel(new Model(REPO,
-                new ArrayList<>(Arrays.asList(issue)),
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new ArrayList<>(Arrays.asList(assignee, assignee2))));
+                                                          new ArrayList<>(Arrays.asList(issue)),
+                                                          new ArrayList<>(),
+                                                          new ArrayList<>(),
+                                                          new ArrayList<>(Arrays.asList(assignee, assignee2))));
 
         try {
             new Qualifier(ASSIGNEE, "aa").applyTo(issue, model);
@@ -188,10 +188,10 @@ public class FilterApplyTests {
         issue = new TurboIssue(REPO, 1, "");
         assignee2 = new TurboUser(REPO, "bbcc");
         model = TestUtils.singletonModel(new Model(REPO,
-                new ArrayList<>(Arrays.asList(issue)),
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new ArrayList<>(Arrays.asList(assignee, assignee2))));
+                                                   new ArrayList<>(Arrays.asList(issue)),
+                                                   new ArrayList<>(),
+                                                   new ArrayList<>(),
+                                                   new ArrayList<>(Arrays.asList(assignee, assignee2))));
 
         try {
             new Qualifier(ASSIGNEE, "bb").applyTo(issue, model);

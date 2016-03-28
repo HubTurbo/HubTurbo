@@ -71,9 +71,8 @@ public class UpdateController {
                     // ...and then wait for all of them to complete.
                     Futures.sequence(metadataRetrievalTasks)
                             .thenAccept(results -> logger.info("Metadata retrieval successful for "
-                                    + results.stream().filter(result -> result)
-                                    .count() + "/"
-                                    + results.size() + " repos"))
+                                    + results.stream().filter(result -> result).count()
+                                    + "/" + results.size() + " repos"))
                             .thenCompose(n -> logic.getRateLimitResetTime())
                             .thenApply(logic::updateRemainingRate)
                             .thenRun(() -> logic.updateUI(processFilters(filterExprs))); // Then filter the second time.
@@ -93,13 +92,11 @@ public class UpdateController {
      */
     private CompletableFuture<List<Boolean>> openRepositoriesInFilters(List<FilterPanel> filterPanels) {
         return Futures.sequence(filterPanels.stream()
-                .flatMap(panel -> Qualifier.getMetaQualifierContent(panel
-                                .getCurrentFilterExpression(),
-                        QualifierType.REPO)
-                        .stream()
-                        .map(repoId -> logic.openRepositoryFromFilter
-                                (repoId, panel)))
-                .collect(Collectors.toList()));
+                .flatMap(panel -> {
+                    return Qualifier.getMetaQualifierContent(panel.getCurrentFilterExpression(), QualifierType.REPO)
+                            .stream()
+                            .map(repoId -> logic.openRepositoryFromFilter(repoId, panel));
+                }).collect(Collectors.toList()));
     }
 
     /**
@@ -118,7 +115,7 @@ public class UpdateController {
                         .filter(issue -> {
                             try {
                                 return Qualifier.process(models, filterExpr,
-                                        issue);
+                                                         issue);
                             } catch (FilterException e) {
                                 Platform.runLater(() -> UI.events.triggerEvent(
                                         new FilterExceptionEvent(filterExpr, e
@@ -151,11 +148,11 @@ public class UpdateController {
 
                 List<TurboIssue> processedIssues = allModelIssues.stream()
                         .filter(issue -> Qualifier.process(models,
-                                filterExprNoAlias, issue))
+                                                           filterExprNoAlias, issue))
                         .sorted(determineComparator(filterExprNoAlias,
-                                hasUpdatedQualifier))
+                                                    hasUpdatedQualifier))
                         .limit(Qualifier.determineCount(allModelIssues,
-                                filterExprNoAlias))
+                                                        filterExprNoAlias))
                         .collect(Collectors.toList());
 
                 List<GuiElement> processedElements = produceGuiElements(models, processedIssues);
@@ -219,10 +216,10 @@ public class UpdateController {
             assert modelOfIssue.isPresent();
 
             return new GuiElement(issue,
-                    models.getLabelsOfIssue(issue),
-                    models.getMilestoneOfIssue(issue),
-                    models.getAssigneeOfIssue(issue),
-                    models.getAuthorOfIssue(issue)
+                                  models.getLabelsOfIssue(issue),
+                                  models.getMilestoneOfIssue(issue),
+                                  models.getAssigneeOfIssue(issue),
+                                  models.getAuthorOfIssue(issue)
             );
         }).collect(Collectors.toList());
     }

@@ -20,7 +20,7 @@ public class LabelPickerState {
 
     public LabelPickerState(List<TurboLabel> initialLabels, List<TurboLabel> allLabels, String userInput) {
         this(initialLabels, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), allLabels,
-                OptionalInt.empty());
+             OptionalInt.empty());
         update(userInput);
     }
 
@@ -172,8 +172,7 @@ public class LabelPickerState {
 
         // Add to removedLabels all initialLabels that have conflicting group
         removedLabels.addAll(initialLabels.stream()
-                .filter(label -> label.getGroupName().equals(group)
-                        && !removedLabels.contains(targetLabel))
+                .filter(label -> label.getGroupName().equals(group) && !removedLabels.contains(targetLabel))
                 .collect(Collectors.toList()));
     }
 

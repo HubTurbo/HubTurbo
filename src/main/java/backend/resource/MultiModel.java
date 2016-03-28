@@ -110,6 +110,7 @@ public class MultiModel implements IModel {
 
     /**
      * Replaces the milestone of an issue specified by {@code issueId} in {@code repoId} with {@code milestone}
+     *
      * @param repoId
      * @param issueId
      * @param milestone
@@ -147,11 +148,11 @@ public class MultiModel implements IModel {
                 // to not replace events while still replacing comments in the case of same ETag.
                 // TODO move ETag comparison here when comments ETag implementation is complete.
                 LocalDateTime nonSelfUpdatedAt = reconcileCreationDate(toBeInserted.getNonSelfUpdatedAt(),
-                        issue.getCreatedAt(), currentUser, issue
-                                .getCreator());
+                                                                       issue.getCreatedAt(), currentUser, issue
+                                                                               .getCreator());
                 issue.setMetadata(toBeInserted.reconcile(nonSelfUpdatedAt,
-                        issue.getMetadata().getEvents(), issue.getMetadata()
-                                .getEventsETag()));
+                                                         issue.getMetadata().getEvents(), issue.getMetadata()
+                                                                 .getEventsETag()));
             }
         });
     }

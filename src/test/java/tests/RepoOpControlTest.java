@@ -45,8 +45,8 @@ public class RepoOpControlTest {
 
     private GitHubModelUpdatesData createEmptyModelUpdatesData(Model model) {
         return new GitHubModelUpdatesData(model, createEmptyUpdatesResult(), new ArrayList<>(),
-                createEmptyUpdatesResult(), createEmptyUpdatesResult(),
-                createEmptyUpdatesResult());
+                                          createEmptyUpdatesResult(), createEmptyUpdatesResult(),
+                                          createEmptyUpdatesResult());
     }
 
     @Test
@@ -147,7 +147,7 @@ public class RepoOpControlTest {
 
         RepoOpControl repoOpControl = new RepoOpControl(mock(RepoIO.class), models);
         Optional<TurboIssue> result = repoOpControl.replaceIssueMilestoneLocally(returnedIssue, milestoneId).join();
-        
+
         assertTrue(result.isPresent());
         assertEquals(returnedIssue, result.get());
     }

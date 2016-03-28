@@ -66,9 +66,9 @@ public class LoginDialog extends Dialog<Boolean> {
         Platform.runLater(() -> enableUI(false));
         CompletableFuture.supplyAsync(() -> {
             return ui.logic.loginController.attemptLogin(repoOwnerField.getText(),
-                    repoNameField.getText(),
-                    usernameField.getText(),
-                    passwordField.getText());
+                                                         repoNameField.getText(),
+                                                         usernameField.getText(),
+                                                         passwordField.getText());
         }, executor).thenAccept(success -> {
             if (success) {
                 Platform.runLater(() -> {

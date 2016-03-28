@@ -232,7 +232,7 @@ public class TurboIssue {
         LocalDateTime otherIssueLabelsModifiedAt = otherIssue.getLabelsLastModifiedAt();
         if (thisIssueLabelsModifiedAt.isBefore(otherIssueLabelsModifiedAt)) {
             logger.info(String.format("Issue %s's labels %s are stale, replacing with %s",
-                    this, this.getLabels(), otherIssue.getLabels()));
+                                      this, this.getLabels(), otherIssue.getLabels()));
             this.labels = otherIssue.getLabels();
             this.labelsLastModifiedAt = Optional.of(otherIssue.getLabelsLastModifiedAt());
         }
@@ -349,21 +349,22 @@ public class TurboIssue {
 
     /**
      * Matching is done by matching all words separated by space in query
+     *
      * @param issues
      * @param query
      * @return list of issues that contains the query
      */
-    public static List<TurboIssue> getMatchedIssues(List<TurboIssue> issues, String query){
+    public static List<TurboIssue> getMatchedIssues(List<TurboIssue> issues, String query) {
         List<String> queries = Arrays.asList(query.split("\\s"));
         return issues.stream()
-            .filter(i -> Utility.containsIgnoreCase(i.getTitle() + " " + i.getId(), queries))
-            .collect(Collectors.toList());
+                .filter(i -> Utility.containsIgnoreCase(i.getTitle() + " " + i.getId(), queries))
+                .collect(Collectors.toList());
     }
 
     /**
      * @param issues
      * @param query
-     * @return first issue that matches the given query 
+     * @return first issue that matches the given query
      */
     public static Optional<TurboIssue> getFirstMatchingIssue(List<TurboIssue> issues, String query) {
         return getMatchedIssues(issues, query).stream().findFirst();
@@ -479,7 +480,7 @@ public class TurboIssue {
     public Optional<Integer> getMilestone() {
         return milestone;
     }
-    
+
     public void setMilestoneById(Integer milestone) {
         this.milestone = Optional.of(milestone);
         this.milestoneLastModifiedAt = Optional.of(LocalDateTime.now());

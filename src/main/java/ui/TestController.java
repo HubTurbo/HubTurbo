@@ -161,6 +161,6 @@ public final class TestController {
      */
     public static RepoIO createTestingRepoIO(Optional<JSONStore> jsonStoreToBeUsed) {
         return new RepoIO(Optional.of(new DummySource()), jsonStoreToBeUsed,
-                Optional.of(RepoStore.TEST_DIRECTORY));
+                          Optional.of(RepoStore.TEST_DIRECTORY));
     }
 }

@@ -32,7 +32,8 @@ public class NotificationController {
                 hideNotification();
             }));
             notificationPaneTimer = new TickingTimer("Notification Timer",
-                    notification.getTimeoutDuration(), integer -> {}, () -> {}, TimeUnit.SECONDS);
+                                                     notification.getTimeoutDuration(), integer -> {}, () -> {},
+                                                     TimeUnit.SECONDS);
             notificationPane.show();
             notificationPaneTimer.start();
             this.notification = Optional.of(notification);

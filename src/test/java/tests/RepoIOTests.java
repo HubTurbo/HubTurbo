@@ -44,7 +44,7 @@ public class RepoIOTests {
         RepoSource source = mock(RepoSource.class);
         CompletableFuture<List<String>> response = new CompletableFuture<>();
         doReturn(response).when(source).replaceIssueLabels(any(TurboIssue.class),
-                anyListOf(String.class));
+                                                           anyListOf(String.class));
 
         RepoIO repoIO = new RepoIO(Optional.of(source), Optional.empty(), Optional.empty());
         CompletableFuture result = repoIO.replaceIssueLabels(mock(TurboIssue.class), new ArrayList<>());
@@ -62,7 +62,7 @@ public class RepoIOTests {
         RepoSource source = mock(RepoSource.class);
         CompletableFuture<List<String>> response = new CompletableFuture<>();
         doReturn(response).when(source).replaceIssueMilestone(any(TurboIssue.class),
-                any(Optional.class));
+                                                              any(Optional.class));
 
         RepoIO repoIO = new RepoIO(Optional.of(source), Optional.empty(), Optional.empty());
         CompletableFuture result = repoIO.replaceIssueMilestone(mock(TurboIssue.class), Optional.of(0));
@@ -80,7 +80,7 @@ public class RepoIOTests {
         RepoSource source = mock(RepoSource.class);
         CompletableFuture<List<String>> response = new CompletableFuture<>();
         doReturn(response).when(source).editIssueState(any(TurboIssue.class),
-                anyBoolean());
+                                                       anyBoolean());
 
         RepoIO repoIO = new RepoIO(Optional.of(source), Optional.empty(), Optional.empty());
         CompletableFuture result1 = repoIO.editIssueState(mock(TurboIssue.class), true);

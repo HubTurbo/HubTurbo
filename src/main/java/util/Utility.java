@@ -108,16 +108,15 @@ public final class Utility {
         // we consider the json to have exploded as the file is unusually large.
         if (issueCount > 0 && sizeAfterWrite > ((long) issueCount * 2000)) {
             UI.events.triggerEvent(new ShowErrorDialogEvent("Possible data corruption detected",
-                            fileName + " is unusually large.\n\n"
-                                    + "Now proceeding to delete the file and " +
-                                    "redownload the repository to prevent "
-                                    + "further corruption.\n\n"
-                                    + "A copy of the corrupted file is saved as " +
-                                    fileName + "-err. "
-                                    + "The error log of the program has been stored " +
-                                    "in the file hubturbo-err-log.log."
-                    )
-            );
+                    fileName + " is unusually large.\n\n"
+                            + "Now proceeding to delete the file and "
+                            + "redownload the repository to prevent "
+                            + "further corruption.\n\n"
+                            + "A copy of the corrupted file is saved as "
+                            + fileName + "-err. "
+                            + "The error log of the program has been stored "
+                            + "in the file hubturbo-err-log.log."
+            ));
             parseAndDeleteFile(fileName);
             copyLog();
             return true;
@@ -128,8 +127,8 @@ public final class Utility {
     public static void copyLog() {
         try {
             Files.copy(Paths.get("hubturbo-log.log"),
-                    Paths.get("hubturbo-err-log.log"),
-                    StandardCopyOption.REPLACE_EXISTING);
+                       Paths.get("hubturbo-err-log.log"),
+                       StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             logger.error(e.getLocalizedMessage(), e);
         }
@@ -273,6 +272,7 @@ public final class Utility {
 
     /**
      * Checks that the source contains all words in queries
+     *
      * @param source
      * @param queries
      * @return
@@ -295,9 +295,7 @@ public final class Utility {
         List<String> existingSuffixes = existingNames.stream()
                 .filter(existing -> existing.startsWith(desiredName)
                         && !existing.equalsIgnoreCase(desiredName))
-                .map(existing ->
-                        existing.substring(existing.indexOf(desiredName, 0)
-                                + desiredName.length()))
+                .map(existing -> existing.substring(existing.indexOf(desiredName, 0) + desiredName.length()))
                 .collect(Collectors.toList());
 
         int index = 1;

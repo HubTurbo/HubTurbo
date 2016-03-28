@@ -212,6 +212,7 @@ public class Model implements IBaseModel {
 
     /**
      * Replaces the milestone of an issue specified by {@code issueId} with {@code milestone}
+     *
      * @param issueId
      * @param milestone
      * @return the modified TurboIssue if successful

@@ -104,8 +104,8 @@ public class GUIController {
 
     private void updateAPIBox(UpdateRateLimitsEvent e) {
         Platform.runLater(() -> apiBox.setText(String.format("%s/%s",
-                e.remainingRequests,
-                Utility.minutesFromNow(e.nextRefreshInMillisecs)))
+                                                             e.remainingRequests,
+                                                             Utility.minutesFromNow(e.nextRefreshInMillisecs)))
         );
     }
 

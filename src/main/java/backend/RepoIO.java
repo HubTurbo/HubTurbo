@@ -87,7 +87,7 @@ public class RepoIO {
         // The ignoreCase logic is necessary when we are opening a repo from the login dialog window
         // i.e. when the isAlreadyOpen check in Logic fails.
         Optional<String> matchingRepoName = storedRepos.stream().filter(repoName ->
-                repoName.equalsIgnoreCase(repoId))
+                                                                                repoName.equalsIgnoreCase(repoId))
                 .findFirst();
         if (matchingRepoName.isPresent()) {
             // TODO avoid CI deadlock in the .exceptionally call. Explanation:
@@ -181,20 +181,18 @@ public class RepoIO {
                         }
                     } else {
                         logger.info(HTLog.format(model.getRepoId(),
-                                "Nothing changed; not writing to store"));
+                                                 "Nothing changed; not writing to store"));
                     }
                     if (corruptedJson && remainingTries > 0) {
                         return downloadRepoFromSourceAsync(model.getRepoId(), remainingTries - 1).join();
                     } else {
                         if (corruptedJson && remainingTries == 0) {
                             UI.events.triggerEvent(new ShowErrorDialogEvent("Could not sync " + model.getRepoId(),
-                                    "We were not able to sync with GitHub to "
-                                            + "retrieve and store data for " +
-                                            "the repository "
+                                            "We were not able to sync with GitHub "
+                                            + "to retrieve and store data for the repository "
                                             + model.getRepoId()
-                                            + ". Please let us know if you " +
-                                            "encounter this issue consistently."
-                            ));
+                                            + ". Please let us know if you "
+                                            + "encounter this issue consistently."));
                         } else {
                             UI.status.displayMessage(model.getRepoId() + " is up to date!");
                         }

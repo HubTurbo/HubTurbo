@@ -122,14 +122,14 @@ public class ScreenManager {
 
         if (availableDimensions.getWidth() > maximiseThreshold * screenDimensions.getWidth()) {
             return new Rectangle((int) getCollapsedX(),
-                    0,
-                    (int) availableDimensions.getWidth(),
-                    (int) availableDimensions.getHeight());
+                                 0,
+                                 (int) availableDimensions.getWidth(),
+                                 (int) availableDimensions.getHeight());
         } else {
             return new Rectangle(0,
-                    0,
-                    (int) screenDimensions.getWidth(),
-                    (int) screenDimensions.getHeight());
+                                 0,
+                                 (int) screenDimensions.getWidth(),
+                                 (int) screenDimensions.getHeight());
         }
     }
 

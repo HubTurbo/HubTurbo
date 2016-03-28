@@ -122,7 +122,7 @@ public class ListPanel extends FilterPanel {
         closedIssueText.setFill(Color.RED);
         totalIssueText.setFill(Color.BLACK);
         TextFlow bottomPanelText = new TextFlow(totalIssueText, bracketOpenText,
-                openIssueText, plusText, closedIssueText, bracketCloseText);
+                                                openIssueText, plusText, closedIssueText, bracketCloseText);
         return bottomPanelText;
     }
 
@@ -441,7 +441,7 @@ public class ListPanel extends FilterPanel {
         markAllBelowAsUnreadMenuItem.setOnAction(e -> {
             markAllItemsBelow(!READ);
         });
-        
+
         contextMenu.getItems().addAll(markAsReadUnreadMenuItem,
                                       markAllBelowAsReadMenuItem, markAllBelowAsUnreadMenuItem,
                                       changeLabelsMenuItem,
@@ -528,7 +528,7 @@ public class ListPanel extends FilterPanel {
 
         return closeReopenIssueMenuItem;
     }
-    
+
     public Optional<GuiElement> getSelectedElement() {
         return listView.getSelectedItem();
     }
@@ -584,7 +584,7 @@ public class ListPanel extends FilterPanel {
         response.ifPresent(res -> {
             if (res == ButtonType.OK) {
                 ui.undoController.addAction(element.getIssue(),
-                        new EditIssueStateAction(ui.logic, isOpen));
+                                            new EditIssueStateAction(ui.logic, isOpen));
             }
         });
     }

@@ -59,14 +59,14 @@ public class TurboMilestoneTest {
 
         Comparator<TurboMilestone> comparator = TurboMilestone.getDueDateComparator();
         List<TurboMilestone> milestones = Arrays.asList(milestoneWithDueDateOpen1, milestoneWithDueDateOpen2,
-                milestoneWithDueDateClosed1, milestoneWithDueDateClosed2,
-                milestoneWithoutDueDateOpen1, milestoneWithoutDueDateOpen2,
-                milestoneWithoutDueDateClosed1, milestoneWithoutDueDateClosed2);
+                                                        milestoneWithDueDateClosed1, milestoneWithDueDateClosed2,
+                                                        milestoneWithoutDueDateOpen1, milestoneWithoutDueDateOpen2,
+                                                        milestoneWithoutDueDateClosed1, milestoneWithoutDueDateClosed2);
         Collections.sort(milestones, comparator);
         List<TurboMilestone> expected = Arrays.asList(milestoneWithoutDueDateClosed1, milestoneWithoutDueDateClosed2,
-                milestoneWithDueDateOpen1, milestoneWithDueDateClosed2,
-                milestoneWithDueDateOpen2, milestoneWithDueDateClosed1,
-                milestoneWithoutDueDateOpen1, milestoneWithoutDueDateOpen2);
+                                                      milestoneWithDueDateOpen1, milestoneWithDueDateClosed2,
+                                                      milestoneWithDueDateOpen2, milestoneWithDueDateClosed1,
+                                                      milestoneWithoutDueDateOpen1, milestoneWithoutDueDateOpen2);
         assertEquals(expected, milestones);
     }
 
@@ -84,10 +84,10 @@ public class TurboMilestoneTest {
 
         // the sort should be stable
         List<TurboMilestone> milestones = Arrays.asList(milestone1,
-                milestone2,
-                milestone3,
-                milestone4,
-                milestone5);
+                                                        milestone2,
+                                                        milestone3,
+                                                        milestone4,
+                                                        milestone5);
         List<TurboMilestone> sortedMilestones = TurboMilestone.sortByDueDate(milestones);
         assertEquals("milestone2", sortedMilestones.get(0).getTitle());
         assertEquals("milestone1", sortedMilestones.get(1).getTitle());

@@ -77,7 +77,7 @@ public class MilestoneUpdateServiceTests {
         assertTrue(milestones.isEmpty());
         assertEquals(previousETags, service.getUpdatedETags());
         assertEquals(Utility.parseHTTPLastModifiedDate("Sun, 27 Dec 2015 15:28:46 GMT"),
-                service.getUpdatedCheckTime());
+                     service.getUpdatedCheckTime());
     }
 
     /**
@@ -97,7 +97,7 @@ public class MilestoneUpdateServiceTests {
         assertEquals(188, milestones.size());
         assertEquals(expectedETags, service.getUpdatedETags());
         assertEquals(Utility.parseHTTPLastModifiedDate("Sun, 27 Dec 2015 15:28:46 GMT"),
-                service.getUpdatedCheckTime());
+                     service.getUpdatedCheckTime());
     }
 
     private static HttpRequest createMockServerRequest(String method, int page) {

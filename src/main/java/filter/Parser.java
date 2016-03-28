@@ -442,8 +442,7 @@ public final class Parser {
                 } catch (NumberFormatException e) {
                     // Exit with an exception if it's not a number
                     throw new ParseException(String.format(// NOPMD
-                            "Operator %s can only be applied to number or date",
-                            operator));
+                            "Operator %s can only be applied to number or date", operator));
                 }
 
                 // Must be a number

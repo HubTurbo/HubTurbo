@@ -96,7 +96,7 @@ public class UIEventTests extends UITest {
         press(KeyboardShortcuts.SWITCH_DEFAULT_REPO);
         assertEquals("dummy3/dummy3", defaultRepoId);
     }
-    
+
     @Test
     public void triggerIssuePicker_dialogAppears() {
         UI.events.registerEvent((ShowIssuePickerEventHandler) e -> UIEventTests.increaseEventTestCount());

@@ -77,8 +77,8 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     private void initialiseDialog(Stage stage, TurboIssue issue) {
         initOwner(stage);
         initModality(Modality.APPLICATION_MODAL);
-        setTitle("Edit Labels for " + (issue.isPullRequest() ? "PR #" : "Issue #") +
-                issue.getId() + " in " + issue.getRepoId());
+        setTitle("Edit Labels for " + (issue.isPullRequest() ? "PR #" : "Issue #")
+                + issue.getId() + " in " + issue.getRepoId());
         // Ensures height and width of dialog has been initialized before positioning
         Platform.runLater(() -> positionDialog(stage));
     }
@@ -99,7 +99,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     private final void populatePanes(LabelPickerState state) {
         // Population of UI elements
         populateAssignedLabels(state.getInitialLabels(), state.getRemovedLabels(), state.getAddedLabels(),
-                state.getCurrentSuggestion());
+                               state.getCurrentSuggestion());
         populateFeedbackLabels(state.getAssignedLabels(), state.getMatchedLabels(), state.getCurrentSuggestion());
         // Ensures dialog pane resize according to content
         getDialogPane().getScene().getWindow().sizeToScene();

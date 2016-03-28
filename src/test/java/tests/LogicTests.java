@@ -42,7 +42,7 @@ public class LogicTests {
         mockedMultiModel = mock(MultiModel.class);
 
         logic = new Logic(mock(UIManager.class), mockedPreferences,
-                Optional.of(mockedRepoIO), Optional.of(mockedMultiModel));
+                          Optional.of(mockedRepoIO), Optional.of(mockedMultiModel));
     }
 
     @Before
@@ -357,7 +357,7 @@ public class LogicTests {
     }
 
     private void mockMultiModelReplaceIssueMilestone(Optional<TurboIssue> replaceResult,
-                                                  Optional<Model> modelLookUpResult) {
+                                                     Optional<Model> modelLookUpResult) {
         when(mockedMultiModel.replaceIssueMilestone(anyString(), anyInt(), any(Optional.class)))
                 .thenReturn(replaceResult);
         when(mockedMultiModel.getModelById(anyString())).thenReturn(modelLookUpResult);

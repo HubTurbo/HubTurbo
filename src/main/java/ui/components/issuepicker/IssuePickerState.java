@@ -7,7 +7,7 @@ import java.util.Optional;
 import backend.resource.TurboIssue;
 
 /**
- * Represents the state of the issue picker. 
+ * Represents the state of the issue picker.
  */
 public class IssuePickerState {
 
@@ -36,7 +36,8 @@ public class IssuePickerState {
 
     /**
      * Sets issues based on given user input
-     * @param userInput 
+     *
+     * @param userInput
      */
     private final void setIssues(String userInput) {
         String query = userInput.trim();
@@ -47,6 +48,7 @@ public class IssuePickerState {
 
     /**
      * Sets selected issues if issue is present
+     *
      * @param issue
      */
     public void setSelectedIssues(TurboIssue selectedIssue) {
@@ -55,6 +57,7 @@ public class IssuePickerState {
 
     /**
      * Sets suggested issues with given query
+     *
      * @param issue
      */
     private void setSuggestedIssues(List<TurboIssue> issues, String query) {

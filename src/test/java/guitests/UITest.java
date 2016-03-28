@@ -110,10 +110,8 @@ public class UITest extends GuiTest {
             if (Files.exists(Paths.get(RepoStore.TEST_DIRECTORY))) {
                 Files.walk(Paths.get(RepoStore.TEST_DIRECTORY), 1)
                         .filter(Files::isRegularFile)
-                        .filter(p ->
-                                getFileExtension(String.valueOf(p.getFileName())).equalsIgnoreCase("json") ||
-                                        getFileExtension(String.valueOf(p.getFileName())).equalsIgnoreCase("json-err")
-                        )
+                        .filter(p -> getFileExtension(String.valueOf(p.getFileName())).equalsIgnoreCase("json")
+                                || getFileExtension(String.valueOf(p.getFileName())).equalsIgnoreCase("json-err"))
                         .forEach(p -> new File(p.toAbsolutePath().toString()).delete());
             }
         } catch (IOException e) {
@@ -437,8 +435,7 @@ public class UITest extends GuiTest {
                     .filter(m -> m.getText().equals(names[0]))
                     .findFirst()
                     .orElseThrow(() ->
-                            new IllegalArgumentException(
-                                    String.format("%s is not a valid menu item", names[0])));
+                            new IllegalArgumentException(String.format("%s is not a valid menu item", names[0])));
 
             for (int i = 1; i < names.length; i++) {
                 final int j = i;
@@ -450,8 +447,7 @@ public class UITest extends GuiTest {
                         .filter(m -> m.getText().equals(names[j]))
                         .findFirst()
                         .orElseThrow(() ->
-                                new IllegalArgumentException(
-                                        String.format("%s is not a valid menu item", names[j])));
+                                new IllegalArgumentException(String.format("%s is not a valid menu item", names[j])));
             }
 
             current.getOnAction().handle(new ActionEvent());

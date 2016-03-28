@@ -16,24 +16,23 @@ public class PlatformSpecificTests {
     @Test
     public void testStringToArchitectureEnum() {
         assertEquals(Architecture.X86_64,
-                PlatformSpecific.getArchitectureFromString("blah x86_64 blah"));
+                     PlatformSpecific.getArchitectureFromString("blah x86_64 blah"));
         assertEquals(Architecture.I386,
-                PlatformSpecific.getArchitectureFromString("blah i386 blah"));
+                     PlatformSpecific.getArchitectureFromString("blah i386 blah"));
         assertEquals(Architecture.I686,
-                PlatformSpecific.getArchitectureFromString("blah i686 blah"));
+                     PlatformSpecific.getArchitectureFromString("blah i686 blah"));
         assertEquals(Architecture.UNKNOWN,
-                PlatformSpecific.getArchitectureFromString("blah blah blah"));
+                     PlatformSpecific.getArchitectureFromString("blah blah blah"));
         assertEquals(Architecture.UNKNOWN,
-                PlatformSpecific.getArchitectureFromString(""));
+                     PlatformSpecific.getArchitectureFromString(""));
         assertEquals(Architecture.UNKNOWN,
-                PlatformSpecific.getArchitectureFromString(null));
+                     PlatformSpecific.getArchitectureFromString(null));
     }
 
     @Test
     public void testGettingLinuxArchitecture() {
         if (PlatformSpecific.isOnLinux()) {
-            assertTrue(PlatformSpecific.isOn32BitsLinux() ||
-                    PlatformSpecific.isOn64BitsLinux());
+            assertTrue(PlatformSpecific.isOn32BitsLinux() || PlatformSpecific.isOn64BitsLinux());
         }
 
         if (!PlatformSpecific.isOnLinux()) {
@@ -78,30 +77,30 @@ public class PlatformSpecificTests {
         assertNotNull(chromeDriverBinaryName);
 
         if (PlatformSpecific.isOnMac()) {
-            assertTrue(chromeDriverBinaryName.startsWith("chromedriver_") &&
-                    !chromeDriverBinaryName.contains("exe") &&
-                    !chromeDriverBinaryName.contains("linux") &&
-                    !chromeDriverBinaryName.contains("x86_64"));
+            assertTrue(chromeDriverBinaryName.startsWith("chromedriver_")
+                    && !chromeDriverBinaryName.contains("exe")
+                    && !chromeDriverBinaryName.contains("linux")
+                    && !chromeDriverBinaryName.contains("x86_64"));
         } else if (PlatformSpecific.isOnWindows()) {
-            assertTrue(chromeDriverBinaryName.startsWith("chromedriver_") &&
-                    chromeDriverBinaryName.contains("exe") &&
-                    !chromeDriverBinaryName.contains("linux") &&
-                    !chromeDriverBinaryName.contains("x86_64"));
+            assertTrue(chromeDriverBinaryName.startsWith("chromedriver_")
+                    && chromeDriverBinaryName.contains("exe")
+                    && !chromeDriverBinaryName.contains("linux")
+                    && !chromeDriverBinaryName.contains("x86_64"));
         } else if (PlatformSpecific.isOn32BitsLinux()) {
-            assertTrue(chromeDriverBinaryName.startsWith("chromedriver_") &&
-                    !chromeDriverBinaryName.contains("exe") &&
-                    chromeDriverBinaryName.contains("linux") &&
-                    !chromeDriverBinaryName.contains("x86_64"));
+            assertTrue(chromeDriverBinaryName.startsWith("chromedriver_")
+                    && !chromeDriverBinaryName.contains("exe")
+                    && chromeDriverBinaryName.contains("linux")
+                    && !chromeDriverBinaryName.contains("x86_64"));
         } else if (PlatformSpecific.isOn64BitsLinux()) {
-            assertTrue(chromeDriverBinaryName.startsWith("chromedriver_") &&
-                    !chromeDriverBinaryName.contains("exe") &&
-                    chromeDriverBinaryName.contains("linux") &&
-                    chromeDriverBinaryName.contains("x86_64"));
+            assertTrue(chromeDriverBinaryName.startsWith("chromedriver_")
+                    && !chromeDriverBinaryName.contains("exe")
+                    && chromeDriverBinaryName.contains("linux")
+                    && chromeDriverBinaryName.contains("x86_64"));
         } else {
-            assertTrue(chromeDriverBinaryName.startsWith("chromedriver_") &&
-                    !chromeDriverBinaryName.contains("exe") &&
-                    chromeDriverBinaryName.contains("linux") &&
-                    !chromeDriverBinaryName.contains("x86_64"));
+            assertTrue(chromeDriverBinaryName.startsWith("chromedriver_")
+                    && !chromeDriverBinaryName.contains("exe")
+                    && chromeDriverBinaryName.contains("linux")
+                    && !chromeDriverBinaryName.contains("x86_64"));
         }
     }
 

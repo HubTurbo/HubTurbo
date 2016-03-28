@@ -229,20 +229,20 @@ public class DummyRepoState {
 
     private TurboIssue makeDummyIssue() {
         return new TurboIssue(dummyRepoId,
-                issues.size() + 1,
-                "Issue " + (issues.size() + 1),
-                "User " + (issues.size() + 1),
-                LocalDateTime.of(1999 + issues.size(), 1, 1, 0, 0),
-                false);
+                              issues.size() + 1,
+                              "Issue " + (issues.size() + 1),
+                              "User " + (issues.size() + 1),
+                              LocalDateTime.of(1999 + issues.size(), 1, 1, 0, 0),
+                              false);
     }
 
     private TurboIssue makeDummyPR() {
         return new TurboIssue(dummyRepoId,
-                issues.size() + 1,
-                "PR " + (issues.size() + 1),
-                "User " + (issues.size() + 1),
-                LocalDateTime.of(1999 + issues.size(), 1, 1, 0, 0),
-                true);
+                              issues.size() + 1,
+                              "PR " + (issues.size() + 1),
+                              "User " + (issues.size() + 1),
+                              LocalDateTime.of(1999 + issues.size(), 1, 1, 0, 0),
+                              true);
     }
 
     private TurboLabel makeDummyLabel() {
@@ -317,8 +317,8 @@ public class DummyRepoState {
 
         // Mutate the copies
         eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test-nonself"),
-                IssueEventType.Renamed,
-                new Date()));
+                                              IssueEventType.Renamed,
+                                              new Date()));
         toRename.setTitle(updateText);
         toRename.setUpdatedAt(LocalDateTime.now());
 
@@ -335,8 +335,8 @@ public class DummyRepoState {
         List<TurboIssueEvent> eventsOfIssue = metadataOfIssue.getEvents();
 
         eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test-nonself"),
-                isOpen ? IssueEventType.Reopened : IssueEventType.Closed,
-                new Date()));
+                                              isOpen ? IssueEventType.Reopened : IssueEventType.Closed,
+                                              new Date()));
         toEdit.setOpen(isOpen);
         toEdit.setUpdatedAt(LocalDateTime.now());
 
@@ -395,17 +395,20 @@ public class DummyRepoState {
 
         // Mutate the copies
         List<String> labelsOfIssue = toSet.getLabels();
-        labelsOfIssue.stream().filter(existingLabel -> !newLabels.contains(existingLabel)).forEach(labelName ->
-                eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test-nonself"),
-                        IssueEventType.Unlabeled,
-                        new Date()).setLabelName(labelName).setLabelColour(labels.get(labelName).getColour()))
-        );
-        newLabels.stream().filter(newLabel -> !labelsOfIssue.contains(newLabel)).forEach(newLabel ->
-                eventsOfIssue.add
-                        (new TurboIssueEvent(new User().setLogin("test-nonself"),
-                                IssueEventType.Labeled,
-                                new Date()).setLabelName(newLabel).setLabelColour(labels.get(newLabel).getColour()))
-        );
+        labelsOfIssue.stream()
+                .filter(existingLabel -> !newLabels.contains(existingLabel))
+                .forEach(labelName -> eventsOfIssue.add(
+                        new TurboIssueEvent(new User().setLogin("test-nonself"), IssueEventType.Unlabeled, new Date())
+                                .setLabelName(labelName)
+                                .setLabelColour(labels.get(labelName).getColour())));
+
+        newLabels.stream()
+                .filter(newLabel -> !labelsOfIssue.contains(newLabel))
+                .forEach(newLabel -> eventsOfIssue.add(
+                        new TurboIssueEvent(new User().setLogin("test-nonself"), IssueEventType.Labeled, new Date())
+                                .setLabelName(newLabel)
+                                .setLabelColour(labels.get(newLabel).getColour())));
+
         toSet.setLabels(newLabels);
         toSet.setUpdatedAt(LocalDateTime.now());
 
@@ -438,27 +441,31 @@ public class DummyRepoState {
 
     /**
      * Sets milestone for an issue, after triggering a 'Milestoned' TurboIssueEvent for it
+     *
      * @param milestone
      * @param toSet
      * @param eventsOfIssue
      */
     private void setMilestoneForIssue(int milestone, TurboIssue toSet, List<TurboIssueEvent> eventsOfIssue) {
         eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test"),
-                IssueEventType.Milestoned,
-                new Date()).setMilestoneTitle(milestones.get(milestone).getTitle()));
+                                              IssueEventType.Milestoned,
+                                              new Date()).setMilestoneTitle(milestones.get(milestone).getTitle()));
         toSet.setMilestoneById(milestone);
     }
 
     /**
      * Removes the milestone of an issue, after triggerign a 'Demilestoned' TurboIssueEvent for it
+     *
      * @param milestoneOfIssue
      * @param toSet
      * @param eventsOfIssue
      */
     private void removeMilestoneFromIssue(int milestoneOfIssue, TurboIssue toSet, List<TurboIssueEvent> eventsOfIssue) {
         eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test"),
-                IssueEventType.Demilestoned,
-                new Date()).setMilestoneTitle(milestones.get(milestoneOfIssue).getTitle()));
+                                              IssueEventType.Demilestoned,
+                                              new Date())
+                .setMilestoneTitle(milestones.get(milestoneOfIssue).getTitle()));
+
         toSet.removeMilestone();
     }
 
@@ -480,7 +487,7 @@ public class DummyRepoState {
 
         // Replace originals with copies, and queue them up to be retrieved
         markUpdatedComments(toComment,
-                IssueMetadata.intermediate(metadataOfIssue.getEvents(), commentsOfIssue, "", ""));
+                            IssueMetadata.intermediate(metadataOfIssue.getEvents(), commentsOfIssue, "", ""));
 
         return toComment;
     }

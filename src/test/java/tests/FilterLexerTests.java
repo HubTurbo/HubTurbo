@@ -32,7 +32,7 @@ public class FilterLexerTests {
     public void lex_repoIds() {
 
         assertEquals(tokenise("test/test"),
-                Arrays.asList(new Token(TokenType.SYMBOL, "test/test"), new Token(TokenType.EOF, "")));
+                     Arrays.asList(new Token(TokenType.SYMBOL, "test/test"), new Token(TokenType.EOF, "")));
     }
 
     @Test

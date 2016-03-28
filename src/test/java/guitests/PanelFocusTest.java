@@ -57,26 +57,21 @@ public class PanelFocusTest extends UITest {
         assertEquals(3, panelControl.getPanelCount());
 
         // check that focus is on first panel
-        awaitCondition(() ->
-                0 == panelControl.getCurrentlySelectedPanel().get());
+        awaitCondition(() -> 0 == panelControl.getCurrentlySelectedPanel().get());
 
         // Check that pressing F will go to second panel
         // This checks that no filter text field is in focus and panel
         // shortcut works at startup
         pushKeys(KeyCode.F);
-        awaitCondition(() ->
-                1 == panelControl.getCurrentlySelectedPanel().get());
+        awaitCondition(() -> 1 == panelControl.getCurrentlySelectedPanel().get());
 
         // More shortcut checks to ensure the focus is always correct
         pushKeys(JUMP_TO_FILTER_BOX);
-        awaitCondition(() ->
-                1 == panelControl.getCurrentlySelectedPanel().get());
+        awaitCondition(() -> 1 == panelControl.getCurrentlySelectedPanel().get());
         pushKeys(JUMP_TO_FIRST_ISSUE);
-        awaitCondition(() ->
-                1 == panelControl.getCurrentlySelectedPanel().get());
+        awaitCondition(() -> 1 == panelControl.getCurrentlySelectedPanel().get());
         pushKeys(KeyCode.F);
-        awaitCondition(() ->
-                2 == panelControl.getCurrentlySelectedPanel().get());
+        awaitCondition(() -> 2 == panelControl.getCurrentlySelectedPanel().get());
     }
 
     private void panelFocus_focusedPanel_focusCorrectOnCreatingPanels(PanelControl panelControl) {
@@ -88,12 +83,10 @@ public class PanelFocusTest extends UITest {
         // - this includes testing double space as the last panel might be
         //   colour focused but the real JavaFX focus is on first panel
         pushKeys(CREATE_RIGHT_PANEL);
-        awaitCondition(() -> panelControl.getCurrentlySelectedPanel().get() ==
-                panelControl.getPanelCount() - 1);
+        awaitCondition(() -> panelControl.getCurrentlySelectedPanel().get() == panelControl.getPanelCount() - 1);
 
         type("  ");
-        awaitCondition(() -> panelControl.getCurrentlySelectedPanel().get() ==
-                panelControl.getPanelCount() - 1);
+        awaitCondition(() -> panelControl.getCurrentlySelectedPanel().get() == panelControl.getPanelCount() - 1);
 
         // test that upon creating panel on the left, focus is on the first panel
         // - same consideration as above
@@ -121,8 +114,7 @@ public class PanelFocusTest extends UITest {
         awaitCondition(() -> 1 == panelControl.getNumberOfSavedBoards());
         // 2. Create a new panel so that scroll bar is on the left
         pushKeys(CREATE_RIGHT_PANEL);
-        awaitCondition(() -> panelControl.getCurrentlySelectedPanel().get() ==
-                panelControl.getPanelCount() - 1);
+        awaitCondition(() -> panelControl.getCurrentlySelectedPanel().get() == panelControl.getPanelCount() - 1);
         // 3. Open board
         pushKeys(SWITCH_BOARD);
 

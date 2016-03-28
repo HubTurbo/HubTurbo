@@ -106,7 +106,7 @@ public final class IssueMetadata {
                           boolean isLatest, String eventsETag, String commentsETag,
                           String user) {
         this(events, comments, isLatest, eventsETag, commentsETag,
-                computeNonSelfUpdatedAt(events, comments, user), user);
+             computeNonSelfUpdatedAt(events, comments, user), user);
     }
 
     /**
@@ -152,8 +152,8 @@ public final class IssueMetadata {
 
     private static int countCommentsBySelf(List<Comment> comments, String user) {
         return Utility.safeLongToInt(comments.stream()
-                .filter(c -> isCommentBySelf(c, user))
-                .count());
+                                             .filter(c -> isCommentBySelf(c, user))
+                                             .count());
     }
 
     private static boolean isEventBySelf(TurboIssueEvent event, String user) {

@@ -14,8 +14,8 @@ public class IssuePicker {
 
     public IssuePicker(UI ui, Stage stage) {
         this.stage = stage;
-        ui.registerEvent((ShowIssuePickerEventHandler) e -> 
-            Platform.runLater(() -> showIssuePicker(ui.logic.getModels())));
+        ui.registerEvent((ShowIssuePickerEventHandler) e ->
+                Platform.runLater(() -> showIssuePicker(ui.logic.getModels())));
     }
 
     private Optional<String> showIssuePicker(MultiModel models) {

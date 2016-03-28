@@ -66,8 +66,8 @@ public enum QualifierType {
         defaultCompletions.addAll(Arrays.asList("body", "desc", "status", "user", "creator"));
 
         defaultCompletions.addAll(Arrays.asList("closed", "open", "issue", "pr",
-                "pullrequest", "read", "unread", "merged", "unmerged", "comments",
-                "nonSelfUpdate"));
+                                                "pullrequest", "read", "unread", "merged", "unmerged", "comments",
+                                                "nonSelfUpdate"));
 
         return Collections.unmodifiableSet(defaultCompletions);
     }

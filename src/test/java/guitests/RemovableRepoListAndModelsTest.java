@@ -90,7 +90,7 @@ public class RemovableRepoListAndModelsTest extends UITest {
         assertEquals(noOfUsedRepo, ui.logic.getOpenRepositories().size());
         assertEquals(totalRepoInSystem + 1, removeRepoMenu.getItems().size());
         assertEquals(totalRepoInSystem + 1 - noOfUsedRepo,
-                getNoOfEnabledMenuItems(removeRepoMenu.getItems()));
+                     getNoOfEnabledMenuItems(removeRepoMenu.getItems()));
         assertEquals(noOfUsedRepo, getNoOfDisabledMenuItems(removeRepoMenu.getItems()));
 
         // we check that if there is a panel referencing same repo,
@@ -107,7 +107,7 @@ public class RemovableRepoListAndModelsTest extends UITest {
         assertEquals(noOfUsedRepo, ui.logic.getOpenRepositories().size());
         assertEquals(totalRepoInSystem + 1, removeRepoMenu.getItems().size());
         assertEquals(totalRepoInSystem + 1 - noOfUsedRepo,
-                getNoOfEnabledMenuItems(removeRepoMenu.getItems()));
+                     getNoOfEnabledMenuItems(removeRepoMenu.getItems()));
         assertEquals(noOfUsedRepo, getNoOfDisabledMenuItems(removeRepoMenu.getItems()));
 
         // we check for panel referencing different repo(s)
@@ -121,7 +121,7 @@ public class RemovableRepoListAndModelsTest extends UITest {
         assertEquals(noOfUsedRepo, ui.logic.getOpenRepositories().size());
         assertEquals(totalRepoInSystem + 1, removeRepoMenu.getItems().size());
         assertEquals(totalRepoInSystem + 1 - noOfUsedRepo,
-                getNoOfEnabledMenuItems(removeRepoMenu.getItems()));
+                     getNoOfEnabledMenuItems(removeRepoMenu.getItems()));
         assertEquals(noOfUsedRepo, getNoOfDisabledMenuItems(removeRepoMenu.getItems()));
 
         noOfUsedRepo = 3;
@@ -136,7 +136,7 @@ public class RemovableRepoListAndModelsTest extends UITest {
         assertEquals(noOfUsedRepo, ui.logic.getOpenRepositories().size());
         assertEquals(totalRepoInSystem + 1, removeRepoMenu.getItems().size());
         assertEquals(totalRepoInSystem + 1 - noOfUsedRepo,
-                getNoOfEnabledMenuItems(removeRepoMenu.getItems()));
+                     getNoOfEnabledMenuItems(removeRepoMenu.getItems()));
         assertEquals(noOfUsedRepo, getNoOfDisabledMenuItems(removeRepoMenu.getItems()));
 
         noOfUsedRepo = 4;
@@ -152,7 +152,7 @@ public class RemovableRepoListAndModelsTest extends UITest {
         assertEquals(noOfUsedRepo, ui.logic.getOpenRepositories().size());
         assertEquals(totalRepoInSystem + 1, removeRepoMenu.getItems().size());
         assertEquals(totalRepoInSystem + 1 - noOfUsedRepo,
-                getNoOfEnabledMenuItems(removeRepoMenu.getItems()));
+                     getNoOfEnabledMenuItems(removeRepoMenu.getItems()));
         assertEquals(noOfUsedRepo, getNoOfDisabledMenuItems(removeRepoMenu.getItems()));
 
         noOfUsedRepo = 3;
@@ -165,7 +165,7 @@ public class RemovableRepoListAndModelsTest extends UITest {
         assertEquals(noOfUsedRepo, ui.logic.getOpenRepositories().size());
         assertEquals(totalRepoInSystem + 1, removeRepoMenu.getItems().size()); // remove would not decrease
         assertEquals(totalRepoInSystem + 1 - noOfUsedRepo,
-                getNoOfEnabledMenuItems(removeRepoMenu.getItems()));
+                     getNoOfEnabledMenuItems(removeRepoMenu.getItems()));
         assertEquals(noOfUsedRepo, getNoOfDisabledMenuItems(removeRepoMenu.getItems()));
     }
 

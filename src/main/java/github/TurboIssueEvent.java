@@ -165,24 +165,24 @@ public class TurboIssueEvent {
         case Renamed: {
             HBox display = new HBox();
             display.getChildren().addAll(octicon(OCTICON_PENCIL),
-                    conditionallyBold(bold,
-                            new Text(String.format("%s renamed this issue %s.",
-                                    actorName, time))));
+                                         conditionallyBold(bold,
+                                                           new Text(String.format("%s renamed this issue %s.",
+                                                                                  actorName, time))));
             return display;
         }
         case Milestoned: {
             HBox display = new HBox();
             display.getChildren().addAll(octicon(OCTICON_MILESTONE),
-                    conditionallyBold(bold, new Text(String.format(
-                            "%s added milestone %s %s.", actorName, getMilestoneTitle(), time))));
+                                         conditionallyBold(bold, new Text(String.format(
+                                                 "%s added milestone %s %s.", actorName, getMilestoneTitle(), time))));
             return display;
         }
         case Demilestoned: {
             HBox display = new HBox();
             display.getChildren().addAll(octicon(OCTICON_MILESTONE),
-                    conditionallyBold(bold, new Text(String.format(
-                            "%s removed milestone %s %s.", actorName, getMilestoneTitle(), time)
-                    )));
+                                         conditionallyBold(bold, new Text(String.format(
+                                                 "%s removed milestone %s %s.", actorName, getMilestoneTitle(), time)
+                                         )));
             return display;
         }
         // Labeled and Unlabeled are not invoked as createLabelUpdateEventNodes is invoked
@@ -218,8 +218,8 @@ public class TurboIssueEvent {
             display.getChildren().addAll(
                     octicon(OCTICON_PERSON),
                     conditionallyBold(bold,
-                            new Text(String.format(
-                                    "%s was assigned to this issue %s.", actorName, time)))
+                                      new Text(String.format(
+                                              "%s was assigned to this issue %s.", actorName, time)))
             );
             return display;
         }
@@ -237,7 +237,7 @@ public class TurboIssueEvent {
             display.getChildren().addAll(
                     octicon(OCTICON_ISSUE_CLOSED),
                     conditionallyBold(bold,
-                            new Text(String.format("%s closed this issue %s.", actorName, time)))
+                                      new Text(String.format("%s closed this issue %s.", actorName, time)))
             );
             return display;
         }
@@ -246,7 +246,7 @@ public class TurboIssueEvent {
             display.getChildren().addAll(
                     octicon(OCTICON_ISSUE_OPENED),
                     conditionallyBold(bold,
-                            new Text(String.format("%s reopened this issue %s.", actorName, time)))
+                                      new Text(String.format("%s reopened this issue %s.", actorName, time)))
             );
             return display;
         }
@@ -262,11 +262,11 @@ public class TurboIssueEvent {
         case Subscribed:
             return conditionallyBold(bold, new Text(
                     String.format("%s subscribed to receive notifications for this issue %s.",
-                            actorName, time)));
+                                  actorName, time)));
         case Unsubscribed:
             return conditionallyBold(bold, new Text(
                     String.format("%s unsubscribed from notifications for this issue %s.",
-                            actorName, time)));
+                                  actorName, time)));
         case Mentioned:
             return conditionallyBold(bold, new Text(
                     String.format("%s was mentioned %s.", actorName, time)));
@@ -328,8 +328,8 @@ public class TurboIssueEvent {
     private static Node createLabelNode(GuiElement guiElement, TurboIssueEvent e) {
         // Unlabeled/Labeled events use data from the TurboIssueEvent itself (see GuiElement.getLabels documentation)
         TurboLabel label = new TurboLabel(guiElement.getIssue().getRepoId(),
-                e.getLabelColour(),
-                e.getLabelName());
+                                          e.getLabelColour(),
+                                          e.getLabelName());
         Node node = label.getNode();
         if (e.getType() == IssueEventType.Unlabeled) {
             node.getStyleClass().add("labels-removed");
@@ -403,10 +403,10 @@ public class TurboIssueEvent {
             return String.format("%s renamed this issue %s.", actorName, time);
         case Milestoned:
             return String.format("%s added milestone %s %s.", actorName,
-                    getMilestoneTitle(), time);
+                                 getMilestoneTitle(), time);
         case Demilestoned:
             return String.format("%s removed milestone %s %s.", actorName,
-                    getMilestoneTitle(), time);
+                                 getMilestoneTitle(), time);
         case Labeled:
             return String.format("%s added label %s %s.", actorName, getLabelName(), time);
         case Unlabeled:
@@ -427,7 +427,7 @@ public class TurboIssueEvent {
             return String.format("%s referenced this issue %s.", actorName, time);
         case Subscribed:
             return String.format("%s subscribed to receive notifications for this issue %s.",
-                    actorName, time);
+                                 actorName, time);
         case Mentioned:
             return String.format("%s was mentioned %s.", actorName, time);
         case Merged:

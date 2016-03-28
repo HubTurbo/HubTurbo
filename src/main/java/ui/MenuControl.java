@@ -119,8 +119,8 @@ public class MenuControl extends MenuBar {
         dlg.initModality(Modality.APPLICATION_MODAL);
         dlg.setTitle("Confirmation");
         dlg.getDialogPane().setHeaderText("Create a new board");
-        dlg.getDialogPane().setContentText("Are you sure you want to create a new board?" +
-                " All unsaved changes to the current board will be lost.");
+        dlg.getDialogPane().setContentText("Are you sure you want to create a new board?"
+                                           + " All unsaved changes to the current board will be lost.");
         Optional<ButtonType> response = dlg.showAndWait();
         return response.isPresent() &&
                 response.get().getButtonData() == ButtonData.OK_DONE;
@@ -320,8 +320,7 @@ public class MenuControl extends MenuBar {
 
         Set<String> currentlyUsedRepos = Utility.convertSetToLowerCase(ui.getCurrentlyUsedRepos());
         Set<String> removableRepos = ui.logic.getStoredRepos()
-                .stream().filter(repoId -> !currentlyUsedRepos.contains(repoId
-                        .toLowerCase()))
+                .stream().filter(repoId -> !currentlyUsedRepos.contains(repoId.toLowerCase()))
                 .collect(Collectors.toSet());
 
         for (String repoId : removableRepos) {

@@ -431,12 +431,12 @@ public class Qualifier implements FilterExpression {
     @Override
     public List<String> getWarnings(IModel model, TurboIssue issue) {
         switch (type) {
-            case AUTHOR:
-            case ASSIGNEE:
-            case INVOLVES:
-                return getWarningsForTypeAuthorOrAssignee(model, issue);
-            default:
-                return new ArrayList<>();
+        case AUTHOR:
+        case ASSIGNEE:
+        case INVOLVES:
+            return getWarningsForTypeAuthorOrAssignee(model, issue);
+        default:
+            return new ArrayList<>();
         }
     }
 
@@ -991,8 +991,7 @@ public class Qualifier implements FilterExpression {
 
         // Find milestones containing partial title
         List<TurboMilestone> milestones = model.getMilestones().stream()
-                .filter(m -> m.getTitle().toLowerCase().contains(content.get()
-                        .toLowerCase()))
+                .filter(m -> m.getTitle().toLowerCase().contains(content.get().toLowerCase()))
                 .collect(Collectors.toList());
 
         if (milestones.isEmpty()) {
@@ -1058,8 +1057,7 @@ public class Qualifier implements FilterExpression {
 
         // Find assignees containing partial name
         List<TurboUser> assignees = model.getUsers().stream()
-                .filter(c -> c.getLoginName().toLowerCase().contains(content.get()
-                        .toLowerCase()))
+                .filter(c -> c.getLoginName().toLowerCase().contains(content.get().toLowerCase()))
                 .collect(Collectors.toList());
 
         if (assignees.isEmpty()) {

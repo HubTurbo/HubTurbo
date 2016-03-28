@@ -282,7 +282,7 @@ public class QualifierTests {
         Collections.sort(issues, comparator);
 
         assertEquals("[a/a #2, b/b #3, c/c #1, d/d #3, d/d #3, d/d #5, e/e #4]",
-                issues.toString());
+                     issues.toString());
     }
 
     /**
@@ -374,22 +374,22 @@ public class QualifierTests {
 
         IModel model = TestUtils.singletonModel(
                 new Model(FilterEvalTests.REPO, issues,
-                        new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
+                          new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
 
         List<TurboIssue> renderedIssues = new ArrayList<>(issues);
 
 
         // test: sorting by repo
         assertSorted(renderedIssues, Arrays.asList(5, 6, 7, 8, 9, 0, 1, 2, 3, 4),
-                model, "repo", false, false);
+                     model, "repo", false, false);
 
         // repo alias
         assertSorted(renderedIssues, Arrays.asList(5, 6, 7, 8, 9, 0, 1, 2, 3, 4),
-                model, "r", false, false);
+                     model, "r", false, false);
 
         // inverted sort order
         assertSorted(renderedIssues, Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9),
-                model, "repo", true, false);
+                     model, "repo", true, false);
     }
 
     @Test
@@ -403,20 +403,20 @@ public class QualifierTests {
 
         IModel model = TestUtils.singletonModel(
                 new Model(FilterEvalTests.REPO, issues,
-                        new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
+                          new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
 
         List<TurboIssue> renderedIssues = new ArrayList<>(issues);
 
         // test: sorting by updated 
         assertSorted(renderedIssues, Arrays.asList(0, 1, 2, 3, 4),
-                model, "updated", false, false);
+                     model, "updated", false, false);
         // updated alias
         assertSorted(renderedIssues, Arrays.asList(0, 1, 2, 3, 4),
-                model, "u", false, false);
+                     model, "u", false, false);
 
         // inverted sort order
         assertSorted(renderedIssues, Arrays.asList(4, 3, 2, 1, 0),
-                model, "updated", true, false);
+                     model, "updated", true, false);
     }
 
     @Test
@@ -428,18 +428,18 @@ public class QualifierTests {
 
         IModel model = TestUtils.singletonModel(
                 new Model(FilterEvalTests.REPO, issues,
-                        new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
+                          new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
 
         List<TurboIssue> renderedIssues = new ArrayList<>(issues);
 
 
         // test: sorting by id
         assertSorted(renderedIssues, Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7),
-                model, "id", false, false);
+                     model, "id", false, false);
 
         // inverted sort order
         assertSorted(renderedIssues, Arrays.asList(7, 6, 5, 4, 3, 2, 1, 0),
-                model, "id", true, false);
+                     model, "id", true, false);
 
     }
 
@@ -454,21 +454,21 @@ public class QualifierTests {
 
         IModel model = TestUtils.singletonModel(
                 new Model(FilterEvalTests.REPO, issues,
-                        new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
+                          new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
 
         List<TurboIssue> renderedIssues = new ArrayList<>(issues);
 
         // test: sorting by comments
         assertSorted(renderedIssues, Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7),
-                model, "comments", false, false);
+                     model, "comments", false, false);
 
         // comments alias
         assertSorted(renderedIssues, Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7),
-                model, "cm", false, false);
+                     model, "cm", false, false);
 
         // inverted sort order
         assertSorted(renderedIssues, Arrays.asList(7, 6, 5, 4, 3, 2, 1, 0),
-                model, "comments", true, false);
+                     model, "comments", true, false);
 
     }
 
@@ -516,10 +516,10 @@ public class QualifierTests {
         // (being last can mean either larger or smaller depending on inversion)
 
         assertSorted(renderedIssues, Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7),
-                model, "test", false, false);
+                     model, "test", false, false);
 
         assertSorted(renderedIssues, Arrays.asList(5, 4, 3, 2, 1, 0, 6, 7),
-                model, "test", true, false);
+                     model, "test", true, false);
     }
 
     @Test
@@ -536,21 +536,21 @@ public class QualifierTests {
         }
         IModel model = TestUtils.singletonModel(
                 new Model(FilterEvalTests.REPO, issues,
-                        new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
+                          new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
 
         List<TurboIssue> renderedIssues = new ArrayList<>(issues);
 
         // test: sorting by status 
         assertSorted(renderedIssues, Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7),
-                model, "status", false, false);
+                     model, "status", false, false);
 
         // status alias
         assertSorted(renderedIssues, Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7),
-                model, "st", false, false);
+                     model, "st", false, false);
 
         // inverted sort order
         assertSorted(renderedIssues, Arrays.asList(4, 5, 6, 7, 0, 1, 2, 3),
-                model, "status", true, false);
+                     model, "status", true, false);
 
     }
 
@@ -561,7 +561,7 @@ public class QualifierTests {
                               IModel model, String sortCriteria,
                               boolean isInverted, boolean isNonSelfUpdate) {
         Collections.sort(issues,
-                Qualifier.getSortComparator(model, sortCriteria, isInverted, isNonSelfUpdate));
+                         Qualifier.getSortComparator(model, sortCriteria, isInverted, isNonSelfUpdate));
 
         assertEquals(expectedIds, getIds(issues));
     }

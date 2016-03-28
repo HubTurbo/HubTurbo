@@ -135,11 +135,11 @@ public class UI extends Application implements EventDispatcher {
                 status.displayMessage("Waiting for login...");
                 mainStage.show();
                 new LoginDialog(this,
-                        mainStage,
-                        logic.loginController.getOwner(),
-                        logic.loginController.getRepo(),
-                        logic.loginController.getUsername(),
-                        logic.loginController.getPassword()
+                                mainStage,
+                                logic.loginController.getOwner(),
+                                logic.loginController.getRepo(),
+                                logic.loginController.getUsername(),
+                                logic.loginController.getPassword()
                 ).show().thenApply(isLoggedIn -> {
                     if (isLoggedIn) {
                         showMainWindow(logic.loginController.getRepoId());
@@ -238,7 +238,7 @@ public class UI extends Application implements EventDispatcher {
         logic = new Logic(uiManager, prefs, Optional.empty(), Optional.empty());
         // TODO clear cache if necessary
         refreshTimer = new TickingTimer("Refresh Timer", REFRESH_PERIOD,
-                status::updateTimeToRefresh, logic::refresh, TimeUnit.SECONDS);
+                                        status::updateTimeToRefresh, logic::refresh, TimeUnit.SECONDS);
         refreshTimer.start();
         undoController = new UndoController(notificationController);
     }
@@ -288,7 +288,7 @@ public class UI extends Application implements EventDispatcher {
                 params[0] = java.awt.Image.class;
                 Method setDockIconImage = util.getMethod("setDockIconImage", params);
                 setDockIconImage.invoke(application,
-                        new ImageIcon(UI.class.getResource(APPLICATION_LOGO_FILENAME)).getImage());
+                                        new ImageIcon(UI.class.getResource(APPLICATION_LOGO_FILENAME)).getImage());
             } catch (Exception e) {
                 logger.info("Not OSX", e);
             }
@@ -595,7 +595,7 @@ public class UI extends Application implements EventDispatcher {
 
     private void showJavaVersionOutdatedWarning(JavaVersion runtimeVersion, JavaVersion requiredVersion) {
         String message = String.format(WARNING_MSG_OUTDATED_JAVA_VERSION,
-                requiredVersion.toString(), runtimeVersion.toString());
+                                       requiredVersion.toString(), runtimeVersion.toString());
         DialogMessage.showInformationDialog("Update your Java version", message);
     }
 

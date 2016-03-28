@@ -36,7 +36,7 @@ public class IssueServiceEx extends IssueService {
         if (!returnedIssue.getState().equals(issue.getState())) {
             returnedIssue.setState(issue.getState());
             editIssueState(repository, returnedIssue.getNumber(),
-                    returnedIssue.getState().equals(STATE_OPEN));
+                           returnedIssue.getState().equals(STATE_OPEN));
         }
         return returnedIssue;
     }

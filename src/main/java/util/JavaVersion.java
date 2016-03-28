@@ -39,11 +39,11 @@ public class JavaVersion implements Comparable<JavaVersion> {
         }
 
         return new JavaVersion(Integer.parseInt(javaVersionMatcher.group(1)),
-                Integer.parseInt(javaVersionMatcher.group(2)),
-                Integer.parseInt(javaVersionMatcher.group(3)),
-                Integer.parseInt(javaVersionMatcher.group(4)),
-                Integer.parseInt((javaVersionMatcher.group(6) != null ? javaVersionMatcher.group(6) :
-                        "0")));
+                               Integer.parseInt(javaVersionMatcher.group(2)),
+                               Integer.parseInt(javaVersionMatcher.group(3)),
+                               Integer.parseInt(javaVersionMatcher.group(4)),
+                               Integer.parseInt((javaVersionMatcher.group(6) != null ? javaVersionMatcher.group(6)
+                                                                                     : "0")));
     }
 
     public String toString() {

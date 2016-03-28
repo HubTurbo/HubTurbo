@@ -107,8 +107,8 @@ public class IssuePanelTests extends UITest {
                 Optional.empty());
 
         assertEquals(0,
-                TurboIssueEvent.createLabelUpdateEventNodes(
-                        guiElement, new ArrayList<>()).size());
+                     TurboIssueEvent.createLabelUpdateEventNodes(
+                             guiElement, new ArrayList<>()).size());
     }
 
     @Test
@@ -144,8 +144,8 @@ public class IssuePanelTests extends UITest {
         assertEquals(4, ((HBox) nodes.get(2)).getChildren().size());
         assertEquals(4, ((HBox) nodes.get(3)).getChildren().size());
         assertEquals(4, ((HBox) nodes.get(4)).getChildren().size());
-        assertEquals(5, ((VBox) layoutMethod.invoke(null,
-                guiElement, events, new ArrayList<Comment>())).getChildren().size());
+        assertEquals(5, ((VBox) layoutMethod.invoke(null, guiElement, events, new ArrayList<Comment>()))
+                                            .getChildren().size());
     }
 
     @Test
@@ -165,8 +165,8 @@ public class IssuePanelTests extends UITest {
                         .setLabelName("X").setLabelColour("ffffff"));
 
         assertEquals(1,
-                TurboIssueEvent.createLabelUpdateEventNodes(
-                        guiElement, events).size());
+                     TurboIssueEvent.createLabelUpdateEventNodes(
+                             guiElement, events).size());
     }
 
     @Test

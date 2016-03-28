@@ -87,7 +87,7 @@ public class ListPanelCard extends VBox {
 
         if (Qualifier.hasUpdatedQualifier(parentPanel.getCurrentFilterExpression())) {
             getChildren().add(getEventDisplay(issue,
-                    getUpdateFilterHours(parentPanel.getCurrentFilterExpression())));
+                                              getUpdateFilterHours(parentPanel.getCurrentFilterExpression())));
         }
     }
 
@@ -104,19 +104,15 @@ public class ListPanelCard extends VBox {
                 .filter(event -> {
                     LocalDateTime eventTime = Utility.longToLocalDateTime
                             (event.getDate().getTime());
-                    int hours = Utility.safeLongToInt(eventTime.until(now,
-                            ChronoUnit.HOURS));
+                    int hours = Utility.safeLongToInt(eventTime.until(now, ChronoUnit.HOURS));
                     return hours < withinHours;
                 })
                 .collect(Collectors.toList());
 
         List<Comment> commentsWithinDuration = issue.getMetadata().getComments().stream()
                 .filter(comment -> {
-                    LocalDateTime created = Utility.longToLocalDateTime(comment
-                            .getCreatedAt().getTime());
-                    int hours = Utility.safeLongToInt(created.until(now,
-                            ChronoUnit
-                                    .HOURS));
+                    LocalDateTime created = Utility.longToLocalDateTime(comment.getCreatedAt().getTime());
+                    int hours = Utility.safeLongToInt(created.until(now, ChronoUnit.HOURS));
                     return hours < withinHours;
                 })
                 .collect(Collectors.toList());

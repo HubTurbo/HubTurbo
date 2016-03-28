@@ -56,7 +56,7 @@ class ReadTask extends StoreTask {
 
             try {
                 SerializableModel sModel = new Gson().fromJson(input.get(),
-                        new TypeToken<SerializableModel>() {}.getType());
+                                                               new TypeToken<SerializableModel>() {}.getType());
 
                 return new Model(sModel);
             } catch (NullPointerException | JsonParseException e) {

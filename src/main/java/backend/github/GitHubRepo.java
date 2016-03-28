@@ -67,7 +67,7 @@ public class GitHubRepo implements Repo {
                 .map(i -> new TurboIssue(repoId, i))
                 .collect(Collectors.toList());
         return new ImmutableTriple<>(items, issueUpdateService.getUpdatedETags(),
-                issueUpdateService.getUpdatedCheckTime());
+                                     issueUpdateService.getUpdatedCheckTime());
     }
 
     @Override
@@ -101,7 +101,7 @@ public class GitHubRepo implements Repo {
                 .map(i -> resourceConstructor.apply(repoId, i))
                 .collect(Collectors.toList());
         return new ImmutablePair<>(items,
-                updateService.getUpdatedETags());
+                                   updateService.getUpdatedETags());
     }
 
     @Override
@@ -183,7 +183,7 @@ public class GitHubRepo implements Repo {
                 float progress = (float) elements.size() / (float) totalIssueCount;
                 UI.events.triggerEvent(new UpdateProgressEvent(repoId, progress));
                 logger.info(HTLog.format(repoId, "Loaded %d issues (%.0f%% done)",
-                        elements.size(), progress * 100));
+                                         elements.size(), progress * 100));
             }
             UI.events.triggerEvent(new UpdateProgressEvent(repoId));
         } catch (NoSuchPageException pageException) {
@@ -224,7 +224,7 @@ public class GitHubRepo implements Repo {
     public List<ReviewComment> getReviewComments(String repoId, int pullRequestId) {
         try {
             return pullRequestService.getReviewComments(RepositoryId.createFromId(repoId),
-                    pullRequestId);
+                                                        pullRequestId);
         } catch (IOException e) {
             HTLog.error(logger, e);
             return new ArrayList<>();

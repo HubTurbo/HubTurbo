@@ -318,11 +318,12 @@ public class FilterEvalTests {
 
         // test: no milestone in model should return qualifier false
         model = TestUtils.singletonModel(new Model(REPO,
-                new ArrayList<>(Arrays.asList(iCurrMin3, iCurrMin2, iCurrMin1,
-                        iCurr, iCurrPlus1, iCurrPlus2, iCurrPlus3)),
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new ArrayList<>()));
+                                                   new ArrayList<>(Arrays.asList(iCurrMin3, iCurrMin2, iCurrMin1,
+                                                                                 iCurr, iCurrPlus1, iCurrPlus2,
+                                                                                 iCurrPlus3)),
+                                                   new ArrayList<>(),
+                                                   new ArrayList<>(),
+                                                   new ArrayList<>()));
 
         noMilestoneAlias = Qualifier.replaceMilestoneAliases(model, Parser.parse("milestone:curr-3"));
         assertFalse(Qualifier.process(model, noMilestoneAlias, iCurrMin3));
@@ -422,10 +423,10 @@ public class FilterEvalTests {
         issue.addLabel(label);
 
         model = TestUtils.singletonModel(new Model(new Model(REPO,
-                new ArrayList<>(Arrays.asList(issue)),
-                new ArrayList<>(Arrays.asList(label, label2)),
-                new ArrayList<>(),
-                new ArrayList<>())));
+                                                             new ArrayList<>(Arrays.asList(issue)),
+                                                             new ArrayList<>(Arrays.asList(label, label2)),
+                                                             new ArrayList<>(),
+                                                             new ArrayList<>())));
 
         assertTrue(Qualifier.process(model, Parser.parse("label:t."), issue));
 
@@ -760,7 +761,7 @@ public class FilterEvalTests {
 
         assertFalse(matches("updated:<24", issue));
         assertEquals(matches("updated:<24", issue),
-                matches("updated:24", issue));
+                     matches("updated:24", issue));
         assertTrue(matches("updated:>24", issue));
 
         // test: qualifier alias
@@ -771,7 +772,7 @@ public class FilterEvalTests {
 
         assertTrue(matches("updated:<26", issue));
         assertEquals(matches("updated:<26", issue),
-                matches("updated:26", issue));
+                     matches("updated:26", issue));
         assertFalse(matches("updated:>26", issue));
     }
 
@@ -884,7 +885,7 @@ public class FilterEvalTests {
 
     private void verifyQualifierContentError(QualifierType type, String invalidInput) {
         verifySemanticException(empty, invalidInput, String.format(SemanticException.ERROR_MESSAGE,
-                type, type.getDescriptionOfValidInputs()));
+                                                                   type, type.getDescriptionOfValidInputs()));
     }
 
     private void verifyUserWarning(IModel model, String input, List<String> expectedWarnings) {

@@ -156,9 +156,9 @@ public class BrowserComponent {
         Rectangle windowBounds = screenManager.getBrowserComponentBounds();
 
         driverOptions.window().setPosition(new Point((int) windowBounds.getX(),
-                (int) windowBounds.getY()));
+                                                     (int) windowBounds.getY()));
         driverOptions.window().setSize(new Dimension((int) windowBounds.getWidth(),
-                (int) windowBounds.getHeight()));
+                                                     (int) windowBounds.getHeight()));
     }
 
     private void removeChromeDriverIfNecessary() {
@@ -398,7 +398,7 @@ public class BrowserComponent {
         if (!f.exists()) {
             InputStream in = BrowserComponent.class.getClassLoader()
                     .getResourceAsStream(CHROME_DRIVER_LOCATION +
-                            CHROME_DRIVER_BINARY_NAME);
+                                                 CHROME_DRIVER_BINARY_NAME);
             assert in != null : "Could not find " + CHROME_DRIVER_BINARY_NAME + " at "
                     + CHROME_DRIVER_LOCATION + "; this path must be updated if the executables are moved";
             OutputStream out;
@@ -432,7 +432,7 @@ public class BrowserComponent {
             // SWP_NOMOVE and SWP_NOSIZE prevents the 0,0,0,0 parameters from taking effect.
             logger.info("Bringing bView to front");
             boolean success = user32.SetWindowPos(browserWindowHandle, mainWindowHandle, 0, 0, 0, 0,
-                    SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+                                                  SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
             if (!success) {
                 logger.info("Failed to bring bView to front.");
                 logger.info(Kernel32.INSTANCE.GetLastError());
