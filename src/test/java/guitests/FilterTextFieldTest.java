@@ -47,6 +47,17 @@ public class FilterTextFieldTest extends UITest {
     }
 
     @Test
+    public void completion_isNavigatingAndEnter_match() {
+        FilterTextField field = getFirstPanelField();
+
+        clearField();
+        type("a");
+        push(KeyCode.DOWN, 2);
+        press(KeyCode.ENTER);
+        waitAndAssertEquals("author", field::getText);
+    }
+
+    @Test
     public void inputHandleSpaces_fieldNotEmpty_allowSpaces() {
         FilterTextField field = getFirstPanelField();
         // Consecutive spaces allowed
