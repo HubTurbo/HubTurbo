@@ -38,7 +38,7 @@ public class PanelControl extends HBox {
         this.ui = ui;
         this.mainStage = mainStage;
         this.prefs = prefs;
-        
+
         setSpacing(10);
         setPadding(new Insets(0, 10, 0, 10));
 
@@ -99,7 +99,7 @@ public class PanelControl extends HBox {
         forEach(child -> child.refreshItems());
     }
 
-    public FilterPanel generatePanelWithNameAndFilter(String panelName, String filterName){
+    public FilterPanel generatePanelWithNameAndFilter(String panelName, String filterName) {
         FilterPanel panelAdded = this.addPanelAt(this.getPanelCount());
         panelAdded.setPanelName(panelName);
         panelAdded.setFilterByString(filterName);
@@ -215,9 +215,11 @@ public class PanelControl extends HBox {
 
     // For dragging purposes
     private int currentlyDraggedPanelIndex = -1;
+
     public int getCurrentlyDraggedPanelIndex() {
         return currentlyDraggedPanelIndex;
     }
+
     public void setCurrentlyDraggedPanelIndex(int i) {
         currentlyDraggedPanelIndex = i;
     }
@@ -228,7 +230,7 @@ public class PanelControl extends HBox {
             closePanel(panelIndex);
         }
     }
-    
+
     public void updateFocus(int closedPanelIndex) {
         if (closedPanelIndex != currentlySelectedPanel.get()) {
             return;
@@ -236,9 +238,9 @@ public class PanelControl extends HBox {
             setCurrentlySelectedPanel(Optional.empty());
         } else {
             int newPanelIndex =
-                closedPanelIndex > getChildren().size() - 1
-                    ? closedPanelIndex - 1
-                    : closedPanelIndex;
+                    closedPanelIndex > getChildren().size() - 1
+                            ? closedPanelIndex - 1
+                            : closedPanelIndex;
             setCurrentlySelectedPanel(Optional.of(newPanelIndex));
             getPanel(currentlySelectedPanel.get()).requestFocus();
         }
@@ -252,6 +254,7 @@ public class PanelControl extends HBox {
         // that they are that large.
         return 40 + AbstractPanel.PANEL_WIDTH;
     }
+
     private void setupKeyEvents() {
         addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             if (KeyboardShortcuts.rightPanel.match(event) || KeyboardShortcuts.leftPanel.match(event)) {
@@ -269,8 +272,8 @@ public class PanelControl extends HBox {
             return;
         }
         AbstractPanel selectedPanel = getPanel(currentlySelectedPanel.get());
-        if (selectedPanel instanceof FilterPanel){
-            if (((FilterPanel) selectedPanel).filterTextField.isFocused()){
+        if (selectedPanel instanceof FilterPanel) {
+            if (((FilterPanel) selectedPanel).filterTextField.isFocused()) {
                 return;
             } else {
                 int newIndex = currentlySelectedPanel.get() + (isForwardKey ? 1 : -1);
@@ -334,6 +337,7 @@ public class PanelControl extends HBox {
 
     /**
      * Returns the list of panel names and filters currently showing the user interface
+     *
      * @return
      */
     public List<PanelInfo> getCurrentPanelInfos() {

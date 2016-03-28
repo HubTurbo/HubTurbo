@@ -6,6 +6,7 @@ import filter.Parser;
 import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
 import org.junit.Test;
+
 import static org.junit.Assert.*;
 
 import backend.interfaces.IModel;
@@ -59,7 +60,7 @@ public class MilestoneAliasTests {
         msCurrPlus3.setDueDate(Optional.empty());
 
         model = createIModelFromTurboMilestones(msCurrMin3, msCurrMin2, msCurrMin1,
-                                        msCurr, msCurrPlus1, msCurrPlus2, msCurrPlus3);
+                                                msCurr, msCurrPlus1, msCurrPlus2, msCurrPlus3);
 
         FilterExpression noMilestoneAlias;
         List<Qualifier> milestoneQualifiers;
@@ -143,13 +144,13 @@ public class MilestoneAliasTests {
 
         // test disjunction and conjunction
         noMilestoneAlias = Qualifier.replaceMilestoneAliases(model,
-                Parser.parse("milestone:curr+2 || milestone:curr+3"));
+                                                             Parser.parse("milestone:curr+2 || milestone:curr+3"));
         milestoneQualifiers = noMilestoneAlias.find(Qualifier::isMilestoneQualifier);
         assertEquals(false, milestoneQualifiers.get(0).getContent().get().equalsIgnoreCase("curr+2"));
         assertEquals(true, milestoneQualifiers.get(0).getContent().get().equalsIgnoreCase("V0.6"));
 
         noMilestoneAlias = Qualifier.replaceMilestoneAliases(model,
-                Parser.parse("milestone:curr+2 && milestone:curr+3"));
+                                                             Parser.parse("milestone:curr+2 && milestone:curr+3"));
         milestoneQualifiers = noMilestoneAlias.find(Qualifier::isMilestoneQualifier);
         assertEquals(false, milestoneQualifiers.get(0).isFalse());
 
@@ -288,9 +289,9 @@ public class MilestoneAliasTests {
 
     private IModel createIModelFromTurboMilestones(TurboMilestone... milestones) {
         return TestUtils.singletonModel(new Model(REPO,
-                new ArrayList<>(),
-                new ArrayList<>(),
-                new ArrayList<>(Arrays.asList(milestones)),
-                new ArrayList<>()));
+                                                  new ArrayList<>(),
+                                                  new ArrayList<>(),
+                                                  new ArrayList<>(Arrays.asList(milestones)),
+                                                  new ArrayList<>()));
     }
 }

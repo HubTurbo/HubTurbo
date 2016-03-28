@@ -49,7 +49,7 @@ public class ConfigFileHandler {
     public void saveGlobalConfig(GlobalConfig config) {
         File configFile = getGlobalConfigFile();
         try {
-            Writer writer = new OutputStreamWriter(new FileOutputStream(configFile) , CHARSET);
+            Writer writer = new OutputStreamWriter(new FileOutputStream(configFile), CHARSET);
             gson.toJson(config, GlobalConfig.class, writer);
             writer.close();
         } catch (IOException e) {
@@ -71,7 +71,7 @@ public class ConfigFileHandler {
         File configFile = getGlobalConfigFile();
         if (configFile.exists()) {
             try (Reader reader =
-                     new InputStreamReader(new FileInputStream(configFile), CHARSET)) {
+                         new InputStreamReader(new FileInputStream(configFile), CHARSET)) {
                 config = gson.fromJson(reader, GlobalConfig.class);
             } catch (IOException e) {
                 HTLog.error(logger, e);
@@ -92,19 +92,19 @@ public class ConfigFileHandler {
     }
 
     private void setupGson() {
-         gson = new GsonBuilder()
-            .setPrettyPrinting()
-            .registerTypeAdapter(LocalDateTime.class,
-                (JsonSerializer<LocalDateTime>) (src, typeOfSrc, context) -> {
-                    Instant instant = src.atZone(ZoneId.systemDefault()).toInstant();
-                    long epochMilli = instant.toEpochMilli();
-                    return new JsonPrimitive(epochMilli);
-                })
-            .registerTypeAdapter(LocalDateTime.class,
-                (JsonDeserializer<LocalDateTime>) (json, typeOfT, context) -> {
-                    Instant instant = Instant.ofEpochMilli(json.getAsJsonPrimitive().getAsLong());
-                    return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
-                }
-            ).create();
+        gson = new GsonBuilder()
+                .setPrettyPrinting()
+                .registerTypeAdapter(LocalDateTime.class,
+                    (JsonSerializer<LocalDateTime>) (src, typeOfSrc, context) -> {
+                        Instant instant = src.atZone(ZoneId.systemDefault()).toInstant();
+                        long epochMilli = instant.toEpochMilli();
+                        return new JsonPrimitive(epochMilli);
+                    }
+                ).registerTypeAdapter(LocalDateTime.class,
+                    (JsonDeserializer<LocalDateTime>) (json, typeOfT, context) -> {
+                        Instant instant = Instant.ofEpochMilli(json.getAsJsonPrimitive().getAsLong());
+                        return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+                    }
+                ).create();
     }
 }

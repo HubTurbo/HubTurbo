@@ -27,7 +27,7 @@ import ui.UI;
 import util.HTLog;
 
 /**
- * Serves as a presenter that synchronizes changes in issues with dialog view  
+ * Serves as a presenter that synchronizes changes in issues with dialog view
  */
 public class IssuePickerDialog extends Dialog<String> {
 
@@ -91,6 +91,7 @@ public class IssuePickerDialog extends Dialog<String> {
 
     /**
      * Populates respective panes with issues that matches current user input
+     *
      * @param state
      */
     private final void populatePanes(IssuePickerState state) {
@@ -113,7 +114,7 @@ public class IssuePickerDialog extends Dialog<String> {
     private void populateSuggestedIssues(List<TurboIssue> matchedIssues, Optional<TurboIssue> selectedIssue) {
         suggestedIssues.getChildren().clear();
         matchedIssues.stream().limit(MAX_ISSUE_SIZE)
-            .forEach(issue -> suggestedIssues.getChildren().add(processIssue(issue, selectedIssue)));
+                .forEach(issue -> suggestedIssues.getChildren().add(processIssue(issue, selectedIssue)));
     }
 
     private Node processIssue(TurboIssue issue, Optional<TurboIssue> selectedIssue) {
@@ -134,7 +135,7 @@ public class IssuePickerDialog extends Dialog<String> {
         state = new IssuePickerState(allIssues, query.toLowerCase());
         populatePanes(state);
     }
-    
+
     private void handleIssueClick(TurboIssue issue, IssueCard card) {
         issuepickerQueryField.setDisable(true);
         Platform.runLater(card::requestFocus);

@@ -31,7 +31,7 @@ public class LogoutTest extends UITest {
         type("test");
         click("Sign in");
         sleep(2000);
-        
+
         click("File");
         click("Logout");
 

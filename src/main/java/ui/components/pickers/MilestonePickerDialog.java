@@ -183,7 +183,7 @@ public class MilestonePickerDialog extends Dialog<MilestonePickerDialogResponse>
         if (!existingMilestone.isPresent()) return;
 
         Node existingMilestoneNode = setMouseClickForNode(existingMilestone.get().getExistingMilestoneNode(),
-                existingMilestone.get().getTitle());
+                                                          existingMilestone.get().getTitle());
         assignedMilestoneBox.getChildren().add(existingMilestoneNode);
     }
 

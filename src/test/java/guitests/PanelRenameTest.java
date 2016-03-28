@@ -35,7 +35,7 @@ public class PanelRenameTest extends UITest {
 
         UI ui = TestController.getUI();
         PanelControl panels = ui.getPanelControl();
-        
+
         // Test for saving panel name
 
         pushKeys(MAXIMIZE_WINDOW);
@@ -51,9 +51,9 @@ public class PanelRenameTest extends UITest {
         Text panelNameText0 = panel0.getNameText();
         assertEquals("Panel", panelNameText0.getText());
         sleep(EVENT_DELAY);
-        
+
         pushKeys(CREATE_RIGHT_PANEL);
-        
+
         // Testing case where a name with whitespaces at either end is submitted
         // Expected: new name accepted with whitespaces removed
         PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(1)));
@@ -89,7 +89,7 @@ public class PanelRenameTest extends UITest {
         boolean isPresentDuringEdit = true; //stub value, this should change to false.
         try {
             exists("#dummy/dummy_col3_closeButton");
-        } catch (NoNodesFoundException e){
+        } catch (NoNodesFoundException e) {
             isPresentDuringEdit = false;
         }
 
@@ -124,7 +124,7 @@ public class PanelRenameTest extends UITest {
         FilterPanel panel5 = (FilterPanel) panels.getPanel(5);
         Text panelNameText5 = panel5.getNameText();
         assertEquals("Panel", panelNameText5.getText());
-        
+
         // Quitting to update json
         traverseMenu("File", "Quit");
         push(KeyCode.ENTER);

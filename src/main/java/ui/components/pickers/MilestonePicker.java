@@ -27,7 +27,7 @@ public class MilestonePicker {
 
     /**
      * Shows a MilestonePickerDialog, then waits for its result
-     *
+     * <p>
      * If the resulting milestone obtained from the dialog is different from the original,
      * it will automatically trigger a milestone change both locally and on the server
      *

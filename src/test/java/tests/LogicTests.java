@@ -357,7 +357,7 @@ public class LogicTests {
     }
 
     private void mockMultiModelReplaceIssueMilestone(Optional<TurboIssue> replaceResult,
-                                                  Optional<Model> modelLookUpResult) {
+                                                     Optional<Model> modelLookUpResult) {
         when(mockedMultiModel.replaceIssueMilestone(anyString(), anyInt(), any(Optional.class)))
                 .thenReturn(replaceResult);
         when(mockedMultiModel.getModelById(anyString())).thenReturn(modelLookUpResult);

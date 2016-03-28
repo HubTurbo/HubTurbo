@@ -34,8 +34,8 @@ public class GitHubSource extends RepoSource {
         execute(() -> {
             boolean success = gitHub.login(credentials);
             logger.info(String.format("%s to %s as %s",
-                success ? "Logged in" : "Failed to log in",
-                getName(), credentials.username));
+                                      success ? "Logged in" : "Failed to log in",
+                                      getName(), credentials.username));
             response.complete(success);
         });
 
@@ -70,7 +70,7 @@ public class GitHubSource extends RepoSource {
     @Override
     public CompletableFuture<Boolean> replaceIssueMilestone(TurboIssue issue, Optional<Integer> milestone) {
         return addTask(new ReplaceIssueMilestoneTask(this, gitHub, issue.getRepoId(), issue.getId(), issue.getTitle(),
-                milestone)).response;
+                                                     milestone)).response;
     }
 
     @Override

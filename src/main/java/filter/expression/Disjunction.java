@@ -114,6 +114,7 @@ public class Disjunction implements FilterExpression {
             return new Disjunction(left, right);
         }
     }
+
     @Override
     public boolean isEmpty() {
         return left.isEmpty() && right.isEmpty();

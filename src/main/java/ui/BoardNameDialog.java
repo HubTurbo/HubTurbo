@@ -84,8 +84,8 @@ public final class BoardNameDialog extends Dialog<String> {
 
     private boolean shouldOverwriteDuplicateBoard() {
         return DialogMessage.showYesNoWarningDialog("Warning",
-                String.format(WARNING_HEADER_DUPLICATE_NAME, nameField.getText()),
-                WARNING_MESSAGE_DUPLICATE_NAME, "Yes", "No");
+                                                    String.format(WARNING_HEADER_DUPLICATE_NAME, nameField.getText()),
+                                                    WARNING_MESSAGE_DUPLICATE_NAME, "Yes", "No");
     }
 
     protected void setupGrid() {

@@ -16,7 +16,8 @@ public class RepositorySelector extends HBox {
 
     private final ComboBox<String> comboBox = new ComboBox<>();
     private final UI ui;
-    private Consumer<String> onValueChangeCallback = e -> {};
+    private Consumer<String> onValueChangeCallback = e -> {
+    };
     private boolean changesDisabled = false;
 
     public RepositorySelector(UI ui) {

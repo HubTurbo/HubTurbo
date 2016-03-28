@@ -1,6 +1,7 @@
 package util;
 
 import static ui.components.KeyboardShortcuts.GLOBAL_HOTKEY;
+
 import javafx.application.Platform;
 
 import javax.swing.KeyStroke;
@@ -14,7 +15,7 @@ import com.tulskiy.keymaster.common.Provider;
 public class GlobalHotkey {
     private final Provider provider = Provider.getCurrentProvider(false);
     private final UI ui;
-    
+
     public GlobalHotkey(UI ui) {
         this.ui = ui;
     }

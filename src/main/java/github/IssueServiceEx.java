@@ -26,17 +26,17 @@ public class IssueServiceEx extends IssueService {
 
         StringBuilder uri = new StringBuilder(SEGMENT_REPOS);
         uri.append('/').append(repository.generateId())
-            .append(SEGMENT_ISSUES).append('/').append(issueId);
+                .append(SEGMENT_ISSUES).append('/').append(issueId);
         return ghClient.createPost(uri.toString());
     }
 
     @Override
     public Issue createIssue(IRepositoryIdProvider repository, Issue issue) throws IOException {
         Issue returnedIssue = super.createIssue(repository, issue);
-        if (!returnedIssue.getState().equals(issue.getState())){
+        if (!returnedIssue.getState().equals(issue.getState())) {
             returnedIssue.setState(issue.getState());
             editIssueState(repository, returnedIssue.getNumber(),
-                returnedIssue.getState().equals(STATE_OPEN));
+                           returnedIssue.getState().equals(STATE_OPEN));
         }
         return returnedIssue;
     }
@@ -54,18 +54,18 @@ public class IssueServiceEx extends IssueService {
      * and an empty list with the current ETag if there are no new events.
      *
      * @param repository The repository from which to retrieve the issue
-     * @param issueId The numeric ID of the issue
-     * @param eTag The eTag to be added to the request header
+     * @param issueId    The numeric ID of the issue
+     * @param eTag       The eTag to be added to the request header
      * @return list of issue events
      * @throws IOException
      */
     public GitHubEventsResponse getIssueEvents(IRepositoryIdProvider repository, int issueId, String eTag)
-        throws IOException {
+            throws IOException {
         GitHubRequest request = createRequest();
         StringBuilder uri = new StringBuilder(SEGMENT_REPOS);
         uri.append('/').append(repository.generateId())
-            .append(SEGMENT_ISSUES).append('/').append(issueId)
-            .append(SEGMENT_EVENTS);
+                .append(SEGMENT_ISSUES).append('/').append(issueId)
+                .append(SEGMENT_EVENTS);
         request.setUri(uri);
         request.setType(IssueEvent[].class);
         return ghClient.getEvent(request, eTag);

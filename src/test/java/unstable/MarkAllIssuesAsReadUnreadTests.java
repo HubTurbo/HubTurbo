@@ -75,19 +75,20 @@ public class MarkAllIssuesAsReadUnreadTests extends UITest {
 
     /**
      * Marks issues in the panel from Issue index in the UI right to the end of the list as read/unread
+     *
      * @param isMarkAsRead If true, marks the selected issue and below as read
      *                     If false, marks the selected issue and below as unread
-     * @param index The issue number in the panel
+     * @param index        The issue number in the panel
      */
-    private void clickAndMarkIssuesBelow(ListPanel issuePanel, int index, boolean isMarkAsRead){
+    private void clickAndMarkIssuesBelow(ListPanel issuePanel, int index, boolean isMarkAsRead) {
         click("#" + issuePanel.getId() + "_" + index);
         rightClick("#" + issuePanel.getId() + "_" + index);
         ContextMenu contextMenu = issuePanel.getContextMenu();
-        for (MenuItem menuItem : contextMenu.getItems()){
+        for (MenuItem menuItem : contextMenu.getItems()) {
             awaitCondition(menuItem::isVisible);
         }
 
-        if (isMarkAsRead){
+        if (isMarkAsRead) {
             click(ListPanel.MARK_ALL_AS_READ_MENU_ITEM_TEXT);
         } else {
             click(ListPanel.MARK_ALL_AS_UNREAD_MENU_ITEM_TEXT);
@@ -97,8 +98,8 @@ public class MarkAllIssuesAsReadUnreadTests extends UITest {
     /**
      * Tests whether list panel cells corresponding to a particular index and below are marked as read/unread
      */
-    private void verifyReadStatusOfIssuesBelow(ListPanel issuePanel, int index, boolean isExpectedStatusRead){
-        for (int i = index; i >= 1; i--){
+    private void verifyReadStatusOfIssuesBelow(ListPanel issuePanel, int index, boolean isExpectedStatusRead) {
+        for (int i = index; i >= 1; i--) {
             ListPanelCell listPanelCell = find("#" + issuePanel.getId() + "_" + index);
             assertEquals(listPanelCell.getIssue().isCurrentlyRead(), isExpectedStatusRead);
         }

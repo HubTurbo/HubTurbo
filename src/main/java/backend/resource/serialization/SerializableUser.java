@@ -21,9 +21,11 @@ public class SerializableUser {
     public String getLoginName() {
         return loginName;
     }
+
     public String getRealName() {
         return realName;
     }
+
     public String getAvatarURL() {
         return avatarURL;
     }

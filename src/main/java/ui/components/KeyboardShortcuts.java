@@ -17,13 +17,13 @@ import java.util.Set;
 
 /**
  * a central place to specify keyboard shortcuts
- *
+ * <p>
  * Classes that currently have keyboard shortcut code:
  * ui.components.NavigableListView
  * ui.issuepanel.PanelControl
  * ui.listpanel.ListPanel
  * ui.MenuControl
- *
+ * <p>
  * Utility Class:
  * util.KeyPress
  */
@@ -73,7 +73,7 @@ public final class KeyboardShortcuts {
             new KeyCodeCombination(KeyCode.I);
     public static final KeyCodeCombination SHOW_ISSUE_PICKER =
             new KeyCodeCombination(KeyCode.I, KeyCombination.SHORTCUT_DOWN);
-    public static final KeyCodeCombination SWITCH_BOARD = 
+    public static final KeyCodeCombination SWITCH_BOARD =
             new KeyCodeCombination(KeyCode.B, KeyCombination.SHORTCUT_DOWN);
     public static final KeyCodeCombination UNDO_LABEL_CHANGES =
             new KeyCodeCombination(KeyCode.Z, KeyCombination.SHORTCUT_DOWN);
@@ -116,11 +116,11 @@ public final class KeyboardShortcuts {
 
     // TODO decouple manage/show labels/milestones?
     public static final KeyCodeCombination MANAGE_LABELS =
-        new KeyCodeCombination(KeyCode.L);
+            new KeyCodeCombination(KeyCode.L);
     public static final KeyCodeCombination MANAGE_ASSIGNEES =
-        new KeyCodeCombination(KeyCode.A);
+            new KeyCodeCombination(KeyCode.A);
     public static final KeyCodeCombination MANAGE_MILESTONE =
-        new KeyCodeCombination(KeyCode.M);
+            new KeyCodeCombination(KeyCode.M);
 
     //ui.RepositorySelector
     public static final KeyCodeCombination REMOVE_FOCUS =
@@ -140,10 +140,11 @@ public final class KeyboardShortcuts {
             new KeyCodeCombination(KeyCode.P, KeyCombination.SHORTCUT_DOWN);
     public static final KeyCodeCombination CLOSE_PANEL =
             new KeyCodeCombination(KeyCode.W, KeyCombination.SHORTCUT_DOWN);
-    
+
     public static final String GLOBAL_HOTKEY = "control alt H";
 
-    private KeyboardShortcuts() {}
+    private KeyboardShortcuts() {
+    }
 
     private static Map<Integer, KeyCodeCombination> populateJumpToNthIssueMap() {
         Map<Integer, KeyCodeCombination> result = new HashMap<>();
@@ -158,7 +159,7 @@ public final class KeyboardShortcuts {
         result.put(9, new KeyCodeCombination(KeyCode.DIGIT9, KeyCombination.SHORTCUT_DOWN));
         return Collections.unmodifiableMap(result);
     }
-    
+
     public static Map<String, String> getDefaultKeyboardShortcuts() {
         Map<String, String> defaultKeyboardShortcuts = new HashMap<>();
         defaultKeyboardShortcuts.put("MARK_AS_READ", "E");
@@ -228,15 +229,16 @@ public final class KeyboardShortcuts {
     }
 
     private static KeyCodeCombination getKeyCodeCombination(String keyboardShortcut) {
-        KeyCodeCombination keyCodeCombi = 
-                new KeyCodeCombination(KeyCode.getKeyCode(getDefaultKeyboardShortcuts().get(keyboardShortcut))); 
+        KeyCodeCombination keyCodeCombi =
+                new KeyCodeCombination(KeyCode.getKeyCode(getDefaultKeyboardShortcuts().get(keyboardShortcut)));
         if (keyboardShortcuts.containsKey(keyboardShortcut)) {
             KeyCode keyCode = KeyCode.getKeyCode(keyboardShortcuts.get(keyboardShortcut).toUpperCase());
             if (keyCode != null && !assignedKeys.contains(new KeyCodeCombination(keyCode))) {
                 keyCodeCombi = new KeyCodeCombination(keyCode);
             } else {
-                logger.warn("Invalid key specified for " + keyboardShortcut +
-                        " or it has already been used for some other shortcut. ");
+                logger.warn("Invalid key specified for "
+                        + keyboardShortcut
+                        + " or it has already been used for some other shortcut. ");
                 if (DialogMessage.showYesNoWarningDialog(
                         "Warning",
                         "Invalid key specified for " + keyboardShortcut +

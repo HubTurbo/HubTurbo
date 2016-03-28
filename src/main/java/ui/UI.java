@@ -139,8 +139,8 @@ public class UI extends Application implements EventDispatcher {
                                 logic.loginController.getOwner(),
                                 logic.loginController.getRepo(),
                                 logic.loginController.getUsername(),
-                                logic.loginController.getPassword())
-                                .show().thenApply(isLoggedIn -> {
+                                logic.loginController.getPassword()
+                ).show().thenApply(isLoggedIn -> {
                     if (isLoggedIn) {
                         showMainWindow(logic.loginController.getRepoId());
                         disableUI(false);
@@ -157,7 +157,7 @@ public class UI extends Application implements EventDispatcher {
         getMainWindowHandle(mainStage.getTitle());
     }
 
-    private void createAndLoadSampleBoard(){
+    private void createAndLoadSampleBoard() {
         BoardAutoCreator boardCreator = new BoardAutoCreator(this, panels, prefs);
         boardCreator.createSampleBoard(false);
     }
@@ -195,7 +195,7 @@ public class UI extends Application implements EventDispatcher {
         // Should only be called after panels have been initialized
         ensureSelectedPanelHasFocus();
         initialisePickers();
-        if (isAFirstTimeUser && TestController.shouldOpenSampleBoard()){
+        if (isAFirstTimeUser && TestController.shouldOpenSampleBoard()) {
             createAndLoadSampleBoard();
         }
     }
@@ -238,7 +238,7 @@ public class UI extends Application implements EventDispatcher {
         logic = new Logic(uiManager, prefs, Optional.empty(), Optional.empty());
         // TODO clear cache if necessary
         refreshTimer = new TickingTimer("Refresh Timer", REFRESH_PERIOD,
-            status::updateTimeToRefresh, logic::refresh, TimeUnit.SECONDS);
+                                        status::updateTimeToRefresh, logic::refresh, TimeUnit.SECONDS);
         refreshTimer.start();
         undoController = new UndoController(notificationController);
     }
@@ -288,7 +288,7 @@ public class UI extends Application implements EventDispatcher {
                 params[0] = java.awt.Image.class;
                 Method setDockIconImage = util.getMethod("setDockIconImage", params);
                 setDockIconImage.invoke(application,
-                        new ImageIcon(UI.class.getResource(APPLICATION_LOGO_FILENAME)).getImage());
+                                        new ImageIcon(UI.class.getResource(APPLICATION_LOGO_FILENAME)).getImage());
             } catch (Exception e) {
                 logger.info("Not OSX", e);
             }
@@ -324,7 +324,7 @@ public class UI extends Application implements EventDispatcher {
         scene.getStylesheets().add(css);
     }
 
-    public static void loadFonts(){
+    public static void loadFonts() {
         Font.loadFont(UI.class.getResource("octicons/octicons-local.ttf").toExternalForm(), 32);
     }
 
@@ -464,7 +464,7 @@ public class UI extends Application implements EventDispatcher {
         triggerEvent(new UsedReposChangedEvent());
     }
 
-    public void switchDefaultRepo(){
+    public void switchDefaultRepo() {
         String[] openRepos = repoSelector.getContents().toArray(new String[0]);
         String currentRepo = logic.getDefaultRepo();
 

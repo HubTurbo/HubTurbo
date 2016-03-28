@@ -13,7 +13,7 @@ import util.PlatformEx;
 
 import java.util.Optional;
 
-public class FilterTests extends UITest{
+public class FilterTests extends UITest {
 
     @Test
     public void parseExceptionTest() {
@@ -134,7 +134,7 @@ public class FilterTests extends UITest{
     }
 
     @Test
-    public void countFilterTest(){
+    public void countFilterTest() {
         ListPanel issuePanel = find("#dummy/dummy_col0");
 
         // Checking 7 issues shown for count:7
@@ -217,7 +217,7 @@ public class FilterTests extends UITest{
     }
 
     private void checkCurrWithResult(String milestoneAlias, String currString, ListPanel issuePanel,
-                                     int milestoneNumber){
+                                     int milestoneNumber) {
         click("#dummy/dummy_col0_filterTextField");
         selectAll();
         type(milestoneAlias + ":" + currString);

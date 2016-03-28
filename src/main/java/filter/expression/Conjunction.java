@@ -57,8 +57,8 @@ public class Conjunction implements FilterExpression {
 
     private boolean containsDuplicateQualifierTypes() {
         List<QualifierType> nonLabelQualifierTypes = getQualifierTypes().stream()
-            .filter(pn -> !pn.equals(QualifierType.LABEL))
-            .collect(Collectors.toList());
+                .filter(pn -> !pn.equals(QualifierType.LABEL))
+                .collect(Collectors.toList());
         HashSet<QualifierType> noDuplicates = new HashSet<>(nonLabelQualifierTypes);
         return noDuplicates.size() != nonLabelQualifierTypes.size();
     }

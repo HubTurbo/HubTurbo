@@ -147,7 +147,7 @@ public class RepoOpControlTest {
 
         RepoOpControl repoOpControl = new RepoOpControl(mock(RepoIO.class), models);
         Optional<TurboIssue> result = repoOpControl.replaceIssueMilestoneLocally(returnedIssue, milestoneId).join();
-        
+
         assertTrue(result.isPresent());
         assertEquals(returnedIssue, result.get());
     }
@@ -160,7 +160,7 @@ public class RepoOpControlTest {
         MultiModel models = mock(MultiModel.class);
         TurboIssue returnedIssue = new TurboIssue("testrepo/testrepo", 1, "Issue title");
         when(models.replaceIssueLabels("testrepo/testrepo", 1, new ArrayList<>()))
-        .thenReturn(Optional.of(returnedIssue));
+                .thenReturn(Optional.of(returnedIssue));
         RepoOpControl repoOpControl = new RepoOpControl(mock(RepoIO.class), models);
         TurboIssue result = repoOpControl.replaceIssueLabelsLocally(returnedIssue, new ArrayList<>()).join().get();
         assertEquals(returnedIssue, result);
@@ -209,19 +209,19 @@ public class RepoOpControlTest {
                 .then(invocation -> createResult(counter, new TurboIssue("dummy/dummy", 1, "Issue title")));
 
         when(stub.openRepository(REPO))
-            .then(invocation -> createResult(counter, new Model(REPO)));
+                .then(invocation -> createResult(counter, new Model(REPO)));
         when(stub.removeRepository(REPO))
-            .then(invocation -> createResult(counter, true));
+                .then(invocation -> createResult(counter, true));
         when(stub.updateModel(new Model(REPO), false))
-            .then(invocation -> createResult(counter, new Model(REPO)));
+                .then(invocation -> createResult(counter, new Model(REPO)));
 
         for (int i = 0; i < 3; i++) {
             when(stub.openRepository(REPO + i))
-                .then(invocation -> createResult(counter, new Model(REPO)));
+                    .then(invocation -> createResult(counter, new Model(REPO)));
             when(stub.removeRepository(REPO + i))
-                .then(invocation -> createResult(counter, true));
+                    .then(invocation -> createResult(counter, true));
             when(stub.updateModel(new Model(REPO + i), false))
-                .then(invocation -> createResult(counter, new Model(REPO)));
+                    .then(invocation -> createResult(counter, new Model(REPO)));
         }
 
         return stub;

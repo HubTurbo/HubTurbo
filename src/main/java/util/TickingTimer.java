@@ -16,15 +16,15 @@ import java.util.function.Consumer;
  * A abstract timer that counts down ('ticks') on a specified period. Repeats
  * once the countdown is completed ('times out'). Supports hooks for ticks and
  * for timing out. Also supports various operations on the state of the timer.
- *
+ * <p>
  * This class is thread-safe, however compound operations require explicit
  * synchronization:
- *
+ * <p>
  * TickingTimer t = new TickingTimer(...);
  * synchronized (t) {
- *     if (t.isPaused()) {
- *         t.resume();
- *     }
+ * if (t.isPaused()) {
+ * t.resume();
+ * }
  * }
  */
 public class TickingTimer {

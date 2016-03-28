@@ -10,7 +10,7 @@ import java.util.concurrent.Executors;
 
 /**
  * Extensions to JavaFX's Platform class.
- *
+ * <p>
  * Contains utility methods for running code in various ways,
  * on or off (but close to) the JavaFX application thread.
  */
@@ -20,6 +20,7 @@ public final class PlatformEx {
 
     /**
      * Similar to Platform.runLater, but with a small delay, so UI updates have time to propagate.
+     *
      * @param action
      */
     public static void runLaterDelayed(Runnable action) {
@@ -41,13 +42,15 @@ public final class PlatformEx {
      * Blocks until the JavaFX event queue becomes empty.
      */
     public static void waitOnFxThread() {
-        runLaterAndWait(() -> {});
+        runLaterAndWait(() -> {
+        });
     }
 
     /**
      * Runs an action on the JavaFX Application Thread and blocks until it completes.
      * Similar to {@link #runAndWait(Runnable) runAndWait}, but always enqueues the
      * action, eschewing checking the current thread.
+     *
      * @param action The action to run on the JavaFX Application Thread
      */
     public static void runLaterAndWait(Runnable action) {
@@ -59,13 +62,15 @@ public final class PlatformEx {
         });
         try {
             latch.await();
-        } catch (InterruptedException ignored) {}
+        } catch (InterruptedException ignored) {
+        }
     }
 
     /**
      * Synchronous version of Platform.runLater, like SwingUtilities.invokeAndWait.
      * Caveat: will execute immediately when invoked from the JavaFX application thread
      * instead of being queued up for execution.
+     *
      * @param action The action to execute on the JavaFX Application Thread.
      */
     public static void runAndWait(Runnable action) {
@@ -77,5 +82,6 @@ public final class PlatformEx {
         runLaterAndWait(action);
     }
 
-    private PlatformEx() {}
+    private PlatformEx() {
+    }
 }

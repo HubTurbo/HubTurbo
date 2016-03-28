@@ -30,7 +30,7 @@ public class TurboIssue {
 
     /**
      * Serialized fields.
-     *
+     * <p>
      * Must have reasonable, NON-NULL defaults.
      * Should be primitive types, or at least easily-serializable ones.
      * Should be specified in order.
@@ -129,28 +129,28 @@ public class TurboIssue {
     public TurboIssue(String repoId, Issue issue) {
         this.id = issue.getNumber();
         this.title = issue.getTitle() == null
-            ? ""
-            : issue.getTitle();
+                ? ""
+                : issue.getTitle();
         this.creator = issue.getUser().getLogin();
         this.createdAt = Utility.dateToLocalDateTime(issue.getCreatedAt());
         this.isPullRequest = isPullRequest(issue);
 
         this.description = issue.getBody() == null
-            ? ""
-            : issue.getBody();
+                ? ""
+                : issue.getBody();
         this.updatedAt = issue.getUpdatedAt() != null ?
                 Utility.dateToLocalDateTime(issue.getUpdatedAt()) : this.createdAt;
         this.commentCount = issue.getComments();
         this.isOpen = issue.getState().equals(STATE_OPEN);
         this.assignee = issue.getAssignee() == null
-            ? Optional.empty()
-            : Optional.of(issue.getAssignee().getLogin());
+                ? Optional.empty()
+                : Optional.of(issue.getAssignee().getLogin());
         this.labels = issue.getLabels().stream()
-            .map(Label::getName)
-            .collect(Collectors.toList());
+                .map(Label::getName)
+                .collect(Collectors.toList());
         this.milestone = issue.getMilestone() == null
-            ? Optional.empty()
-            : Optional.of(issue.getMilestone().getNumber());
+                ? Optional.empty()
+                : Optional.of(issue.getMilestone().getNumber());
 
         this.metadata = IssueMetadata.empty();
         this.repoId = repoId;
@@ -203,6 +203,7 @@ public class TurboIssue {
      * when an issue is updated, the new issue is constructed from an external object,
      * not an existing issue, so transient state on the old one is lost if the old issue
      * is just replaced by the new. This method is required in such cases.
+     *
      * @param fromIssue
      */
     private void transferTransientState(TurboIssue fromIssue) {
@@ -213,6 +214,7 @@ public class TurboIssue {
     /**
      * Reconciles content elements in this issue with {@code otherIssue} by taking
      * the most recently updated elements based on their modified time.
+     *
      * @param otherIssue
      */
     private void reconcile(TurboIssue otherIssue) {
@@ -222,6 +224,7 @@ public class TurboIssue {
 
     /**
      * See also {@link #reconcile(TurboIssue)}
+     *
      * @param otherIssue
      */
     private void reconcileLabels(TurboIssue otherIssue) {
@@ -229,7 +232,7 @@ public class TurboIssue {
         LocalDateTime otherIssueLabelsModifiedAt = otherIssue.getLabelsLastModifiedAt();
         if (thisIssueLabelsModifiedAt.isBefore(otherIssueLabelsModifiedAt)) {
             logger.info(String.format("Issue %s's labels %s are stale, replacing with %s",
-                        this, this.getLabels(), otherIssue.getLabels()));
+                                      this, this.getLabels(), otherIssue.getLabels()));
             this.labels = otherIssue.getLabels();
             this.labelsLastModifiedAt = Optional.of(otherIssue.getLabelsLastModifiedAt());
         }
@@ -249,6 +252,7 @@ public class TurboIssue {
     /**
      * Takes lists of TurboIssues and reconciles the changes between them,
      * returning a list of TurboIssues with updates from the second.
+     *
      * @param existing
      * @param changed
      */
@@ -279,6 +283,7 @@ public class TurboIssue {
     /**
      * Updates data for issues with corresponding pull requests. Original list of
      * issues and original issue instances are not mutated
+     *
      * @param issues
      * @param pullRequests
      * @return a new list of issues
@@ -306,6 +311,7 @@ public class TurboIssue {
     /**
      * Combines data from a corresponding pull request with data in this issue
      * This method returns a new combined issue and does not mutate this issue
+     *
      * @param pullRequest
      * @return new new combined issue
      */
@@ -327,6 +333,7 @@ public class TurboIssue {
 
     /**
      * Finds the index of an issue with specified id in a list of issues
+     *
      * @param issues
      * @param id
      * @return the list's index of the issue or empty of there is no issue with such id in the list
@@ -342,21 +349,22 @@ public class TurboIssue {
 
     /**
      * Matching is done by matching all words separated by space in query
+     *
      * @param issues
      * @param query
      * @return list of issues that contains the query
      */
-    public static List<TurboIssue> getMatchedIssues(List<TurboIssue> issues, String query){
+    public static List<TurboIssue> getMatchedIssues(List<TurboIssue> issues, String query) {
         List<String> queries = Arrays.asList(query.split("\\s"));
         return issues.stream()
-            .filter(i -> Utility.containsIgnoreCase(i.getTitle() + " " + i.getId(), queries))
-            .collect(Collectors.toList());
+                .filter(i -> Utility.containsIgnoreCase(i.getTitle() + " " + i.getId(), queries))
+                .collect(Collectors.toList());
     }
 
     /**
      * @param issues
      * @param query
-     * @return first issue that matches the given query 
+     * @return first issue that matches the given query
      */
     public static Optional<TurboIssue> getFirstMatchingIssue(List<TurboIssue> issues, String query) {
         return getMatchedIssues(issues, query).stream().findFirst();
@@ -472,7 +480,7 @@ public class TurboIssue {
     public Optional<Integer> getMilestone() {
         return milestone;
     }
-    
+
     public void setMilestoneById(Integer milestone) {
         this.milestone = Optional.of(milestone);
         this.milestoneLastModifiedAt = Optional.of(LocalDateTime.now());

@@ -33,7 +33,7 @@ public class SavedLoginTest extends UITest {
         // setup test json with last viewed repo "test/test"
         // and then create the corresponding repo json file
         ConfigFileHandler configFileHandler =
-            new ConfigFileHandler(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
+                new ConfigFileHandler(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
         GlobalConfig globalConfig = new GlobalConfig();
         globalConfig.setLastLoginCredentials("test", "test");
         globalConfig.setLastViewedRepository("test/test");
@@ -49,7 +49,7 @@ public class SavedLoginTest extends UITest {
 
     @Test
     public void savedLogin_lastSavedLoginCredentials_shouldAllowLoginWithoutPrompting()
-        throws InterruptedException {
+            throws InterruptedException {
         ComboBox<String> repositorySelector = find("#repositorySelector");
         assertEquals("test/test", repositorySelector.getValue());
     }

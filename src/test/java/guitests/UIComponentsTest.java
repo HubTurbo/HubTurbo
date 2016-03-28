@@ -9,7 +9,7 @@ import util.events.UpdateProgressEvent;
 import static org.junit.Assert.assertEquals;
 
 public class UIComponentsTest extends UITest {
-    
+
     // TODO check that filter text field does indeed do autocomplete correctly, etc
     @Test
     public void keywordCompletionTest() {
@@ -29,7 +29,7 @@ public class UIComponentsTest extends UITest {
         push(KeyCode.BACK_SPACE);
         type("is:open OR is:closed");
         push(KeyCode.ENTER);
-        
+
         FilterTextField filterTextField = find("#dummy/dummy_col0_filterTextField");
         filterTextField.clear();
         click("#dummy/dummy_col0_filterTextField");

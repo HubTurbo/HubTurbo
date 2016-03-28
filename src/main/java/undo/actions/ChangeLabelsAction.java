@@ -22,7 +22,7 @@ public class ChangeLabelsAction implements Action<TurboIssue> {
      * Takes in two lists of labels and the Logic used to replace the labels.
      *
      * @param originalLabels The original list of labels
-     * @param newLabels The new list of labels
+     * @param newLabels      The new list of labels
      */
     public ChangeLabelsAction(Logic logic, List<String> originalLabels, List<String> newLabels) {
         this.logic = logic;

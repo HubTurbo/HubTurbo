@@ -44,7 +44,7 @@ public class ListPanelCell extends ListCell<GuiElement> {
     private void updateStyleToMatchStatus(TurboIssue issue) {
         final String closedStyle = "issue-cell-closed";
         boolean isCurrentStyleClosed = getStyleClass().contains(closedStyle);
-        if (!issue.isOpen()){
+        if (!issue.isOpen()) {
             if (!isCurrentStyleClosed) {
                 getStyleClass().add(closedStyle);
             }

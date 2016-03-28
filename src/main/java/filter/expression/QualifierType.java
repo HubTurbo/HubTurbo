@@ -1,4 +1,3 @@
-
 package filter.expression;
 
 import java.util.*;
@@ -18,7 +17,7 @@ public enum QualifierType {
     private static final Map<String, QualifierType> ALIASES = initialiseQualifierAliases();
 
     /**
-     * Consists of aliases for all supported qualifiers. Applicable only when 
+     * Consists of aliases for all supported qualifiers. Applicable only when
      * parsing Qualifier left hand side of ":"
      */
     private static Map<String, QualifierType> initialiseQualifierAliases() {
@@ -52,22 +51,23 @@ public enum QualifierType {
      * the filter field. Defaults to the string forms of all qualifier types. Exceptions
      * may be added by modifying the collection before it is returned, for example, to
      * include additional keywords or remove conflicting ones.
+     *
      * @return a set of keywords to be used for completion
      */
     public static Set<String> getCompletionKeywords() {
         Set<String> defaultCompletions =
-            new ArrayList<>(Arrays.asList(QualifierType.values())).stream()
-                .map(QualifierType::name)
-                .map(String::toLowerCase)
-                .collect(Collectors.toSet());
+                new ArrayList<>(Arrays.asList(QualifierType.values())).stream()
+                        .map(QualifierType::name)
+                        .map(String::toLowerCase)
+                        .collect(Collectors.toSet());
         defaultCompletions.removeAll(Arrays.asList("false", "empty", "keyword"));
 
         // Add only longer aliases
         defaultCompletions.addAll(Arrays.asList("body", "desc", "status", "user", "creator"));
 
         defaultCompletions.addAll(Arrays.asList("closed", "open", "issue", "pr",
-            "pullrequest", "read", "unread",  "merged", "unmerged", "comments",
-            "nonSelfUpdate"));
+                                                "pullrequest", "read", "unread", "merged", "unmerged", "comments",
+                                                "nonSelfUpdate"));
 
         return Collections.unmodifiableSet(defaultCompletions);
     }
@@ -92,12 +92,12 @@ public enum QualifierType {
 
     private static boolean isSpecialQualifier(String input) {
         switch (input) {
-            case "empty":
-            case "keyword":
-            case "false":
-                return true;
-            default:
-                return false;
+        case "empty":
+        case "keyword":
+        case "false":
+            return true;
+        default:
+            return false;
         }
     }
 
@@ -109,32 +109,33 @@ public enum QualifierType {
     public String toString() {
         return name().toLowerCase();
     }
-    
+
     /**
      * Returns short description of all inputs supported by a type of qualifier
+     *
      * @return
      */
     public String getDescriptionOfValidInputs() {
-        
-        switch(this) {
-            case ID:
-            case UPDATED:
-                return "a number or a number range";
-            case STATE:
-                return "\"open\" or \"closed\"";
-            case HAS:
-            case NO:
-                return "\"label\", \"milestone\", or \"assignee\"";
-            case IN:
-                return "\"title\" or \"body\"";
-            case TYPE:
-                return "\"issue\" or \"pr\"";
-            case CREATED:
-                return "a date or a date range";
-            case REPO:
-                return "a repo id";
-            default:
-                return "a string";
+
+        switch (this) {
+        case ID:
+        case UPDATED:
+            return "a number or a number range";
+        case STATE:
+            return "\"open\" or \"closed\"";
+        case HAS:
+        case NO:
+            return "\"label\", \"milestone\", or \"assignee\"";
+        case IN:
+            return "\"title\" or \"body\"";
+        case TYPE:
+            return "\"issue\" or \"pr\"";
+        case CREATED:
+            return "a date or a date range";
+        case REPO:
+            return "a repo id";
+        default:
+            return "a string";
         }
     }
 }

@@ -28,10 +28,13 @@ public class DownloadIssuesUpdatesTask extends GitHubRepoTask<GitHubRepoTask.Res
     @Override
     public void run() {
         ImmutableTriple<List<TurboIssue>, String, Date> changes = repo.getUpdatedIssues(model.getRepoId(),
-            model.getUpdateSignature().issuesETag, model.getUpdateSignature().lastCheckTime);
+                                                                                        model.getUpdateSignature()
+                                                                                                .issuesETag, model
+                                                                                                .getUpdateSignature()
+                                                                                                .lastCheckTime);
         List<TurboIssue> updatedIssues = changes.left;
         logger.info(HTLog.format(model.getRepoId(), "%s issue(s)) changed%s",
-                updatedIssues.size(), updatedIssues.isEmpty() ? "" : ": " + updatedIssues));
+                                 updatedIssues.size(), updatedIssues.isEmpty() ? "" : ": " + updatedIssues));
         response.complete(new Result<>(updatedIssues, changes.middle, changes.right));
     }
 }

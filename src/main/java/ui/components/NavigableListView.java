@@ -13,18 +13,18 @@ import java.util.function.BiConsumer;
 
 /**
  * A very specialized ListView subclass that:
- *
+ * <p>
  * - can be navigated with the arrow keys and Enter
  * - supports an event for item selection
  * - provides methods for retaining selection of an item (not by index)
- *   after its contents are changed
- *
+ * after its contents are changed
+ * <p>
  * It depends on the functionality of ScrollableListView to ensure that
  * navigation scrolls the list properly. The Up, Down, and Enter key events
  * should not be separately bound on it.
- *
+ * <p>
  * An item is considered selected when:
- *
+ * <p>
  * - it is highlighted with the arrow keys, but only when the Shift key is not down
  * - Enter is pressed when it is highlighted
  * - it is clicked
@@ -48,7 +48,8 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
 
     public static final boolean IS_RIGHT_CLICK = true;
 
-    private BiConsumer<Integer, Boolean> onItemSelected = (index, rightKey) -> {};
+    private BiConsumer<Integer, Boolean> onItemSelected = (index, rightKey) -> {
+    };
 
     public NavigableListView() {
         setupKeyEvents();
@@ -69,6 +70,7 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
     /**
      * Should be called to restore selection after making changes to the item list
      * of this list view. Must be called after saveSelection is.
+     *
      * @throws IllegalStateException if called before saveSelection is
      */
     public void restoreSelection() {
@@ -122,14 +124,14 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
     /**
      * Triggers the selected item on the card at the specified index for actions that are not right clicks
      */
-    private void triggerItemSelected(int index){
+    private void triggerItemSelected(int index) {
         onItemSelected.accept(index, !IS_RIGHT_CLICK);
     }
 
     /**
      * Triggers the selected item on the card at the specified index for actions that are right clicks
      */
-    private void triggerItemSelectedRightClick(int index){
+    private void triggerItemSelectedRightClick(int index) {
         onItemSelected.accept(index, IS_RIGHT_CLICK);
     }
 
@@ -144,7 +146,7 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
                 selectedIndex = Optional.of(currentlySelected);
 
                 logger.info("Mouse click on item index " + selectedIndex.get());
-                if (e.getButton().equals(MouseButton.SECONDARY)){
+                if (e.getButton().equals(MouseButton.SECONDARY)) {
                     triggerItemSelectedRightClick(currentlySelected);
                 } else {
                     triggerItemSelected(currentlySelected);
@@ -209,6 +211,7 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
 
     /**
      * Selects the nth item in the navigable list.
+     *
      * @param n - Nth item, indexing is 1-based (1st item would correspond to n = 1)
      */
 
@@ -220,16 +223,16 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
         selectedIndex = Optional.of(n - 1);
         triggerItemSelected(selectedIndex.get());
     }
-    
-   public void selectNextItem() {
-       requestFocus();
-       if (selectedIndex.get() < getItems().size() - 1) {
-           getSelectionModel().clearAndSelect(selectedIndex.get() + 1);
-           scrollAndShow(selectedIndex.get() + 1);
-           selectedIndex = Optional.of(selectedIndex.get() + 1);
-           triggerItemSelected(selectedIndex.get());
-       }
-   }
+
+    public void selectNextItem() {
+        requestFocus();
+        if (selectedIndex.get() < getItems().size() - 1) {
+            getSelectionModel().clearAndSelect(selectedIndex.get() + 1);
+            scrollAndShow(selectedIndex.get() + 1);
+            selectedIndex = Optional.of(selectedIndex.get() + 1);
+            triggerItemSelected(selectedIndex.get());
+        }
+    }
 
     public Optional<T> getSelectedItem() {
         return selectedIndex.map(getItems()::get);

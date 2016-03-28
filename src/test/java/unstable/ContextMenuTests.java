@@ -53,7 +53,7 @@ public class ContextMenuTests extends UITest {
         sleep(EVENT_DELAY);
 
         ContextMenu contextMenu = issuePanel.getContextMenu();
-        for (MenuItem menuItem : contextMenu.getItems()){
+        for (MenuItem menuItem : contextMenu.getItems()) {
             assertTrue(menuItem.isDisable());
         }
     }

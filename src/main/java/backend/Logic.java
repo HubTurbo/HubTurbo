@@ -89,8 +89,8 @@ public class Logic {
         UI.status.displayMessage(message);
 
         Futures.sequence(models.toModels().stream()
-                .map((model) -> repoIO.updateModel(model, true))
-                .collect(Collectors.toList()))
+                                 .map((model) -> repoIO.updateModel(model, true))
+                                 .collect(Collectors.toList()))
                 .thenRun(this::refreshUI)
                 .thenCompose(n -> getRateLimitResetTime())
                 .thenApply(this::updateRemainingRate)
@@ -110,14 +110,14 @@ public class Logic {
 
     /**
      * Opens repoId if it isn't already open, else simply refreshes the UI
-     *
+     * <p>
      * If a repo needs to be opened, FilterRepoOpeningEvent and FilterRepoOpenedEvent will both
      * be triggered with panel as argument
-     *
+     * <p>
      * Shortly before this method terminates, an AppliedFilterEvent will be triggered
      *
      * @param repoId
-     * @param panel panel that opened the repository
+     * @param panel  panel that opened the repository
      * @return
      */
     public CompletableFuture<Boolean> openRepositoryFromFilter(String repoId, FilterPanel panel) {
@@ -126,11 +126,11 @@ public class Logic {
 
     /**
      * Opens repoId if it isn't already open, else simply refreshes the UI
-     *
+     * <p>
      * During the process, it will trigger the appropriate events depending on panel's presence
      *
      * @param repoId id of repository to be opened
-     * @param panel panel that opened the repository, if there is
+     * @param panel  panel that opened the repository, if there is
      * @return
      */
     private CompletableFuture<Boolean> openRepository(String repoId, Optional<FilterPanel> panel) {
@@ -171,6 +171,7 @@ public class Logic {
 
     /**
      * Triggers opening repo event based on isPrimaryRepository
+     *
      * @param isPrimaryRepository triggers PrimaryRepoOpeningEvent if true, FilterRepoOpeningEvent otherwise
      */
     private void notifyRepoOpening(boolean isPrimaryRepository) {
@@ -180,7 +181,7 @@ public class Logic {
 
     /**
      * Triggers the relevant event(s) based on panel's presence
-     *
+     * <p>
      * If panel is present, it will trigger FilterRepoOpenedEvent and AppliedFilterEvent
      * Otherwise, it will simply trigger PrimaryRepoOpenedEvent
      *
@@ -222,7 +223,7 @@ public class Logic {
 
     /**
      * Recommended Pre-condition: normalize reposInUse to lower case
-     *                           - using Utility.convertSetToLowerCase()
+     * - using Utility.convertSetToLowerCase()
      */
     public void removeUnusedModels(Set<String> reposInUse) {
         models.toModels().stream().map(Model::getRepoId)
@@ -230,8 +231,7 @@ public class Logic {
                 .forEach(models::removeRepoModelById);
     }
 
-    public ImmutablePair<Integer, Long> updateRemainingRate
-            (ImmutablePair<Integer, Long> rateLimits) {
+    public ImmutablePair<Integer, Long> updateRemainingRate(ImmutablePair<Integer, Long> rateLimits) {
         uiManager.updateRateLimits(rateLimits);
         return rateLimits;
     }
@@ -252,7 +252,7 @@ public class Logic {
      * Replaces existing labels with new labels in the issue object, the UI, and the server, in that order.
      * Server update is done after the local update to reduce the lag between the user action and the UI response
      *
-     * @param issue The issue object whose labels are to be replaced.
+     * @param issue     The issue object whose labels are to be replaced.
      * @param newLabels The list of new labels to be assigned to the issue.
      * @return true if label replacement on GitHub was a success, false otherwise.
      */
@@ -265,16 +265,15 @@ public class Logic {
         localLabelsReplaceFuture.thenRun(this::refreshUI);
 
         return updateIssueLabelsOnServer(issue, newLabels)
-                .thenCombine(localLabelsReplaceFuture,
-                             (isUpdateSuccessful, locallyModifiedIssue) -> handleIssueLabelsUpdateResult(
-                                     isUpdateSuccessful, locallyModifiedIssue, originalLabels));
+                .thenCombine(localLabelsReplaceFuture, (isUpdateSuccessful, locallyModifiedIssue) ->
+                        handleIssueLabelsUpdateResult(isUpdateSuccessful, locallyModifiedIssue, originalLabels));
     }
 
     /**
      * Replaces existing milestone with the newMilestone in the issue object, the UI, and the server, in that order.
      * Server update is done after the local update to reduce the lag between the user action and the UI response
      *
-     * @param issue The issue object whose milestone is to be replaced
+     * @param issue        The issue object whose milestone is to be replaced
      * @param newMilestone The new milestone to be assigned to the issue
      * @return true if milestone replacements locally and on GitHub were successful
      */
@@ -290,6 +289,7 @@ public class Logic {
 
     /**
      * Gets the issue identified by {@code repoId} and {@code issueId} in {@link Logic#models}
+     *
      * @param repoId
      * @param issueId
      * @return
@@ -297,8 +297,9 @@ public class Logic {
     private Optional<TurboIssue> getIssue(String repoId, int issueId) {
         Optional<Model> modelLookUpResult = models.getModelById(repoId);
         return Utility.safeFlatMapOptional(modelLookUpResult,
-                (model) -> model.getIssueById(issueId),
-                () -> logger.error("Model " + repoId + " not found in models"));
+            (model) -> model.getIssueById(issueId),
+            () -> logger.error("Model " + repoId + " not found in models")
+        );
     }
 
     private CompletableFuture<Boolean> updateIssueLabelsOnServer(TurboIssue issue, List<String> newLabels) {
@@ -314,6 +315,7 @@ public class Logic {
     /**
      * Handles the result of updating an issue's labels on server. Current implementation includes
      * reverting back to the original labels locally if the server update failed.
+     *
      * @param isUpdateSuccessful
      * @param locallyModifiedIssue
      * @param originalLabels
@@ -337,12 +339,13 @@ public class Logic {
     /**
      * Handles the result of updating an issue's milestone on server.
      * Locally reverts back to the original milestone if the server update fails.
+     *
      * @param isUpdateSuccessful
      * @param originalIssue
      * @return true if the server update is successful
      */
     private boolean handleIssueMilestoneUpdateOnServerResult(boolean isUpdateSuccessful,
-                                                          Optional<TurboIssue> originalIssue) {
+                                                             Optional<TurboIssue> originalIssue) {
         if (!originalIssue.isPresent()) {
             logger.error("Unable to replace issue milestone locally");
             return false;
@@ -357,6 +360,7 @@ public class Logic {
     /**
      * Replaces labels of the issue in the {@link Logic#models} corresponding to {@code modifiedIssue} with
      * {@code originalLabels} if the current labels on the issue is assigned at the same time as {@code modifiedIssue}
+     *
      * @param modifiedIssue
      * @param originalLabels
      */
@@ -421,6 +425,7 @@ public class Logic {
     /**
      * Sets the state of the issue in the {@link Logic#models} corresponding to {@code modifiedIssue} to
      * {@code isOpenOriginally} if the current state on the issue is assigned at the same time as {@code modifiedIssue}
+     *
      * @param modifiedIssue
      * @param isOpenOriginally
      */
@@ -444,7 +449,7 @@ public class Logic {
      * Edits the open/closed state in the issue object, the UI, and the server, in that order.
      * Server update is done after the local update to reduce the lag between the user action and the UI response.
      *
-     * @param issue The issue whose state is to be updated
+     * @param issue  The issue whose state is to be updated
      * @param isOpen The new state for the issue
      * @return True for success, false otherwise
      */
@@ -486,7 +491,7 @@ public class Logic {
         // AppliedFilterEvent will be triggered asynchronously when repo(s) have finished opening, so just terminate
         if (hasRepoSpecifiedInFilter(panel)) return;
 
-        Platform.runLater (() -> UI.events.triggerEvent(new AppliedFilterEvent(panel)));
+        Platform.runLater(() -> UI.events.triggerEvent(new AppliedFilterEvent(panel)));
     }
 
     private boolean hasRepoSpecifiedInFilter(FilterPanel panel) {

@@ -46,6 +46,7 @@ public final class RepoOpControl {
     /**
      * Updates repository stored locally with data from a GitHubModelUpdatesData object.
      * Set syncOperation to queue this operation in the blocking queue for the updating repository
+     *
      * @param updates
      * @param syncOperation
      * @return

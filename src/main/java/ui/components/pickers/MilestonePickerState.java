@@ -41,8 +41,9 @@ public class MilestonePickerState {
 
     /**
      * Toggles the milestone that has milestoneName as its exact name
-     *
+     * <p>
      * This method is case-sensitive
+     *
      * @param milestoneName
      */
     public final void toggleExactMatchMilestone(String milestoneName) {
@@ -52,8 +53,9 @@ public class MilestonePickerState {
 
     /**
      * Toggles the milestone that is the first match to the given query
-     *
+     * <p>
      * This method is NOT case-sensitive
+     *
      * @param milestoneList
      */
     private final void toggleFirstMatchingMilestone(List<PickerMilestone> milestoneList) {
@@ -69,8 +71,8 @@ public class MilestonePickerState {
      */
     private void toggleMilestone(PickerMilestone milestone) {
         this.currentMilestonesList.stream()
-                .forEach(listMilestone -> listMilestone.setSelected(listMilestone.equals(milestone)
-                        && !listMilestone.isSelected()));
+                .forEach(listMilestone ->
+                        listMilestone.setSelected(listMilestone.equals(milestone) && !listMilestone.isSelected()));
     }
 
     public List<PickerMilestone> getCurrentMilestonesList() {
@@ -79,6 +81,7 @@ public class MilestonePickerState {
 
     /**
      * Gets the list of milestones that matches the current query
+     *
      * @return
      */
     public List<PickerMilestone> getMatchingMilestonesList() {

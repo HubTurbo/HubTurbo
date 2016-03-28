@@ -33,8 +33,10 @@ public class FilterTextField extends TextField {
     public static final String INVALID_FILTER_STYLE = "-fx-control-inner-background: #EE8993";
 
     // Callback functions
-    private Runnable onCancel = () -> {};
-    private Runnable onShowDocs = () -> {};
+    private Runnable onCancel = () -> {
+    };
+    private Runnable onShowDocs = () -> {
+    };
     private Function<String, String> onConfirm = (s) -> s;
 
     // For reverting edits
@@ -83,8 +85,8 @@ public class FilterTextField extends TextField {
         });
         setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.TAB) {
-                 // Disable tab for UI traversal
-                 e.consume();
+                // Disable tab for UI traversal
+                e.consume();
             }
         });
         setOnKeyReleased(e -> {
@@ -125,6 +127,7 @@ public class FilterTextField extends TextField {
      * after the caret, or if there is selected text (indicating either that we are in
      * the midst of completion, or that the user does not want the selected text and is
      * typing to replace it)
+     *
      * @return true if completion should be started
      */
     private boolean shouldStartCompletion() {
@@ -158,8 +161,8 @@ public class FilterTextField extends TextField {
             String addition = candidateWord.substring(word.length());
             setText(before + insertion + addition + after);
             Platform.runLater(() -> selectRange(
-                before.length() + insertion.length() + addition.length(),
-                before.length() + insertion.length()));
+                    before.length() + insertion.length() + addition.length(),
+                    before.length() + insertion.length()));
         } else {
             IndexRange sel = getSelection();
             int start = Math.min(sel.getStart(), sel.getEnd());
@@ -170,8 +173,8 @@ public class FilterTextField extends TextField {
             String addition = candidateWord.substring(word.length());
             setText(before + insertion + addition + after);
             Platform.runLater(() -> selectRange(
-                before.length() + insertion.length() + addition.length(),
-                before.length() + insertion.length()));
+                    before.length() + insertion.length() + addition.length(),
+                    before.length() + insertion.length()));
         }
     }
 
@@ -268,7 +271,7 @@ public class FilterTextField extends TextField {
         this.onConfirm = onConfirm;
         return this;
     }
-    
+
     /**
      * Sets the 'onShowDocs' callback, which will be called when the user triggers the show_docs
      * keyboard shortcut event.

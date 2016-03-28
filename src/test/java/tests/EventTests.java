@@ -22,7 +22,7 @@ public class EventTests {
         // Ensure that the right handler is triggered
         events.register(fail2);
         events.register(succeed1);
-        
+
         BoardSavedEvent te = new BoardSavedEvent();
         IssueSelectedEvent te2 = new IssueSelectedEvent("", 1, 2, false);
 
@@ -47,16 +47,16 @@ public class EventTests {
         // Try the other event
         events.register(fail1);
         events.register(succeed2);
-        
+
         events.post(te2);
-        
+
         events.unregister(fail1);
         events.unregister(succeed2);
 
         // Try both
         events.register(succeed1);
         events.register(succeed2);
-        
+
         events.post(te);
         events.post(te2);
     }

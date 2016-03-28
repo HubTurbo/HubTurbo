@@ -67,7 +67,8 @@ public class JSONStore extends RepoStore {
         try {
             String repoId = new Model(
                     (SerializableModel) new Gson().fromJson(Utility.readFile(String.valueOf(p.toAbsolutePath())).get(),
-                            new TypeToken<SerializableModel>() {}.getType())).getRepoId();
+                                                            new TypeToken<SerializableModel>() {}.getType()))
+                    .getRepoId();
             if (String.valueOf(p.getFileName()).equalsIgnoreCase(escapeRepoName(repoId))) {
                 logger.info("Adding " + p.getFileName() + " to stored repository list. ");
                 return Optional.of(repoId);

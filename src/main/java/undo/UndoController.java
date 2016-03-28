@@ -43,7 +43,7 @@ public class UndoController {
     /**
      * Adds an action to the undo buffer.
      *
-     * @param issue The TurboIssue to be acted on
+     * @param issue  The TurboIssue to be acted on
      * @param action The Action that acts on the above TurboIssue
      */
     public void addAction(TurboIssue issue, Action<TurboIssue> action) {

@@ -44,36 +44,47 @@ public class SerializableIssue {
     public int getId() {
         return id;
     }
+
     public String getTitle() {
         return title;
     }
+
     public String getCreator() {
         return creator;
     }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
+
     public boolean isPullRequest() {
         return isPullRequest;
     }
+
     public String getDescription() {
         return description;
     }
+
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
     }
+
     public int getCommentCount() {
         return commentCount;
     }
+
     public boolean isOpen() {
         return isOpen;
     }
+
     public Optional<String> getAssignee() {
         return assignee;
     }
+
     public List<String> getLabels() {
         return labels;
     }
+
     public Optional<Integer> getMilestone() {
         return milestone;
     }

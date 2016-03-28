@@ -36,6 +36,7 @@ public class PullRequestUpdateService extends UpdateService<PullRequest> {
     /**
      * Overrides parent's method to change the number of items per page. This allow the update process
      * to stop earlier once it encounters the first item whose updatedAt time is before lastIssueCheckTime
+     *
      * @param repoId the repository to make the request for
      * @return a list of pull requests
      */
@@ -48,20 +49,23 @@ public class PullRequestUpdateService extends UpdateService<PullRequest> {
         request.setResponseContentType(CONTENT_TYPE_JSON);
 
         request.setParams(createUpdatedPullRequestsParams());
-        request.setType(new TypeToken<PullRequest>() { }.getType());
-        request.setArrayType(new TypeToken<ArrayList<PullRequest>>() { }.getType());
+        request.setType(new TypeToken<PullRequest>() {
+        }.getType());
+        request.setArrayType(new TypeToken<ArrayList<PullRequest>>() {
+        }.getType());
         return request;
     }
 
     /**
      * Overrides the parent's method to remove ETags checking step and use the specialized
      * method get
+     *
      * @param repoId the repository to get the items from
      * @return
      */
     @Override
     public ArrayList<PullRequest> getUpdatedItems(IRepositoryIdProvider repoId) {
-        if (updatedItems != null)  {
+        if (updatedItems != null) {
             return updatedItems;
         }
 
@@ -84,8 +88,9 @@ public class PullRequestUpdateService extends UpdateService<PullRequest> {
     /**
      * Overrides parent's method to stop getting items if some items in a page has
      * updatedAt time before the lastIssueCheckTime
+     *
      * @param resourceDesc
-     * @param iterator the paged request to iterate through
+     * @param iterator     the paged request to iterate through
      * @return
      * @throws IOException
      */
@@ -115,8 +120,9 @@ public class PullRequestUpdateService extends UpdateService<PullRequest> {
 
     /**
      * Add all pull requests in {@code src} to {@code dest} of which updated time is after {@code since}
-     * @param dest current list of pull requests
-     * @param src new pull quests to be added
+     *
+     * @param dest  current list of pull requests
+     * @param src   new pull quests to be added
      * @param since
      * @return number of pull requests added to {@code dest}
      */

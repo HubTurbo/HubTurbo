@@ -9,8 +9,10 @@ import org.apache.logging.log4j.Logger;
 public final class PlatformSpecific {
     private static final Logger logger = HTLog.get(PlatformSpecific.class);
 
-//    private static final PlatformSpecific instance = new PlatformSpecific();
-    private PlatformSpecific() {}
+    //    private static final PlatformSpecific instance = new PlatformSpecific();
+    private PlatformSpecific() {
+    }
+
     private static final String osName = System.getProperty("os.name");
 
     public static enum Architecture {
@@ -59,7 +61,7 @@ public final class PlatformSpecific {
             process.waitFor();
 
             try (BufferedReader reader =
-                     new BufferedReader(new InputStreamReader(process.getInputStream(), "UTF-8"))) {
+                         new BufferedReader(new InputStreamReader(process.getInputStream(), "UTF-8"))) {
                 StringBuilder output = new StringBuilder();
                 String nextOutputLine = reader.readLine();
 
@@ -79,6 +81,7 @@ public final class PlatformSpecific {
     /**
      * Finds a relevant sub-string that characterizes an os architecture and
      * return the corresponding Architecture enum
+     *
      * @param architectureDescription a string description of an os architecture
      * @return the corresponding Architecture enum
      */

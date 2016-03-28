@@ -28,20 +28,20 @@ public class BoardAutoCreator {
     private static final String TIPS_REPO_NAME = "HubTurbo/TipsRepo";
     public static final String SAMPLE_BOARD_DIALOG = String.format("%s has been created and loaded.", SAMPLE_BOARD);
 
-    public static final Map<String, String> getSamplePanelDetails(){
+    public static final Map<String, String> getSamplePanelDetails() {
         Map<String, String> panelMap = new LinkedHashMap<>();
         panelMap.put("Latest tips",
-                String.format("repo:%s is:open label:\"latest-tips\"", TIPS_REPO_NAME));
+                     String.format("repo:%s is:open label:\"latest-tips\"", TIPS_REPO_NAME));
         panelMap.put("Seven latest updated issues in my two sample repos",
-                String.format("repo:%s;%s is:issue sort:!updated,comments count:7",
-                FIRST_SAMPLE_REPO_NAME, SECOND_SAMPLE_REPO_NAME));
+                     String.format("repo:%s;%s is:issue sort:!updated,comments count:7",
+                                   FIRST_SAMPLE_REPO_NAME, SECOND_SAMPLE_REPO_NAME));
         panelMap.put("Open issues assigned to Darius or Manmeet",
-                String.format("repo:%s is:issue is:open (assignee:dariusf || assignee:codemanmeet)",
-                FIRST_SAMPLE_REPO_NAME));
+                     String.format("repo:%s is:issue is:open (assignee:dariusf || assignee:codemanmeet)",
+                                   FIRST_SAMPLE_REPO_NAME));
         panelMap.put("Progress of the current milestone",
-                String.format("repo:%s m:curr sort:status", FIRST_SAMPLE_REPO_NAME));
+                     String.format("repo:%s m:curr sort:status", FIRST_SAMPLE_REPO_NAME));
         panelMap.put("Issues awaiting prioritization",
-                String.format("repo:%s is:open is:issue !label:priority.", FIRST_SAMPLE_REPO_NAME));
+                     String.format("repo:%s is:open is:issue !label:priority.", FIRST_SAMPLE_REPO_NAME));
         return Collections.unmodifiableMap(panelMap);
 
     }
@@ -95,8 +95,8 @@ public class BoardAutoCreator {
         triggerBoardSaveEventSequence(boardName);
 
         DialogMessage.showInformationDialog("Auto-create Board - " + MILESTONES,
-                MILESTONES + " board has been created and loaded.\n\n" +
-                        "It is saved under the name \"" + boardName + "\".");
+                                            MILESTONES + " board has been created and loaded.\n\n" +
+                                                    "It is saved under the name \"" + boardName + "\".");
     }
 
     private void createWorkAllocationBoard() {
@@ -106,8 +106,8 @@ public class BoardAutoCreator {
 
         if (userList.isEmpty()) {
             DialogMessage.showInformationDialog("Auto-create Board - " + WORK_ALLOCATION,
-                    WORK_ALLOCATION + " board cannot be created as your" +
-                            " account has no push access to the default repo.");
+                                                WORK_ALLOCATION + " board cannot be created as your" +
+                                                        " account has no push access to the default repo.");
 
             return;
         }
@@ -115,21 +115,23 @@ public class BoardAutoCreator {
         int noOfPanelsToBeGenerated = Math.min(MAX_WORK_ALLOCATION_PANELS, userList.size());
 
         List<PanelInfo> panelData = generatePanelInfoFromTurboUsers(userList.subList(0, noOfPanelsToBeGenerated),
-                "Work allocated to %s", "assignee:%s sort:milestone,status");
+                                                                    "Work allocated to %s", "assignee:%s " +
+                                                                            "sort:milestone,status");
 
         String boardName = Utility.getNameClosestToDesiredName(WORK_ALLOCATION, prefs.getAllBoardNames());
 
         createBoard(panelData, boardName);
 
         DialogMessage.showInformationDialog("Auto-create Board - " + WORK_ALLOCATION,
-                WORK_ALLOCATION + " board has been created and loaded.\n\n" +
-                        "It is saved under the name \"" + boardName + "\".");
+                                            WORK_ALLOCATION + " board has been created and loaded.\n\n" +
+                                                    "It is saved under the name \"" + boardName + "\".");
     }
 
     /**
      * Creates a sample board to showcase HubTurbo's functionality with sample repos in filters.
      * The dialog box shows a confirmation message for the successful
      * creation and loading of the sample board if isDialogShown is set to true.
+     *
      * @param isDialogShown
      */
     public void createSampleBoard(boolean isDialogShown) {
@@ -149,7 +151,7 @@ public class BoardAutoCreator {
 
         triggerBoardSaveEventSequence(SAMPLE_BOARD);
 
-        if (isDialogShown){
+        if (isDialogShown) {
             DialogMessage.showInformationDialog("Auto-create Board - " + SAMPLE_BOARD, SAMPLE_BOARD_DIALOG);
         }
     }
@@ -158,7 +160,7 @@ public class BoardAutoCreator {
                                                             String nameTemplate, String filterTemplate) {
         return users.stream()
                 .map(user -> new PanelInfo(String.format(nameTemplate, user.getFriendlierName()),
-                        String.format(filterTemplate, user.getLoginName())))
+                                           String.format(filterTemplate, user.getLoginName())))
                 .collect(Collectors.toList());
     }
 

@@ -109,12 +109,10 @@ public class UITest extends GuiTest {
         try {
             if (Files.exists(Paths.get(RepoStore.TEST_DIRECTORY))) {
                 Files.walk(Paths.get(RepoStore.TEST_DIRECTORY), 1)
-                    .filter(Files::isRegularFile)
-                    .filter(p ->
-                        getFileExtension(String.valueOf(p.getFileName())).equalsIgnoreCase("json") ||
-                            getFileExtension(String.valueOf(p.getFileName())).equalsIgnoreCase("json-err")
-                    )
-                    .forEach(p -> new File(p.toAbsolutePath().toString()).delete());
+                        .filter(Files::isRegularFile)
+                        .filter(p -> getFileExtension(String.valueOf(p.getFileName())).equalsIgnoreCase("json")
+                                || getFileExtension(String.valueOf(p.getFileName())).equalsIgnoreCase("json-err"))
+                        .forEach(p -> new File(p.toAbsolutePath().toString()).delete());
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -360,18 +358,19 @@ public class UITest extends GuiTest {
     /**
      * Performs logout from File -> Logout on HubTurbo's pView.
      */
-    public void logout(){
+    public void logout() {
         clickMenu("File", "Logout");
     }
 
     /**
      * Performs UI login on the login dialog box.
-     * @param owner The owner of the repo.
+     *
+     * @param owner    The owner of the repo.
      * @param repoName The repository name
      * @param username The Github username
      * @param password The Github password
      */
-    public void login(String owner, String repoName, String username, String password){
+    public void login(String owner, String repoName, String username, String password) {
         selectAll();
         type(owner).push(KeyCode.TAB);
         type(repoName).push(KeyCode.TAB);
@@ -399,8 +398,9 @@ public class UITest extends GuiTest {
     }
 
     /**
-     * Sets a text field with given text. Does not simulate clicking and typing 
+     * Sets a text field with given text. Does not simulate clicking and typing
      * in the text field.
+     *
      * @param fieldId
      * @param text
      */
@@ -416,11 +416,11 @@ public class UITest extends GuiTest {
     /**
      * Traverses HubTurbo's menu, looking for a chain of nodes with the
      * given names and triggering their associated action.
-     *
+     * <p>
      * This is a more reliable method of triggering menu items than
      * {@link #clickMenu}, especially when dealing with nested menu items.
      * It is a drop-in replacement in most cases.
-     *
+     * <p>
      * Caveats: ensure that adequate synchronisation is used after this method
      * if it is called from a thread other than the UI thread.
      *
@@ -432,24 +432,22 @@ public class UITest extends GuiTest {
         Platform.runLater(() -> {
             MenuControl root = TestController.getUI().getMenuControl();
             MenuItem current = root.getMenus().stream()
-                .filter(m -> m.getText().equals(names[0]))
-                .findFirst()
-                .orElseThrow(() ->
-                    new IllegalArgumentException(
-                        String.format("%s is not a valid menu item", names[0])));
+                    .filter(m -> m.getText().equals(names[0]))
+                    .findFirst()
+                    .orElseThrow(() ->
+                            new IllegalArgumentException(String.format("%s is not a valid menu item", names[0])));
 
             for (int i = 1; i < names.length; i++) {
                 final int j = i;
                 if (!(current instanceof Menu)) {
                     throw new IllegalArgumentException(
-                        String.format("Menu %s is not as nested as arguments require", names[0]));
+                            String.format("Menu %s is not as nested as arguments require", names[0]));
                 }
                 current = ((Menu) current).getItems().stream()
-                    .filter(m -> m.getText().equals(names[j]))
-                    .findFirst()
-                    .orElseThrow(() ->
-                        new IllegalArgumentException(
-                            String.format("%s is not a valid menu item", names[j])));
+                        .filter(m -> m.getText().equals(names[j]))
+                        .findFirst()
+                        .orElseThrow(() ->
+                                new IllegalArgumentException(String.format("%s is not a valid menu item", names[j])));
             }
 
             current.getOnAction().handle(new ActionEvent());
@@ -461,7 +459,7 @@ public class UITest extends GuiTest {
         for (int i = 0; i < text.length(); i++) {
             if (specialCharsMap.containsKey(text.charAt(i))) {
                 press(KeyCode.SHIFT).press(specialCharsMap.get(text.charAt(i)))
-                    .release(specialCharsMap.get(text.charAt(i))).release(KeyCode.SHIFT);
+                        .release(specialCharsMap.get(text.charAt(i))).release(KeyCode.SHIFT);
 
             } else {
                 type(text.charAt(i));

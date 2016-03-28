@@ -87,12 +87,13 @@ public class ListPanelCard extends VBox {
 
         if (Qualifier.hasUpdatedQualifier(parentPanel.getCurrentFilterExpression())) {
             getChildren().add(getEventDisplay(issue,
-                getUpdateFilterHours(parentPanel.getCurrentFilterExpression())));
+                                              getUpdateFilterHours(parentPanel.getCurrentFilterExpression())));
         }
     }
 
     /**
      * Creates a JavaFX node containing a graphical display of this issue's events.
+     *
      * @param withinHours the number of hours to bound the returned events by
      * @return the node
      */
@@ -100,26 +101,28 @@ public class ListPanelCard extends VBox {
         final LocalDateTime now = LocalDateTime.now();
 
         List<TurboIssueEvent> eventsWithinDuration = issue.getMetadata().getEvents().stream()
-            .filter(event -> {
-                LocalDateTime eventTime = Utility.longToLocalDateTime(event.getDate().getTime());
-                int hours = Utility.safeLongToInt(eventTime.until(now, ChronoUnit.HOURS));
-                return hours < withinHours;
-            })
-            .collect(Collectors.toList());
+                .filter(event -> {
+                    LocalDateTime eventTime = Utility.longToLocalDateTime
+                            (event.getDate().getTime());
+                    int hours = Utility.safeLongToInt(eventTime.until(now, ChronoUnit.HOURS));
+                    return hours < withinHours;
+                })
+                .collect(Collectors.toList());
 
         List<Comment> commentsWithinDuration = issue.getMetadata().getComments().stream()
-            .filter(comment -> {
-                LocalDateTime created = Utility.longToLocalDateTime(comment.getCreatedAt().getTime());
-                int hours = Utility.safeLongToInt(created.until(now, ChronoUnit.HOURS));
-                return hours < withinHours;
-            })
-            .collect(Collectors.toList());
+                .filter(comment -> {
+                    LocalDateTime created = Utility.longToLocalDateTime(comment.getCreatedAt().getTime());
+                    int hours = Utility.safeLongToInt(created.until(now, ChronoUnit.HOURS));
+                    return hours < withinHours;
+                })
+                .collect(Collectors.toList());
 
         return layoutEvents(guiElement, eventsWithinDuration, commentsWithinDuration);
     }
 
     /**
      * Given a list of issue events, returns a JavaFX node laying them out properly.
+     *
      * @param events
      * @param comments
      * @return
@@ -134,7 +137,7 @@ public class ListPanelCard extends VBox {
 
         // Label update events
         List<TurboIssueEvent> labelUpdateEvents =
-                        events.stream()
+                events.stream()
                         .filter(TurboIssueEvent::isLabelUpdateEvent)
                         .collect(Collectors.toList());
         List<Node> labelUpdateEventNodes =
@@ -143,21 +146,21 @@ public class ListPanelCard extends VBox {
 
         // Other events beside label updates
         events.stream()
-            .filter(e -> !e.isLabelUpdateEvent())
-            .map(e -> e.display(guiElement, issue))
-            .forEach(e -> result.getChildren().add(e));
+                .filter(e -> !e.isLabelUpdateEvent())
+                .map(e -> e.display(guiElement, issue))
+                .forEach(e -> result.getChildren().add(e));
 
         // Comments
         if (!comments.isEmpty()) {
             String names = comments.stream()
-                .map(comment -> comment.getUser().getLogin())
-                .distinct()
-                .collect(Collectors.joining(", "));
+                    .map(comment -> comment.getUser().getLogin())
+                    .distinct()
+                    .collect(Collectors.joining(", "));
             HBox commentDisplay = new HBox();
             commentDisplay.getChildren().addAll(
-                TurboIssueEvent.octicon(TurboIssueEvent.OCTICON_QUOTE),
-                new javafx.scene.control.Label(
-                    String.format("%d comments since, involving %s.", comments.size(), names))
+                    TurboIssueEvent.octicon(TurboIssueEvent.OCTICON_QUOTE),
+                    new javafx.scene.control.Label(
+                            String.format("%d comments since, involving %s.", comments.size(), names))
             );
             result.getChildren().add(commentDisplay);
         }
@@ -207,7 +210,7 @@ public class ListPanelCard extends VBox {
             issueDetails.getChildren().add(icon);
         }
 
-        if (issue.getCommentCount() > 0){
+        if (issue.getCommentCount() > 0) {
             Label commentIcon = new Label(OCTICON_COMMENT);
             commentIcon.getStyleClass().addAll("octicon", "comments-label-button");
             Label commentCount = new Label(Integer.toString(issue.getCommentCount()));
@@ -247,6 +250,7 @@ public class ListPanelCard extends VBox {
     /**
      * Creates a box that displays a label of userName
      * The avatar that belongs to the user will be prepended if TurboUser has it
+     *
      * @param user
      * @param userName
      * @return
@@ -274,6 +278,7 @@ public class ListPanelCard extends VBox {
 
     /**
      * Attempts to get the TurboUser's avatar
+     *
      * @param user
      * @return ImageView that contains the avatar image if it exists or an empty ImageView if it doesn't exist
      */
