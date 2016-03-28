@@ -467,6 +467,28 @@ public class UITest extends FxRobot {
     }
 
     /**
+     * Traverses a generic Menu represented "current" as its root, looking for a chain of nodes
+     * with given names and triggering their associated action.
+     */
+    private void traverseMenu(MenuItem current, String... names) {
+        for (int i = 1; i < names.length; i++) {
+            final int j = i;
+            if (!(current instanceof Menu)) {
+                throw new IllegalArgumentException(
+                        String.format("Menu %s is not as nested as arguments require", names[0]));
+            }
+            current = ((Menu) current).getItems().stream()
+                    .filter(m -> m.getText().equals(names[j]))
+                    .findFirst()
+                    .orElseThrow(() ->
+                            new IllegalArgumentException(
+                                    String.format("%s is not a valid menu item", names[j])));
+        }
+
+        current.getOnAction().handle(new ActionEvent());
+    }
+
+    /**
      * Traverses HubTurbo's menu, looking for a chain of nodes with the
      * given names and triggering their associated action.
      * <p>
@@ -479,8 +501,8 @@ public class UITest extends FxRobot {
      *
      * @param names the chain of menu nodes to visit
      */
-    public void traverseMenu(String... names) {
-        assert names.length > 0 : "traverseMenu called with no arguments";
+    public void traverseHubTurboMenu(String... names) {
+        assert names.length > 0 : "traverseHubTurboMenu called with no arguments";
 
         Platform.runLater(() -> {
             MenuControl root = TestController.getUI().getMenuControl();
@@ -490,20 +512,33 @@ public class UITest extends FxRobot {
                     .orElseThrow(() ->
                             new IllegalArgumentException(String.format("%s is not a valid menu item", names[0])));
 
-            for (int i = 1; i < names.length; i++) {
-                final int j = i;
-                if (!(current instanceof Menu)) {
-                    throw new IllegalArgumentException(
-                            String.format("Menu %s is not as nested as arguments require", names[0]));
-                }
-                current = ((Menu) current).getItems().stream()
-                        .filter(m -> m.getText().equals(names[j]))
-                        .findFirst()
-                        .orElseThrow(() ->
-                                new IllegalArgumentException(String.format("%s is not a valid menu item", names[j])));
+            if (names.length > 1) {
+                traverseMenu(current, Arrays.copyOfRange(names, 1, names.length));
+            } else {
+                traverseMenu(current);
             }
+        });
+    }
 
-            current.getOnAction().handle(new ActionEvent());
+    /**
+     * Similar with traverseHubTurboMenu, including the caveats, but this method traverses a ContextMenu instead.
+     */
+    public void traverseContextMenu(ContextMenu contextMenu, String... names) {
+        assert names.length > 0 : "traverseContextMenu called with no arguments";
+
+        Platform.runLater(() -> {
+            MenuItem current = contextMenu.getItems().stream()
+                    .filter(m -> m.getText().equals(names[0]))
+                    .findFirst()
+                    .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                String.format("%s is not a valid menu item", names[0])));
+
+            if (names.length > 1) {
+                traverseMenu(current, Arrays.copyOfRange(names, 1, names.length));
+            } else {
+                traverseMenu(current);
+            }
         });
     }
 

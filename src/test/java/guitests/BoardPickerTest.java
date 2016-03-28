@@ -28,23 +28,23 @@ public class BoardPickerTest extends UITest {
         VBox suggestedBoardList;
 
         // Create some boards
-        traverseMenu("Boards", "Save as");
+        traverseHubTurboMenu("Boards", "Save as");
         waitUntilNodeAppears(boardNameInputId);
         ((TextField) GuiTest.find(boardNameInputId)).setText("Board 1");
         clickOn(boardNameSaveButtonId);
-        traverseMenu("Boards", "Save as");
+        traverseHubTurboMenu("Boards", "Save as");
         waitUntilNodeAppears(boardNameInputId);
         ((TextField) GuiTest.find(boardNameInputId)).setText("Board 2");
         clickOn(boardNameSaveButtonId);
-        traverseMenu("Boards", "Save as");
+        traverseHubTurboMenu("Boards", "Save as");
         waitUntilNodeAppears(boardNameInputId);
         ((TextField) GuiTest.find(boardNameInputId)).setText("Board 3");
         clickOn(boardNameSaveButtonId);
-        traverseMenu("Boards", "Save as");
+        traverseHubTurboMenu("Boards", "Save as");
         waitUntilNodeAppears(boardNameInputId);
         ((TextField) GuiTest.find(boardNameInputId)).setText("Dummy Board 1");
         clickOn(boardNameSaveButtonId);
-        traverseMenu("Boards", "Save as");
+        traverseHubTurboMenu("Boards", "Save as");
         waitUntilNodeAppears(boardNameInputId);
         ((TextField) GuiTest.find(boardNameInputId)).setText("Dummy Board 2");
         clickOn(boardNameSaveButtonId);

@@ -33,9 +33,9 @@ public class PanelsTest extends UITest {
         UI.events.registerEvent((PanelClickedEventHandler) e -> eventTriggered.set(true));
 
         press(MAXIMIZE_WINDOW);
-        traverseMenu("Panels", "Create");
+        traverseHubTurboMenu("Panels", "Create");
         waitAndAssertEquals(2, panelControl::getPanelCount);
-        traverseMenu("Panels", "Create");
+        traverseHubTurboMenu("Panels", "Create");
         waitAndAssertEquals(3, panelControl::getPanelCount);
         clickFilterTextFieldAtPanel(0);
 

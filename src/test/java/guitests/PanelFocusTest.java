@@ -114,7 +114,7 @@ public class PanelFocusTest extends UITest {
          */
         // Setup:
         // 1. Save a board
-        traverseMenu("Boards", "Save as");
+        traverseHubTurboMenu("Boards", "Save as");
         PlatformEx.waitOnFxThread();
         ((TextField) GuiTest.find(IdGenerator.getBoardNameInputFieldIdReference())).setText("Board 1");
         clickOn("OK");
