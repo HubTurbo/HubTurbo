@@ -108,8 +108,13 @@ public class PanelRenameTest extends UITest {
         PlatformEx.waitOnFxThread();
         boolean isPresentDuringEdit = true; //stub value, this should change to false.
         try {
+<<<<<<< HEAD
             GuiTest.exists(panelCloseButtonId);
         } catch (NoNodesFoundException e) {
+=======
+            GuiTest.exists("#dummy/dummy_col3_closeButton");
+        } catch (NoNodesFoundException e){
+>>>>>>> Fix clickOn issue by waiting first
             isPresentDuringEdit = false;
         }
 

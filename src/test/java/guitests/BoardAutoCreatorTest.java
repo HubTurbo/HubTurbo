@@ -13,6 +13,7 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import org.junit.Before;
 import org.junit.Test;
+import org.loadui.testfx.GuiTest;
 
 import prefs.PanelInfo;
 import prefs.Preferences;

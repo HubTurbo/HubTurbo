@@ -53,6 +53,7 @@ public class KeyboardShortcutsConfigTest extends UITest {
         reloadPrefs(testPref);
         Platform.runLater(() -> KeyboardShortcuts.loadKeyboardShortcuts(testPref));
         waitUntilNodeAppears(hasText("Invalid number of shortcut keys specified"));
+        waitUntilNodeAppears(hasText("Reset to default"));
         clickOn("Reset to default");
         reloadPrefs(testPref);
         assertEquals(KeyboardShortcuts.getDefaultKeyboardShortcuts().size(), testPref.getKeyboardShortcuts().size());

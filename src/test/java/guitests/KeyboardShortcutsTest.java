@@ -39,10 +39,12 @@ public class KeyboardShortcutsTest extends UITest {
         // maximize
         assertEquals(false, getStage().getWidth() > 500);
         press(MAXIMIZE_WINDOW);
+        PlatformEx.waitOnFxThread();
         assertEquals(true, getStage().getWidth() > 500);
 
         // mid-sized window
         press(DEFAULT_SIZE_WINDOW);
+        PlatformEx.waitOnFxThread();
         assertEquals(false, getStage().getWidth() > 500);
 
         // jump from panel focus to first issue
