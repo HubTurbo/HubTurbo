@@ -36,6 +36,6 @@ To __abort__ the renaming action any time before step 3, press <kbd>Esc</kbd> or
 Watch list panels are panels whose filter reflects a "watch list". More specifically, a filter reflects a watch list if either of the following conditions is met :
 
 - It is empty (in other words, it watches all issues from the primary repo)
-- It is in the form of `id:repo1#id1;repo2#id2;repo3#id3;...;repoN#idN` (you can refer [here](filters.md) for more explanation about this filter syntax)
+- It is in the form of `id:repo1#id1;repo2#id2;repo3#id3;...;repoN#idN` (you can refer [here](filters.md#operator) and [here](filters.md#id) for more explanation about this filter syntax)
 
-To create a new watch list panel or add an issue to an existing watch list panel, you can refer [here](issuesAndPRs.md).
+To create a new watch list panel or add an issue to an existing watch list panel, you can refer [here](issuesAndPRs.md#watching).

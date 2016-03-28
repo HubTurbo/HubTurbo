@@ -9,12 +9,9 @@ import javafx.scene.input.KeyCode;
 import org.junit.Before;
 import org.junit.Test;
 
-import javafx.application.Platform;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.input.KeyCode;
+import ui.IdGenerator;
 import ui.components.FilterTextField;
 import ui.listpanel.ListPanel;
-import ui.listpanel.ListPanelCell;
 import util.PlatformEx;
 
 import java.util.Optional;
@@ -144,17 +141,6 @@ public class ContextMenuTests extends UITest {
     }
 
     /**
-<<<<<<< HEAD
-=======
-     * Clicks on menu item with target text
-     * @param target
-     */
-    private void clickMenuItem(String target) {
-        clickMenuItem(issuePanel.getContextMenu(), target);
-    }
-
-    /**
->>>>>>> Add tests for watch list panel
      * Verifies that context menu is disabled
      * contextMenu.isDisabled() not used because of unreliability in headless test environment
      * @param contextMenu
@@ -165,78 +151,75 @@ public class ContextMenuTests extends UITest {
 
     @Test
     public void addToWatchListPanel_createNewWatchListPanel_issueAddedToNewPanel() {
-        rightClickOn("#dummy/dummy_col0_9");
-        waitUntilNodeAppears("Add to watch list");
-        clickOn("Add to watch list");
-        waitUntilNodeAppears("New watch list");
-        clickOn("New watch list");
+        ListPanel listPanel = getPanel(0);
+        clickIssue(0, 9);
+        traverseContextMenu(listPanel.getContextMenu(), "Add to watch list", "New watch list");
         waitUntilNodeAppears("Cancel");
 
         type("Watch List #1");
         press(KeyCode.ENTER);
 
-        ListPanel watchList1 = findOrWaitFor("#dummy/dummy_col1");
+        ListPanel watchList1 = getPanel(1);
         assertEquals("Watch List #1", watchList1.getCurrentInfo().getPanelName());
         assertEquals("id:dummy/dummy#9", watchList1.getCurrentInfo().getPanelFilter());
 
         // clean up
-        clickOn("#dummy/dummy_col1_filterTextField");
+        clickPanel(1);
         traverseHubTurboMenu("Panels", "Close");
     }
 
     @Test
     public void addToWatchListPanel_addToExistingWatchListPanel_issueAddedToExistingPanel() {
-        clickOn("Panels");
-        waitUntilNodeAppears("Create");
-        clickOn("Create");
-        ListPanel createdPanel = findOrWaitFor("#dummy/dummy_col1");
+        traverseHubTurboMenu("Panels", "Create");
+        PlatformEx.waitOnFxThread();
+        ListPanel createdPanel = getPanel(1);
         createdPanel.setPanelName("New Panel");
-        rightClickOn("#dummy/dummy_col0_11");
-        clickOn("Add to watch list");
-        clickOn("New Panel");
+        clickIssue(0, 11);
+        ListPanel originalPanel = getPanel(0);
+        traverseContextMenu(originalPanel.getContextMenu(), "Add to watch list", "New Panel");
+        PlatformEx.waitOnFxThread();
         assertEquals("id:dummy/dummy#11", createdPanel.getCurrentInfo().getPanelFilter());
 
         // clean up
-        clickOn("#dummy/dummy_col1_filterTextField");
+        clickOn(IdGenerator.getPanelFilterTextFieldIdReference(1));
         traverseHubTurboMenu("Panels", "Close");
     }
 
     @Test
     public void addToWatchListPanel_issueFromDifferentRepos_addedIssuesRetainRepoInfo() {
-        rightClickOn("#dummy/dummy_col0_9");
-        waitUntilNodeAppears("Add to watch list");
-        clickOn("Add to watch list");
-        waitUntilNodeAppears("New watch list");
-        clickOn("New watch list");
+        clickIssue(0, 9);
+        ListPanel listPanel = findOrWaitFor(IdGenerator.getPanelIdReference(0));
+        traverseContextMenu(listPanel.getContextMenu(), "Add to watch list", "New watch list");
         waitUntilNodeAppears("Cancel");
         type("Watch List #1");
         press(KeyCode.ENTER);
 
-        ListPanel originalPanel = findOrWaitFor("#dummy/dummy_col0");
-        originalPanel.setFilterByString("repo:dummy2/dummy2");
+        clickFilterTextFieldAtPanel(0);
+        type("repo:dummy2/dummy2").push(KeyCode.ENTER);
 
-        waitUntilNodeAppears("#dummy2/dummy2_col0_11");
-        rightClickOn("#dummy2/dummy2_col0_11");
-        waitUntilNodeAppears("Add to watch list");
-        clickOn("Add to watch list");
-        waitUntilNodeAppears("Watch List #1");
-        clickOn("Watch List #1");
+        clickIssue(0, 10);
+        traverseContextMenu(listPanel.getContextMenu(), "Add to watch list", "Watch List #1");
+        PlatformEx.waitOnFxThread();
 
-        ListPanel watchList1 = findOrWaitFor("#dummy/dummy_col1");
-        assertEquals("id:dummy/dummy#9;dummy2/dummy2#11", watchList1.getCurrentInfo().getPanelFilter());
+        ListPanel watchList1 = findOrWaitFor(IdGenerator.getPanelIdReference(1));
+        assertEquals("id:dummy/dummy#9;dummy2/dummy2#1" +
+                "0", watchList1.getCurrentInfo().getPanelFilter());
 
         // clean up
-        clickOn("#dummy/dummy_col1_filterTextField");
+        clickPanel(1);
         traverseHubTurboMenu("Panels", "Close");
     }
 
     @Test
     public void editFilter_becomesValidWatchListPanel_panelAddedToContextMenu() {
-        ListPanel originalPanel = findOrWaitFor("#dummy/dummy_col0");
+        ListPanel originalPanel = getPanel(0);
         String originalPanelName = originalPanel.getCurrentInfo().getPanelName();
 
-        originalPanel.setFilterByString("repo:dummy/dummy");
-        clickOn("#dummy/dummy_col0_1");
+        clickOn(IdGenerator.getPanelFilterTextFieldIdReference(0));
+        type("repo:dummy/dummy").push(KeyCode.ENTER);
+        PlatformEx.waitOnFxThread();
+        waitUntilNodeAppears(IdGenerator.getPanelCellIdReference(0, 1));
+        clickOn(IdGenerator.getPanelCellIdReference(0, 1));
         ContextMenu contextMenu = originalPanel.getContextMenu();
         MenuItem addToWatchList = contextMenu.getItems().stream()
                                   .filter(menu -> menu.getText().equals("Add to watch list"))
@@ -248,11 +231,10 @@ public class ContextMenuTests extends UITest {
                                           .findFirst();
         assertFalse(currentPanel.isPresent());
 
-        originalPanel.setFilterByString("");
-        clickOn("#dummy/dummy_col0_filterTextField");
-        type("id:dummy/dummy#1");
-        press(KeyCode.ENTER);
-        clickOn("#dummy/dummy_col0_1");
+        clickOn(IdGenerator.getPanelFilterTextFieldIdReference(0));
+        selectAll();
+        type("id:dummy/dummy#1").push(KeyCode.ENTER);
+        clickOn(IdGenerator.getPanelCellIdReference(0, 1));
         contextMenu = originalPanel.getContextMenu();
         addToWatchList = contextMenu.getItems().stream()
                          .filter(menu -> menu.getText().equals("Add to watch list"))
