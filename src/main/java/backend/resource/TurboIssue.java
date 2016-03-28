@@ -127,6 +127,7 @@ public class TurboIssue {
         this.markedReadAt = issue.markedReadAt;
         this.labelsLastModifiedAt = Optional.of(issue.getLabelsLastModifiedAt());
         this.stateLastModifiedAt = Optional.of(issue.getStateLastModifiedAt());
+        this.milestoneLastModifiedAt = Optional.of(issue.getMilestoneLastModifiedAt());
     }
 
     public TurboIssue(String repoId, Issue issue) {
