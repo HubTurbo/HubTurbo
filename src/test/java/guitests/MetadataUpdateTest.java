@@ -24,11 +24,11 @@ public class MetadataUpdateTest extends UITest {
     }
 
     private void ensureMetadataDownloadIsTriggered() {
-        awaitCondition(() -> existsQuiet("Getting metadata for dummy/dummy..."));
+        awaitCondition(() -> existsQuiet("Getting metadata for dummy/dummy..."), 10);
     }
 
     private void ensureMetadataIsReceived() {
-        awaitCondition(() -> existsQuiet("Received metadata from dummy/dummy!"));
+        awaitCondition(() -> existsQuiet("Received metadata from dummy/dummy!"), 10);
     }
 
     private void updated24() {

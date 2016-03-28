@@ -87,9 +87,9 @@ public class RemovableRepoListAndModelsTest extends UITest {
         assertNodeExists(IdGenerator.getLoginDialogOwnerFieldIdReference());
         type("dummy").push(KeyCode.TAB);
         type("dummy").push(KeyCode.ENTER);
-        assertEquals(noOfUsedRepo, ui.getCurrentlyUsedRepos().size());
-        assertEquals(noOfUsedRepo, ui.logic.getOpenRepositories().size());
-        assertEquals(totalRepoInSystem + 1, removeRepoMenu.getItems().size());
+        waitAndAssertEquals(noOfUsedRepo, ui.getCurrentlyUsedRepos()::size);
+        waitAndAssertEquals(noOfUsedRepo, ui.logic.getOpenRepositories()::size);
+        waitAndAssertEquals(totalRepoInSystem + 1, removeRepoMenu.getItems()::size);
         assertEquals(totalRepoInSystem + 1 - noOfUsedRepo,
                      getNoOfEnabledMenuItems(removeRepoMenu.getItems()));
         assertEquals(noOfUsedRepo, getNoOfDisabledMenuItems(removeRepoMenu.getItems()));

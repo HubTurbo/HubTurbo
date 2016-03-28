@@ -274,7 +274,7 @@ public class UITest extends FxRobot {
         awaitCondition(condition, 5);
     }
 
-    private void awaitCondition(Callable<Boolean> condition, int timeoutInSeconds) {
+    protected void awaitCondition(Callable<Boolean> condition, int timeoutInSeconds) {
         long timeout = System.currentTimeMillis() + timeoutInSeconds * 1000;
         try {
             while (!condition.call()) {
