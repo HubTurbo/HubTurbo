@@ -99,14 +99,6 @@ public class SessionConfig {
         savedBoards.clear();
     }
 
-    public List<String> getLastOpenFilters() {
-        return lastSessionPanels.stream().map(PanelInfo::getPanelFilter).collect(Collectors.toList());
-    }
-
-    public List<String> getPanelNames() {
-        return lastSessionPanels.stream().map(PanelInfo::getPanelName).collect(Collectors.toList());
-    }
-
     public void setPanelInfo(List<PanelInfo> panelInfo) {
         this.lastSessionPanels = new ArrayList<>(panelInfo);
     }

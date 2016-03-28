@@ -113,24 +113,21 @@ public class JsonHelperTest {
     @Test
     public void fromJson_emptyString_nullObject() {
         String emptyString = "";
-        JsonHelper jsonHelper = new JsonHelper();
-        Dummy dummy = jsonHelper.fromJsonString(emptyString, Dummy.class);
+        Dummy dummy = JsonHelper.fromJsonString(emptyString, Dummy.class);
         assertEquals(null, dummy);
     }
 
     @Test
-    public void fromJson_nullJson_defaultObject() {
+    public void fromJson_nullJson_nullObject() {
         String emptyJson = "null";
-        JsonHelper jsonHelper = new JsonHelper();
-        Dummy dummy = jsonHelper.fromJsonString(emptyJson, Dummy.class);
+        Dummy dummy = JsonHelper.fromJsonString(emptyJson, Dummy.class);
         assertEquals(null, dummy);
     }
 
     @Test
     public void fromJson_emptyJson_defaultObject() {
         String emptyJson = "{}";
-        JsonHelper jsonHelper = new JsonHelper();
-        Dummy dummy = jsonHelper.fromJsonString(emptyJson, Dummy.class);
+        Dummy dummy = JsonHelper.fromJsonString(emptyJson, Dummy.class);
         assertEquals(new Dummy(), dummy);
     }
 
@@ -142,8 +139,7 @@ public class JsonHelperTest {
                 "\"testString\":\"expected\"," +
                 "\"testSecondDummy\":{\"testIntArr\":[4,2]}" +
                 "}";
-        JsonHelper jsonHelper = new JsonHelper();
-        Dummy dummy = jsonHelper.fromJsonString(constructedJson, Dummy.class);
+        Dummy dummy = JsonHelper.fromJsonString(constructedJson, Dummy.class);
         Dummy expectedDummy = new Dummy();
         SecondDummy expectedSecondDummy = new SecondDummy();
         expectedSecondDummy.setTestIntArr(new int[]{4, 2});
@@ -157,16 +153,14 @@ public class JsonHelperTest {
 
     @Test
     public void toJson_nullObject_nullJson() {
-        JsonHelper jsonHelper = new JsonHelper();
-        String json = jsonHelper.toJsonString(null, Dummy.class);
+        String json = JsonHelper.toJsonString(null, Dummy.class);
         assertEquals("null", json);
     }
 
     @Test
     public void toJson_defaultObject_defaultJson() {
         Dummy dummyForJson = new Dummy();
-        JsonHelper jsonHelper = new JsonHelper();
-        String json = jsonHelper.toJsonString(dummyForJson, Dummy.class).replaceAll("\\s+", "");
+        String json = JsonHelper.toJsonString(dummyForJson, Dummy.class).replaceAll("\\s+", "");
         String expectedJson = "{" +
                 "\"testInt\":3," +
                 "\"testBoolean\":false," +
@@ -185,8 +179,7 @@ public class JsonHelperTest {
         dummyForJson.setTestInt(42);
         dummyForJson.setTestBoolean(true);
         dummyForJson.setTestString("expected");
-        JsonHelper jsonHelper = new JsonHelper();
-        String json = jsonHelper.toJsonString(dummyForJson, Dummy.class).replaceAll("\\s", "");
+        String json = JsonHelper.toJsonString(dummyForJson, Dummy.class).replaceAll("\\s", "");
         String expectedJson = "{" +
                 "\"testInt\":42," +
                 "\"testBoolean\":true," +

@@ -1,17 +1,12 @@
 package tests;
 
-import guitests.UITest;
 import org.junit.Test;
 import prefs.SessionConfig;
 import prefs.PanelInfo;
 import prefs.Preferences;
 import ui.TestController;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,18 +19,12 @@ public class PreferencesTests {
      * Tests that Preferences' clearLastOpenBoard method calls SessionConfig's clearLastOpenBoard once
      */
     @Test
-    public void testClearLastOpenBoard() {
+    public void prefClearLastOpenBoard_mockSessionConfig_sessionConfigRespectiveMethodCalled()
+            throws NoSuchFieldException, IllegalAccessException {
         SessionConfig sessionConfig = mock(SessionConfig.class);
         Preferences prefs = TestController.createTestPreferences();
-
-        try {
-            setSessionConfigField(prefs, sessionConfig);
-            prefs.clearLastOpenBoard();
-
-        } catch (IllegalAccessException | NoSuchFieldException e) {
-            e.printStackTrace();
-            fail();
-        }
+        setSessionConfigField(prefs, sessionConfig);
+        prefs.clearLastOpenBoard();
 
         verify(sessionConfig, times(1)).clearLastOpenBoard();
     }
@@ -45,24 +34,21 @@ public class PreferencesTests {
      * and receives corresponding result
      */
     @Test
-    public void testGetBoardPanels() {
+    public void prefGetBoardPanels_mockSessionConfig_sessionConfigRespectiveMethodCalled()
+            throws NoSuchFieldException, IllegalAccessException {
         SessionConfig sessionConfig = mock(SessionConfig.class);
         List<PanelInfo> expected = new ArrayList<>();
         when(sessionConfig.getBoardPanels("board")).thenReturn(expected);
 
         Preferences prefs = TestController.createTestPreferences();
-        try {
-            setSessionConfigField(prefs, sessionConfig);
-            prefs.clearLastOpenBoard();
+        setSessionConfigField(prefs, sessionConfig);
+        prefs.clearLastOpenBoard();
 
-        } catch (IllegalAccessException | NoSuchFieldException e) {
-            e.printStackTrace();
-            fail();
-        }
         List<PanelInfo> actual = prefs.getBoardPanels("board");
-
-        verify(sessionConfig, times(1)).getBoardPanels("board");
         assertEquals(expected, actual);
+
+        final List<PanelInfo> mocked = verify(sessionConfig, times(1)).getBoardPanels("board");
+        assertEquals(mocked, null); // this workaround is needed to pass findbugs.
     }
 
     /**

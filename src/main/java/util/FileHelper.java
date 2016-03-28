@@ -12,10 +12,16 @@ import java.nio.file.Paths;
 /**
  * A helper that manages file I/O.
  */
-public class FileHelper {
+public final class FileHelper {
     private static final Logger logger = LogManager.getLogger(FileHelper.class.getName());
 
     private static final String CHARSET = "UTF-8";
+
+    /**
+     * Private constructor to prevent instantiation of utility class
+     */
+    private FileHelper() {
+    }
 
     /**
      * Returns the File representation at the file path
@@ -36,7 +42,7 @@ public class FileHelper {
                 logger.info("Directory created: " + directory.toString());
             } else {
                 logger.error("Could not create file directory");
-                throw new IOException();
+                throw new IOException("Could not create file directory");
             }
         }
     }
@@ -61,7 +67,8 @@ public class FileHelper {
      * Writes a String to the file
      * @param fileContents The contents of the file in String form, to be written
      */
-    public static void writeFileContents(String fileDirectory, String fileName, String fileContents) throws IOException {
+    public static void writeFileContents(String fileDirectory, String fileName, String fileContents)
+            throws IOException {
         createDirectoryIfNonExistent(fileDirectory);
         Path filePath = getFilePath(fileDirectory, fileName);
         logger.info("Write starting: " + filePath.toAbsolutePath());

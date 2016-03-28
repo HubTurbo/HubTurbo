@@ -14,7 +14,6 @@ import org.loadui.testfx.utils.FXTestUtils;
 import javafx.scene.control.ComboBox;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
-import prefs.SessionConfig;
 import prefs.Preferences;
 import ui.TestController;
 import ui.UI;

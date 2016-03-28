@@ -11,36 +11,28 @@ import java.time.ZoneId;
 /**
  * A helper that manages conversion from objects to JSON Strings, and vice versa.
  */
-public class JsonHelper {
+public final class JsonHelper {
     private static final Logger logger = LogManager.getLogger(JsonHelper.class.getName());
 
-    private Gson gson;
+    private static Gson gson = new GsonBuilder()
+        .setPrettyPrinting()
+        .registerTypeAdapter(LocalDateTime.class,
+            (JsonSerializer<LocalDateTime>) (src, typeOfSrc, context) -> {
+                Instant instant = src.atZone(ZoneId.systemDefault()).toInstant();
+                long epochMilli = instant.toEpochMilli();
+                return new JsonPrimitive(epochMilli);
+            })
+        .registerTypeAdapter(LocalDateTime.class,
+            (JsonDeserializer<LocalDateTime>) (json, typeOfT, context) -> {
+                Instant instant = Instant.ofEpochMilli(json.getAsJsonPrimitive().getAsLong());
+                return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+            })
+        .create();
 
     /**
-     * Sets up the JsonHelper by initialising the Gson component
+     * Private constructor to prevent instantiation of utility class
      */
-    public JsonHelper() {
-        setupGson();
-    }
-
-    /**
-     * Configures the gson object that will serialise and deserialise JSON data
-     */
-    private void setupGson() {
-        gson = new GsonBuilder()
-                .setPrettyPrinting()
-                .registerTypeAdapter(LocalDateTime.class,
-                        (JsonSerializer<LocalDateTime>) (src, typeOfSrc, context) -> {
-                            Instant instant = src.atZone(ZoneId.systemDefault()).toInstant();
-                            long epochMilli = instant.toEpochMilli();
-                            return new JsonPrimitive(epochMilli);
-                        })
-                .registerTypeAdapter(LocalDateTime.class,
-                        (JsonDeserializer<LocalDateTime>) (json, typeOfT, context) -> {
-                            Instant instant = Instant.ofEpochMilli(json.getAsJsonPrimitive().getAsLong());
-                            return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
-                        })
-                .create();
+    private JsonHelper() {
     }
 
     /**
@@ -50,7 +42,7 @@ public class JsonHelper {
      * @param <T> The generic type to create an instance of
      * @return The instance of T with the specified values in the JSON string
      */
-    public <T> T fromJsonString(String json, Class<T> instanceClass) {
+    public static <T> T fromJsonString(String json, Class<T> instanceClass) {
         T createdInstance = gson.fromJson(json, instanceClass);
         logger.info("Instance successfully created: " + instanceClass.toString());
         return createdInstance;
@@ -63,7 +55,7 @@ public class JsonHelper {
      * @param <T> The generic type to create an instance of
      * @return The JSON-formatted string that contains the values of the given T instance
      */
-    public <T> String toJsonString(T instance, Class<T> instanceClass) {
+    public static <T> String toJsonString(T instance, Class<T> instanceClass) {
         String json = gson.toJson(instance, instanceClass);
         logger.info("Successfully created json of: " + instanceClass.toString());
         return json;

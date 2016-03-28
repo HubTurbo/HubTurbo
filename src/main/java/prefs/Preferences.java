@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Represents persistent user configuration. Maps to a file on disk.
+ * Represents persistent user configuration.
  *
  * The Preferences class is the facade of all configuration and preferences information. All preferences and config
  * settings can be set in this class.
@@ -91,12 +91,12 @@ public class Preferences { // NOPMD
 
     /**
      * Creates a new Config instance
-     * @param contents The contents of the object to create
-     * @param configClass The class of the Config instance to create
+     * @param contents The JSON representation of an contents of the Config object
+     * @param configClass The class of the Config instance
      * @return The created Config instance
      */
     private <T> T createConfig(String contents, Class<T> configClass) {
-        return new JsonHelper().fromJsonString(contents, configClass);
+        return JsonHelper.fromJsonString(contents, configClass);
     }
 
     /**
@@ -154,96 +154,56 @@ public class Preferences { // NOPMD
                             String configDirectory,
                             String configFileName,
                             Class configClass) throws IOException {
-        JsonHelper jsonHelper = new JsonHelper();
-        String jsonString = jsonHelper.toJsonString(config, configClass);
+        String jsonString = JsonHelper.toJsonString(config, configClass);
         FileHelper.writeFileContents(configDirectory, configFileName, jsonString);
     }
 
-    /**
-     * Retrieves the last login password
-     */
     public String getLastLoginPassword() {
         return sessionConfig.getLastLoginPassword();
     }
 
-    /**
-     * Retrieves the last login username
-     */
     public String getLastLoginUsername() {
         return sessionConfig.getLastLoginUsername();
     }
 
-    /**
-     * Sets the last login credentials
-     * @param username The username used during the last login
-     * @param password The password used during the last login
-     */
-    public void setLastLoginCredentials(String username, String password) {
-        sessionConfig.setLastLoginCredentials(username, password);
+    public void setLastLoginCredentials(String lastLoginUsername, String lastLoginPassword) {
+        sessionConfig.setLastLoginCredentials(lastLoginUsername, lastLoginPassword);
         save();
     }
 
-    /**
-     * Retrieves a list of panel infos
-     */
     public List<PanelInfo> getPanelInfo() {
         return sessionConfig.getPanelInfo();
     }
 
-    /**
-     * Sets the panel infos
-     * @param panelInfo The list of panel infos to set to
-     */
     public void setPanelInfo(List<PanelInfo> panelInfo) {
         sessionConfig.setPanelInfo(panelInfo);
         save();
     }
 
-    /**
-     * Adds a board with the board name and its panels information
-     */
-    public void addBoard(String name, List<PanelInfo> panels) {
-        assert name != null && panels != null;
-        sessionConfig.addBoard(name, panels);
+    public void addBoard(String boardName, List<PanelInfo> panelsInBoard) {
+        assert boardName != null && panelsInBoard != null;
+        sessionConfig.addBoard(boardName, panelsInBoard);
         save();
     }
 
-    /**
-     * Retrieves all the boards
-     */
     public Map<String, List<PanelInfo>> getAllBoards() {
         return sessionConfig.getAllBoards();
     }
 
-    /**
-     * Retrieves a list of all the board names
-     */
     public List<String> getAllBoardNames() {
         return new ArrayList<>(getAllBoards().keySet());
     }
 
-    /**
-     * Removes the board specified
-     * @param name The name of the board to remove
-     */
-    public void removeBoard(String name) {
-        sessionConfig.removeBoard(name);
+    public void removeBoard(String boardName) {
+        sessionConfig.removeBoard(boardName);
         save();
     }
 
-    /**
-     * Sets the last open board
-     * @param board The name of the last open board.
-     */
-    public void setLastOpenBoard(String board) {
-        sessionConfig.setLastOpenBoard(board);
+    public void setLastOpenBoard(String boardName) {
+        sessionConfig.setLastOpenBoard(boardName);
         save();
     }
 
-    /**
-     * Retrieves the name of the last open board.
-     * @return An Optional of a board name
-     */
     public Optional<String> getLastOpenBoard() {
         return sessionConfig.getLastOpenBoard();
     }
@@ -263,55 +223,34 @@ public class Preferences { // NOPMD
         return getLastOpenBoard();
     }
 
-    /**
-     * Clears the last open board
-     */
     public void clearLastOpenBoard() {
         sessionConfig.clearLastOpenBoard();
         save();
     }
 
-    /**
-     * Retrieves the panels of a board.
-     * @param boardName The name of the board to retrieve the panels from
-     * @return A list of panel infos from that board
-     */
     public List<PanelInfo> getBoardPanels(String boardName) {
         return sessionConfig.getBoardPanels(boardName);
     }
 
-    /**
-     * Clears all boards.
-     */
     public void clearAllBoards() {
         sessionConfig.clearAllBoards();
         save();
     }
 
-    /**
-     * Sets the last viewed repo to the specified repo
-     * @param repository The last viewed repo
-     */
-    public void setLastViewedRepository(String repository) {
-        sessionConfig.setLastViewedRepository(repository);
+    public void setLastViewedRepository(String repositoryName) {
+        sessionConfig.setLastViewedRepository(repositoryName);
         save();
     }
 
-    /**
-     * Retrieves the last viewed repo.
-     * @return An Optional of the last viewed repo.
-     */
     public Optional<RepositoryId> getLastViewedRepository() {
         if (sessionConfig.getLastViewedRepository().isEmpty()) {
             return Optional.empty();
-        } else {
-            RepositoryId repositoryId = RepositoryId.createFromId(sessionConfig.getLastViewedRepository());
-            if (repositoryId == null) {
-                return Optional.empty();
-            } else {
-                return Optional.of(repositoryId);
-            }
         }
+        RepositoryId repositoryId = RepositoryId.createFromId(sessionConfig.getLastViewedRepository());
+        if (repositoryId == null) {
+            return Optional.empty();
+        }
+        return Optional.of(repositoryId);
     }
 
     /**
@@ -328,10 +267,10 @@ public class Preferences { // NOPMD
      * Sets the marked read at of an issue in a repo, to a certain time
      * @param repoId The repo of the issue
      * @param issue The issue to set
-     * @param time The time it was marked read
+     * @param timeReadAt The time it was marked read
      */
-    public void setMarkedReadAt(String repoId, int issue, LocalDateTime time) {
-        sessionConfig.setMarkedReadAt(repoId, issue, time);
+    public void setMarkedReadAt(String repoId, int issue, LocalDateTime timeReadAt) {
+        sessionConfig.setMarkedReadAt(repoId, issue, timeReadAt);
         save();
     }
 
@@ -345,17 +284,10 @@ public class Preferences { // NOPMD
         return sessionConfig.getMarkedReadAt(repoId, issue);
     }
 
-    /**
-     * Retrieves the keyboard shortcuts
-     */
     public Map<String, String> getKeyboardShortcuts() {
         return sessionConfig.getKeyboardShortcuts();
     }
 
-    /**
-     * Sets the keyboard shortcuts to the specified mapping
-     * @param keyboardShortcuts The mapping of keyboard shortcuts to set to.
-     */
     public void setKeyboardShortcuts(Map<String, String> keyboardShortcuts) {
         sessionConfig.setKeyboardShortcuts(keyboardShortcuts);
         save();
