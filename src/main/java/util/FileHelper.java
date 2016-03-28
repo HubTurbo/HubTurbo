@@ -17,23 +17,10 @@ public class FileHelper {
 
     private static final String CHARSET = "UTF-8";
 
-    private final String fileDirectory;
-    private final String fileName;
-
-    /**
-     * Initialises the FileHelper with the directory and the file name
-     * @param fileDirectory the directory that the file is located in
-     * @param fileName the name of the file
-     */
-    public FileHelper(String fileDirectory, String fileName) {
-        this.fileName = fileName;
-        this.fileDirectory = fileDirectory;
-    }
-
     /**
      * Returns the File representation at the file path
      */
-    private Path getFilePath() {
+    private static Path getFilePath(String fileDirectory, String fileName) {
         return Paths.get(fileDirectory, fileName);
     }
 
@@ -41,7 +28,7 @@ public class FileHelper {
      * Attempts to create the directory if it does not exist.
      * @throws IOException When the directory cannot be created
      */
-    private void createDirectoryIfNonExistent() throws IOException {
+    private static void createDirectoryIfNonExistent(String fileDirectory) throws IOException {
         File directory = new File(fileDirectory);
         boolean directoryExists = directory.exists() && directory.isDirectory();
         if (!directoryExists) {
@@ -54,16 +41,16 @@ public class FileHelper {
         }
     }
 
-    public boolean exists() {
-        return Files.exists(getFilePath());
+    public static boolean fileExists(String fileDirectory, String fileName) {
+        return Files.exists(getFilePath(fileDirectory, fileName));
     }
 
     /**
      * Loads the contents of the file into a String
      * @return The String representation of the contents of the file
      */
-    public String loadFileContents() throws IOException {
-        Path filePath = getFilePath();
+    public static String loadFileContents(String fileDirectory, String fileName) throws IOException {
+        Path filePath = getFilePath(fileDirectory, fileName);
         logger.info("Load starting: " + filePath.toAbsolutePath());
         String contents = new String(Files.readAllBytes(filePath), CHARSET);
         logger.info("Load successful: " + filePath.toAbsolutePath());
@@ -74,9 +61,9 @@ public class FileHelper {
      * Writes a String to the file
      * @param fileContents The contents of the file in String form, to be written
      */
-    public void writeFileContents(String fileContents) throws IOException {
-        createDirectoryIfNonExistent();
-        Path filePath = getFilePath();
+    public static void writeFileContents(String fileDirectory, String fileName, String fileContents) throws IOException {
+        createDirectoryIfNonExistent(fileDirectory);
+        Path filePath = getFilePath(fileDirectory, fileName);
         logger.info("Write starting: " + filePath.toAbsolutePath());
         Files.write(filePath, fileContents.getBytes(CHARSET));
         logger.info("Write successful: " + filePath.toAbsolutePath());

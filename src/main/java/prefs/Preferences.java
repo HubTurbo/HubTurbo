@@ -107,13 +107,12 @@ public class Preferences { // NOPMD
      * @return The loaded Config instance
      */
     private <T> T loadConfig(String configDirectory, String configFileName, Class<T> configClass) {
-        FileHelper configFileHelper = new FileHelper(configDirectory, configFileName);
         String fileContents = DEFAULT_FILE_CONTENTS;
-        if (configFileHelper.exists()) {
+        if (FileHelper.fileExists(configDirectory, configFileName)) {
             try {
-                fileContents = configFileHelper.loadFileContents();
+                fileContents = FileHelper.loadFileContents(configDirectory, configFileName);
             } catch (IOException e) {
-                // if we can't read the file, just ignore the existing file
+                // if we can't read the file, just ignore the existing files
                 HTLog.error(logger, e);
                 logger.error(e.toString());
                 fileContents = DEFAULT_FILE_CONTENTS;
@@ -157,8 +156,7 @@ public class Preferences { // NOPMD
                             Class configClass) throws IOException {
         JsonHelper jsonHelper = new JsonHelper();
         String jsonString = jsonHelper.toJsonString(config, configClass);
-        FileHelper fileHelper = new FileHelper(configDirectory, configFileName);
-        fileHelper.writeFileContents(jsonString);
+        FileHelper.writeFileContents(configDirectory, configFileName, jsonString);
     }
 
     /**
