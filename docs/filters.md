@@ -81,6 +81,8 @@ Operators may be written in any of the following forms:
 As in C-like languages, NOT is prefix, AND and OR are infix and left-associative, and precedence goes: NOT > AND > OR.
 Note that operators are case sensitive: `AND` is a valid operator, but `and` is not.
 
+HubTurbo also supports `;` as a shorter form of OR that can be used to unify a disjunction of several qualifiers of the same type.
+For example, `(repo:a OR repo:b OR repo:c) AND has:d` can be written as `repo:a;b;c has:d`.
 <!-- To be enabled later
 
 ## Application
