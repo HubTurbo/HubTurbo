@@ -23,7 +23,6 @@ public class MilestonePickerStateTests {
         List<PickerMilestone> milestoneList = new ArrayList<>();
         PickerMilestone milestone1 = new PickerMilestone(new TurboMilestone("testrepo", 1, "milestone1"));
         PickerMilestone milestone2 = new PickerMilestone(new TurboMilestone("testrepo", 2, "milestone2"));
-        milestone2.setSelected(true);
         milestoneList.add(milestone1);
         milestoneList.add(milestone2);
         return new MilestonePickerState(milestoneList, milestone2.getTitle());

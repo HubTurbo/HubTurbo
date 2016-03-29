@@ -30,22 +30,22 @@ public class MilestonePickerState {
     }
 
     private void processInput(String userInput) {
-        filterMilestonesByInput(currentMilestones, userInput);
+        filterMilestonesByQuerySentence(currentMilestones, userInput);
         determineBestMatchingMilestones(userInput);
         if (userInput.isEmpty()) return;
         toggleFirstMilestone(bestMatchingMilestones);
     }
 
-    private void filterMilestonesByInput(List<PickerMilestone> milestones, String userInput) {
-        String[] userInputWords = userInput.split(" ");
+    private void filterMilestonesByQuerySentence(List<PickerMilestone> milestones, String querySentence) {
+        String[] userInputWords = querySentence.split(" ");
         Stream.of(userInputWords)
-                .forEach(query -> filterMilestonesByQuery(milestones, query));
+                .forEach(query -> filterMilestonesByQueryWord(milestones, query));
     }
 
-    private void filterMilestonesByQuery(List<PickerMilestone> milestones, String query) {
+    private void filterMilestonesByQueryWord(List<PickerMilestone> milestones, String queryWord) {
         milestones.stream()
                 .forEach(milestone -> {
-                    if (milestone.isMatching()) milestone.setMatching(isMatchingQuery(milestone, query));
+                    if (milestone.isMatching()) milestone.setMatching(isMatchingQuery(milestone, queryWord));
                 });
     }
 
@@ -93,8 +93,7 @@ public class MilestonePickerState {
     }
 
     /**
-     * Contains the algorithm to generate the best matching milestones
-     * These milestones will be added to bestMatchingMilestones
+     * Generates the best matching milestones which will then be added to bestMatchingMilestones
      *
      * The added milestones are references to the actual elements in currentMilestones, and thus should not be
      * unnecessarily mutated
@@ -197,8 +196,7 @@ public class MilestonePickerState {
      */
     private List<PickerMilestone> getLimitedMatchesFromPreviousInput(String userInput,
                                                                      List<PickerMilestone> currentMilestones,
-                                                                     int limit,
-                                                                     List<PickerMilestone> milestones) {
+                                                                     int limit, List<PickerMilestone> milestones) {
         List<PickerMilestone> bestMatchesForPreviousInput = new ArrayList<>();
         String curUserInput = userInput;
         while (bestMatchesForPreviousInput.size() < limit && curUserInput.length() > 0) {
