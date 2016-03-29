@@ -119,14 +119,24 @@ public class UITest extends GuiTest {
         }
     }
 
-    @Before
-    @Override
-    public void setupStage() throws Throwable {
+    public static void clearAllTestConfigs() {
+        clearTestConfig(TestController.TEST_DIRECTORY, TestController.TEST_SESSION_CONFIG_FILENAME);
+        clearTestConfig(TestController.TEST_DIRECTORY, TestController.TEST_USER_CONFIG_FILENAME);
+    }
+
+    private static void clearTestConfig(String directory, String filename) {
         // delete test.json if it exists
-        File testConfig = new File(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
+        File testConfig = new File(directory, filename);
         if (testConfig.exists() && testConfig.isFile()) {
             assert testConfig.delete();
         }
+    }
+
+    @Before
+    @Override
+    public void setupStage() throws Throwable {
+        // delete test configs if they exist
+        clearAllTestConfigs();
         clearTestFolder();
         beforeStageStarts();
 

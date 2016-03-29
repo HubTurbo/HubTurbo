@@ -13,23 +13,27 @@ import java.util.Optional;
 
 /**
  * A collection of methods that deal with the UI class which are mainly used for testing.
- * <p>
+ *
  * Test mode should only be run as a test task (Gradle / JUnit), as quit()
  * leaves the JVM alive during test mode (which is cleaned up by Gradle).
  * Manually feeding --test=true into the command line arguments will leave the JVM
  * running after the HT window has been closed, and thus will require the
  * process to be closed manually afterwards (Force Quit / End Process) unless
  * the --closeonquit=true argument is used.
- * <p>
+ *
  * Other than the various arguments that can be used, this class also exposes the UI
  * instance which can be called from tests that need to access the UI class directly.
  */
 public final class TestController {
+
+    public static final String TEST_DIRECTORY = "settings";
+    public static final String TEST_SESSION_CONFIG_FILENAME = "test.json";
+    public static final String TEST_USER_CONFIG_FILENAME = "test_user.json";
+
     private static UI ui;
     private static HashMap<String, String> commandLineArgs;
 
-    private TestController() {
-    }
+    private TestController() {}
 
     public static void setUI(UI ui, Application.Parameters params) {
         TestController.ui = ui;
@@ -107,42 +111,36 @@ public final class TestController {
     /**
      * Creates a Preferences instance that stores data in test config file if run in
      * test mode, or in a default config file specified in the Preferences class
-     *
-     * @return
      */
     public static Preferences loadApplicationPreferences() {
         if (isTestMode()) {
             return loadTestPreferences();
         }
 
-        return Preferences.load(Preferences.GLOBAL_CONFIG_FILE);
+        return Preferences.load(Preferences.DIRECTORY,
+                Preferences.SESSION_CONFIG_FILENAME,
+                Preferences.USER_CONFIG_FILENAME);
     }
 
     /**
      * Creates a Preferences instance that stores data in a config file for testing, loading
      * from it if it already exists.
-     *
-     * @return
      */
     public static Preferences loadTestPreferences() {
-        return Preferences.load(Preferences.TEST_CONFIG_FILE);
+        return Preferences.load(TEST_DIRECTORY, TEST_SESSION_CONFIG_FILENAME, TEST_USER_CONFIG_FILENAME);
     }
 
     /**
      * Creates a Preferences instance that stores data in a config file for testing, unconditionally
      * initialising it beforehand.
-     *
-     * @return
      */
     public static Preferences createTestPreferences() {
-        return Preferences.create(Preferences.TEST_CONFIG_FILE);
+        return Preferences.create(TEST_DIRECTORY, TEST_SESSION_CONFIG_FILENAME, TEST_USER_CONFIG_FILENAME);
     }
 
     /**
      * Creates a RepoIO for the application that uses different components
      * depending on various test options: --test, --testjson etc.
-     *
-     * @return
      */
     public static RepoIO createApplicationRepoIO() {
         if (isTestMode()) {
@@ -154,10 +152,8 @@ public final class TestController {
 
     /**
      * Creates a partially stubbed RepoIO used for testing.
-     *
      * @param jsonStoreToBeUsed store to be used with RepoIO,
      *                          defaults to a new instance of JSONStore if this value is empty
-     * @return
      */
     public static RepoIO createTestingRepoIO(Optional<JSONStore> jsonStoreToBeUsed) {
         return new RepoIO(Optional.of(new DummySource()), jsonStoreToBeUsed,

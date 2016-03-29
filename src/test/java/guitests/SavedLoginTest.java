@@ -4,8 +4,6 @@ import backend.RepoIO;
 import javafx.scene.control.ComboBox;
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
-import prefs.ConfigFileHandler;
-import prefs.GlobalConfig;
 import prefs.Preferences;
 import tests.TestUtils;
 import ui.TestController;
@@ -32,12 +30,10 @@ public class SavedLoginTest extends UITest {
         UI.events = mock(EventDispatcher.class);
         // setup test json with last viewed repo "test/test"
         // and then create the corresponding repo json file
-        ConfigFileHandler configFileHandler =
-                new ConfigFileHandler(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
-        GlobalConfig globalConfig = new GlobalConfig();
-        globalConfig.setLastLoginCredentials("test", "test");
-        globalConfig.setLastViewedRepository("test/test");
-        configFileHandler.saveGlobalConfig(globalConfig);
+        Preferences prefs = TestController.createTestPreferences();
+        prefs.setLastLoginCredentials("test", "test");
+        prefs.setLastViewedRepository("test/test");
+
         RepoIO testIO = TestController.createTestingRepoIO(Optional.empty());
         testIO.setRepoOpControl(TestUtils.createRepoOpControlWithEmptyModels(testIO));
         try {
@@ -49,7 +45,7 @@ public class SavedLoginTest extends UITest {
 
     @Test
     public void savedLogin_lastSavedLoginCredentials_shouldAllowLoginWithoutPrompting()
-            throws InterruptedException {
+        throws InterruptedException {
         ComboBox<String> repositorySelector = find("#repositorySelector");
         assertEquals("test/test", repositorySelector.getValue());
     }
