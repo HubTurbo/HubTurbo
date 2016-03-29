@@ -5,7 +5,6 @@ import static util.GithubPageElements.DISCUSSION_TAB;
 import static util.GithubPageElements.COMMITS_TAB;
 import static util.GithubPageElements.FILES_TAB;
 
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -310,39 +309,25 @@ public class ListPanel extends FilterPanel {
             }
             if (NEW_COMMENT.match(event)) {
                 if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
-                    ui.getBrowserComponent().switchToTab(DISCUSSION_TAB);
-                } else {
-                    if (!ui.getBrowserComponent().isCurrentUrlIssue()) {
-                        openPageOfCurrentlySelectedIssue();
-                    } else if (!ui.getBrowserComponent().isCurrentUrlDiscussion()) {
-                        ui.getBrowserComponent().switchToTab(DISCUSSION_TAB);
+                    // goto PR discussion tab
+                    ui.getBrowserComponent().openPrTab(getCurrentlySelectedIssue(), DISCUSSION_TAB);
+                } else { // focus new comment textbox
+                    if (!ui.getBrowserComponent().isCurrentUrlDiscussion()) {
+                        openIssuePageMainTab(getCurrentlySelectedIssue());
                     }
-
                     ui.getBrowserComponent().waitUntilDiscussionPageLoaded();
-                    ui.getBrowserComponent().jumpToComment();
+                    ui.getBrowserComponent().jumpToNewCommentBox();
                 }
 
             }
             if (PR_FILES_CHANGED.match(event)
                     && KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
-
-                if (!ui.getBrowserComponent().isCurrentUrlIssue()) {
-                    openPageOfCurrentlySelectedIssue();
-                    ui.getBrowserComponent().waitUntilDiscussionPageLoaded();
-                }
-
-                ui.getBrowserComponent().switchToTab(FILES_TAB);
+                ui.getBrowserComponent().openPrTab(getCurrentlySelectedIssue(), FILES_TAB);
                 event.consume();
             }
             if (PR_COMMITS.match(event)
                     && KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
-
-                if (!ui.getBrowserComponent().isCurrentUrlIssue()) {
-                    openPageOfCurrentlySelectedIssue();
-                    ui.getBrowserComponent().waitUntilDiscussionPageLoaded();
-                }
-
-                ui.getBrowserComponent().switchToTab(COMMITS_TAB);
+                ui.getBrowserComponent().openPrTab(getCurrentlySelectedIssue(), COMMITS_TAB);
                 event.consume();
             }
             if (SHOW_LABELS.match(event)) {
@@ -353,7 +338,8 @@ public class ListPanel extends FilterPanel {
                 }
             }
             if (MANAGE_ASSIGNEES.match(event) && ui.getBrowserComponent().isCurrentUrlIssue()) {
-                ui.getBrowserComponent().switchToTab(DISCUSSION_TAB);
+                ui.getBrowserComponent().openPrTab(getCurrentlySelectedIssue(), DISCUSSION_TAB);
+                ui.getBrowserComponent().waitUntilDiscussionPageLoaded();
                 ui.getBrowserComponent().manageAssignees(event.getCode().toString());
             }
             if (SHOW_MILESTONES.match(event)) {
@@ -673,8 +659,11 @@ public class ListPanel extends FilterPanel {
         return allReposInFilterExpr.isEmpty();
     }
 
-    private void openPageOfCurrentlySelectedIssue() {
-        TurboIssue issue = getSelectedElement().get().getIssue();
-        ui.getBrowserComponent().showIssue(issue.getRepoId(), issue.getId(), issue.isPullRequest(), false);
+    private TurboIssue getCurrentlySelectedIssue() {
+        return getSelectedElement().get().getIssue();
+    }
+
+    private void openIssuePageMainTab(TurboIssue issue) {
+        ui.getBrowserComponent().showIssueMainTab(issue.getRepoId(), issue.getId(), issue.isPullRequest(), false);
     }
 }

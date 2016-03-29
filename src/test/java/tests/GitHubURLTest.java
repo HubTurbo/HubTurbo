@@ -27,11 +27,11 @@ public class GitHubURLTest {
         assertEquals("https://github.com/dummy/dummy/graphs/contributors",
                      GitHubURL.getPathForContributors("dummy/dummy"));
         assertTrue(GitHubURL.isUrlIssue("https://github.com/dummy/dummy/issues/1"));
-        assertTrue(GitHubURL.isPullRequestLoaded("https://github.com/dummy/dummy/pull/1"));
-        assertTrue(GitHubURL.isPullRequestLoaded("https://github.com/dummy/dummy/pull/1/"));
-        assertTrue(GitHubURL.isPullRequestLoaded("https://github.com/dummy/dummy/pull/1/commits"));
-        assertTrue(GitHubURL.isPullRequestLoaded("https://github.com/dummy/dummy/pull/1/files"));
-        assertFalse(GitHubURL.isPullRequestLoaded("https://github.com/dummy/dummy/pull/1/c"));
+        assertTrue(GitHubURL.isUrlPullRequest("https://github.com/dummy/dummy/pull/1"));
+        assertTrue(GitHubURL.isUrlPullRequest("https://github.com/dummy/dummy/pull/1/"));
+        assertTrue(GitHubURL.isUrlPullRequest("https://github.com/dummy/dummy/pull/1/commits"));
+        assertTrue(GitHubURL.isUrlPullRequest("https://github.com/dummy/dummy/pull/1/files"));
+        assertFalse(GitHubURL.isUrlPullRequest("https://github.com/dummy/dummy/pull/1/c"));
     }
 
     @Test

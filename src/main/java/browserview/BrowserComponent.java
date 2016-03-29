@@ -1,5 +1,6 @@
 package browserview;
 
+import backend.resource.TurboIssue;
 import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef.HWND;
 import com.sun.jna.platform.win32.WinUser;
@@ -17,7 +18,7 @@ import ui.UI;
 import util.GitHubURL;
 import util.GithubPageElements;
 import util.PlatformSpecific;
-import util.events.testevents.JumpToCommentEvent;
+import util.events.testevents.JumpToNewCommentBoxEvent;
 import util.events.testevents.SendKeysToBrowserEvent;
 
 import java.awt.Rectangle;
@@ -240,13 +241,17 @@ public class BrowserComponent {
 
     /**
      * Navigates to the GitHub page for the given issue in the currently-active
-     * driver window.
+     * driver window. Ignores current tab if it's a PR.
      * Run on a separate thread.
      */
     public void showIssue(String repoId, int id, boolean isPullRequest, boolean isForceRefresh) {
         if (isPullRequest) {
             logger.info("Showing pull request #" + id);
-            runBrowserOperation(() -> driver.get(GitHubURL.getPathForPullRequest(repoId, id), isForceRefresh));
+            if (!isCurrentUrlPrPageIgnoreTabs(repoId, id)) {
+                runBrowserOperation(() -> driver.get(GitHubURL.getPathForPullRequest(repoId, id), isForceRefresh));
+            } else {
+                logger.info("Already at PR page: " + getCurrentUrl() + " will not reload.");
+            }
         } else {
             logger.info("Showing issue #" + id);
             runBrowserOperation(() -> driver.get(GitHubURL.getPathForIssue(repoId, id), isForceRefresh));
@@ -254,9 +259,34 @@ public class BrowserComponent {
         runBrowserOperation(() -> scrollToBottom());
     }
 
-    public void jumpToComment() {
+    /**
+     * Checks if current URL is the specified PR's page, regardless of the PR tab the URL is in.
+     *
+     * @return true if the url of current page points to the PR identified by the arguments
+     */
+    private boolean isCurrentUrlPrPageIgnoreTabs(String repoId, int id) {
+        return getCurrentUrl().matches(
+            "\\Q" + GitHubURL.getPathForPullRequest(repoId, id) + "\\E(?:/|/commits|/files)?"
+        );
+    }
+
+    /**
+     * Navigates to the main tab of the given issue in the currently-active driver window.
+     * Runs on a separate thread.
+     */
+    public void showIssueMainTab(String repoId, int id, boolean isPullRequest, boolean isForceRefresh) {
+        if (isPullRequest) {
+            logger.info("Showing main tab for pull request #" + id);
+            runBrowserOperation(() -> driver.get(GitHubURL.getPathForPullRequest(repoId, id), isForceRefresh));
+            runBrowserOperation(() -> scrollToBottom());
+        } else {
+            showIssue(repoId, id, isPullRequest, isForceRefresh);
+        }
+    }
+
+    public void jumpToNewCommentBox(){
         if (isTestChromeDriver) {
-            UI.events.triggerEvent(new JumpToCommentEvent());
+            UI.events.triggerEvent(new JumpToNewCommentBoxEvent());
         }
         try {
             WebElement comment = driver.findElementById(GithubPageElements.NEW_COMMENT);
@@ -301,8 +331,7 @@ public class BrowserComponent {
      * Takes care of running it on a separate thread, and normalises error-handling across
      * all types of code.
      */
-
-    private void runBrowserOperation(Runnable operation) {
+    private void runBrowserOperation (Runnable operation) {
         executor.execute(() -> {
             if (isBrowserActive()) {
                 try {
@@ -523,6 +552,9 @@ public class BrowserComponent {
         return driver != null && GitHubURL.isUrlIssue(driver.getCurrentUrl());
     }
 
+    public boolean isCurrentUrlPR() {
+        return driver != null && GitHubURL.isUrlPullRequest(driver.getCurrentUrl());
+    }
     /**
      * Checks if current URL is GitHub issue or PR discussion page
      */
@@ -535,37 +567,36 @@ public class BrowserComponent {
     }
 
     /**
-     * Switches to the specified tab in GitHub PR page
+     * Opens a specified tab in PR's GitHub page.
+     * Does nothing if specified issue is not a PR.
      *
+     * @param pr TurboIssue of PR whose page is to be opened.
      * @param tabName Either GithubPageElements.DISCUSSION_TAB, GithubPageElements.COMMITS_TAB
      *                or GithubPageElements.FILES_TAB
      */
-    public void switchToTab(String tabName) {
-        if (GitHubURL.isPullRequestLoaded(getCurrentUrl())) {
-            int tabIndex = 0;
-
-            switch (tabName) {
-            case GithubPageElements.DISCUSSION_TAB:
-                tabIndex = 1;
-                break;
-            case GithubPageElements.COMMITS_TAB:
-                tabIndex = 2;
-                break;
-            case GithubPageElements.FILES_TAB:
-                tabIndex = 3;
-                break;
-            default:
-                assert false;
-                return;
-            }
-
-            String xpath = "//*[@id=\"js-repo-pjax-container\"]/div[2]/div[1]/div/div/div[2]/nav/a[%d]";
-            clickElementByXpath(String.format(xpath, tabIndex));
+    public void openPrTab(TurboIssue pr, String tabName) {
+        if (!pr.isPullRequest()) {
+            return;
         }
-    }
-
-    private void clickElementByXpath(String xpath) {
-        driver.findElement(By.xpath(xpath)).click();
+        String suffix;
+        switch (tabName) {
+        case GithubPageElements.DISCUSSION_TAB :
+            suffix = GitHubURL.PR_TAB_SUFFIX_DISCUSSION;
+            break;
+        case GithubPageElements.COMMITS_TAB :
+            suffix = GitHubURL.PR_TAB_SUFFIX_COMMITS;
+            break;
+        case GithubPageElements.FILES_TAB :
+            suffix = GitHubURL.PR_TAB_SUFFIX_FILES_CHANGED;
+            break;
+        default:
+            throw new IllegalArgumentException("Argument tabName = " + tabName + " is not a valid PR tab identifier");
+        }
+        logger.info("Showing " + tabName + " tab for pull request #" + pr.getId());
+        runBrowserOperation(() -> driver.get(
+            GitHubURL.getPathForPullRequest(pr.getRepoId(), pr.getId()) + suffix,
+            false
+        ));
     }
 
     public Optional<Integer> getPRNumberFromIssue() {
