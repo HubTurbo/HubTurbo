@@ -5,6 +5,8 @@ import java.util.Optional;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Side;
+import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.CustomMenuItem;
 import javafx.scene.control.Label;
@@ -21,14 +23,18 @@ public class SuggestionMenu extends ContextMenu {
     private Optional<String> selected = Optional.empty();
     
     // Callback functions
-    private EventHandler<ActionEvent> actionHandler = (event) -> defaultActionHandler(event);
+    private EventHandler<ActionEvent> actionHandler = this::defaultActionHandler;
 
     public SuggestionMenu(int maxEntries) {
         this.maxEntries = maxEntries;
     }
 
+    public void show(Node anchor) {
+        this.show(anchor, Side.BOTTOM, 0, 0);
+    }
+
     /**
-     * Load search result in menu 
+     * Loads search result in menu 
      * @param searchResult
      */
     public void loadSuggestions(List<String> searchResult) {
@@ -38,7 +44,7 @@ public class SuggestionMenu extends ContextMenu {
     }
 
     /**
-     * Get content of selected menu item
+     * Gets content of selected menu item
      */
     public Optional<String> getSelectedContent() {
         return selected;

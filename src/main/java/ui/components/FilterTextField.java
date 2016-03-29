@@ -90,7 +90,7 @@ public class FilterTextField extends TextField {
                 suggestion.getSelectedContent().ifPresent(this::completeWord);
             } else {
                 suggestion.loadSuggestions(getMatchingKeywords(getCurrentWord()));
-                suggestion.show(this, Side.BOTTOM, 0, 0);
+                if (!suggestion.isShowing()) suggestion.show(this, Side.BOTTOM, 0, 0);
             }
         });
         setOnKeyPressed(e -> {
@@ -102,9 +102,11 @@ public class FilterTextField extends TextField {
         setOnKeyReleased(e -> {
             e.consume();
 
-            if (e.getCode() == KeyCode.ENTER) handleOnEnter();
-
-            if (e.getCode() == KeyCode.ESCAPE) handleOnEscape();
+            if (e.getCode() == KeyCode.ENTER) {
+                handleOnEnter();
+            } else if (e.getCode() == KeyCode.ESCAPE) {
+                handleOnEscape();
+            }
 
             isNavigating = e.getCode() == KeyCode.UP || e.getCode() == KeyCode.DOWN;
 
@@ -120,8 +122,8 @@ public class FilterTextField extends TextField {
     }
 
     private void handleOnEnter() {
+        suggestion.hide();
         if (isNavigating) {
-            suggestion.hide();
             suggestion.getSelectedContent().ifPresent(this::completeWord);
         } else {
             confirmEdit();
@@ -131,6 +133,8 @@ public class FilterTextField extends TextField {
     private void handleOnEscape() {
         if (getText().equals(previousText)) {
             onCancel.run();
+        } else if (suggestion.isShowing()){
+            suggestion.hide();
         } else {
             revertEdit();
         }
@@ -219,7 +223,7 @@ public class FilterTextField extends TextField {
 
     // SuggestionMenu 
     
-    private final SuggestionMenu setupSuggestion() {
+    private SuggestionMenu setupSuggestion() {
         SuggestionMenu suggestion = new SuggestionMenu(MAX_SUGGESTIONS).setActionHandler(this::menuItemHandler);
         suggestion.loadSuggestions(keywords);
         return suggestion;
