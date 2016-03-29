@@ -153,6 +153,9 @@ public class MenuControl extends MenuBar {
         saveBoardAs();
     }
 
+    /**
+     * Prompts a BoardNameDialog and saves the current board based on its response
+     */
     public final void saveBoardAs() {
         List<PanelInfo> panelList = panels.getCurrentPanelInfos();
         BoardNameDialog dlg = new BoardNameDialog(prefs, mainStage);
