@@ -60,6 +60,8 @@ These shortcuts can be used when the focus is on an issue card in a panel.
 | Set **M**ilestone|<kbd>M</kbd>|Jump to the *milestone* property of the issue in the browser view|
 | Mark as R**e**ad|<kbd>E</kbd>|Mark an issue as read. Read issues will be shown in a different color and can be filtered. After marking an issue as *read*, it will remain in *read* state until the issue is updated.|
 | Mark as **U**nread|<kbd>U</kbd>|Reverts an issue's *read* status|
+| Close Issue|<kbd>X</kbd>|Close an issue on GitHub|
+| Re**o**pen Issue|<kbd>O</kbd>|Reopen an closed issue on GitHub|
 
 ## Control the panel view window ...
 

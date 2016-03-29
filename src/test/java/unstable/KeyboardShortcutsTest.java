@@ -1,6 +1,7 @@
-package guitests;
+package unstable;
 
 import backend.stub.DummyRepoState;
+import guitests.UITest;
 import javafx.scene.control.ComboBox;
 import javafx.scene.input.KeyCode;
 
@@ -47,7 +48,7 @@ public class KeyboardShortcutsTest extends UITest {
         // jump from panel focus to first issue
         // - This is because on startup focus is on panel and not on filter box
         press(JUMP_TO_FIRST_ISSUE);
-        assertEquals(DummyRepoState.noOfDummyIssues, selectedIssueId);
+        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES, selectedIssueId);
         clearSelectedIssueId();
 
         // jump from issue list to filter box
@@ -59,7 +60,7 @@ public class KeyboardShortcutsTest extends UITest {
         // - To ensure shortcut works from filter box, too
         press(JUMP_TO_FIRST_ISSUE);
         press(JUMP_TO_FILTER_BOX);
-        assertEquals(DummyRepoState.noOfDummyIssues, selectedIssueId);
+        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES, selectedIssueId);
         clearSelectedIssueId();
 
         // jump to nth issue using number keys 1-9
@@ -67,7 +68,7 @@ public class KeyboardShortcutsTest extends UITest {
             push(KeyCode.ESCAPE);
             press(JUMP_TO_NTH_ISSUE_KEYS.get(i));
             PlatformEx.waitOnFxThread();
-            assertEquals(DummyRepoState.noOfDummyIssues - (i - 1), selectedIssueId);
+            assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES - (i - 1), selectedIssueId);
             clearSelectedIssueId();
             if (i == 1) {
                 press(JUMP_TO_FILTER_BOX);
@@ -84,17 +85,17 @@ public class KeyboardShortcutsTest extends UITest {
         // jump to first issue
         push(KeyCode.HOME);
         sleep(1000);
-        assertEquals(DummyRepoState.noOfDummyIssues, selectedIssueId);
+        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES, selectedIssueId);
         clearSelectedIssueId();
 
         push(getKeyCode("DOWN_ISSUE"));
-        assertEquals(DummyRepoState.noOfDummyIssues - 1, selectedIssueId);
+        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES - 1, selectedIssueId);
         clearSelectedIssueId();
         push(getKeyCode("DOWN_ISSUE"));
-        assertEquals(DummyRepoState.noOfDummyIssues - 2, selectedIssueId);
+        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES - 2, selectedIssueId);
         clearSelectedIssueId();
         push(getKeyCode("UP_ISSUE"));
-        assertEquals(DummyRepoState.noOfDummyIssues - 1, selectedIssueId);
+        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES - 1, selectedIssueId);
         clearSelectedIssueId();
 
         press(CREATE_RIGHT_PANEL);
@@ -130,25 +131,25 @@ public class KeyboardShortcutsTest extends UITest {
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
         assertEquals(2, repoSelectorComboBox.getItems().size());
-        assertEquals(repoSelectorComboBox.getValue(), "dummy1/dummy1");
+        assertEquals("dummy1/dummy1", repoSelectorComboBox.getValue());
         // test shortcut on repo dropdown
         doubleClick(repoSelectorComboBox);
         pushKeys(SWITCH_DEFAULT_REPO);
         // wait for issue 9 to appear then click on it
         // issue 9 is chosen instead of issue 10
         // as there is a problem with finding issue 10's node due to it being the first card in the panel
-        waitUntilNodeAppears("#dummy/dummy_col1_" + (DummyRepoState.noOfDummyIssues - 1));
-        assertEquals(repoSelectorComboBox.getValue(), "dummy/dummy");
+        waitUntilNodeAppears("#dummy/dummy_col1_" + (DummyRepoState.NO_OF_DUMMY_ISSUES - 1));
+        assertEquals("dummy/dummy", repoSelectorComboBox.getValue());
         // test shortcut when focus is on panel
-        click("#dummy/dummy_col1_" + (DummyRepoState.noOfDummyIssues - 1));
+        click("#dummy/dummy_col1_" + (DummyRepoState.NO_OF_DUMMY_ISSUES - 1));
         press(SWITCH_DEFAULT_REPO);
         PlatformEx.waitOnFxThread();
-        assertEquals(repoSelectorComboBox.getValue(), "dummy1/dummy1");
+        assertEquals("dummy1/dummy1", repoSelectorComboBox.getValue());
         // test shortcut when focus is on issue list
         press(JUMP_TO_NTH_ISSUE_KEYS.get(1));
         press(SWITCH_DEFAULT_REPO);
         PlatformEx.waitOnFxThread();
-        assertEquals(repoSelectorComboBox.getValue(), "dummy/dummy");
+        assertEquals("dummy/dummy", repoSelectorComboBox.getValue());
 
         // mark as read
         ListPanel issuePanel = find("#dummy/dummy_col1");
@@ -178,10 +179,27 @@ public class KeyboardShortcutsTest extends UITest {
         assertEquals(false, issuePanel.getSelectedElement().get().getIssue().isCurrentlyRead());
         clearSelectedIssueId();
 
+        // close issue
+        push(getKeyCode("CLOSE_ISSUE"));
+        push(KeyCode.ENTER);
+        waitUntilNodeAppears("Undo");
+        assertEquals(true, issuePanel.getSelectedElement().isPresent());
+        assertEquals(false, issuePanel.getSelectedElement().get().getIssue().isOpen());
+        clearSelectedIssueId();
+
+        // reopen issue
+        push(getKeyCode("REOPEN_ISSUE"));
+        push(KeyCode.ENTER);
+        waitUntilNodeAppears("Undo");
+        assertEquals(true, issuePanel.getSelectedElement().isPresent());
+        assertEquals(true, issuePanel.getSelectedElement().get().getIssue().isOpen());
+        clearSelectedIssueId();
+
         // testing corner case for mark as read where there is only one issue displayed
         click("#dummy/dummy_col1_filterTextField");
         type("id:5");
         push(KeyCode.ENTER);
+        PlatformEx.waitOnFxThread();
         press(JUMP_TO_FIRST_ISSUE);
         push(getKeyCode("MARK_AS_READ"));
         // focus should remain at the only issue shown

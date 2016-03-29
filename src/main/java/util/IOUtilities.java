@@ -11,11 +11,12 @@ public final class IOUtilities {
         int nRead;
         byte[] data = new byte[4096];
         while ((nRead = is.read(data, 0, data.length)) != -1) {
-          buffer.write(data, 0, nRead);
+            buffer.write(data, 0, nRead);
         }
         buffer.flush();
         return buffer;
     }
 
-    private IOUtilities() {}
+    private IOUtilities() {
+    }
 }

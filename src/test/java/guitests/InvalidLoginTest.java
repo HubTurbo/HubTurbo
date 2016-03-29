@@ -1,6 +1,5 @@
 package guitests;
 
-import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;

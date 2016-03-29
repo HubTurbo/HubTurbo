@@ -32,21 +32,27 @@ public class SerializableMilestone {
     public int getId() {
         return id;
     }
+
     public String getTitle() {
         return title;
     }
+
     public Optional<LocalDate> getDueDate() {
         return dueDate;
     }
+
     public String getDescription() {
         return description;
     }
+
     public boolean isOpen() {
         return isOpen;
     }
+
     public int getOpenIssues() {
         return openIssues;
     }
+
     public int getClosedIssues() {
         return closedIssues;
     }

@@ -27,12 +27,14 @@ public class DownloadMilestonesUpdatesTask extends GitHubRepoTask<GitHubRepoTask
     @Override
     public void run() {
         ImmutablePair<List<TurboMilestone>, String> changes = repo.getUpdatedMilestones(model.getRepoId(),
-            model.getUpdateSignature().milestonesETag);
+                                                                                        model.getUpdateSignature()
+                                                                                                .milestonesETag);
 
         List<TurboMilestone> changedMilestones = changes.left;
 
         logger.info(HTLog.format(model.getRepoId(), "%s milestone(s)) changed%s",
-            changedMilestones.size(), changedMilestones.isEmpty() ? "" : ": " + changedMilestones));
+                                 changedMilestones.size(),
+                                 changedMilestones.isEmpty() ? "" : ": " + changedMilestones));
 
         response.complete(new Result<>(changedMilestones, changes.right));
     }

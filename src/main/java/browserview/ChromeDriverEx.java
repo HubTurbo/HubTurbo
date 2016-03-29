@@ -51,8 +51,8 @@ public class ChromeDriverEx {
             testGet();
         } else {
             if (!isForceRefresh && (driver.getCurrentUrl().equalsIgnoreCase(url) ||
-                driver.getCurrentUrl().equalsIgnoreCase(url + "/commits") ||
-                driver.getCurrentUrl().equalsIgnoreCase(url + "/files"))) {
+                    driver.getCurrentUrl().equalsIgnoreCase(url + "/commits") ||
+                    driver.getCurrentUrl().equalsIgnoreCase(url + "/files"))) {
 
                 logger.info("Already on page: " + url + " will not load it again. ");
             } else {

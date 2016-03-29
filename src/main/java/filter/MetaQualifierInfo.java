@@ -22,8 +22,8 @@ public class MetaQualifierInfo {
 
     private Optional<String> processInQualifier(List<Qualifier> qualifiers) {
         List<Qualifier> inQualifiers = qualifiers.stream()
-            .filter(q -> q.getType() == QualifierType.IN)
-            .collect(Collectors.toList());
+                .filter(q -> q.getType() == QualifierType.IN)
+                .collect(Collectors.toList());
 
         if (inQualifiers.isEmpty()) {
             return Optional.empty();

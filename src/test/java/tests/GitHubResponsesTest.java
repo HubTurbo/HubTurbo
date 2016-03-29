@@ -60,10 +60,10 @@ public class GitHubResponsesTest {
     private InputStream gitHubEventsResponseJsonStream() throws IOException {
         String eventsResponseJson =
                 "[{\"actor\":{\"login\":\"test-nonself\"},\"event\":\"renamed\"," +
-                "\"created_at\":\"2015-06-12T12:09:07\"," +
-                "\"rename\":{\"from\":\"test issue 1\",\"to\":\"test issue 1.1\"}}," +
-                "{\"actor\":{\"login\":\"test\"},\"event\":\"milestoned\"," +
-                "\"created_at\":\"2015-06-12T02:24:14Z\",\"milestone\":{\"title\":\"3.0.0\"}}]";
+                        "\"created_at\":\"2015-06-12T12:09:07\"," +
+                        "\"rename\":{\"from\":\"test issue 1\",\"to\":\"test issue 1.1\"}}," +
+                        "{\"actor\":{\"login\":\"test\"},\"event\":\"milestoned\"," +
+                        "\"created_at\":\"2015-06-12T02:24:14Z\",\"milestone\":{\"title\":\"3.0.0\"}}]";
 
         return IOUtils.toInputStream(eventsResponseJson, "UTF-8");
     }

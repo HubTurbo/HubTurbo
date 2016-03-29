@@ -1,6 +1,7 @@
 package tests;
 
 import static org.junit.Assert.assertEquals;
+
 import github.IssueEventType;
 import github.TurboIssueEvent;
 
@@ -21,8 +22,8 @@ public class TurboIssueEventTests {
             LocalDateTime time, String labelName, String labelColour) {
 
         return new TurboIssueEvent(
-                   new User().setLogin(userName), eventType, Utility.localDateTimeToDate(time))
-               .setLabelName(labelName).setLabelColour(labelColour);
+                new User().setLogin(userName), eventType, Utility.localDateTimeToDate(time))
+                .setLabelName(labelName).setLabelColour(labelColour);
     }
 
     public TurboIssueEventTests() {
@@ -30,32 +31,32 @@ public class TurboIssueEventTests {
 
         sampleEvents.add(
                 createLabelUpdateEvent("A", IssueEventType.Labeled,
-                        LocalDateTime.of(2015, 1, 1, 1, 1, 0),
-                        "A1", "aaaaaa"));
+                                       LocalDateTime.of(2015, 1, 1, 1, 1, 0),
+                                       "A1", "aaaaaa"));
         sampleEvents.add(
                 createLabelUpdateEvent("A", IssueEventType.Unlabeled,
-                        LocalDateTime.of(2015, 1, 1, 1, 2, 0),
-                        "A2", "aaaaaa"));
+                                       LocalDateTime.of(2015, 1, 1, 1, 2, 0),
+                                       "A2", "aaaaaa"));
         sampleEvents.add(
                 createLabelUpdateEvent("B", IssueEventType.Labeled,
-                        LocalDateTime.of(2015, 1, 1, 1, 0, 30),
-                        "B1", "bbbbbb"));
+                                       LocalDateTime.of(2015, 1, 1, 1, 0, 30),
+                                       "B1", "bbbbbb"));
         sampleEvents.add(
                 createLabelUpdateEvent("B", IssueEventType.Labeled,
-                        LocalDateTime.of(2015, 1, 1, 1, 1, 0),
-                        "B2", "bbbbbb"));
+                                       LocalDateTime.of(2015, 1, 1, 1, 1, 0),
+                                       "B2", "bbbbbb"));
         sampleEvents.add(
                 createLabelUpdateEvent("B", IssueEventType.Unlabeled,
-                        LocalDateTime.of(2015, 1, 1, 1, 1, 31),
-                        "B1", "bbbbbb"));
+                                       LocalDateTime.of(2015, 1, 1, 1, 1, 31),
+                                       "B1", "bbbbbb"));
         sampleEvents.add(
                 createLabelUpdateEvent("C", IssueEventType.Labeled,
-                        LocalDateTime.of(2015, 1, 1, 2, 30, 15),
-                        "C1", "cccccc"));
+                                       LocalDateTime.of(2015, 1, 1, 2, 30, 15),
+                                       "C1", "cccccc"));
         sampleEvents.add(
                 createLabelUpdateEvent("D", IssueEventType.Unlabeled,
-                        LocalDateTime.of(2015, 1, 1, 3, 20, 59),
-                        "D1", "dddddd"));
+                                       LocalDateTime.of(2015, 1, 1, 3, 20, 59),
+                                       "D1", "dddddd"));
     }
 
     /**
@@ -270,7 +271,7 @@ public class TurboIssueEventTests {
      * All events are not in chronological order in the input events list
      * A has 2 events exactly 1 minute from each other
      * B has 3 events 2 of which are 30s part
-     *   and the 3rd one is 61s apart from the 1st one
+     * and the 3rd one is 61s apart from the 1st one
      * B's first 2 events overlap with A's events but B's 1st event occurs first
      * C and D have completely separate events
      * Expected grouping: [[B1, B2], [A1, A2], [B3], [C1], [D1]]

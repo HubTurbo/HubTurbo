@@ -28,7 +28,9 @@ import prefs.Preferences;
 import ui.components.HTStatusBar;
 import ui.components.KeyboardShortcuts;
 import ui.components.StatusUI;
+import ui.components.issuepicker.IssuePicker;
 import ui.components.pickers.LabelPicker;
+import ui.components.pickers.MilestonePicker;
 import ui.issuepanel.PanelControl;
 import undo.UndoController;
 import util.*;
@@ -44,11 +46,12 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static ui.components.KeyboardShortcuts.SWITCH_DEFAULT_REPO;
+import static ui.components.KeyboardShortcuts.SHOW_ISSUE_PICKER;
 
 public class UI extends Application implements EventDispatcher {
 
     public static final int VERSION_MAJOR = 3;
-    public static final int VERSION_MINOR = 23;
+    public static final int VERSION_MINOR = 24;
     public static final int VERSION_PATCH = 0;
 
     private static final Logger logger = LogManager.getLogger(UI.class.getName());
@@ -136,8 +139,8 @@ public class UI extends Application implements EventDispatcher {
                                 logic.loginController.getOwner(),
                                 logic.loginController.getRepo(),
                                 logic.loginController.getUsername(),
-                                logic.loginController.getPassword())
-                                .show().thenApply(isLoggedIn -> {
+                                logic.loginController.getPassword()
+                ).show().thenApply(isLoggedIn -> {
                     if (isLoggedIn) {
                         showMainWindow(logic.loginController.getRepoId());
                         disableUI(false);
@@ -154,7 +157,7 @@ public class UI extends Application implements EventDispatcher {
         getMainWindowHandle(mainStage.getTitle());
     }
 
-    private void createAndLoadSampleBoard(){
+    private void createAndLoadSampleBoard() {
         BoardAutoCreator boardCreator = new BoardAutoCreator(this, panels, prefs);
         boardCreator.createSampleBoard(false);
     }
@@ -192,13 +195,15 @@ public class UI extends Application implements EventDispatcher {
         // Should only be called after panels have been initialized
         ensureSelectedPanelHasFocus();
         initialisePickers();
-        if (isAFirstTimeUser && TestController.shouldOpenSampleBoard()){
+        if (isAFirstTimeUser && TestController.shouldOpenSampleBoard()) {
             createAndLoadSampleBoard();
         }
     }
 
     private void initialisePickers() {
         new LabelPicker(this, mainStage);
+        new MilestonePicker(this, mainStage);
+        new IssuePicker(this, mainStage);
     }
 
     protected void registerTestEvents() {
@@ -233,7 +238,7 @@ public class UI extends Application implements EventDispatcher {
         logic = new Logic(uiManager, prefs, Optional.empty(), Optional.empty());
         // TODO clear cache if necessary
         refreshTimer = new TickingTimer("Refresh Timer", REFRESH_PERIOD,
-            status::updateTimeToRefresh, logic::refresh, TimeUnit.SECONDS);
+                                        status::updateTimeToRefresh, logic::refresh, TimeUnit.SECONDS);
         refreshTimer.start();
         undoController = new UndoController(notificationController);
     }
@@ -246,7 +251,7 @@ public class UI extends Application implements EventDispatcher {
         mainStage = stage;
         stage.setMaximized(false);
 
-        panels = new PanelControl(this, prefs);
+        panels = new PanelControl(this, mainStage, prefs);
         guiController = new GUIController(this, panels, apiBox);
 
         Scene scene = new Scene(createRootNode());
@@ -283,7 +288,7 @@ public class UI extends Application implements EventDispatcher {
                 params[0] = java.awt.Image.class;
                 Method setDockIconImage = util.getMethod("setDockIconImage", params);
                 setDockIconImage.invoke(application,
-                        new ImageIcon(UI.class.getResource(APPLICATION_LOGO_FILENAME)).getImage());
+                                        new ImageIcon(UI.class.getResource(APPLICATION_LOGO_FILENAME)).getImage());
             } catch (Exception e) {
                 logger.info("Not OSX", e);
             }
@@ -298,7 +303,6 @@ public class UI extends Application implements EventDispatcher {
         }
         if (!TestController.isTestMode() || TestController.isTestGlobalConfig()) {
             panels.saveSession();
-            prefs.saveGlobalConfig();
         }
         if (!TestController.isTestMode() || TestController.isCloseOnQuit()) {
             Platform.exit();
@@ -319,7 +323,7 @@ public class UI extends Application implements EventDispatcher {
         scene.getStylesheets().add(css);
     }
 
-    public static void loadFonts(){
+    public static void loadFonts() {
         Font.loadFont(UI.class.getResource("octicons/octicons-local.ttf").toExternalForm(), 32);
     }
 
@@ -354,6 +358,9 @@ public class UI extends Application implements EventDispatcher {
         scene.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
             if (SWITCH_DEFAULT_REPO.match(event)) {
                 switchDefaultRepo();
+            }
+            if (SHOW_ISSUE_PICKER.match(event)) {
+                triggerEvent(new ShowIssuePickerEvent(logic.getModels().getIssues(), true));
             }
         });
     }
@@ -456,7 +463,7 @@ public class UI extends Application implements EventDispatcher {
         triggerEvent(new UsedReposChangedEvent());
     }
 
-    public void switchDefaultRepo(){
+    public void switchDefaultRepo() {
         String[] openRepos = repoSelector.getContents().toArray(new String[0]);
         String currentRepo = logic.getDefaultRepo();
 

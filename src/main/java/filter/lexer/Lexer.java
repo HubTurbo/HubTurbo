@@ -14,7 +14,7 @@ public class Lexer {
     private static final Pattern NO_WHITESPACE = Pattern.compile("\\S");
     private static final String ALPHANUMERIC = "[a-zA-Z0-9]";
     private static final String VALID_USERNAME = String.format(
-           "%s[-a-zA-Z0-9]*%s", ALPHANUMERIC, ALPHANUMERIC);
+            "%s[-a-zA-Z0-9]*%s", ALPHANUMERIC, ALPHANUMERIC);
 
     private final List<Rule> rules = Arrays.asList(
             new Rule("AND|&&?", TokenType.AND),
@@ -42,7 +42,7 @@ public class Lexer {
             new Rule(">", TokenType.GT),
 
             new Rule("\\*", TokenType.STAR)
-        );
+    );
 
     private final String input;
     private int position;
@@ -53,6 +53,7 @@ public class Lexer {
     }
 
     private final Pattern trailingWhitespace = Pattern.compile("\\s+$");
+
     private String stripTrailingWhitespace(String input) {
         return trailingWhitespace.matcher(input).replaceAll("");
     }
@@ -85,8 +86,8 @@ public class Lexer {
         throw new ParseException("Unrecognised token " + input.charAt(position) + " at " + position);
     }
 
-    public ArrayList<Token> lex() {
-        ArrayList<Token> result = new ArrayList<>();
+    public List<Token> lex() {
+        List<Token> result = new ArrayList<>();
 
         Token previous = null;
         while (position < input.length()

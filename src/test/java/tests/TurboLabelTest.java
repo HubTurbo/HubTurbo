@@ -45,17 +45,17 @@ public class TurboLabelTest {
         assertEquals("dummy/dummy", turboLabel.getRepoId());
 
     }
-    
+
     @Test
     public void getMatchingTurboLabel_multipleMatches_firstMatch() {
         List<TurboLabel> labels = new ArrayList<>();
         labels.add(new TurboLabel(REPO, "test"));
         labels.add(new TurboLabel(REPO, "testing"));
-        
+
         // Ensures return of first matching label
         assertEquals("test", TurboLabel.getFirstMatchingTurboLabel(labels, "test").getFullName());
     }
-    
+
     @Test
     public void getLabelsNameList_labelsWithGroup_labelsFullName() {
         TurboLabel test = new TurboLabel(REPO, "test.a");
@@ -79,8 +79,8 @@ public class TurboLabelTest {
     public void getMatchedLabels_withLabelNames() {
         List<String> labelNames = Arrays.asList("homework", "lab");
         List<TurboLabel> labels = labelNames.stream()
-            .map(name -> new TurboLabel("", name)).collect(Collectors.toList());
-        
+                .map(name -> new TurboLabel("", name)).collect(Collectors.toList());
+
         assertEquals(labels, TurboLabel.getMatchedLabels(labels, labelNames));
     }
 

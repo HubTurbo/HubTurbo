@@ -99,7 +99,8 @@ public class ScreenManager {
      */
     public static Region getStageBounds(List<Rectangle2D> intersectingScreenBounds) {
         DoubleSummaryStatistics occupyingHeights = intersectingScreenBounds.stream()
-                .mapToDouble(Rectangle2D::getHeight).summaryStatistics();
+                .mapToDouble(Rectangle2D::getHeight)
+                .summaryStatistics();
 
         double maxHeight = occupyingHeights.getMax();
         double minHeight = occupyingHeights.getMin();

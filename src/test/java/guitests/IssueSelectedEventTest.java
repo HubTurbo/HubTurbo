@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class IssueSelectedEventTest extends UITest{
+public class IssueSelectedEventTest extends UITest {
 
     private static final String PANEL_IDENTIFIER = "#dummy/dummy_col0";
 
@@ -27,7 +27,7 @@ public class IssueSelectedEventTest extends UITest{
         //testing whether right click occurred by checking the presence of context menu items
         rightClick(PANEL_IDENTIFIER + "_9");
         ContextMenu contextMenu = issuePanel.getContextMenu();
-        for (MenuItem menuItem : contextMenu.getItems()){
+        for (MenuItem menuItem : contextMenu.getItems()) {
             assertTrue(!menuItem.isDisable());
         }
 

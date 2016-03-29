@@ -1,6 +1,5 @@
 package guitests;
 
-import static junit.framework.TestCase.assertTrue;
 import static ui.components.KeyboardShortcuts.*;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -9,7 +8,6 @@ import org.junit.Test;
 
 import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.HBox;
 import ui.TestController;
 import ui.UI;
 import ui.issuepanel.FilterPanel;

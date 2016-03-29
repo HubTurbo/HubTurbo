@@ -47,10 +47,10 @@ public class FilterApplyTests {
         issue = new TurboIssue(REPO, 1, "");
         TurboLabel label2 = new TurboLabel(REPO, "bbcc");
         IModel model = TestUtils.singletonModel(new Model(REPO,
-            new ArrayList<>(Arrays.asList(issue)),
-            new ArrayList<>(Arrays.asList(label, label2)),
-            new ArrayList<>(),
-            new ArrayList<>()));
+                                                          new ArrayList<>(Arrays.asList(issue)),
+                                                          new ArrayList<>(Arrays.asList(label, label2)),
+                                                          new ArrayList<>(),
+                                                          new ArrayList<>()));
 
         try {
             new Qualifier(LABEL, "aa").applyTo(issue, model);
@@ -64,27 +64,30 @@ public class FilterApplyTests {
         issue = new TurboIssue(REPO, 1, "");
         label2 = new TurboLabel(REPO, "bbcc");
         model = TestUtils.singletonModel(new Model(REPO,
-            new ArrayList<>(Arrays.asList(issue)),
-            new ArrayList<>(Arrays.asList(label, label2)),
-            new ArrayList<>(),
-            new ArrayList<>()));
+                                                   new ArrayList<>(Arrays.asList(issue)),
+                                                   new ArrayList<>(Arrays.asList(label, label2)),
+                                                   new ArrayList<>(),
+                                                   new ArrayList<>()));
 
         try {
             new Qualifier(LABEL, "bb").applyTo(issue, model);
             fail();
-        } catch (QualifierApplicationException ignored) {}
+        } catch (QualifierApplicationException ignored) {
+        }
 
         // Non-existent label
         try {
             new Qualifier(LABEL, "dd").applyTo(issue, TestUtils.modelWith(issue, label));
             fail();
-        } catch (QualifierApplicationException ignored) {}
+        } catch (QualifierApplicationException ignored) {
+        }
 
         // Non-string
         try {
             new Qualifier(LABEL, 1).applyTo(issue, TestUtils.modelWith(issue, label));
             fail();
-        } catch (QualifierApplicationException ignored) {}
+        } catch (QualifierApplicationException ignored) {
+        }
     }
 
     @Test
@@ -106,10 +109,10 @@ public class FilterApplyTests {
         issue = new TurboIssue(REPO, 1, "");
         TurboMilestone milestone2 = new TurboMilestone(REPO, 9, "v2");
         IModel model = TestUtils.singletonModel(new Model(REPO,
-            new ArrayList<>(Arrays.asList(issue)),
-            new ArrayList<>(),
-            new ArrayList<>(Arrays.asList(milestone, milestone2)),
-            new ArrayList<>()));
+                                                          new ArrayList<>(Arrays.asList(issue)),
+                                                          new ArrayList<>(),
+                                                          new ArrayList<>(Arrays.asList(milestone, milestone2)),
+                                                          new ArrayList<>()));
 
         try {
             new Qualifier(MILESTONE, "1").applyTo(issue, model);
@@ -123,27 +126,30 @@ public class FilterApplyTests {
         issue = new TurboIssue(REPO, 1, "");
         milestone2 = new TurboMilestone(REPO, 9, "v2");
         model = TestUtils.singletonModel(new Model(REPO,
-            new ArrayList<>(Arrays.asList(issue)),
-            new ArrayList<>(),
-            new ArrayList<>(Arrays.asList(milestone, milestone2)),
-            new ArrayList<>()));
+                                                   new ArrayList<>(Arrays.asList(issue)),
+                                                   new ArrayList<>(),
+                                                   new ArrayList<>(Arrays.asList(milestone, milestone2)),
+                                                   new ArrayList<>()));
 
         try {
             new Qualifier(MILESTONE, "v").applyTo(issue, model);
             fail();
-        } catch (QualifierApplicationException ignored) {}
+        } catch (QualifierApplicationException ignored) {
+        }
 
         // Non-existent milestone
         try {
             new Qualifier(MILESTONE, "3").applyTo(issue, TestUtils.modelWith(issue, milestone));
             fail();
-        } catch (QualifierApplicationException ignored) {}
+        } catch (QualifierApplicationException ignored) {
+        }
 
         // Non-string
         try {
             new Qualifier(MILESTONE, 1).applyTo(issue, TestUtils.modelWith(issue, milestone));
             fail();
-        } catch (QualifierApplicationException ignored) {}
+        } catch (QualifierApplicationException ignored) {
+        }
     }
 
     @Test
@@ -165,10 +171,10 @@ public class FilterApplyTests {
         issue = new TurboIssue(REPO, 1, "");
         TurboUser assignee2 = new TurboUser(REPO, "bbcc");
         IModel model = TestUtils.singletonModel(new Model(REPO,
-            new ArrayList<>(Arrays.asList(issue)),
-            new ArrayList<>(),
-            new ArrayList<>(),
-            new ArrayList<>(Arrays.asList(assignee, assignee2))));
+                                                          new ArrayList<>(Arrays.asList(issue)),
+                                                          new ArrayList<>(),
+                                                          new ArrayList<>(),
+                                                          new ArrayList<>(Arrays.asList(assignee, assignee2))));
 
         try {
             new Qualifier(ASSIGNEE, "aa").applyTo(issue, model);
@@ -182,27 +188,30 @@ public class FilterApplyTests {
         issue = new TurboIssue(REPO, 1, "");
         assignee2 = new TurboUser(REPO, "bbcc");
         model = TestUtils.singletonModel(new Model(REPO,
-            new ArrayList<>(Arrays.asList(issue)),
-            new ArrayList<>(),
-            new ArrayList<>(),
-            new ArrayList<>(Arrays.asList(assignee, assignee2))));
+                                                   new ArrayList<>(Arrays.asList(issue)),
+                                                   new ArrayList<>(),
+                                                   new ArrayList<>(),
+                                                   new ArrayList<>(Arrays.asList(assignee, assignee2))));
 
         try {
             new Qualifier(ASSIGNEE, "bb").applyTo(issue, model);
             fail();
-        } catch (QualifierApplicationException ignored) {}
+        } catch (QualifierApplicationException ignored) {
+        }
 
         // Non-existent assignee
         try {
             new Qualifier(ASSIGNEE, "dd").applyTo(issue, TestUtils.modelWith(issue, assignee));
             fail();
-        } catch (QualifierApplicationException ignored) {}
+        } catch (QualifierApplicationException ignored) {
+        }
 
         // Non-string
         try {
             new Qualifier(ASSIGNEE, 1).applyTo(issue, TestUtils.modelWith(issue, assignee));
             fail();
-        } catch (QualifierApplicationException ignored) {}
+        } catch (QualifierApplicationException ignored) {
+        }
     }
 
     @Test
@@ -223,7 +232,8 @@ public class FilterApplyTests {
         try {
             new Qualifier(STATE, "something").applyTo(issue, empty);
             fail();
-        } catch (QualifierApplicationException ignored) {}
+        } catch (QualifierApplicationException ignored) {
+        }
     }
 
     @Test
@@ -262,28 +272,28 @@ public class FilterApplyTests {
 
         // Duplicate names
         assertEquals(false, new Conjunction(
-            Qualifier.EMPTY,
-            Qualifier.EMPTY).canBeAppliedToIssue());
+                Qualifier.EMPTY,
+                Qualifier.EMPTY).canBeAppliedToIssue());
 
         assertEquals(true, Qualifier.EMPTY.canBeAppliedToIssue());
         assertEquals(true, new Conjunction(
-            new Qualifier(ID, ""),
-            Qualifier.EMPTY).canBeAppliedToIssue());
+                new Qualifier(ID, ""),
+                Qualifier.EMPTY).canBeAppliedToIssue());
         assertEquals(true, new Conjunction(
-            new Qualifier(ID, ""),
-            new Conjunction(
-                new Qualifier(SORT, ""),
-                Qualifier.EMPTY)).canBeAppliedToIssue());
+                new Qualifier(ID, ""),
+                new Conjunction(
+                        new Qualifier(SORT, ""),
+                        Qualifier.EMPTY)).canBeAppliedToIssue());
 
         // It doesn't matter what the cntents of the disjunction are
         assertEquals(false, new Disjunction(null, null).canBeAppliedToIssue());
         assertEquals(false, new Disjunction(Qualifier.EMPTY, Qualifier.EMPTY).canBeAppliedToIssue());
         assertEquals(false, new Disjunction(
-            Qualifier.EMPTY,
-            new Conjunction(Qualifier.EMPTY, Qualifier.EMPTY)).canBeAppliedToIssue());
+                Qualifier.EMPTY,
+                new Conjunction(Qualifier.EMPTY, Qualifier.EMPTY)).canBeAppliedToIssue());
         assertEquals(false, new Conjunction(
-            Qualifier.EMPTY,
-            new Disjunction(Qualifier.EMPTY, Qualifier.EMPTY)).canBeAppliedToIssue());
+                Qualifier.EMPTY,
+                new Disjunction(Qualifier.EMPTY, Qualifier.EMPTY)).canBeAppliedToIssue());
 
         // Negation could potentially work, but in the current implementation the contents don't matter
         assertEquals(false, new Negation(null).canBeAppliedToIssue());
@@ -296,43 +306,53 @@ public class FilterApplyTests {
         try {
             new Qualifier(TITLE, "").applyTo(issue, empty);
             fail("title cannot be applied to issue");
-        } catch (QualifierApplicationException ignored) {}
+        } catch (QualifierApplicationException ignored) {
+        }
         try {
             new Qualifier(DESCRIPTION, "").applyTo(issue, empty);
             fail("desc cannot be applied to issue");
-        } catch (QualifierApplicationException ignored) {}
+        } catch (QualifierApplicationException ignored) {
+        }
         try {
             new Qualifier(KEYWORD, "").applyTo(issue, empty);
             fail("keyword cannot be applied to issue");
-        } catch (QualifierApplicationException ignored) {}
+        } catch (QualifierApplicationException ignored) {
+        }
         try {
             new Qualifier(ID, 1).applyTo(issue, empty);
             fail("id cannot be applied to issue");
-        } catch (QualifierApplicationException ignored) {}
+        } catch (QualifierApplicationException ignored) {
+        }
         try {
             new Qualifier(CREATED, LocalDate.now()).applyTo(issue, empty);
             fail("created cannot be applied to issue");
-        } catch (QualifierApplicationException ignored) {}
+        } catch (QualifierApplicationException ignored) {
+        }
         try {
             new Qualifier(HAS, "").applyTo(issue, empty);
             fail("has cannot be applied to issue");
-        } catch (QualifierApplicationException ignored) {}
+        } catch (QualifierApplicationException ignored) {
+        }
         try {
             new Qualifier(NO, "").applyTo(issue, empty);
             fail("no cannot be applied to issue");
-        } catch (QualifierApplicationException ignored) {}
+        } catch (QualifierApplicationException ignored) {
+        }
         try {
             // Could potentially work, but this is the current behaviour
             new Qualifier(IS, "").applyTo(issue, empty);
             fail("is cannot be applied to issue");
-        } catch (QualifierApplicationException ignored) {}
+        } catch (QualifierApplicationException ignored) {
+        }
         try {
             new Qualifier(AUTHOR, "").applyTo(issue, empty);
             fail("author cannot be applied to issue");
-        } catch (QualifierApplicationException ignored) {}
+        } catch (QualifierApplicationException ignored) {
+        }
         try {
             new Qualifier(INVOLVES, "").applyTo(issue, empty);
             fail("involves cannot be applied to issue");
-        } catch (QualifierApplicationException ignored) {}
+        } catch (QualifierApplicationException ignored) {
+        }
     }
 }

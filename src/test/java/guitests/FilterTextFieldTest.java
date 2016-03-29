@@ -3,33 +3,47 @@ package guitests;
 import static junit.framework.TestCase.assertTrue;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
+import org.junit.After;
 import org.junit.Test;
 
 import javafx.scene.input.KeyCode;
+import org.loadui.testfx.utils.FXTestUtils;
 import ui.TestController;
+import ui.UI;
 import ui.components.FilterTextField;
 import ui.issuepanel.FilterPanel;
+import util.GitHubURL;
+import util.events.testevents.NavigateToPageEventHandler;
 
 public class FilterTextFieldTest extends UITest {
 
-    private void testCompletions(FilterTextField field) {
+    @Override
+    public void launchApp() {
+        FXTestUtils.launchApp(
+                TestUI.class, "--test=true", "--bypasslogin=true", "--testchromedriver=true");
+    }
+
+    @Test
+    public void completion_validPrefixes_match() {
+        FilterTextField field = getFirstPanelField();
         // Basic completion
         clearField();
         type("cou").push(KeyCode.TAB);
-        awaitCondition(() -> field.getText().equals("count"));
+        waitAndAssertEquals("count", field::getText);
 
         // Completion does not only work for alternating keys typed
         clearField();
         type("c");
-        awaitCondition(() -> field.getSelectedText().equals("losed"));
+        waitAndAssertEquals("losed", field::getSelectedText);
         type("l");
-        awaitCondition(() -> field.getSelectedText().equals("osed"));
+        waitAndAssertEquals("osed", field::getSelectedText);
         type("o");
-        awaitCondition(() -> field.getSelectedText().equals("sed"));
+        waitAndAssertEquals("sed", field::getSelectedText);
         type(KeyCode.TAB);
-        awaitCondition(() -> field.getSelectedText().equals(""));
-        awaitCondition(() -> field.getText().equals("closed"));
+        waitAndAssertEquals("", field::getSelectedText);
+        waitAndAssertEquals("closed", field::getText);
 
         // Completion with selection
         clearField();
@@ -40,15 +54,17 @@ public class FilterTextFieldTest extends UITest {
         }
         // c[oun]t
         type("lo").push(KeyCode.TAB); // 'c' + 'lo' is a prefix of 'closed'
-        awaitCondition(() -> field.getText().equals("closedt"));
+        waitAndAssertEquals("closedt", field::getText);
     }
 
-    private void testSpaces(FilterTextField field) {
+    @Test
+    public void inputHandleSpaces_fieldNotEmpty_allowSpaces() {
+        FilterTextField field = getFirstPanelField();
         // Consecutive spaces allowed
         clearField();
         type("cou").push(KeyCode.TAB);
         type("   ");
-        awaitCondition(() -> field.getText().equals("count   "));
+        waitAndAssertEquals("count   ", field::getText);
 
         // Insertion of spaces before spaces
         clearField();
@@ -56,7 +72,7 @@ public class FilterTextFieldTest extends UITest {
         type(" c").push(KeyCode.BACK_SPACE); // cancel completion
         push(KeyCode.LEFT, 2);
         type(" ");
-        awaitCondition(() -> field.getText().equals("assignee  c"));
+        waitAndAssertEquals("assignee  c", field::getText);
 
         // Insertion of spaces after spaces
         clearField();
@@ -64,7 +80,7 @@ public class FilterTextFieldTest extends UITest {
         type(" c").push(KeyCode.BACK_SPACE); // cancel completion
         push(KeyCode.LEFT);
         type(" ");
-        awaitCondition(() -> field.getText().equals("assignee  c"));
+        waitAndAssertEquals("assignee  c", field::getText);
 
         // Insertion of spaces with trailing spaces
         clearField();
@@ -73,18 +89,11 @@ public class FilterTextFieldTest extends UITest {
         type(" ");
         push(KeyCode.LEFT, 8);
         type(" ");
-        awaitCondition(() -> field.getText().equals(" assigne e "));
+        waitAndAssertEquals(" assigne e ", field::getText);
     }
 
     @Test
-    public void inputsTest() {
-        FilterTextField field = getFirstPanelField();
-        testCompletions(field);
-        testSpaces(field);
-    }
-
-    @Test
-    public void revertTest() {
+    public void revertTextEdit_overwritePrevFilterText_revertPrev() {
         FilterTextField field = getFirstPanelField();
 
         type("assi").push(KeyCode.TAB);
@@ -92,15 +101,14 @@ public class FilterTextFieldTest extends UITest {
 
         clearField();
         type("test");
-        awaitCondition(() -> field.getText().equals("test"));
+        waitAndAssertEquals("test", field::getText);
 
         push(KeyCode.ESCAPE);
-
-        awaitCondition(() -> field.getText().equals("assignee"));
+        waitAndAssertEquals("assignee", field::getText);
     }
 
     @Test
-    public void cancelTest() {
+    public void detectCancelEvent_noMoreReverts_detected() {
         FilterTextField field = getFirstPanelField();
         AtomicInteger toggle = new AtomicInteger(0);
         field.setOnCancel(toggle::getAndIncrement);
@@ -112,13 +120,41 @@ public class FilterTextFieldTest extends UITest {
 
         clearField();
         type("test");
-        awaitCondition(() -> field.getText().equals("test"));
+        waitAndAssertEquals("test", field::getText);
 
         push(KeyCode.ESCAPE);
-        awaitCondition(() -> toggle.get() % 2 == 0);
+        waitAndAssertEquals(0, () -> toggle.get() % 2);
 
         push(KeyCode.ESCAPE);
-        awaitCondition(() -> toggle.get() % 2 == 1);
+        waitAndAssertEquals(1, () -> toggle.get() % 2);
+    }
+
+    @Test
+    public void showDocs_filterTextFieldInFocus_navigateToFilterDocsPage() {
+        AtomicReference<String> url = new AtomicReference<>();
+        UI.events.registerEvent((NavigateToPageEventHandler) e -> url.set(e.url));
+        getFirstPanelField();
+        push(KeyCode.F1);
+        waitAndAssertEquals(GitHubURL.FILTERS_PAGE, url::get);
+    }
+
+    @Test
+    public void filterTextFieldColor_validFilter_validFilterStyleApplied() {
+        testValidFilterStyleApplied("is:open");
+        testValidFilterStyleApplied("-is:open");
+        testValidFilterStyleApplied("hello");
+        testValidFilterStyleApplied("is:open & has:assignee");
+        testValidFilterStyleApplied("(is:closed)");
+    }
+
+    @Test
+    public void filterTextFieldColor_invalidFilter_invalidFilterStyleApplied() {
+
+        // Tests if parse errors apply invalid filter style
+        testInvalidFilterStyleApplied("is: is:");
+
+        // Tests if semantic errors apply invalid filter style
+        testInvalidFilterStyleAppliedAfterEnter("is:invalid");
     }
 
     private FilterTextField getFirstPanelField() {
@@ -129,7 +165,29 @@ public class FilterTextFieldTest extends UITest {
         return field;
     }
 
-    private void clearField() {
+    private void testValidFilterStyleApplied(String filter) {
+        FilterTextField field = getFirstPanelField();
+        clearField();
+        type(filter);
+        assertTrue(field.getStyle().contains(FilterTextField.VALID_FILTER_STYLE));
+    }
+
+    private void testInvalidFilterStyleApplied(String filter) {
+        FilterTextField field = getFirstPanelField();
+        clearField();
+        type(filter);
+        assertTrue(field.getStyle().contains(FilterTextField.INVALID_FILTER_STYLE));
+    }
+
+    private void testInvalidFilterStyleAppliedAfterEnter(String filter) {
+        FilterTextField field = getFirstPanelField();
+        clearField();
+        type(filter).push(KeyCode.ENTER);
+        assertTrue(field.getStyle().contains(FilterTextField.INVALID_FILTER_STYLE));
+    }
+
+    @After
+    public void clearField() {
         selectAll();
         push(KeyCode.BACK_SPACE);
     }

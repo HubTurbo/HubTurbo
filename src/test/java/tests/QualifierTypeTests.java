@@ -33,8 +33,8 @@ public class QualifierTypeTests {
     @SuppressWarnings("unchecked")
     public void testAliases() throws IllegalAccessException {
         Map<String, QualifierType> aliases =
-            (Map<String, QualifierType>)
-                FieldUtils.readDeclaredStaticField(QualifierType.class, "ALIASES", true);
+                (Map<String, QualifierType>)
+                        FieldUtils.readDeclaredStaticField(QualifierType.class, "ALIASES", true);
 
         // Check that every alias resolves to its declared equivalent
         for (Map.Entry<String, QualifierType> entry : aliases.entrySet()) {

@@ -26,7 +26,8 @@ public final class TestUtils {
     public static final String REPO = "test/test";
     public static final String API_PREFIX = "/api/v3";
 
-    private TestUtils() {}
+    private TestUtils() {
+    }
 
     public static IModel singletonModel(Model model) {
         MultiModel models = new MultiModel(TestController.createTestPreferences());
@@ -38,42 +39,42 @@ public final class TestUtils {
 
     public static IModel modelWith(TurboIssue issue, TurboMilestone milestone) {
         return singletonModel(new Model(REPO,
-            new ArrayList<>(Arrays.asList(issue)),
-            new ArrayList<>(),
-            new ArrayList<>(Arrays.asList(milestone)),
-            new ArrayList<>()));
+                                        new ArrayList<>(Arrays.asList(issue)),
+                                        new ArrayList<>(),
+                                        new ArrayList<>(Arrays.asList(milestone)),
+                                        new ArrayList<>()));
     }
 
     public static IModel modelWith(TurboIssue issue, TurboLabel label) {
         return singletonModel(new Model(new Model(REPO,
-            new ArrayList<>(Arrays.asList(issue)),
-            new ArrayList<>(Arrays.asList(label)),
-            new ArrayList<>(),
-            new ArrayList<>())));
+                                                  new ArrayList<>(Arrays.asList(issue)),
+                                                  new ArrayList<>(Arrays.asList(label)),
+                                                  new ArrayList<>(),
+                                                  new ArrayList<>())));
     }
 
     public static IModel modelWith(TurboIssue issue, TurboUser user) {
         return singletonModel(new Model(new Model(REPO,
-            new ArrayList<>(Arrays.asList(issue)),
-            new ArrayList<>(),
-            new ArrayList<>(),
-            new ArrayList<>(Arrays.asList(user)))));
+                                                  new ArrayList<>(Arrays.asList(issue)),
+                                                  new ArrayList<>(),
+                                                  new ArrayList<>(),
+                                                  new ArrayList<>(Arrays.asList(user)))));
     }
 
     public static IModel modelWith(TurboIssue issue, TurboLabel label, TurboMilestone milestone) {
         return singletonModel(new Model(REPO,
-            new ArrayList<>(Arrays.asList(issue)),
-            new ArrayList<>(Arrays.asList(label)),
-            new ArrayList<>(Arrays.asList(milestone)),
-            new ArrayList<>()));
+                                        new ArrayList<>(Arrays.asList(issue)),
+                                        new ArrayList<>(Arrays.asList(label)),
+                                        new ArrayList<>(Arrays.asList(milestone)),
+                                        new ArrayList<>()));
     }
 
     public static IModel modelWith(TurboIssue issue, TurboLabel label, TurboMilestone milestone, TurboUser user) {
         return singletonModel(new Model(REPO,
-            new ArrayList<>(Arrays.asList(issue)),
-            new ArrayList<>(Arrays.asList(label)),
-            new ArrayList<>(Arrays.asList(milestone)),
-            new ArrayList<>(Arrays.asList(user))));
+                                        new ArrayList<>(Arrays.asList(issue)),
+                                        new ArrayList<>(Arrays.asList(label)),
+                                        new ArrayList<>(Arrays.asList(milestone)),
+                                        new ArrayList<>(Arrays.asList(user))));
     }
 
     /**
@@ -98,6 +99,7 @@ public final class TestUtils {
 
     /**
      * Parses a string containing HTTP header fields and return a List of Header to be used with MockServer
+     *
      * @param header
      * @return
      */
@@ -117,11 +119,12 @@ public final class TestUtils {
 
     /**
      * Creates a GitHub API v3 request that can be used with MockServer and GitHubClient
-     * @param method the HTTP request method
-     * @param page the page of the resource being requested
-     * @param repoStringId string version of the repo id
+     *
+     * @param method        the HTTP request method
+     * @param page          the page of the resource being requested
+     * @param repoStringId  string version of the repo id
      * @param repoNumericId numeric version of the repo id returned in the Link header
-     * @param apiSegments segments of the request path after the repo id
+     * @param apiSegments   segments of the request path after the repo id
      * @return
      */
     public static HttpRequest createMockServerRequest(String method, int page,
@@ -140,7 +143,8 @@ public final class TestUtils {
 
     /**
      * Delays for a specified time then calls a function and returns its result
-     * @param delay time to be delayed in milliseconds
+     *
+     * @param delay    time to be delayed in milliseconds
      * @param supplier
      * @return
      * @throws InterruptedException
@@ -152,7 +156,8 @@ public final class TestUtils {
 
     /**
      * Delays for a specified time then runs a function
-     * @param delay time to be delayed in milliseconds
+     *
+     * @param delay    time to be delayed in milliseconds
      * @param runnable
      * @return
      * @throws InterruptedException
@@ -165,6 +170,7 @@ public final class TestUtils {
     /**
      * Creates a RepoOpControl instance with a mocked MultiModel which contains no Model i.e.
      * the models return an empty Optional when its getModelById method is called.
+     *
      * @param repoIO
      */
     public static RepoOpControl createRepoOpControlWithEmptyModels(RepoIO repoIO) {

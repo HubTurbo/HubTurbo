@@ -21,21 +21,21 @@ public class NoPanelAtQuitTest extends UITest {
 
     @Test
     public void emptyPanelsInfoTest() {
-        
+
         // Test for saving panel information when there are no panels at termination.
-        
+
         // close open panel
         click("#dummy/dummy_col0_closeButton");
-        
+
         // Quitting to update json
         click("File");
         click("Quit");
-        
+
         Preferences testPref = TestController.loadTestPreferences();
         List<PanelInfo> lastSessionPanels = testPref.getPanelInfo();
-        
+
         // Expected result: nothing stored in panelInfo
-        
+
         assertEquals(0, lastSessionPanels.size());
     }
 }

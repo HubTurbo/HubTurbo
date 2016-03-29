@@ -11,14 +11,17 @@ import java.util.ArrayList;
 import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_LABELS;
 
 public class LabelUpdateService extends UpdateService<Label> {
-    public LabelUpdateService(GitHubClientEx client, String labelsETag){
+    public LabelUpdateService(GitHubClientEx client, String labelsETag) {
         super(client, SEGMENT_LABELS, labelsETag);
     }
+
     @Override
-    protected PagedRequest<Label> createUpdatedRequest(IRepositoryIdProvider repoId){
+    protected PagedRequest<Label> createUpdatedRequest(IRepositoryIdProvider repoId) {
         PagedRequest<Label> request = super.createUpdatedRequest(repoId);
-        request.setType(new TypeToken<Label>(){}.getType());
-        request.setArrayType(new TypeToken<ArrayList<Label>>(){}.getType());
+        request.setType(new TypeToken<Label>() {
+        }.getType());
+        request.setArrayType(new TypeToken<ArrayList<Label>>() {
+        }.getType());
         return request;
     }
 }

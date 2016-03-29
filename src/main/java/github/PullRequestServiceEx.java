@@ -68,9 +68,9 @@ public class PullRequestServiceEx extends PullRequestService {
 
         StringBuilder uri = new StringBuilder(SEGMENT_REPOS);
         uri.append('/').append(repoId)
-            .append(SEGMENT_PULLS)
-            .append('/').append(pullRequestNumber)
-            .append(SEGMENT_COMMENTS);
+                .append(SEGMENT_PULLS)
+                .append('/').append(pullRequestNumber)
+                .append(SEGMENT_COMMENTS);
 
         PagedRequest<ReviewComment> request = createPagedRequest();
         request.setUri(uri);

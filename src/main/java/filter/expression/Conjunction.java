@@ -52,14 +52,13 @@ public class Conjunction implements FilterExpression {
 
     @Override
     public boolean isSatisfiedBy(IModel model, TurboIssue issue, MetaQualifierInfo info) {
-        return left.isSatisfiedBy(model, issue, info)
-                && right.isSatisfiedBy(model, issue, info);
+        return left.isSatisfiedBy(model, issue, info) && right.isSatisfiedBy(model, issue, info);
     }
 
     private boolean containsDuplicateQualifierTypes() {
         List<QualifierType> nonLabelQualifierTypes = getQualifierTypes().stream()
-            .filter(pn -> !pn.equals(QualifierType.LABEL))
-            .collect(Collectors.toList());
+                .filter(pn -> !pn.equals(QualifierType.LABEL))
+                .collect(Collectors.toList());
         HashSet<QualifierType> noDuplicates = new HashSet<>(nonLabelQualifierTypes);
         return noDuplicates.size() != nonLabelQualifierTypes.size();
     }
@@ -75,6 +74,15 @@ public class Conjunction implements FilterExpression {
     public void applyTo(TurboIssue issue, IModel model) throws QualifierApplicationException {
         left.applyTo(issue, model);
         right.applyTo(issue, model);
+    }
+
+    @Override
+    public List<String> getWarnings(IModel model, TurboIssue issue) {
+        List<String> leftWarnings = left.getWarnings(model, issue);
+        List<String> rightWarnings = right.getWarnings(model, issue);
+        List<String> result = leftWarnings;
+        result.addAll(rightWarnings);
+        return result;
     }
 
     @Override

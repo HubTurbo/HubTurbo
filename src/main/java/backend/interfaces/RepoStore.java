@@ -24,6 +24,7 @@ public abstract class RepoStore {
     }
 
     public abstract CompletableFuture<Model> loadRepository(String repoId);
+
     public abstract CompletableFuture<Boolean> saveRepository(String repoId, SerializableModel model);
 
     private static Optional<String> getRepoPath(String repoId) {
@@ -48,6 +49,7 @@ public abstract class RepoStore {
 
     /**
      * Returns true on success.
+     *
      * @return
      */
     protected static boolean ensureDirectoryExists() {

@@ -7,7 +7,7 @@ public class SortTest extends UITest {
 
     // TODO check that issue list is sorted correctly
     @Test
-    public void sortTest () {
+    public void sortTest() {
         click("#dummy/dummy_col0_filterTextField");
         // Ascending ID
         type("sort:id");

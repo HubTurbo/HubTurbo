@@ -128,8 +128,8 @@ public class JavaVersionTest {
     public void javaVersionTooLow_JavaVersion_ReturnsCorrectResult() {
         JavaVersion age0 = new JavaVersion(0, 0, 0, 0, 0);
         JavaVersion ageBuild1 = new JavaVersion(0, 0, 0, 0, 1);
-        JavaVersion ageUpdate1Build0  = new JavaVersion(0, 0, 0, 1, 0);
-        JavaVersion ageUpdate1Build1  = new JavaVersion(0, 0, 0, 1, 1);
+        JavaVersion ageUpdate1Build0 = new JavaVersion(0, 0, 0, 1, 0);
+        JavaVersion ageUpdate1Build1 = new JavaVersion(0, 0, 0, 1, 1);
         JavaVersion ageMinor1 = new JavaVersion(0, 0, 1, 0, 0);
         JavaVersion ageMajor1 = new JavaVersion(0, 1, 0, 0, 0);
         JavaVersion ageDiscard2 = new JavaVersion(2, 0, 0, 0, 0);

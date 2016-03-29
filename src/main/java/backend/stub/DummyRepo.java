@@ -10,13 +10,13 @@ import github.ReviewComment;
 import github.TurboIssueEvent;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
-import org.eclipse.egit.github.core.Comment;
-import org.eclipse.egit.github.core.Label;
-import org.eclipse.egit.github.core.PullRequest;
+import org.eclipse.egit.github.core.*;
 import ui.UI;
 import util.events.testevents.ClearLogicModelEvent;
 import util.events.testevents.UpdateDummyRepoEventHandler;
 
+import java.util.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -37,54 +37,54 @@ public class DummyRepo implements Repo {
         UI.events.registerEvent((UpdateDummyRepoEventHandler) e -> {
             assert e.repoId != null;
             switch (e.updateType) {
-                case NEW_ISSUE:
-                    getRepoState(e.repoId).makeNewIssue();
-                    break;
-                case NEW_LABEL:
-                    getRepoState(e.repoId).makeNewLabel();
-                    break;
-                case NEW_MILESTONE:
-                    getRepoState(e.repoId).makeNewMilestone();
-                    break;
-                case NEW_USER:
-                    getRepoState(e.repoId).makeNewUser();
-                    break;
-                // TODO implement update of issue and milestone
-                // (after switching to TreeMap implementation)
-                case UPDATE_ISSUE:
-                    getRepoState(e.repoId).updateIssue(e.itemId, e.updateText);
-                    break;
-                case UPDATE_MILESTONE:
-                    getRepoState(e.repoId).updateMilestone(e.itemId, e.updateText);
-                    break;
-                // Model reload is done by event handler registered in Logic in
-                // the following five:
-                case DELETE_ISSUE:
-                    getRepoState(e.repoId).deleteIssue(e.itemId);
-                    UI.events.triggerEvent(new ClearLogicModelEvent(e.repoId));
-                    break;
-                case DELETE_LABEL:
-                    getRepoState(e.repoId).deleteLabel(e.idString);
-                    UI.events.triggerEvent(new ClearLogicModelEvent(e.repoId));
-                    break;
-                case DELETE_MILESTONE:
-                    getRepoState(e.repoId).deleteMilestone(e.itemId);
-                    UI.events.triggerEvent(new ClearLogicModelEvent(e.repoId));
-                    break;
-                case DELETE_USER:
-                    getRepoState(e.repoId).deleteUser(e.idString);
-                    UI.events.triggerEvent(new ClearLogicModelEvent(e.repoId));
-                    break;
-                case ADD_COMMENT:
-                    getRepoState(e.repoId).commentOnIssue(e.actor, e.updateText, e.itemId);
-                    break;
-                case RESET_REPO:
-                    repoStates.put(e.repoId, new DummyRepoState(e.repoId));
-                    UI.events.triggerEvent(new ClearLogicModelEvent(e.repoId));
-                    break;
-                default:
-                    assert false : "Missing case " + e.updateType;
-                    break;
+            case NEW_ISSUE:
+                getRepoState(e.repoId).makeNewIssue();
+                break;
+            case NEW_LABEL:
+                getRepoState(e.repoId).makeNewLabel();
+                break;
+            case NEW_MILESTONE:
+                getRepoState(e.repoId).makeNewMilestone();
+                break;
+            case NEW_USER:
+                getRepoState(e.repoId).makeNewUser();
+                break;
+            // TODO implement update of issue and milestone
+            // (after switching to TreeMap implementation)
+            case UPDATE_ISSUE:
+                getRepoState(e.repoId).updateIssue(e.itemId, e.updateText);
+                break;
+            case UPDATE_MILESTONE:
+                getRepoState(e.repoId).updateMilestone(e.itemId, e.updateText);
+                break;
+            // Model reload is done by event handler registered in Logic in
+            // the following five:
+            case DELETE_ISSUE:
+                getRepoState(e.repoId).deleteIssue(e.itemId);
+                UI.events.triggerEvent(new ClearLogicModelEvent(e.repoId));
+                break;
+            case DELETE_LABEL:
+                getRepoState(e.repoId).deleteLabel(e.idString);
+                UI.events.triggerEvent(new ClearLogicModelEvent(e.repoId));
+                break;
+            case DELETE_MILESTONE:
+                getRepoState(e.repoId).deleteMilestone(e.itemId);
+                UI.events.triggerEvent(new ClearLogicModelEvent(e.repoId));
+                break;
+            case DELETE_USER:
+                getRepoState(e.repoId).deleteUser(e.idString);
+                UI.events.triggerEvent(new ClearLogicModelEvent(e.repoId));
+                break;
+            case ADD_COMMENT:
+                getRepoState(e.repoId).commentOnIssue(e.actor, e.updateText, e.itemId);
+                break;
+            case RESET_REPO:
+                repoStates.put(e.repoId, new DummyRepoState(e.repoId));
+                UI.events.triggerEvent(new ClearLogicModelEvent(e.repoId));
+                break;
+            default:
+                assert false : "Missing case " + e.updateType;
+                break;
             }
         });
     }
@@ -105,7 +105,8 @@ public class DummyRepo implements Repo {
 
     @Override
     public ImmutableTriple<List<TurboIssue>, String, Date>
-        getUpdatedIssues(String repoId, String eTag, Date lastCheckTime) {
+            getUpdatedIssues(String repoId, String eTag, Date lastCheckTime) {
+
         return getRepoState(repoId).getUpdatedIssues(eTag, lastCheckTime);
     }
 
@@ -150,8 +151,9 @@ public class DummyRepo implements Repo {
     }
 
     @Override
-    public ImmutablePair<List<TurboIssueEvent>, String> getUpdatedEvents
-            (String repoId, int issueId, String currentETag) {
+    public ImmutablePair<List<TurboIssueEvent>, String>
+            getUpdatedEvents(String repoId, int issueId, String currentETag) {
+
         ImmutablePair<List<TurboIssueEvent>, String> result = getRepoState(repoId).getEvents(issueId, currentETag);
 
         if (!result.getRight().equals(currentETag) || currentETag.length() == 0) apiQuota--;
@@ -180,6 +182,18 @@ public class DummyRepo implements Repo {
     @Override
     public List<Label> setLabels(String repoId, int issueId, List<String> labels) {
         return getRepoState(repoId).setLabels(issueId, labels);
+    }
+
+    @Override
+    public Optional<Integer> setMilestone(String repoId, int issueId, String issueTitle,
+                                          Optional<Integer> issueMilestone) {
+        Issue returnedIssue = getRepoState(repoId).setMilestone(issueId, issueMilestone);
+        return Optional.ofNullable(returnedIssue.getMilestone())
+                .map(Milestone::getNumber);
+    }
+
+    public boolean editIssueState(String repoId, int issueId, boolean isOpen) throws IOException {
+        return getRepoState(repoId).editIssueState(issueId, isOpen);
     }
 
     @Override

@@ -49,8 +49,7 @@ public class Disjunction implements FilterExpression {
 
     @Override
     public boolean isSatisfiedBy(IModel model, TurboIssue issue, MetaQualifierInfo info) {
-        return left.isSatisfiedBy(model, issue, info)
-                || right.isSatisfiedBy(model, issue, info);
+        return left.isSatisfiedBy(model, issue, info) || right.isSatisfiedBy(model, issue, info);
     }
 
     @Override
@@ -61,6 +60,15 @@ public class Disjunction implements FilterExpression {
     @Override
     public void applyTo(TurboIssue issue, IModel model) throws QualifierApplicationException {
         assert false;
+    }
+
+    @Override
+    public List<String> getWarnings(IModel model, TurboIssue issue) {
+        List<String> leftWarnings = left.getWarnings(model, issue);
+        List<String> rightWarnings = right.getWarnings(model, issue);
+        List<String> result = leftWarnings;
+        result.addAll(rightWarnings);
+        return result;
     }
 
     @Override
@@ -106,6 +114,7 @@ public class Disjunction implements FilterExpression {
             return new Disjunction(left, right);
         }
     }
+
     @Override
     public boolean isEmpty() {
         return left.isEmpty() && right.isEmpty();

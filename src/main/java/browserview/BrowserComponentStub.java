@@ -10,10 +10,12 @@ public class BrowserComponentStub extends BrowserComponent {
     }
 
     @Override
-    public void onAppQuit() {}
+    public void onAppQuit() {
+    }
 
     @Override
-    public void focus(WinDef.HWND mainWindowHandle) {}
+    public void focus(WinDef.HWND mainWindowHandle) {
+    }
 
     @Override
     public boolean hasBviewChanged() {
@@ -21,16 +23,20 @@ public class BrowserComponentStub extends BrowserComponent {
     }
 
     @Override
-    public void newLabel() {}
+    public void newLabel() {
+    }
 
     @Override
-    public void newMilestone() {}
+    public void newMilestone() {
+    }
 
     @Override
-    public void newIssue() {}
+    public void newIssue() {
+    }
 
     @Override
-    public void showIssue(String repoId, int id, boolean isPullRequest, boolean isForceRefresh) {}
+    public void showIssue(String repoId, int id, boolean isPullRequest, boolean isForceRefresh) {
+    }
 
     @Override
     public boolean isCurrentUrlIssue() {

@@ -144,6 +144,28 @@ public class TurboIssueTests {
     }
 
     /**
+     * Tests that when an issue is created and no manual state change have been made, the state
+     * modified time is equal to the issue's updatedAt time
+     */
+    @Test
+    public void getStateModifiedAt_initial() {
+        TurboIssue issue = new TurboIssue("testrepo", 1, "Issue title");
+        assertEquals(issue.getUpdatedAt(), issue.getStateLastModifiedAt());
+    }
+
+    /**
+     * Tests that state modified time is updated properly when {@code setOpen} is called
+     */
+    @Test
+    public void getStateModifiedAt_updated() throws InterruptedException {
+        TurboIssue issue = new TurboIssue("testrepo", 1, "Issue title");
+
+        LocalDateTime checkPoint = issue.getStateLastModifiedAt();
+        TestUtils.delayThenRun(10, () -> issue.setOpen(false));
+        assertTrue(issue.getStateLastModifiedAt().isAfter(checkPoint));
+    }
+
+    /**
      * Tests that if the updated issue's labels are more recently modified,
      * it overrides the original issue's labels
      */

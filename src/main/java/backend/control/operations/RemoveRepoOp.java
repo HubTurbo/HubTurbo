@@ -26,6 +26,6 @@ public class RemoveRepoOp implements RepoOp<Boolean> {
     @Override
     public CompletableFuture<Boolean> perform() {
         return repoIO.removeRepository(repoId)
-            .thenApply(chain(result));
+                .thenApply(chain(result));
     }
 }

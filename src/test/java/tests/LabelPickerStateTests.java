@@ -58,7 +58,7 @@ public class LabelPickerStateTests {
     }
 
     private List<TurboLabel> getTestRepoLabels() {
-        return getLabelsFromNames("priority.high", "priority.medium", "priority.low", "highest", 
+        return getLabelsFromNames("priority.high", "priority.medium", "priority.low", "highest",
                                   "Problem.Heavy", "f-aaa", "f-bbb");
     }
 

@@ -16,8 +16,7 @@ public class TurboMilestone {
     private static final String STATE_CLOSED = "closed";
     private static final String STATE_OPEN = "open";
 
-    private void ______SERIALIZED_FIELDS______() {
-    }
+    private void ______SERIALIZED_FIELDS______() {}
 
     private final int id;
 
@@ -28,13 +27,11 @@ public class TurboMilestone {
     private int openIssues;
     private int closedIssues;
 
-    private void ______TRANSIENT_FIELDS______() {
-    }
+    private void ______TRANSIENT_FIELDS______() {}
 
     private final String repoId;
 
-    private void ______CONSTRUCTORS______() {
-    }
+    private void ______CONSTRUCTORS______() {}
 
     public TurboMilestone(String repoId, int id, String title) {
         this.id = id;
@@ -51,8 +48,8 @@ public class TurboMilestone {
         this.id = milestone.getNumber();
         this.title = milestone.getTitle();
         this.dueDate = milestone.getDueOn() == null
-            ? Optional.empty()
-            : Optional.of(Utility.dateToLocalDateTime(milestone.getDueOn()).toLocalDate());
+                ? Optional.empty()
+                : Optional.of(Utility.dateToLocalDateTime(milestone.getDueOn()).toLocalDate());
         this.description = milestone.getDescription() == null ? "" : milestone.getDescription();
         this.isOpen = milestone.getState().equals(STATE_OPEN);
         this.openIssues = milestone.getOpenIssues();
@@ -83,8 +80,7 @@ public class TurboMilestone {
         this.repoId = milestone.getRepoId();
     }
 
-    private void ______METHODS______() {
-    }
+    private void ______METHODS______() {}
 
     public boolean isOverdue() {
         return dueDate.isPresent() && dueDate.get().isBefore(LocalDate.now());
@@ -115,34 +111,29 @@ public class TurboMilestone {
     }
 
     /**
-     * Condition: milestone must have due dates
+     * Returns a stable TurboMilestone comparator by due date.
+     * <p>
+     * Open milestones without due date are considered to have a due date very far in the future. On the contrary,
+     * closed milestones without due date are considered to have a due date very far in the past.
+     * <p>
+     * Milestones with due dates are considered in between, considered according to their due dates.
      */
     public static Comparator<TurboMilestone> getDueDateComparator() {
         return (a, b) -> {
-            assert a.getDueDate().isPresent();
-            assert b.getDueDate().isPresent();
-            LocalDate aDueDate = a.getDueDate().get();
-            LocalDate bDueDate = b.getDueDate().get();
+            LocalDate aDueDate = a.getDueDate().orElse(a.isOpen() ? LocalDate.MAX : LocalDate.MIN);
+            LocalDate bDueDate = b.getDueDate().orElse(b.isOpen() ? LocalDate.MAX : LocalDate.MIN);
             return aDueDate.compareTo(bDueDate);
         };
     }
 
     /**
-     * Sort a List<TurboMilestone> by due date. Milestones without due date are considered to
-     * have an imaginary due date in the far future. The sorting algorithm used is stable
+     * Sorts a List<TurboMilestone> by due date. The sorting algorithm used is stable
      * (i.e. relative ordering of 2 milestones with the same due date will be retained)
      */
     public static List<TurboMilestone> sortByDueDate(List<TurboMilestone> milestones) {
-        List<TurboMilestone> milestonesWithDueDate = milestones.stream()
-                .filter(ms -> ms.getDueDate().isPresent())
-                .sorted(getDueDateComparator())
+        return milestones.stream()
+                .sorted(TurboMilestone.getDueDateComparator())
                 .collect(Collectors.toList());
-        List<TurboMilestone> milestonesWithoutDueDate = milestones.stream()
-                .filter(ms -> !ms.getDueDate().isPresent())
-                .collect(Collectors.toList());
-        List<TurboMilestone> result = milestonesWithDueDate;
-        result.addAll(milestonesWithoutDueDate);
-        return result;
     }
 
     @Override
@@ -150,48 +141,60 @@ public class TurboMilestone {
         return title;
     }
 
-    private void ______BOILERPLATE______() {
-    }
+    private void ______BOILERPLATE______() {}
 
     public String getRepoId() {
         return repoId;
     }
+
     public int getId() {
         return id;
     }
+
     public String getTitle() {
         return title;
     }
+
     public void setTitle(String title) {
         this.title = title;
     }
+
     public Optional<LocalDate> getDueDate() {
         return dueDate;
     }
+
     public void setDueDate(Optional<LocalDate> dueDate) {
         this.dueDate = dueDate;
     }
+
     public String getDescription() {
         return description;
     }
+
     public void setDescription(String description) {
-        this.description = description;
+        this.description = description == null ? "" : description;
     }
+
     public boolean isOpen() {
         return isOpen;
     }
+
     public void setOpen(boolean isOpen) {
         this.isOpen = isOpen;
     }
+
     public int getOpenIssues() {
         return openIssues;
     }
+
     public void setOpenIssues(int openIssues) {
         this.openIssues = openIssues;
     }
+
     public int getClosedIssues() {
         return closedIssues;
     }
+
     public void setClosedIssues(int closedIssues) {
         this.closedIssues = closedIssues;
     }

@@ -39,10 +39,11 @@ class ReadTask extends StoreTask {
 
     /**
      * Loads repository data from RepoStore into a new Model.
+     *
      * @param repoId the string id of the repository to be loaded
      * @return a new Model containing data for the requested repository.
      * @throws JSONLoadException when the repository's JSON data cannot be
-     *         retrieved from the local store or is corrupted
+     *                           retrieved from the local store or is corrupted
      */
     private Model load(String repoId) throws RepoStoreException {
         Optional<String> input = RepoStore.read(repoId);
@@ -55,7 +56,7 @@ class ReadTask extends StoreTask {
 
             try {
                 SerializableModel sModel = new Gson().fromJson(input.get(),
-                        new TypeToken<SerializableModel>(){}.getType());
+                                                               new TypeToken<SerializableModel>() {}.getType());
 
                 return new Model(sModel);
             } catch (NullPointerException | JsonParseException e) {

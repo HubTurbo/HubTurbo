@@ -69,7 +69,7 @@ public class GitHubClientEx extends GitHubClient {
      * @throws IOException
      */
     public <V> V sendJson(final HttpURLConnection request, final Object params, final Type type)
-        throws IOException {
+            throws IOException {
 
         sendParams(request, params);
         final int code = request.getResponseCode();
@@ -175,19 +175,19 @@ public class GitHubClientEx extends GitHubClient {
             httpRequest.setRequestProperty(HEADER_ACCEPT, accept);
         }
         logger.info(String.format("Requesting: %s %s",
-                    httpRequest.getRequestMethod(), httpRequest.getURL().getFile()));
+                                  httpRequest.getRequestMethod(), httpRequest.getURL().getFile()));
 
         final int code = httpRequest.getResponseCode();
         updateRateLimits(httpRequest);
 
         logger.info(String.format("%s responded with %d %s",
-                    httpRequest.getURL().getPath(), code, httpRequest.getResponseMessage()));
+                                  httpRequest.getURL().getPath(), code, httpRequest.getResponseMessage()));
         if (isOk(code) || code == HttpURLConnection.HTTP_NOT_MODIFIED || isEmpty(code)) {
             return new ImmutablePair<>(httpRequest, new GitHubResponse(httpRequest, null));
         }
 
         throw createException(getStream(httpRequest), code,
-                httpRequest.getResponseMessage());
+                              httpRequest.getResponseMessage());
     }
 
     /**

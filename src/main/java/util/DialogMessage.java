@@ -7,7 +7,8 @@ import java.util.Optional;
 
 public final class DialogMessage {
 
-    private DialogMessage() {}
+    private DialogMessage() {
+    }
 
     public static void showErrorDialog(String header, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -16,8 +17,9 @@ public final class DialogMessage {
         alert.showAndWait();
     }
 
-    public static boolean showYesNoWarningDialog
-            (String title, String header, String message, String yesButtonLabel, String noButtonLabel) {
+    public static boolean showYesNoWarningDialog(String title, String header, String message,
+                                                 String yesButtonLabel, String noButtonLabel) {
+
         Alert alert = new Alert(Alert.AlertType.WARNING);
         alert.setTitle(title);
         alert.setHeaderText(header);

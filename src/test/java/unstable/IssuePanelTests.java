@@ -1,4 +1,4 @@
-package guitests;
+package unstable;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import guitests.UITest;
 import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
@@ -30,6 +31,7 @@ import ui.GuiElement;
 import ui.UI;
 import ui.listpanel.ListPanel;
 import ui.listpanel.ListPanelCard;
+import util.PlatformEx;
 import util.Utility;
 import util.events.testevents.UILogicRefreshEvent;
 import util.events.testevents.UpdateDummyRepoEvent;
@@ -49,6 +51,7 @@ public class IssuePanelTests extends UITest {
         selectAll();
         type("sort:date");
         push(KeyCode.ENTER);
+        PlatformEx.waitOnFxThread();
         press(JUMP_TO_FIRST_ISSUE);
         push(KeyCode.DOWN).push(KeyCode.DOWN);
         sleep(EVENT_DELAY);
@@ -68,6 +71,7 @@ public class IssuePanelTests extends UITest {
         selectAll();
         type("id:8");
         push(KeyCode.ENTER);
+        PlatformEx.waitOnFxThread();
         // Issue #8 was assigned label 11, but it was removed
         try {
             GuiTest.exists("Label 11");
@@ -86,6 +90,7 @@ public class IssuePanelTests extends UITest {
         click("#dummy/dummy_col0_filterTextField");
         selectAll();
         type("id:9 updated:5");
+        PlatformEx.waitOnFxThread();
         push(KeyCode.ENTER);
         waitUntilNodeAppears("Deleted");
         // We should see the "Deleted" label with the proper color despite the label having been deleted.
@@ -102,14 +107,14 @@ public class IssuePanelTests extends UITest {
                 Optional.empty());
 
         assertEquals(0,
-                TurboIssueEvent.createLabelUpdateEventNodes(
-                        guiElement, new ArrayList<>()).size());
+                     TurboIssueEvent.createLabelUpdateEventNodes(
+                             guiElement, new ArrayList<>()).size());
     }
 
     @Test
     public void testCreateLabelUpdateEventNodesForSampleEvents()
             throws IllegalAccessException, IllegalArgumentException, InvocationTargetException,
-                   NoSuchMethodException, SecurityException {
+            NoSuchMethodException, SecurityException {
 
         Method layoutMethod = ListPanelCard.class.getDeclaredMethod(
                 "layoutEvents", GuiElement.class, List.class, List.class);
@@ -139,8 +144,8 @@ public class IssuePanelTests extends UITest {
         assertEquals(4, ((HBox) nodes.get(2)).getChildren().size());
         assertEquals(4, ((HBox) nodes.get(3)).getChildren().size());
         assertEquals(4, ((HBox) nodes.get(4)).getChildren().size());
-        assertEquals(5, ((VBox) layoutMethod.invoke(null,
-                                    guiElement, events, new ArrayList<Comment>())).getChildren().size());
+        assertEquals(5, ((VBox) layoutMethod.invoke(null, guiElement, events, new ArrayList<Comment>()))
+                                            .getChildren().size());
     }
 
     @Test
@@ -155,13 +160,13 @@ public class IssuePanelTests extends UITest {
         List<TurboIssueEvent> events = new ArrayList<>();
         events.add(
                 new TurboIssueEvent(
-                    new User().setLogin("A"), IssueEventType.Labeled,
+                        new User().setLogin("A"), IssueEventType.Labeled,
                         Utility.localDateTimeToDate(LocalDateTime.of(2015, 1, 1, 1, 1, 0)))
-                    .setLabelName("X").setLabelColour("ffffff"));
+                        .setLabelName("X").setLabelColour("ffffff"));
 
         assertEquals(1,
-                TurboIssueEvent.createLabelUpdateEventNodes(
-                        guiElement, events).size());
+                     TurboIssueEvent.createLabelUpdateEventNodes(
+                             guiElement, events).size());
     }
 
     @Test
@@ -170,6 +175,7 @@ public class IssuePanelTests extends UITest {
         selectAll();
         type("id:11");
         push(KeyCode.ENTER);
+        PlatformEx.waitOnFxThread();
         assertEquals(true, GuiTest.exists("User 11"));
         // arrow to indicate assignment i.e. author -> assignee
         assertEquals(true, GuiTest.exists("\uf03e"));
@@ -182,6 +188,7 @@ public class IssuePanelTests extends UITest {
         selectAll();
         type("id:12");
         push(KeyCode.ENTER);
+        PlatformEx.waitOnFxThread();
         // author should not show since it is an issue
         try {
             GuiTest.exists("User 12");

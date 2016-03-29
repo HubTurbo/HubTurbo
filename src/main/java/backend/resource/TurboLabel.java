@@ -18,13 +18,13 @@ import java.util.stream.Collectors;
 
 public class TurboLabel implements Comparable<TurboLabel> {
 
-    public enum Grouping { EXCLUSIVE, NON_EXCLUSIVE, NONE }
+    public enum Grouping {EXCLUSIVE, NON_EXCLUSIVE, NONE}
 
     public static final String DEFAULT_COLOR = "ffffff";
     public static final String EXCLUSIVE_DELIMITER = ".";
     public static final String NONEXCLUSIVE_DELIMITER = "-";
     public static final String GROUP_PATTERN = String.format(
-        "^([^\\%1$s\\%2$s]+)(\\%1$s|\\%2$s)([^\\%1$s\\%2$s]*)", EXCLUSIVE_DELIMITER, NONEXCLUSIVE_DELIMITER);
+            "^([^\\%1$s\\%2$s]+)(\\%1$s|\\%2$s)([^\\%1$s\\%2$s]*)", EXCLUSIVE_DELIMITER, NONEXCLUSIVE_DELIMITER);
 
     private final String fullName;
     private final String shortName;
@@ -72,6 +72,7 @@ public class TurboLabel implements Comparable<TurboLabel> {
      * group name is name of the group associated with a keyword
      * short name is name of the keyword after omitting its group name and group delimiter
      * Example: "priority.high" -> group name = "priority", group delimiter = ".", short name = "high"
+     *
      * @param keyword
      * @return String array of group name, group delimiter and short name
      */
@@ -79,14 +80,15 @@ public class TurboLabel implements Comparable<TurboLabel> {
         Pattern p = Pattern.compile(GROUP_PATTERN);
         Matcher m = p.matcher(keyword);
 
-        if (!m.find()) return new String[] {"", "", keyword};
-            
-        return new String[] {m.group(1), m.group(2), m.group(3)};
+        if (!m.find()) return new String[] { "", "", keyword };
+
+        return new String[] { m.group(1), m.group(2), m.group(3) };
 
     }
 
     /**
      * Assumption: the labelName matches at least 1 TurboLabel
+     *
      * @return the first TurboLabel in labels that matches labelName
      */
     public static final TurboLabel getFirstMatchingTurboLabel(List<TurboLabel> labels, String labelName) {
@@ -104,6 +106,7 @@ public class TurboLabel implements Comparable<TurboLabel> {
 
     /**
      * Matches label name that contains nameQuery and the matching is case-insensitive
+     *
      * @param allLabels
      * @param nameQuery
      * @return the list of label names that matches a query
@@ -118,6 +121,7 @@ public class TurboLabel implements Comparable<TurboLabel> {
     /**
      * Matches label name that contains groupQuery and the matching is
      * case-insensitive
+     *
      * @param allLabels
      * @param groupQuery
      * @return the list of label names that belongs to a group and matches a query
@@ -139,7 +143,7 @@ public class TurboLabel implements Comparable<TurboLabel> {
     /**
      * @param allLabels
      * @param keyword
-     * @return the list of labels that matches the keyword i.e. the label's group 
+     * @return the list of labels that matches the keyword i.e. the label's group
      * contains keyword's group and label's name contains keyword's name
      */
     public static List<TurboLabel> getMatchedLabels(List<TurboLabel> allLabels, String keyword) {
@@ -159,13 +163,13 @@ public class TurboLabel implements Comparable<TurboLabel> {
      */
     public static List<TurboLabel> getMatchedLabels(List<TurboLabel> allLabels, List<String> labelNames) {
         return allLabels.stream()
-            .filter(label -> labelNames.contains(label.getFullName()))
-            .collect(Collectors.toList());
+                .filter(label -> labelNames.contains(label.getFullName()))
+                .collect(Collectors.toList());
     }
 
     /**
      * @return group name if the label belongs to a group. Empty string if otherwise.
-     * Optional is not returned to make standardise handling of names consistent with short name 
+     * Optional is not returned to make standardise handling of names consistent with short name
      * which always return a String
      */
     public String getGroupName() {
@@ -173,8 +177,8 @@ public class TurboLabel implements Comparable<TurboLabel> {
     }
 
     /**
-     * @return short name if the label belongs to a group. 
-     * full name will be returned for label without a group 
+     * @return short name if the label belongs to a group.
+     * full name will be returned for label without a group
      */
     public String getShortName() {
         return shortName;

@@ -38,7 +38,7 @@ public final class Utility {
     public static boolean isWellFormedRepoId(String repoId) {
         RepositoryId repositoryId = RepositoryId.createFromId(repoId);
         return repoId != null && !repoId.isEmpty() && repositoryId != null
-            && repoId.equals(repositoryId.generateId());
+                && repoId.equals(repositoryId.generateId());
     }
 
     public static Optional<String> readFile(String fileName) {
@@ -56,6 +56,7 @@ public final class Utility {
     /**
      * Returns true on JSON corruption.
      * TODO remove JSON-specific parts
+     *
      * @param fileName
      * @param content
      * @param issueCount
@@ -84,6 +85,7 @@ public final class Utility {
 
     /**
      * Returns true on failure to delete file
+     *
      * @param fileName
      * @return true on error in deleting file, false otherwise
      */
@@ -107,12 +109,14 @@ public final class Utility {
         if (issueCount > 0 && sizeAfterWrite > ((long) issueCount * 2000)) {
             UI.events.triggerEvent(new ShowErrorDialogEvent("Possible data corruption detected",
                     fileName + " is unusually large.\n\n"
-                            + "Now proceeding to delete the file and redownload the repository to prevent "
+                            + "Now proceeding to delete the file and "
+                            + "redownload the repository to prevent "
                             + "further corruption.\n\n"
-                            + "A copy of the corrupted file is saved as " + fileName + "-err. "
-                            + "The error log of the program has been stored in the file hubturbo-err-log.log."
-                    )
-            );
+                            + "A copy of the corrupted file is saved as "
+                            + fileName + "-err. "
+                            + "The error log of the program has been stored "
+                            + "in the file hubturbo-err-log.log."
+            ));
             parseAndDeleteFile(fileName);
             copyLog();
             return true;
@@ -123,8 +127,8 @@ public final class Utility {
     public static void copyLog() {
         try {
             Files.copy(Paths.get("hubturbo-log.log"),
-                    Paths.get("hubturbo-err-log.log"),
-                    StandardCopyOption.REPLACE_EXISTING);
+                       Paths.get("hubturbo-err-log.log"),
+                       StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             logger.error(e.getLocalizedMessage(), e);
         }
@@ -165,6 +169,7 @@ public final class Utility {
 
     /**
      * Returns a replacement object if obj is null
+     *
      * @param obj
      * @param replacement
      * @return a replacement value if obj is null
@@ -175,8 +180,7 @@ public final class Utility {
 
     public static int safeLongToInt(long l) {
         if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE) {
-            throw new IllegalArgumentException
-                (l + " cannot be cast to int without changing its value.");
+            throw new IllegalArgumentException(l + " cannot be cast to int without changing its value.");
         }
         return (int) l;
     }
@@ -191,7 +195,7 @@ public final class Utility {
         }
     }
 
-    public static String formatDateISO8601(Date date){
+    public static String formatDateISO8601(Date date) {
         assert date != null;
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'", Locale.US);
         df.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -228,6 +232,7 @@ public final class Utility {
 
     /**
      * Parses a version number string in the format V1.2.3.
+     *
      * @param version version number string
      * @return an array of 3 elements, representing the major, minor, and patch versions respectively
      */
@@ -240,7 +245,7 @@ public final class Utility {
             int major = temp.length > 0 ? Integer.parseInt(temp[0]) : 0;
             int minor = temp.length > 1 ? Integer.parseInt(temp[1]) : 0;
             int patch = temp.length > 2 ? Integer.parseInt(temp[2]) : 0;
-            return Optional.of(new int[] {major, minor, patch});
+            return Optional.of(new int[] { major, minor, patch });
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
@@ -265,6 +270,17 @@ public final class Utility {
         return source.toLowerCase().contains(query.toLowerCase());
     }
 
+    /**
+     * Checks that the source contains all words in queries
+     *
+     * @param source
+     * @param queries
+     * @return
+     */
+    public static boolean containsIgnoreCase(String source, List<String> queries) {
+        return queries.stream().allMatch(query -> Utility.containsIgnoreCase(source, query));
+    }
+
     public static boolean startsWithIgnoreCase(String source, String query) {
         return source.toLowerCase().startsWith(query.toLowerCase());
     }
@@ -279,8 +295,7 @@ public final class Utility {
         List<String> existingSuffixes = existingNames.stream()
                 .filter(existing -> existing.startsWith(desiredName)
                         && !existing.equalsIgnoreCase(desiredName))
-                .map(existing ->
-                        existing.substring(existing.indexOf(desiredName, 0) + desiredName.length()))
+                .map(existing -> existing.substring(existing.indexOf(desiredName, 0) + desiredName.length()))
                 .collect(Collectors.toList());
 
         int index = 1;
@@ -302,6 +317,7 @@ public final class Utility {
     /**
      * If a value is present in the optional, applies mapping function to it and return the result,
      * otherwise executes the ifEmpty function and returns an empty optional
+     *
      * @param optional
      * @param mapper
      * @param ifEmpty
@@ -318,4 +334,5 @@ public final class Utility {
     }
 
     private Utility() {}
+
 }

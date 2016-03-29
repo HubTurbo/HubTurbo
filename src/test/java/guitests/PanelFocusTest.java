@@ -13,8 +13,6 @@ import org.loadui.testfx.utils.FXTestUtils;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
-import prefs.ConfigFileHandler;
-import prefs.GlobalConfig;
 import prefs.PanelInfo;
 import prefs.Preferences;
 import ui.TestController;
@@ -135,9 +133,7 @@ public class PanelFocusTest extends UITest {
     }
 
     private void createDefaultPanels() {
-        ConfigFileHandler configFileHandler =
-            new ConfigFileHandler(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
-        GlobalConfig globalConfig = new GlobalConfig();
+        Preferences prefs = TestController.createTestPreferences();
 
         PanelInfo test1 = new PanelInfo();
         PanelInfo test2 = new PanelInfo();
@@ -147,7 +143,6 @@ public class PanelFocusTest extends UITest {
         panels.add(test2);
         panels.add(test3);
 
-        globalConfig.setPanelInfo(panels);
-        configFileHandler.saveGlobalConfig(globalConfig);
+        prefs.setPanelInfo(panels);
     }
 }

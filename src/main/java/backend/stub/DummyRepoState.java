@@ -9,9 +9,7 @@ import github.IssueEventType;
 import github.TurboIssueEvent;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
-import org.eclipse.egit.github.core.Comment;
-import org.eclipse.egit.github.core.Label;
-import org.eclipse.egit.github.core.User;
+import org.eclipse.egit.github.core.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -20,7 +18,7 @@ import java.util.stream.Collectors;
 
 public class DummyRepoState {
 
-    public static final int noOfDummyIssues = 12;
+    public static final int NO_OF_DUMMY_ISSUES = 12;
     private final String dummyRepoId;
 
     private final TreeMap<Integer, TurboIssue> issues = new TreeMap<>();
@@ -50,17 +48,17 @@ public class DummyRepoState {
     }
 
     private void initializeRepoEntities() {
-        for (int i = 0; i < noOfDummyIssues; i++) {
+        for (int i = 0; i < NO_OF_DUMMY_ISSUES; i++) {
             TurboIssue dummyIssue;
             // Issue #7 is a PR
             switch (i) {
-                case 6:
-                case 10:
-                    dummyIssue = makeDummyPR();
-                    break;
-                default:
-                    dummyIssue = makeDummyIssue();
-                    break;
+            case 6:
+            case 10:
+                dummyIssue = makeDummyPR();
+                break;
+            default:
+                dummyIssue = makeDummyIssue();
+                break;
             }
             // All default issues are treated as if created a long time ago
             dummyIssue.setUpdatedAt(LocalDateTime.of(2000 + i, 1, 1, 0, 0));
@@ -102,7 +100,7 @@ public class DummyRepoState {
         }
 
         // Odd issues are assigned label 1, even issues are assigned label 2
-        for (int i = 1; i <= noOfDummyIssues; i++) {
+        for (int i = 1; i <= NO_OF_DUMMY_ISSUES; i++) {
             issues.get(i).addLabel((i % 2 == 0) ? "Label 2" : "Label 1");
         }
 
@@ -155,27 +153,26 @@ public class DummyRepoState {
         updatedEvents.add(10);
 
         // Then set label 3 and 11 for issue 8, and immediately remove label 11
-        String[] oldLabels = {"Label 3", "Label 11"};
-        String[] newLabels = {"Label 3"};
+        String[] oldLabels = { "Label 3", "Label 11" };
+        String[] newLabels = { "Label 3" };
         setLabels(8, Arrays.asList(oldLabels));
         setLabels(8, Arrays.asList(newLabels));
         // Then put a temporary (colourful) label into the repo
         labels.put("Deleted", new TurboLabel(dummyRepoId, "84b6eb", "Deleted"));
-        String[] issue9Labels = {"Label 1"};
-        String[] deletedLabels = {"Label 1", "Deleted"};
+        String[] issue9Labels = { "Label 1" };
+        String[] deletedLabels = { "Label 1", "Deleted" };
         setLabels(9, Arrays.asList(deletedLabels)); // add and unset it immediately on issue 9
         setLabels(9, Arrays.asList(issue9Labels));
         labels.remove("Deleted"); // Then remove this label. The labeling events should still display the color.
     }
 
-    protected ImmutableTriple<List<TurboIssue>, String, Date>
-        getUpdatedIssues(String eTag, Date lastCheckTime) {
+    protected ImmutableTriple<List<TurboIssue>, String, Date> getUpdatedIssues(String eTag, Date lastCheckTime) {
 
         String currETag = eTag;
         if (!updatedIssues.isEmpty() || eTag == null) currETag = UUID.randomUUID().toString();
 
         ImmutableTriple<List<TurboIssue>, String, Date> toReturn = new ImmutableTriple<>(
-            deepCopyIssues(updatedIssues), currETag, lastCheckTime);
+                deepCopyIssues(updatedIssues), currETag, lastCheckTime);
 
         updatedIssues = new TreeMap<>();
         return toReturn;
@@ -186,7 +183,7 @@ public class DummyRepoState {
         if (!updatedLabels.isEmpty() || eTag == null) currETag = UUID.randomUUID().toString();
 
         ImmutablePair<List<TurboLabel>, String> toReturn
-            = new ImmutablePair<>(deepCopyLabels(updatedLabels), currETag);
+                = new ImmutablePair<>(deepCopyLabels(updatedLabels), currETag);
 
         updatedLabels = new TreeMap<>();
         return toReturn;
@@ -197,7 +194,7 @@ public class DummyRepoState {
         if (!updatedMilestones.isEmpty() || eTag == null) currETag = UUID.randomUUID().toString();
 
         ImmutablePair<List<TurboMilestone>, String> toReturn
-            = new ImmutablePair<>(deepCopyMilestones(updatedMilestones), currETag);
+                = new ImmutablePair<>(deepCopyMilestones(updatedMilestones), currETag);
 
         updatedMilestones = new TreeMap<>();
         return toReturn;
@@ -208,7 +205,7 @@ public class DummyRepoState {
         if (!updatedUsers.isEmpty() || eTag == null) currETag = UUID.randomUUID().toString();
 
         ImmutablePair<List<TurboUser>, String> toReturn
-            = new ImmutablePair<>(deepCopyUsers(updatedUsers), currETag);
+                = new ImmutablePair<>(deepCopyUsers(updatedUsers), currETag);
 
         updatedUsers = new TreeMap<>();
         return toReturn;
@@ -232,20 +229,20 @@ public class DummyRepoState {
 
     private TurboIssue makeDummyIssue() {
         return new TurboIssue(dummyRepoId,
-                issues.size() + 1,
-                "Issue " + (issues.size() + 1),
-                "User " + (issues.size() + 1),
-                LocalDateTime.of(1999 + issues.size(), 1, 1, 0, 0),
-                false);
+                              issues.size() + 1,
+                              "Issue " + (issues.size() + 1),
+                              "User " + (issues.size() + 1),
+                              LocalDateTime.of(1999 + issues.size(), 1, 1, 0, 0),
+                              false);
     }
 
     private TurboIssue makeDummyPR() {
         return new TurboIssue(dummyRepoId,
-                issues.size() + 1,
-                "PR " + (issues.size() + 1),
-                "User " + (issues.size() + 1),
-                LocalDateTime.of(1999 + issues.size(), 1, 1, 0, 0),
-                true);
+                              issues.size() + 1,
+                              "PR " + (issues.size() + 1),
+                              "User " + (issues.size() + 1),
+                              LocalDateTime.of(1999 + issues.size(), 1, 1, 0, 0),
+                              true);
     }
 
     private TurboLabel makeDummyLabel() {
@@ -320,8 +317,8 @@ public class DummyRepoState {
 
         // Mutate the copies
         eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test-nonself"),
-                IssueEventType.Renamed,
-                new Date()));
+                                              IssueEventType.Renamed,
+                                              new Date()));
         toRename.setTitle(updateText);
         toRename.setUpdatedAt(LocalDateTime.now());
 
@@ -329,6 +326,23 @@ public class DummyRepoState {
         markUpdatedEvents(toRename, IssueMetadata.intermediate(eventsOfIssue, metadataOfIssue.getComments(), "", ""));
 
         return toRename;
+    }
+
+    public boolean editIssueState(int issueId, boolean isOpen) {
+        ImmutablePair<TurboIssue, IssueMetadata> mutables = produceMutables(issueId);
+        TurboIssue toEdit = mutables.getLeft();
+        IssueMetadata metadataOfIssue = mutables.getRight();
+        List<TurboIssueEvent> eventsOfIssue = metadataOfIssue.getEvents();
+
+        eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test-nonself"),
+                                              isOpen ? IssueEventType.Reopened : IssueEventType.Closed,
+                                              new Date()));
+        toEdit.setOpen(isOpen);
+        toEdit.setUpdatedAt(LocalDateTime.now());
+
+        markUpdatedEvents(toEdit, IssueMetadata.intermediate(eventsOfIssue, metadataOfIssue.getComments(), "", ""));
+
+        return true;
     }
 
     protected TurboMilestone updateMilestone(int itemId, String updateText) {
@@ -381,16 +395,20 @@ public class DummyRepoState {
 
         // Mutate the copies
         List<String> labelsOfIssue = toSet.getLabels();
-        labelsOfIssue.stream().filter(existingLabel -> !newLabels.contains(existingLabel)).forEach(labelName ->
-                eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test-nonself"),
-                        IssueEventType.Unlabeled,
-                        new Date()).setLabelName(labelName).setLabelColour(labels.get(labelName).getColour()))
-        );
-        newLabels.stream().filter(newLabel -> !labelsOfIssue.contains(newLabel)).forEach(newLabel ->
-                eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test-nonself"),
-                        IssueEventType.Labeled,
-                        new Date()).setLabelName(newLabel).setLabelColour(labels.get(newLabel).getColour()))
-        );
+        labelsOfIssue.stream()
+                .filter(existingLabel -> !newLabels.contains(existingLabel))
+                .forEach(labelName -> eventsOfIssue.add(
+                        new TurboIssueEvent(new User().setLogin("test-nonself"), IssueEventType.Unlabeled, new Date())
+                                .setLabelName(labelName)
+                                .setLabelColour(labels.get(labelName).getColour())));
+
+        newLabels.stream()
+                .filter(newLabel -> !labelsOfIssue.contains(newLabel))
+                .forEach(newLabel -> eventsOfIssue.add(
+                        new TurboIssueEvent(new User().setLogin("test-nonself"), IssueEventType.Labeled, new Date())
+                                .setLabelName(newLabel)
+                                .setLabelColour(labels.get(newLabel).getColour())));
+
         toSet.setLabels(newLabels);
         toSet.setUpdatedAt(LocalDateTime.now());
 
@@ -398,6 +416,57 @@ public class DummyRepoState {
         markUpdatedEvents(toSet, IssueMetadata.intermediate(eventsOfIssue, metadataOfIssue.getComments(), "", ""));
 
         return newLabels.stream().map(new Label()::setName).collect(Collectors.toList());
+    }
+
+    protected final Issue setMilestone(int issueId, Optional<Integer> milestone) {
+        ImmutablePair<TurboIssue, IssueMetadata> mutables = produceMutables(issueId);
+        TurboIssue issueToSet = mutables.getLeft();
+        IssueMetadata metadataOfIssue = mutables.getRight();
+        List<TurboIssueEvent> eventsOfIssue = metadataOfIssue.getEvents();
+
+        // demilestone the issue, then set issue milestone using the new milestone
+        issueToSet.getMilestone()
+                .ifPresent(issueMilestone -> removeMilestoneFromIssue(issueMilestone, issueToSet, eventsOfIssue));
+        milestone
+                .ifPresent(newMilestone -> setMilestoneForIssue(newMilestone, issueToSet, eventsOfIssue));
+
+        issueToSet.setUpdatedAt(LocalDateTime.now());
+        // Replace originals with copies, and queue them up to be retrieved
+        markUpdatedEvents(issueToSet, IssueMetadata.intermediate(eventsOfIssue, metadataOfIssue.getComments(), "", ""));
+
+        Issue serverIssue = new Issue();
+        milestone.ifPresent(newMilestone -> serverIssue.setMilestone(new Milestone().setNumber(newMilestone)));
+        return serverIssue;
+    }
+
+    /**
+     * Sets milestone for an issue, after triggering a 'Milestoned' TurboIssueEvent for it
+     *
+     * @param milestone
+     * @param toSet
+     * @param eventsOfIssue
+     */
+    private void setMilestoneForIssue(int milestone, TurboIssue toSet, List<TurboIssueEvent> eventsOfIssue) {
+        eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test"),
+                                              IssueEventType.Milestoned,
+                                              new Date()).setMilestoneTitle(milestones.get(milestone).getTitle()));
+        toSet.setMilestoneById(milestone);
+    }
+
+    /**
+     * Removes the milestone of an issue, after triggerign a 'Demilestoned' TurboIssueEvent for it
+     *
+     * @param milestoneOfIssue
+     * @param toSet
+     * @param eventsOfIssue
+     */
+    private void removeMilestoneFromIssue(int milestoneOfIssue, TurboIssue toSet, List<TurboIssueEvent> eventsOfIssue) {
+        eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test"),
+                                              IssueEventType.Demilestoned,
+                                              new Date())
+                .setMilestoneTitle(milestones.get(milestoneOfIssue).getTitle()));
+
+        toSet.removeMilestone();
     }
 
     protected TurboIssue commentOnIssue(String author, String commentText, int issueId) {
@@ -418,7 +487,7 @@ public class DummyRepoState {
 
         // Replace originals with copies, and queue them up to be retrieved
         markUpdatedComments(toComment,
-            IssueMetadata.intermediate(metadataOfIssue.getEvents(), commentsOfIssue, "", ""));
+                            IssueMetadata.intermediate(metadataOfIssue.getEvents(), commentsOfIssue, "", ""));
 
         return toComment;
     }
@@ -448,7 +517,7 @@ public class DummyRepoState {
      * Auxiliary method that replaces original issue & metadata with the mutated copies after updating the issue.
      * Simulates the event of an user action causing the ETag of the issue events to change.
      *
-     * @param toMark The mutated copy of the issue, to replace the original issue
+     * @param toMark   The mutated copy of the issue, to replace the original issue
      * @param toInsert The mutated metadata of the issue, to replace the original issue metadata
      */
     private void markUpdatedEvents(TurboIssue toMark, IssueMetadata toInsert) {
@@ -464,7 +533,7 @@ public class DummyRepoState {
      * Auxiliary method that replaces original issue & metadata with the mutated copies after updating the issue.
      * Simulates the event of an user action causing the ETag of the issue comments to change.
      *
-     * @param toMark The mutated copy of the issue, to replace the original issue
+     * @param toMark   The mutated copy of the issue, to replace the original issue
      * @param toInsert The mutated metadata of the issue, to replace the original issue metadata
      */
     private void markUpdatedComments(TurboIssue toMark, IssueMetadata toInsert) {

@@ -28,8 +28,8 @@ public class Model implements IBaseModel {
      * Standard constructor.
      */
     public Model(String repoId, List<TurboIssue> issues,
-        List<TurboLabel> labels, List<TurboMilestone> milestones, List<TurboUser> users,
-        UpdateSignature updateSignature) {
+                 List<TurboLabel> labels, List<TurboMilestone> milestones, List<TurboUser> users,
+                 UpdateSignature updateSignature) {
 
         this.updateSignature = updateSignature;
         this.repoId = repoId;
@@ -44,7 +44,7 @@ public class Model implements IBaseModel {
      * a model is first downloaded.
      */
     public Model(String repoId, List<TurboIssue> issues,
-        List<TurboLabel> labels, List<TurboMilestone> milestones, List<TurboUser> users) {
+                 List<TurboLabel> labels, List<TurboMilestone> milestones, List<TurboUser> users) {
 
         this.updateSignature = UpdateSignature.EMPTY;
         this.repoId = repoId;
@@ -82,17 +82,17 @@ public class Model implements IBaseModel {
         this.updateSignature = model.updateSignature;
         this.repoId = model.repoId;
         this.issues = model.issues.stream()
-            .map(i -> new TurboIssue(model.repoId, i))
-            .collect(Collectors.toList());
+                .map(i -> new TurboIssue(model.repoId, i))
+                .collect(Collectors.toList());
         this.labels = model.labels.stream()
-            .map(l -> new TurboLabel(model.repoId, l))
-            .collect(Collectors.toList());
+                .map(l -> new TurboLabel(model.repoId, l))
+                .collect(Collectors.toList());
         this.milestones = model.milestones.stream()
-            .map(m -> new TurboMilestone(model.repoId, m))
-            .collect(Collectors.toList());
+                .map(m -> new TurboMilestone(model.repoId, m))
+                .collect(Collectors.toList());
         this.users = model.users.stream()
-            .map(u -> new TurboUser(model.repoId, u))
-            .collect(Collectors.toList());
+                .map(u -> new TurboUser(model.repoId, u))
+                .collect(Collectors.toList());
     }
 
     public String getRepoId() {
@@ -190,25 +190,58 @@ public class Model implements IBaseModel {
 
     public List<TurboLabel> getLabelsOfIssue(TurboIssue issue) {
         return issue.getLabels().stream()
-            .map(this::getLabelByActualName)
-            .filter(Optional::isPresent).map(Optional::get)
-            .collect(Collectors.toList());
+                .map(this::getLabelByActualName)
+                .filter(Optional::isPresent).map(Optional::get)
+                .collect(Collectors.toList());
     }
 
     /**
      * Replaces labels of an issue specified by {@code issueId} with {@code labels}
+     *
      * @param issueId
      * @param labels
      * @return the modified TurboIssue if successful
      */
     public synchronized Optional<TurboIssue> replaceIssueLabels(int issueId, List<String> labels) {
         Optional<TurboIssue> issueLookUpResult = getIssueById(issueId);
-        return Utility.safeFlatMapOptional(issueLookUpResult,
-                (issue) -> {
-                    issue.setLabels(labels);
-                    return Optional.of(new TurboIssue(issue));
-                },
-                () -> logger.error("Issue " + issueId + " not found in model for " + repoId));
+        return Utility.safeFlatMapOptional(issueLookUpResult, (issue) -> {
+            issue.setLabels(labels);
+            return Optional.of(new TurboIssue(issue));
+        }, () -> logger.error("Issue " + issueId + " not found in model for " + repoId));
+    }
+
+    /**
+     * Replaces the milestone of an issue specified by {@code issueId} with {@code milestone}
+     *
+     * @param issueId
+     * @param milestone
+     * @return the modified TurboIssue if successful
+     */
+    public synchronized Optional<TurboIssue> replaceIssueMilestone(int issueId, Optional<Integer> milestone) {
+        Optional<TurboIssue> issueLookUpResult = getIssueById(issueId);
+        return Utility.safeFlatMapOptional(issueLookUpResult, (issue) -> {
+            if (!milestone.isPresent()) {
+                issue.removeMilestone();
+            } else {
+                issue.setMilestoneById(milestone.get());
+            }
+            return Optional.of(new TurboIssue(issue));
+        }, () -> logger.error("Issue " + issueId + " not found in model for " + repoId));
+    }
+
+    /**
+     * Sets the open/closed state of an issue specified by {@code issueId} with {@code isOpen}
+     *
+     * @param issueId
+     * @param isOpen
+     * @return the modified TurboIssue if successful
+     */
+    public synchronized Optional<TurboIssue> editIssueState(int issueId, boolean isOpen) {
+        Optional<TurboIssue> issueLookUpResult = getIssueById(issueId);
+        return Utility.safeFlatMapOptional(issueLookUpResult, issue -> {
+            issue.setOpen(isOpen);
+            return Optional.of(new TurboIssue(issue));
+        }, () -> logger.error("Issue " + issueId + " not found in model for " + repoId));
     }
 
     @SuppressWarnings("unused")

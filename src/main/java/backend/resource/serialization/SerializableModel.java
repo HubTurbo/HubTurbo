@@ -23,13 +23,13 @@ public class SerializableModel {
         this.updateSignature = model.getUpdateSignature();
 
         this.issues = model.getIssues().stream()
-            .map(SerializableIssue::new).collect(Collectors.toList());
+                .map(SerializableIssue::new).collect(Collectors.toList());
         this.labels = model.getLabels().stream()
-            .map(SerializableLabel::new).collect(Collectors.toList());
+                .map(SerializableLabel::new).collect(Collectors.toList());
         this.milestones = model.getMilestones().stream()
-            .map(SerializableMilestone::new).collect(Collectors.toList());
+                .map(SerializableMilestone::new).collect(Collectors.toList());
         this.users = model.getUsers().stream()
-            .map(SerializableUser::new).collect(Collectors.toList());
+                .map(SerializableUser::new).collect(Collectors.toList());
     }
 }
 
