@@ -43,10 +43,15 @@ public class MilestonePickerDialog extends Dialog<MilestonePickerDialogResponse>
         state = new MilestonePickerState(originalMilestones);
         initUI();
         setupKeyEvents();
+        setInputFieldToDefaultMilestone();
+    }
 
-        getExistingMilestone(originalMilestones)
-                .map(PickerMilestone::getTitle)
-                .ifPresent(this::fillInputFieldWithMilestoneName);
+    /**
+     * Fills the input field of milestone picker dialog with default milestone's title
+     */
+    private void setInputFieldToDefaultMilestone() {
+        Optional<PickerMilestone> defaultMilestone = PickerMilestone.getDefaultMilestone(originalMilestones);
+        defaultMilestone.map(PickerMilestone::getTitle).ifPresent(this::fillInputFieldWithMilestoneName);
     }
 
     private boolean areFromSameRepo(TurboIssue issue, List<TurboMilestone> milestones) {
@@ -99,11 +104,8 @@ public class MilestonePickerDialog extends Dialog<MilestonePickerDialogResponse>
     private void setConfirmResultConverter() {
         setResultConverter((dialogButton) -> {
             List<PickerMilestone> finalList = state.getCurrentMilestonesList();
-            if (hasSelectedMilestone(finalList)) {
-                return new MilestonePickerDialogResponse(dialogButton,
-                                                         Optional.of(getSelectedMilestone(finalList).get().getId()));
-            }
-            return new MilestonePickerDialogResponse(dialogButton, Optional.empty());
+            Optional<PickerMilestone> selectedMilestone = PickerMilestone.getSelectedMilestone(finalList);
+            return new MilestonePickerDialogResponse(dialogButton, selectedMilestone.map(PickerMilestone::getId));
         });
     }
 
@@ -146,9 +148,9 @@ public class MilestonePickerDialog extends Dialog<MilestonePickerDialogResponse>
 
     private void populateAssignedMilestone(List<PickerMilestone> pickerMilestoneList, FlowPane assignedMilestonePane) {
         assignedMilestonePane.getChildren().clear();
-        updateExistingMilestone(getExistingMilestone(pickerMilestoneList), assignedMilestonePane);
+        updateExistingMilestone(PickerMilestone.getExistingMilestone(pickerMilestoneList), assignedMilestonePane);
         addAssignmentIndicator(assignedMilestonePane);
-        updateNewlyAssignedMilestone(getSelectedMilestone(pickerMilestoneList), assignedMilestonePane);
+        updateNewlyAssignedMilestone(PickerMilestone.getSelectedMilestone(pickerMilestoneList), assignedMilestonePane);
     }
 
     private void populateMatchingMilestones(List<PickerMilestone> matchingMilestoneList, VBox matchingMilestones) {
@@ -272,25 +274,6 @@ public class MilestonePickerDialog extends Dialog<MilestonePickerDialogResponse>
         milestoneBox.setMaxHeight(30);
         milestoneBox.setStyle("-fx-border-radius: 3;-fx-border-style: dotted;-fx-alignment:center");
         return milestoneBox;
-    }
-
-    private Optional<PickerMilestone> getExistingMilestone(List<PickerMilestone> milestoneList) {
-        return milestoneList.stream()
-                .filter(PickerMilestone::isExisting)
-                .findAny();
-    }
-
-    private boolean hasSelectedMilestone(List<PickerMilestone> milestoneList) {
-        return milestoneList.stream()
-                .filter(PickerMilestone::isSelected)
-                .findAny()
-                .isPresent();
-    }
-
-    private Optional<PickerMilestone> getSelectedMilestone(List<PickerMilestone> milestoneList) {
-        return milestoneList.stream()
-                .filter(PickerMilestone::isSelected)
-                .findAny();
     }
 
 }
