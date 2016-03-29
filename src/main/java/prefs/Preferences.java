@@ -70,17 +70,17 @@ public class Preferences { // NOPMD
      * @param configDirectory The directory that the config files are held in.
      * @param sessionConfigFileName The name of the session config file
      * @param userConfigFileName The name of the user config file
-     * @param ignoreExisting True if existing config file is to be ignored.
+     * @param isIgnoreExisting True if existing config file is to be ignored.
      */
     private Preferences(String configDirectory,
                         String sessionConfigFileName,
                         String userConfigFileName,
-                        boolean ignoreExisting) {
+                        boolean isIgnoreExisting) {
         this.configDirectory = configDirectory;
         this.sessionConfigFileName = sessionConfigFileName;
         this.userConfigFileName = userConfigFileName;
 
-        if (ignoreExisting) {
+        if (isIgnoreExisting) {
             this.sessionConfig = createConfig(DEFAULT_FILE_CONTENTS, SessionConfig.class);
             this.userConfig = createConfig(DEFAULT_FILE_CONTENTS, UserConfig.class);
         } else {
@@ -115,7 +115,6 @@ public class Preferences { // NOPMD
                 // if we can't read the file, just ignore the existing files
                 HTLog.error(logger, e);
                 logger.error(e.toString());
-                fileContents = DEFAULT_FILE_CONTENTS;
             }
         }
 
