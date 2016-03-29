@@ -36,18 +36,20 @@ public final class FileHelper {
      */
     private static void createDirectoryIfNonExistent(String fileDirectory) throws IOException {
         File directory = new File(fileDirectory);
-        boolean directoryExists = directory.exists() && directory.isDirectory();
-        if (!directoryExists) {
-            if (directory.mkdirs()) {
-                logger.info("Directory created: " + directory.toString());
-            } else {
-                logger.error("Could not create file directory");
-                throw new IOException("Could not create file directory");
-            }
+        boolean isDirectoryExists = directory.exists() && directory.isDirectory();
+        if (isDirectoryExists) {
+            return;
         }
+        boolean isMkdirsSuccessful = directory.mkdirs();
+        if (isMkdirsSuccessful) {
+            logger.info("Directory created: " + directory.toString());
+            return;
+        }
+        logger.error("Could not create file directory");
+        throw new IOException("Could not create file directory");
     }
 
-    public static boolean fileExists(String fileDirectory, String fileName) {
+    public static boolean isFileExists(String fileDirectory, String fileName) {
         return Files.exists(getFilePath(fileDirectory, fileName));
     }
 
@@ -55,7 +57,7 @@ public final class FileHelper {
      * Loads the contents of the file into a String
      * @return The String representation of the contents of the file
      */
-    public static String loadFileContents(String fileDirectory, String fileName) throws IOException {
+    public static String getFileContents(String fileDirectory, String fileName) throws IOException {
         Path filePath = getFilePath(fileDirectory, fileName);
         logger.info("Load starting: " + filePath.toAbsolutePath());
         String contents = new String(Files.readAllBytes(filePath), CHARSET);

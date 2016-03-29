@@ -108,9 +108,9 @@ public class Preferences { // NOPMD
      */
     private <T> T loadConfig(String configDirectory, String configFileName, Class<T> configClass) {
         String fileContents = DEFAULT_FILE_CONTENTS;
-        if (FileHelper.fileExists(configDirectory, configFileName)) {
+        if (FileHelper.isFileExists(configDirectory, configFileName)) {
             try {
-                fileContents = FileHelper.loadFileContents(configDirectory, configFileName);
+                fileContents = FileHelper.getFileContents(configDirectory, configFileName);
             } catch (IOException e) {
                 // if we can't read the file, just ignore the existing files
                 HTLog.error(logger, e);
@@ -150,10 +150,8 @@ public class Preferences { // NOPMD
      * @param configFileName The file name of the config file on disk
      * @param configClass The class of the config object
      */
-    private <T> void saveConfig(T config,
-                            String configDirectory,
-                            String configFileName,
-                            Class configClass) throws IOException {
+    private <T> void saveConfig(T config, String configDirectory, String configFileName, Class configClass)
+            throws IOException {
         String jsonString = JsonHelper.toJsonString(config, configClass);
         FileHelper.writeFileContents(configDirectory, configFileName, jsonString);
     }

@@ -8,6 +8,7 @@ import util.FileHelper;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -19,90 +20,57 @@ public class FileHelperTest {
     private static final String TEST_FILE_NAME = "expected.txt";
 
     @Before
-    public void initialiseTestFilesDirectory() {
-        try {
-            FileUtils.deleteDirectory(new File(TEST_FOLDER));
-            Files.createDirectories(Paths.get(TEST_FOLDER));
-        } catch (IOException e) {
-            fail(e.toString());
-        }
+    public void initialiseTestFilesDirectory() throws IOException {
+        FileUtils.deleteDirectory(new File(TEST_FOLDER));
+        Files.createDirectories(Paths.get(TEST_FOLDER));
     }
 
     @After
-    public void removeTestFilesDirectory() {
-        try {
-            FileUtils.deleteDirectory(new File(TEST_FOLDER));
-        } catch (IOException e) {
-            fail(e.toString());
-        }
+    public void removeTestFilesDirectory() throws IOException {
+        FileUtils.deleteDirectory(new File(TEST_FOLDER));
     }
 
-    private void createTestFile(String content) {
-        try {
-            Files.write(Paths.get(TEST_FOLDER, TEST_FILE_NAME), content.getBytes("UTF-8"));
-        } catch (IOException e) {
-            fail(e.toString());
-        }
+    private void createTestFile(String content) throws IOException {
+        Files.write(Paths.get(TEST_FOLDER, TEST_FILE_NAME), content.getBytes("UTF-8"));
     }
 
-    private void createEmptyTestFile() {
-        try {
-            Files.createFile(Paths.get(TEST_FOLDER, TEST_FILE_NAME));
-        } catch (IOException e) {
-            fail(e.toString());
-        }
+    private void createEmptyTestFile() throws IOException{
+        Files.createFile(Paths.get(TEST_FOLDER, TEST_FILE_NAME));
     }
 
     @Test
-    public void exists_fileExists_true() {
+    public void exists_fileExists_true() throws IOException {
         createEmptyTestFile();
-        assertTrue(FileHelper.fileExists(TEST_FOLDER, TEST_FILE_NAME));
+        assertTrue(FileHelper.isFileExists(TEST_FOLDER, TEST_FILE_NAME));
     }
 
     @Test
     public void exists_fileDoesNotExist_false() {
-        assertFalse(FileHelper.fileExists(TEST_FOLDER, TEST_FILE_NAME));
+        assertFalse(FileHelper.isFileExists(TEST_FOLDER, TEST_FILE_NAME));
     }
 
     @Test
-    public void loadFileContents_fromEmptyFile_emptyString() {
+    public void loadFileContents_fromEmptyFile_emptyString() throws IOException {
         createEmptyTestFile();
-        try {
-            assertEquals("", FileHelper.loadFileContents(TEST_FOLDER, TEST_FILE_NAME));
-        } catch (IOException e) {
-            fail(e.toString());
-        }
+        assertEquals("", FileHelper.getFileContents(TEST_FOLDER, TEST_FILE_NAME));
     }
 
     @Test
-    public void loadFileContents_fromConstructedFile_constructedString() {
+    public void loadFileContents_fromConstructedFile_constructedString() throws IOException {
         String fileContents = "this is a test string 42 {}\nthis is a new line 44";
         createTestFile(fileContents);
-        try {
-            assertEquals(fileContents, FileHelper.loadFileContents(TEST_FOLDER, TEST_FILE_NAME));
-        } catch (IOException e) {
-            fail(e.toString());
-        }
+        assertEquals(fileContents, FileHelper.getFileContents(TEST_FOLDER, TEST_FILE_NAME));
     }
 
     @Test
-    public void writeFileContents_emptyString_emptyFileContents() {
-        try {
-            FileHelper.writeFileContents(TEST_FOLDER, TEST_FILE_NAME, "");
-            assertEquals("", FileUtils.readFileToString(new File(TEST_FOLDER, TEST_FILE_NAME)));
-        } catch (IOException e) {
-            fail(e.toString());
-        }
+    public void writeFileContents_emptyString_emptyFileContents() throws IOException {
+        assertEquals("", FileUtils.readFileToString(new File(TEST_FOLDER, TEST_FILE_NAME)));
     }
 
     @Test
-    public void writeFileContents_constructedString_constructedFileContents() {
+    public void writeFileContents_constructedString_constructedFileContents() throws IOException {
         String fileContents = "this is a test string 47 {}\nthis is a new line 49";
-        try {
-            FileHelper.writeFileContents(TEST_FOLDER, TEST_FILE_NAME, fileContents);
-            assertEquals(fileContents, FileUtils.readFileToString(new File(TEST_FOLDER, TEST_FILE_NAME)));
-        } catch (IOException e) {
-            fail(e.toString());
-        }
+        FileHelper.writeFileContents(TEST_FOLDER, TEST_FILE_NAME, fileContents);
+        assertEquals(fileContents, FileUtils.readFileToString(new File(TEST_FOLDER, TEST_FILE_NAME)));
     }
 }
