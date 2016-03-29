@@ -11,6 +11,9 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 
+import java.util.List;
+import java.util.Optional;
+
 public class PickerAssignee extends TurboUser implements Comparable<PickerAssignee> {
 
     private static final int AVATAR_SIZE = 30;
@@ -51,12 +54,36 @@ public class PickerAssignee extends TurboUser implements Comparable<PickerAssign
         return getAssigneeLabelWithAvatar();
     }
 
-    public Node getExistingAssigneeNode(boolean hasSelected) {
+    public Node getExistingAssigneeNode(boolean hasSelectedAssigneeInPicker) {
         Label assignee = getAssigneeLabelWithAvatar();
-        if (hasSelected || !isSelected()) {
+        if (hasSelectedAssigneeInPicker || !isSelected()) {
             assignee.getStyleClass().add("labels-removed"); // add strikethrough
         }
         return assignee;
+    }
+
+    /**
+     * Gets the existing assignee from the assignees list
+     *
+     * @param assignees
+     * @return Optional of existing assignee
+     */
+    public static Optional<PickerAssignee> getExistingAssignee(List<PickerAssignee> assignees) {
+        return assignees.stream()
+                .filter(PickerAssignee::isExisting)
+                .findAny();
+    }
+
+    /**
+     * Gets the selected assignee from the assignees list
+     *
+     * @param assignees
+     * @return Optional of selected assignee
+     */
+    public static Optional<PickerAssignee> getSelectedAssignee(List<PickerAssignee> assignees) {
+        return assignees.stream()
+                .filter(PickerAssignee::isSelected)
+                .findAny();
     }
 
     public void setSelected(boolean isSelected) {
@@ -86,11 +113,6 @@ public class PickerAssignee extends TurboUser implements Comparable<PickerAssign
         String thisLoginName = this.getLoginName().toLowerCase();
         String otherLoginName = other.getLoginName().toLowerCase();
         return thisLoginName.compareTo(otherLoginName);
-    }
-
-    private ImageView getAvatarImageView(){
-        if (getAvatarURL().isEmpty()) return new ImageView();
-        return new ImageView(new Image(getAvatarURL(), AVATAR_SIZE, AVATAR_SIZE, true, true, true));
     }
 
     /**
@@ -142,5 +164,10 @@ public class PickerAssignee extends TurboUser implements Comparable<PickerAssign
         assignee.getStyleClass().add("labels");
         assignee.setStyle("-fx-background-color: lightgreen;");
         return assignee;
+    }
+
+    private ImageView getAvatarImageView(){
+        if (getAvatarURL().isEmpty()) return new ImageView();
+        return new ImageView(new Image(getAvatarURL(), AVATAR_SIZE, AVATAR_SIZE, true, true, true));
     }
 }

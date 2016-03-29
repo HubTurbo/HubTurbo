@@ -11,7 +11,7 @@ public class AssigneePickerState {
     private List<PickerAssignee> currentAssigneesList;
 
     public AssigneePickerState(List<PickerAssignee> assignees) {
-        currentAssigneesList = cloneList(assignees);
+        currentAssigneesList = cloneAssignees(assignees);
     }
 
     public AssigneePickerState(List<PickerAssignee> assignees, String userInput) {
@@ -19,7 +19,7 @@ public class AssigneePickerState {
         processInput(userInput);
     }
 
-    private List<PickerAssignee> cloneList(List<PickerAssignee> sourceList) {
+    private static List<PickerAssignee> cloneAssignees(List<PickerAssignee> sourceList) {
         return sourceList.stream()
                 .map(PickerAssignee::new)
                 .collect(Collectors.toList());
@@ -40,9 +40,9 @@ public class AssigneePickerState {
         return this.currentAssigneesList;
     }
 
-    public List<PickerAssignee> getMatchingAssigneeList() {
+    public List<PickerAssignee> getMatchingAssigneesList() {
         return currentAssigneesList.stream()
-                .filter(assignee -> assignee.isMatching())
+                .filter(PickerAssignee::isMatching)
                 .collect(Collectors.toList());
     }
 
@@ -57,22 +57,20 @@ public class AssigneePickerState {
     }
 
     private void toggleAssignee(PickerAssignee matchingAssignee) {
-        currentAssigneesList
-                .forEach(assignee -> assignee.setSelected(matchingAssignee.equals(assignee)
+        currentAssigneesList.forEach(assignee -> assignee.setSelected(matchingAssignee.equals(assignee)
                 && !assignee.isSelected()));
     }
 
     private void filterAssignees(String query) {
-        currentAssigneesList
-                .forEach(assignee -> {
-                    boolean matchQuery = Utility.containsIgnoreCase(assignee.getLoginName(), query);
-                    assignee.setMatching(matchQuery);
-                });
+        currentAssigneesList.forEach(assignee -> {
+            boolean matchQuery = Utility.containsIgnoreCase(assignee.getLoginName(), query);
+            assignee.setMatching(matchQuery);
+        });
     }
 
     private Optional<PickerAssignee> getFirstMatchingAssignee() {
         return currentAssigneesList.stream()
-                .filter(assignee -> assignee.isMatching())
+                .filter(PickerAssignee::isMatching)
                 .findFirst();
     }
 

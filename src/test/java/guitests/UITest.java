@@ -362,6 +362,14 @@ public class UITest extends FxRobot {
     }
 
     /**
+     * Clicks the assignee picker's TextField
+     */
+    public void clickAssigneePickerTextField() {
+        waitUntilNodeAppears(IdGenerator.getAssigneePickerFieldIdReference());
+        clickOn(IdGenerator.getAssigneePickerFieldIdReference());
+    }
+
+    /**
      * Gets the label picker's TextField
      */
     public TextField getLabelPickerTextField() {
@@ -373,6 +381,13 @@ public class UITest extends FxRobot {
      */
     public TextField getMilestonePickerTextField() {
         return GuiTest.find(IdGenerator.getMilestonePickerTextFieldIdReference());
+    }
+
+    /**
+     * Gets the assignee picker's TextField
+     */
+    public TextField getAssigneePickerTextField() {
+        return GuiTest.find(IdGenerator.getAssigneePickerFieldIdReference());
     }
 
     /**

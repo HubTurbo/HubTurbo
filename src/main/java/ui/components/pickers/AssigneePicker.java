@@ -24,26 +24,27 @@ public class AssigneePicker {
     }
 
     private void showAssigneePicker(TurboIssue issue) {
-        List<TurboUser> assigneeList = ui.logic.getRepo(issue.getRepoId()).getUsers();
-        AssigneePickerDialog assigneePickerDialog = new AssigneePickerDialog(stage, issue, assigneeList);
-        Optional<AssigneePickerDialogResponse> assigneeDialogResponse = assigneePickerDialog.showAndWait();
+        List<TurboUser> assignees = ui.logic.getRepo(issue.getRepoId()).getUsers();
+        Optional<AssigneePickerDialog.AssigneePickerDialogResponse> assigneeDialogResponse =
+                new AssigneePickerDialog(stage, issue, assignees).showAndWait();
 
         if (wasCancelled(assigneeDialogResponse)) {
             return;
         }
+
         Optional<String> newlyAssignedAssignee = assigneeDialogResponse.get().getAssigneeLoginName();
-        if (!issue.getAssignee().equals(newlyAssignedAssignee)) {
-            addActionIfAssigneeChanged(issue, newlyAssignedAssignee);
-        }
+        changeAssignee(issue, newlyAssignedAssignee);
     }
 
-    private boolean wasCancelled(Optional<AssigneePickerDialogResponse> assigneeDialogResponse) {
+    private boolean wasCancelled(Optional<AssigneePickerDialog.AssigneePickerDialogResponse> assigneeDialogResponse) {
         return !assigneeDialogResponse.isPresent() ||
                 assigneeDialogResponse.get().getButtonClicked().equals(ButtonType.CANCEL);
     }
 
-    private void addActionIfAssigneeChanged(TurboIssue issue, Optional<String> newlyAssignedAssignee) {
-        ui.undoController.addAction(issue,
-                new ChangeAssigneeAction(ui.logic, issue.getAssignee(), newlyAssignedAssignee));
+    private void changeAssignee(TurboIssue issue, Optional<String> newlyAssignedAssignee) {
+        if (!issue.getAssignee().equals(newlyAssignedAssignee)) {
+            ui.undoController.addAction(issue,
+                    new ChangeAssigneeAction(ui.logic, issue.getAssignee(), newlyAssignedAssignee));
+        }
     }
 }

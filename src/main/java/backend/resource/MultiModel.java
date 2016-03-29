@@ -150,8 +150,8 @@ public class MultiModel implements IModel {
                                                                   Optional<String> assigneeLoginName) {
         Optional<Model> modelLookUpResult = getModelById(repoId);
         return Utility.safeFlatMapOptional(modelLookUpResult,
-                (model) -> model.replaceIssueAssignee(issueId, assigneeLoginName),
-                () -> logger.error("Model " + repoId + " not found in models"));
+            (model) -> model.replaceIssueAssignee(issueId, assigneeLoginName),
+            () -> logger.error("Model " + repoId + " not found in models"));
     }
 
     public synchronized void insertMetadata(String repoId, Map<Integer, IssueMetadata> metadata, String currentUser) {

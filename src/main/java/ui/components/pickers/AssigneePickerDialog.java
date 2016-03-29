@@ -14,33 +14,38 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-public class AssigneePickerDialog extends Dialog<AssigneePickerDialogResponse> {
-    public static final String DIALOG_TITLE = "Select Assignee";
-    private static final String ASSIGNED_ASSIGNEE = "Assigned Assignee";
-    private static final String ALL_ASSIGNEES = "All Assignees";
+public class AssigneePickerDialog extends Dialog<AssigneePickerDialog.AssigneePickerDialogResponse> {
+    private static final String ID_TEXT_FIELD = "assigneePickerTextField";
+    private static final String TITLE_DIALOG = "Select Assignee";
+    private static final String TITLE_ASSIGNED_ASSIGNEE = "Assigned Assignee";
+    private static final String TITLE_ALL_ASSIGNEES = "All Assignees";
+    private static final String MESSAGE_NO_ASSIGNEE = "No assignee";
+    private static final String MESSAGE_NO_MATCHES = "No users matched your query.";
 
     private final List<PickerAssignee> originalAssignees = new ArrayList<>();
-    FlowPane assignedAssigneePane;
-    ScrollPane matchingAssigneePane;
-    VBox matchingAssigneesBox;
+    private FlowPane assignedAssigneePane;
+    private VBox matchingAssigneesBox;
     private TextField textField;
     private AssigneePickerState state;
 
     public AssigneePickerDialog(Stage stage, TurboIssue issue, List<TurboUser> assignees) {
         initOwner(stage);
-        setTitle(DIALOG_TITLE);
+        setTitle(TITLE_DIALOG);
         setupButtons(getDialogPane());
         setConfirmResultConverter();
         originalAssignees.addAll(convertToPickerAssignees(issue, assignees));
         state = new AssigneePickerState(originalAssignees);
         initUI();
         setupKeyEvents();
+        fillTextFieldWithExistingAssignee();
+    }
 
-        getExistingAssignee(originalAssignees)
+    private void fillTextFieldWithExistingAssignee() {
+        PickerAssignee.getExistingAssignee(originalAssignees)
                 .map(PickerAssignee::getLoginName)
                 .ifPresent(this::fillTextFieldWithAssigneeLoginName);
     }
@@ -66,19 +71,14 @@ public class AssigneePickerDialog extends Dialog<AssigneePickerDialogResponse> {
     }
 
     private List<PickerAssignee> convertToPickerAssignees(TurboIssue issue, List<TurboUser> assignees) {
-        List<PickerAssignee> originalAssignees = new ArrayList<>();
-        assignees.stream()
-        .forEach(assignee -> {
-            PickerAssignee convertedAssignee = new PickerAssignee(assignee);
-            if (isExistingAssignee(issue, convertedAssignee)) {
-                convertedAssignee.setExisting(true);
-            }
-            originalAssignees.add(convertedAssignee);
-        });
-
-        Collections.sort(originalAssignees);
-
-        return originalAssignees;
+        return assignees.stream()
+                .map(assignee -> {
+                    PickerAssignee convertedAssignee = new PickerAssignee(assignee);
+                    if (isExistingAssignee(issue, convertedAssignee)) {
+                        convertedAssignee.setExisting(true);
+                    }
+                    return convertedAssignee;
+                }).sorted().collect(Collectors.toList());
     }
 
     private boolean isExistingAssignee(TurboIssue issue, PickerAssignee assignee) {
@@ -86,19 +86,16 @@ public class AssigneePickerDialog extends Dialog<AssigneePickerDialogResponse> {
         return issue.getAssignee().get().equals(assignee.getLoginName());
     }
 
-    private void setupButtons(DialogPane assigneePickerDialogPane) {
+    private void setupButtons(DialogPane dialogPane) {
         ButtonType confirmButtonType = new ButtonType("Confirm", ButtonBar.ButtonData.OK_DONE);
-        assigneePickerDialogPane.getButtonTypes().addAll(confirmButtonType, ButtonType.CANCEL);
+        dialogPane.getButtonTypes().addAll(confirmButtonType, ButtonType.CANCEL);
     }
 
     private void setConfirmResultConverter() {
         setResultConverter((dialogButton) -> {
-            List<PickerAssignee> finalList = state.getCurrentAssigneesList();
-            if (hasSelectedAssignee(finalList)) {
-                return new AssigneePickerDialogResponse(dialogButton,
-                        Optional.of(getSelectedAssignee(finalList).get().getLoginName()));
-            }
-            return new AssigneePickerDialogResponse(dialogButton, Optional.empty());
+            List<PickerAssignee> finalAssignees = state.getCurrentAssigneesList();
+            Optional<PickerAssignee> selectedAssignee = PickerAssignee.getSelectedAssignee(finalAssignees);
+            return new AssigneePickerDialogResponse(dialogButton, selectedAssignee.map(PickerAssignee::getLoginName));
         });
     }
 
@@ -106,15 +103,13 @@ public class AssigneePickerDialog extends Dialog<AssigneePickerDialogResponse> {
         VBox assigneeDialogBox = new VBox();
         assignedAssigneePane = createAssignedAssigneeGroup();
         matchingAssigneesBox = createMatchingAssigneeBox();
-        matchingAssigneePane = createMatchingAssigneePane();
+        ScrollPane matchingAssigneePane = createMatchingAssigneePane();
         textField = createTextField();
 
-        assigneeDialogBox.getChildren().add(new Label(ASSIGNED_ASSIGNEE));
-        assigneeDialogBox.getChildren().add(assignedAssigneePane);
-        assigneeDialogBox.getChildren().add(textField);
-        assigneeDialogBox.getChildren().add(new Label(ALL_ASSIGNEES));
-        assigneeDialogBox.getChildren().add(matchingAssigneePane);
-
+        assigneeDialogBox.getChildren().addAll(new Label(TITLE_ASSIGNED_ASSIGNEE),
+                                                assignedAssigneePane,
+                                                textField, new Label(TITLE_ALL_ASSIGNEES),
+                                                matchingAssigneePane);
 
         getDialogPane().setContent(assigneeDialogBox);
         refreshUI(state);
@@ -123,28 +118,28 @@ public class AssigneePickerDialog extends Dialog<AssigneePickerDialogResponse> {
 
     private void refreshUI(AssigneePickerState state) {
         populateAssignedAssignee(state.getCurrentAssigneesList(), assignedAssigneePane);
-        populateMatchingAssignee(state.getMatchingAssigneeList(), matchingAssigneesBox);
+        populateMatchingAssignee(state.getMatchingAssigneesList(), matchingAssigneesBox);
     }
 
-    private void populateAssignedAssignee(List<PickerAssignee> assigneeList, FlowPane assignedAssigneeStatus) {
+    private void populateAssignedAssignee(List<PickerAssignee> assignees, FlowPane assignedAssigneeStatus) {
         assignedAssigneeStatus.getChildren().clear();
-        boolean hasSelectedAssignee = hasSelectedAssignee(assigneeList);
+        boolean hasSelectedAssignee = PickerAssignee.getSelectedAssignee(assignees).isPresent();
 
-        updateExistingAssignee(assigneeList, assignedAssigneeStatus, hasSelectedAssignee);
+        updateExistingAssignee(assignees, assignedAssigneeStatus, hasSelectedAssignee);
         addSeparator(assignedAssigneeStatus);
-        updateNewlyAddedAssignee(assigneeList, assignedAssigneeStatus);
+        updateNewlyAddedAssignee(assignees, assignedAssigneeStatus);
     }
 
-    private void populateMatchingAssignee(List<PickerAssignee> matchingAssigneeList, VBox matchingAssigneesBox) {
+    private void populateMatchingAssignee(List<PickerAssignee> matchingAssignees, VBox matchingAssigneesBox) {
         matchingAssigneesBox.getChildren().clear();
 
-        if (matchingAssigneeList.isEmpty()) {
+        if (matchingAssignees.isEmpty()) {
             Label noMatchAssigneeLabel = createNoMatchingAssigneeLabel();
             matchingAssigneesBox.getChildren().add(noMatchAssigneeLabel);
             return; 
         }
 
-        matchingAssigneeList.stream()
+        matchingAssignees.stream()
                 .sorted()
                 .forEach(assignee -> matchingAssigneesBox.getChildren().add(setMouseClickForNode(
                         assignee.getMatchingNode(), assignee.getLoginName())));
@@ -154,51 +149,34 @@ public class AssigneePickerDialog extends Dialog<AssigneePickerDialogResponse> {
         assignedAssigneeStatus.getChildren().add(new Label("|"));
     }
 
-    private void updateNewlyAddedAssignee(List<PickerAssignee> assigneeList, FlowPane assignedAssigneeStatus) {
-        assigneeList.stream()
-                .filter(assignee -> assignee.isSelected())
+    private void updateNewlyAddedAssignee(List<PickerAssignee> assignees, FlowPane assignedAssigneeStatus) {
+        assignees.stream()
+                .filter(PickerAssignee::isSelected)
                 .forEach(assignee -> assignedAssigneeStatus.getChildren().add(
                         setMouseClickForNode(assignee.getNewlyAssignedAssigneeNode(),
                                 assignee.getLoginName())
                 ));
     }
 
-    private void updateExistingAssignee(List<PickerAssignee> assigneeList,
+    private void updateExistingAssignee(List<PickerAssignee> assignees,
                                    FlowPane assignedAssigneeStatus, boolean hasSuggestion) {
-        Optional<PickerAssignee> existingAssignee = getExistingAssignee(assigneeList);
+        Optional<PickerAssignee> existingAssignee = PickerAssignee.getExistingAssignee(assignees);
+        Node existingAssigneeNode = createExistingAssigneeNode(existingAssignee, hasSuggestion);
+        assignedAssigneeStatus.getChildren().add(existingAssigneeNode);
+    }
+
+    private Node createExistingAssigneeNode(Optional<PickerAssignee> existingAssignee, boolean hasSuggestion) {
         if (!existingAssignee.isPresent()) {
-            Label noExistingAssignee = createNoExistingAssigneeLabel();
-            assignedAssigneeStatus.getChildren().add(noExistingAssignee);
-            return;
+            return createNoExistingAssigneeLabel();
         }
 
-        Node existingAssigneeNode = setMouseClickForNode(existingAssignee.get().getExistingAssigneeNode(hasSuggestion),
-                    existingAssignee.get().getLoginName());
-            assignedAssigneeStatus.getChildren().add(existingAssigneeNode);
+        return setMouseClickForNode(existingAssignee.get().getExistingAssigneeNode(hasSuggestion),
+                existingAssignee.get().getLoginName());
     }
 
     private Node setMouseClickForNode(Node node, String assigneeName) {
         node.setOnMouseClicked(e -> handleMouseClick(assigneeName));
         return node;
-    }
-
-    private boolean hasSelectedAssignee(List<PickerAssignee> assigneeList) {
-        return assigneeList.stream()
-                .filter(PickerAssignee::isSelected)
-                .findAny()
-                .isPresent();
-    }
-
-    private Optional<PickerAssignee> getSelectedAssignee(List<PickerAssignee> assigneeList) {
-        return assigneeList.stream()
-                .filter(PickerAssignee::isSelected)
-                .findAny();
-    }
-
-    private Optional<PickerAssignee> getExistingAssignee(List<PickerAssignee> assigneeList) {
-        return assigneeList.stream()
-                .filter(PickerAssignee::isExisting)
-                .findAny();
     }
 
     private FlowPane createAssignedAssigneeGroup() {
@@ -227,12 +205,12 @@ public class AssigneePickerDialog extends Dialog<AssigneePickerDialogResponse> {
 
     private TextField createTextField() {
         TextField textField = new TextField();
-        textField.setId("assigneePickerTextField");
+        textField.setId(ID_TEXT_FIELD);
         return textField;
     }
 
     private Label createNoMatchingAssigneeLabel() {
-        Label noMatchAssigneeLabel = new Label("No users matched your query.");
+        Label noMatchAssigneeLabel = new Label(MESSAGE_NO_MATCHES);
         noMatchAssigneeLabel.setPrefHeight(40);
         noMatchAssigneeLabel.setPrefWidth(398);
         noMatchAssigneeLabel.setAlignment(Pos.CENTER);
@@ -240,12 +218,30 @@ public class AssigneePickerDialog extends Dialog<AssigneePickerDialogResponse> {
     }
 
     private Label createNoExistingAssigneeLabel() {
-        Label noExistingAssignee = new Label("No assignee");
+        Label noExistingAssignee = new Label(MESSAGE_NO_ASSIGNEE);
         noExistingAssignee.setPrefHeight(40);
         FontLoader fontLoader = Toolkit.getToolkit().getFontLoader();
         double width = fontLoader.computeStringWidth(noExistingAssignee.getText(), noExistingAssignee.getFont());
         noExistingAssignee.setPrefWidth(width);
         return noExistingAssignee;
+    }
+
+    public static class AssigneePickerDialogResponse {
+        private final ButtonType buttonClicked;
+        private final Optional<String> assigneeLoginName;
+
+        public AssigneePickerDialogResponse(ButtonType buttonClicked, Optional<String> assigneeLoginName) {
+            this.buttonClicked = buttonClicked;
+            this.assigneeLoginName = assigneeLoginName;
+        }
+
+        public ButtonType getButtonClicked() {
+            return buttonClicked;
+        }
+
+        public Optional<String> getAssigneeLoginName() {
+            return assigneeLoginName;
+        }
     }
 
 }
