@@ -7,6 +7,7 @@
 - **Pref** : Handles user preferences.
 - **GitHub** : An adapter to access GitHub remote API.
 - **Filters** : Handles processing of filters used to filter issues.
+- **Updater** : Handles updating of application.
 
 ## UI Component
 
@@ -114,3 +115,12 @@ an alternative source of issues in future.
 without race conditions, while allowing the UI to remain responsive.
 
 Subclassing `RepoStore` may be used to implement an alternative store.
+
+## Updater
+
+Updater handles updating of application, including updating the JAR, restarting of application once download of update
+is done, and clearing cache and migrating preferences if required.
+
+For clearing cache and migrating preferences, we use semantic versioning convention. Data will be backward compatible
+if the major version number does not change. Otherwise, data should be migrated (and in this case, cache should be
+cleared and redownloaded).
