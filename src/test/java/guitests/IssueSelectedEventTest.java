@@ -3,7 +3,6 @@ package guitests;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCode;
-import org.junit.Before;
 import org.junit.Test;
 import ui.UI;
 import ui.listpanel.ListPanel;
@@ -16,16 +15,14 @@ import static org.junit.Assert.assertTrue;
 
 public class IssueSelectedEventTest extends UITest {
 
-    private static final String PANEL_IDENTIFIER = "#dummy/dummy_col0";
-
     @Test
     public void eventTriggerOnIssueSelection_byRightClick_selectionEventNotTriggered() {
         AtomicInteger eventCount = new AtomicInteger(0);
         UI.events.registerEvent((IssueSelectedEventHandler) e -> eventCount.incrementAndGet());
-        ListPanel issuePanel = find(PANEL_IDENTIFIER);
+        ListPanel issuePanel = getPanel(0);
 
         //testing whether right click occurred by checking the presence of context menu items
-        rightClick(PANEL_IDENTIFIER + "_9");
+        rightClickIssue(0, 9);
         ContextMenu contextMenu = issuePanel.getContextMenu();
         for (MenuItem menuItem : contextMenu.getItems()) {
             assertTrue(!menuItem.isDisable());
@@ -43,7 +40,7 @@ public class IssueSelectedEventTest extends UITest {
         AtomicInteger eventCount = new AtomicInteger(0);
         UI.events.registerEvent((IssueSelectedEventHandler) e -> eventCount.incrementAndGet());
 
-        click(PANEL_IDENTIFIER + "_10");
+        clickIssue(0, 10);
 
         // testing IssueSelectedEvent is triggered on left click
         assertEquals(1, eventCount.get());

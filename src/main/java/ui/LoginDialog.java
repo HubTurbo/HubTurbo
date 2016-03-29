@@ -105,7 +105,7 @@ public class LoginDialog extends Dialog<Boolean> {
         grid.add(githubLabel, 1, 0);
 
         repoOwnerField = new TextField();
-        repoOwnerField.setId("repoOwnerField");
+        repoOwnerField.setId(IdGenerator.getLoginDialogOwnerFieldId());
         repoOwnerField.setPrefWidth(140);
         grid.add(repoOwnerField, 2, 0);
 

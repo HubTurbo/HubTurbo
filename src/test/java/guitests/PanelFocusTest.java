@@ -15,6 +15,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import prefs.PanelInfo;
 import prefs.Preferences;
+import ui.IdGenerator;
 import ui.TestController;
 import ui.issuepanel.PanelControl;
 
@@ -114,7 +115,7 @@ public class PanelFocusTest extends UITest {
         pushKeys(KeyCode.DOWN);
         pushKeys(KeyCode.DOWN);
         pushKeys(KeyCode.ENTER);
-        ((TextField) find("#boardnameinput")).setText("Board 1");
+        ((TextField) find(IdGenerator.getBoardNameInputFieldIdReference())).setText("Board 1");
         click("OK");
         awaitCondition(() -> 1 == panelControl.getNumberOfSavedBoards());
         // 2. Create a new panel so that scroll bar is on the left

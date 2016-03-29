@@ -28,6 +28,7 @@ import org.apache.logging.log4j.Logger;
 
 import ui.GUIController;
 import ui.GuiElement;
+import ui.IdGenerator;
 import ui.UI;
 import ui.components.IssueListView;
 import ui.components.KeyboardShortcuts;
@@ -48,7 +49,6 @@ public class ListPanel extends FilterPanel {
     private static final Logger logger = HTLog.get(ListPanel.class);
 
     private final UI ui;
-    private final GUIController guiController;
     private int issuesCount = 0;
     private int closedIssuesCount = 0;
     private int openIssuesCount = 0;
@@ -87,11 +87,9 @@ public class ListPanel extends FilterPanel {
     private static final String closeIssueMenuItemText = "Close issue (C)";
     private static final String reopenIssueMenuItemText = "Reopen issue (O)";
 
-    public ListPanel(UI ui, GUIController guiController, Stage mainStage,
-                     PanelControl parentPanelControl, int panelIndex) {
-        super(ui, guiController, parentPanelControl, panelIndex);
+    public ListPanel(UI ui, Stage mainStage, PanelControl parentPanelControl, int panelIndex) {
+        super(ui, parentPanelControl, panelIndex);
         this.ui = ui;
-        this.guiController = guiController;
         this.mainStage = mainStage;
 
         listView = new IssueListView();
@@ -191,7 +189,7 @@ public class ListPanel extends FilterPanel {
         closedIssuesCount = getClosedIssuesCount();
         openIssuesCount = issuesCount - closedIssuesCount;
         listView.restoreSelection();
-        this.setId(guiController.getDefaultRepo() + "_col" + panelIndex);
+        this.setId(IdGenerator.getPanelId(panelIndex));
         updateFooter();
 
 

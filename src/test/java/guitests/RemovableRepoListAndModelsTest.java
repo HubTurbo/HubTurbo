@@ -8,6 +8,7 @@ import javafx.scene.input.KeyCode;
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
 import prefs.Preferences;
+import ui.IdGenerator;
 import ui.TestController;
 import ui.UI;
 import util.PlatformEx;
@@ -79,7 +80,7 @@ public class RemovableRepoListAndModelsTest extends UITest {
         // we check that only 1 repo is in use
         noOfUsedRepo = 1;
         totalRepoInSystem = 1;
-        assertNodeExists("#repoOwnerField");
+        assertNodeExists(IdGenerator.getLoginDialogOwnerFieldIdReference());
         type("dummy").push(KeyCode.TAB).type("dummy").push(KeyCode.ENTER);
         assertEquals(noOfUsedRepo, ui.getCurrentlyUsedRepos().size());
         assertEquals(noOfUsedRepo, ui.logic.getOpenRepositories().size());
@@ -92,7 +93,7 @@ public class RemovableRepoListAndModelsTest extends UITest {
         // it's still 1 repo in use
         noOfUsedRepo = 1;
         totalRepoInSystem = 1;
-        Platform.runLater(find("#dummy/dummy_col0_filterTextField")::requestFocus);
+        Platform.runLater(getFilterTextFieldAtPanel(0)::requestFocus);
         PlatformEx.waitOnFxThread();
         selectAll();
         type("repo:dummY/Dummy");
@@ -137,8 +138,8 @@ public class RemovableRepoListAndModelsTest extends UITest {
         noOfUsedRepo = 4;
         totalRepoInSystem = 4;
         pushKeys(CREATE_RIGHT_PANEL);
-        waitUntilNodeAppears("#dummy/dummy_col1_filterTextField");
-        click("#dummy/dummy_col1_filterTextField");
+        waitUntilNodeAppears(getFilterTextFieldAtPanel(1));
+        clickFilterTextFieldAtPanel(1);
         selectAll();
         type("repo:dummy4/dummy4");
         push(KeyCode.ENTER);

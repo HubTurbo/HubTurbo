@@ -21,6 +21,7 @@ import java.util.Optional;
 
 import org.apache.logging.log4j.Logger;
 
+import ui.IdGenerator;
 import ui.UI;
 import util.HTLog;
 
@@ -62,6 +63,7 @@ public class LabelPickerDialog extends Dialog<List<String>> {
     @FXML
     public void initialize() {
         queryField.textProperty().addListener((observable, oldText, newText) -> handleUserInput(queryField.getText()));
+        queryField.setId(IdGenerator.getLabelPickerTextFieldId());
     }
 
     private void initUI(Stage stage, TurboIssue issue) {

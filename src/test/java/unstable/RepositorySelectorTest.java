@@ -15,6 +15,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 import prefs.Preferences;
+import ui.IdGenerator;
 import ui.TestController;
 import ui.UI;
 import util.PlatformEx;
@@ -66,16 +67,16 @@ public class RepositorySelectorTest extends UITest {
 
         // now we check if the login dialog pops up because the "dummy/dummy" json
         // doesn't exist and there are no other valid repo json files
-        assertNodeExists("#repoOwnerField");
+        assertNodeExists(IdGenerator.getLoginDialogOwnerFieldIdReference());
         type("dummy").push(KeyCode.TAB);
         type("dummy").push(KeyCode.ENTER);
-        ComboBox<String> comboBox = find("#repositorySelector");
+        ComboBox<String> comboBox = getRepositorySelector();
         assertEquals(1, comboBox.getItems().size());
         assertEquals("dummy/dummy", primaryRepo);
 
         // we check if the "dummy2/dummy2" is added to the repository selector
         // but the primary repo isn't changed
-        Platform.runLater(find("#dummy/dummy_col0_filterTextField")::requestFocus);
+        Platform.runLater(getFilterTextFieldAtPanel(0)::requestFocus);
         PlatformEx.waitOnFxThread();
         type("repo:dummy2/dummy2");
         push(KeyCode.ENTER);
