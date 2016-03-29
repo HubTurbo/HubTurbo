@@ -39,6 +39,7 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
         this((TurboMilestone) milestone);
         setSelected(milestone.isSelected());
         setExisting(milestone.isExisting());
+        setMatching(milestone.isMatching());
     }
 
     public Node getNode() {
