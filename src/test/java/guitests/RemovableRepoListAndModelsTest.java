@@ -9,7 +9,6 @@ import org.junit.Test;
 import org.loadui.testfx.GuiTest;
 import org.testfx.api.FxToolkit;
 
-import guitests.UITest;
 import prefs.Preferences;
 import ui.IdGenerator;
 import ui.TestController;

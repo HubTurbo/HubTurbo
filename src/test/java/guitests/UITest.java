@@ -119,11 +119,8 @@ public class UITest extends FxRobot {
     }
 
     protected void handleSetupStage(Stage stage) {
-        // delete test.json if it exists
-        File testConfig = new File(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
-        if (testConfig.exists() && testConfig.isFile()) {
-            assert testConfig.delete();
-        }
+        // delete test configs if they exist
+        clearAllTestConfigs();
         clearTestFolder();
         beforeStageStarts();
         stage.show();
@@ -145,6 +142,19 @@ public class UITest extends FxRobot {
                 .forEach(p -> new File(p.toAbsolutePath().toString()).delete());
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public static void clearAllTestConfigs() {
+        clearTestConfig(TestController.TEST_DIRECTORY, TestController.TEST_SESSION_CONFIG_FILENAME);
+        clearTestConfig(TestController.TEST_DIRECTORY, TestController.TEST_USER_CONFIG_FILENAME);
+    }
+
+    private static void clearTestConfig(String directory, String filename) {
+        // delete test.json if it exists
+        File testConfig = new File(directory, filename);
+        if (testConfig.exists() && testConfig.isFile()) {
+            assert testConfig.delete();
         }
     }
 
