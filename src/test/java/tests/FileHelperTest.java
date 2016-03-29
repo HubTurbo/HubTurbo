@@ -64,6 +64,7 @@ public class FileHelperTest {
 
     @Test
     public void writeFileContents_emptyString_emptyFileContents() throws IOException {
+        FileHelper.writeFileContents(TEST_FOLDER, TEST_FILE_NAME, "");
         assertEquals("", FileUtils.readFileToString(new File(TEST_FOLDER, TEST_FILE_NAME)));
     }
 
