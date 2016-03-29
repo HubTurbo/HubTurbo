@@ -52,9 +52,19 @@ public class FilterTextFieldTest extends UITest {
 
         clearField();
         type("a");
-        push(KeyCode.DOWN, 2);
+        push(KeyCode.DOWN, 4);
         press(KeyCode.ENTER);
-        waitAndAssertEquals("author", field::getText);
+        waitAndAssertEquals("creator", field::getText);
+    }
+
+    @Test
+    public void completion_escapeOnce_filterRemainsUnchanged() {
+        FilterTextField field = getFirstPanelField();
+
+        clearField();
+        type("a");
+        press(KeyCode.ESCAPE);
+        waitAndAssertEquals("a", field::getText);
     }
 
     @Test
