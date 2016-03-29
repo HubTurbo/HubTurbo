@@ -677,4 +677,9 @@ public class ListPanel extends FilterPanel {
         TurboIssue issue = getSelectedElement().get().getIssue();
         ui.getBrowserComponent().showIssue(issue.getRepoId(), issue.getId(), issue.isPullRequest(), false);
     }
+
+    @Override
+    public void close() {
+        // To be implemented if action needed to be taken after panel is deselected
+    }
 }
