@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 import java.util.Optional;
 
 /**
- * Abstraction for session and app-defined settings.
+ * Represents session and app-defined settings.
  */
 @SuppressWarnings("unused")
 public class SessionConfig {

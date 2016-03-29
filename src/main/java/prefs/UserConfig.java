@@ -1,7 +1,7 @@
 package prefs;
 
 /**
- * Abstraction for user-defined settings.
+ * Represents user-defined settings.
  */
 public class UserConfig {
 }
