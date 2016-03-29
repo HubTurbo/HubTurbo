@@ -30,11 +30,8 @@ public class MilestonePickerState {
     }
 
     private void processInput(String userInput) {
-        if (userInput.isEmpty()) {
-            bestMatchingMilestones.addAll(currentMilestones);
-            return;
-        }
         determineBestMatchingMilestones(userInput);
+        if (userInput.isEmpty()) return;
         toggleFirstMilestone(bestMatchingMilestones);
     }
 
@@ -71,6 +68,9 @@ public class MilestonePickerState {
         this.currentMilestones.stream()
                 .forEach(listMilestone -> listMilestone.setSelected(listMilestone.equals(milestone)
                         && !listMilestone.isSelected()));
+        this.bestMatchingMilestones.stream()
+                .forEach(listMilestone -> listMilestone.setSelected(listMilestone.equals(milestone)
+                        && !listMilestone.isSelected()));
     }
 
     public List<PickerMilestone> getCurrentMilestones() {
@@ -82,7 +82,13 @@ public class MilestonePickerState {
     }
 
     private void determineBestMatchingMilestones(String userInput) {
-        bestMatchingMilestones.addAll(getLimitedMatchingMilestones(userInput, BEST_MATCHING_LIMIT));
+        if (userInput.isEmpty()) {
+            bestMatchingMilestones.addAll(currentMilestones);
+            return;
+        }
+        List<PickerMilestone> matchingMilestones = getLimitedMatchingMilestones(userInput, BEST_MATCHING_LIMIT);
+        System.out.println(matchingMilestones.toString());
+        bestMatchingMilestones.addAll(matchingMilestones);
         if (bestMatchingMilestones.size() == BEST_MATCHING_LIMIT) return;
         bestMatchingMilestones.addAll(getLimitedSuggestedMilestones(userInput, bestMatchingMilestones,
                 BEST_MATCHING_LIMIT - bestMatchingMilestones.size()));
@@ -93,8 +99,15 @@ public class MilestonePickerState {
                                                                 int noToAdd) {
         List<PickerMilestone> suggestedMilestones = new ArrayList<>();
         suggestedMilestones.addAll(getLimitedMatchesFromPreviousInput(userInput, matchingMilestones, noToAdd));
-        suggestedMilestones.addAll(getLimitedSortedMilestones(matchingMilestones,
+
+        List<PickerMilestone> curMilestones = new ArrayList<>(matchingMilestones);
+        curMilestones.addAll(suggestedMilestones);
+
+        suggestedMilestones.addAll(getLimitedSortedMilestones(curMilestones,
                                                               noToAdd - suggestedMilestones.size()));
+
+        suggestedMilestones.stream()
+                .forEach(milestone -> milestone.setMatching(false));
         return suggestedMilestones;
     }
 
