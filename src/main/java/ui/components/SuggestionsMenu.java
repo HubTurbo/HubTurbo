@@ -15,7 +15,7 @@ import javafx.scene.control.Label;
  * Pop-up menu that appears with suggestions for auto-completion
  *
  */
-public class SuggestionMenu extends ContextMenu {
+public class SuggestionsMenu extends ContextMenu {
     
     private final int maxEntries;
 
@@ -25,7 +25,7 @@ public class SuggestionMenu extends ContextMenu {
     // Callback functions
     private EventHandler<ActionEvent> actionHandler = this::defaultActionHandler;
 
-    public SuggestionMenu(int maxEntries) {
+    public SuggestionsMenu(int maxEntries) {
         this.maxEntries = maxEntries;
     }
 
@@ -51,7 +51,8 @@ public class SuggestionMenu extends ContextMenu {
     }
     
     /**
-     *  Wraps a label inside a menu item.
+     * Adds a menuItem with content as its text
+     * @param content
      */
     private void addMenuItem(String content) {
         Label label = new Label(content);
@@ -79,7 +80,7 @@ public class SuggestionMenu extends ContextMenu {
         return Optional.of(((CustomMenuItem) event.getSource()).getText());
     }
 
-    public SuggestionMenu setActionHandler(EventHandler<ActionEvent> actionHandler) {
+    public SuggestionsMenu setActionHandler(EventHandler<ActionEvent> actionHandler) {
         this.actionHandler = actionHandler;
         return this;
     }

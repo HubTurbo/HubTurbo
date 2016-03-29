@@ -25,7 +25,7 @@ import static ui.components.KeyboardShortcuts.SHOW_DOCS;
  */
 public class FilterTextField extends TextField {
 
-    private static final int MAX_SUGGESTIONS = 10;
+    private static final int MAX_SUGGESTIONS = 20;
 
     // A character class that indicates the characters considered to be word boundaries.
     // Specialised to HubTurbo's filter syntax.
@@ -38,7 +38,7 @@ public class FilterTextField extends TextField {
 
     // For on-the-fly parsing and checking
     private final ValidationSupport validationSupport = new ValidationSupport();
-    private final SuggestionMenu suggestion;
+    private final SuggestionsMenu suggestions;
 
     // Callback functions
     private Runnable onCancel = () -> {
@@ -54,13 +54,17 @@ public class FilterTextField extends TextField {
     private boolean isNavigating = false;
 
     // The list of keywords which will be used in completion
-    private List<String> keywords = new ArrayList<>(QualifierType.getCompletionKeywords());
+    private List<String> keywords = initCompletionKeywords();
 
 
     public FilterTextField(Predicate<String> validation) {
         super("");
-        suggestion = setupSuggestion();
+        suggestions = setupSuggestion();
         setup(validation);
+    }
+
+    private List<String> initCompletionKeywords() {
+        return QualifierType.getCompletionKeywords().stream().sorted().collect(Collectors.toList());
     }
 
     private void setup(Predicate<String> validation) {
@@ -85,12 +89,12 @@ public class FilterTextField extends TextField {
             
             char typed = key.charAt(0);
             
-            if (typed == '\t' && suggestion.isShowing()) {
-                suggestion.hide();
-                suggestion.getSelectedContent().ifPresent(this::completeWord);
+            if (typed == '\t' && suggestions.isShowing()) {
+                suggestions.hide();
+                suggestions.getSelectedContent().ifPresent(this::completeWord);
             } else {
-                suggestion.loadSuggestions(getMatchingKeywords(getCurrentWord()));
-                if (!suggestion.isShowing()) suggestion.show(this, Side.BOTTOM, 0, 0);
+                suggestions.loadSuggestions(getMatchingKeywords(getCurrentWord()));
+                if (!suggestions.isShowing()) suggestions.show(this, Side.BOTTOM, 0, 0);
             }
         });
         setOnKeyPressed(e -> {
@@ -110,8 +114,8 @@ public class FilterTextField extends TextField {
 
             isNavigating = e.getCode() == KeyCode.UP || e.getCode() == KeyCode.DOWN;
 
-            if (suggestion.isShowing() && !isNavigating) {
-                suggestion.loadSuggestions(getMatchingKeywords(getCurrentWord()));
+            if (suggestions.isShowing() && !isNavigating) {
+                suggestions.loadSuggestions(getMatchingKeywords(getCurrentWord()));
             }
         });
         addEventHandler(KeyEvent.KEY_PRESSED, event -> {
@@ -122,9 +126,9 @@ public class FilterTextField extends TextField {
     }
 
     private void handleOnEnter() {
-        suggestion.hide();
+        suggestions.hide();
         if (isNavigating) {
-            suggestion.getSelectedContent().ifPresent(this::completeWord);
+            suggestions.getSelectedContent().ifPresent(this::completeWord);
         } else {
             confirmEdit();
         }
@@ -133,8 +137,8 @@ public class FilterTextField extends TextField {
     private void handleOnEscape() {
         if (getText().equals(previousText)) {
             onCancel.run();
-        } else if (suggestion.isShowing()){
-            suggestion.hide();
+        } else if (suggestions.isShowing()){
+            suggestions.hide();
         } else {
             revertEdit();
         }
@@ -223,8 +227,8 @@ public class FilterTextField extends TextField {
 
     // SuggestionMenu 
     
-    private SuggestionMenu setupSuggestion() {
-        SuggestionMenu suggestion = new SuggestionMenu(MAX_SUGGESTIONS).setActionHandler(this::menuItemHandler);
+    private SuggestionsMenu setupSuggestion() {
+        SuggestionsMenu suggestion = new SuggestionsMenu(MAX_SUGGESTIONS).setActionHandler(this::menuItemHandler);
         suggestion.loadSuggestions(keywords);
         return suggestion;
     }
@@ -241,8 +245,8 @@ public class FilterTextField extends TextField {
 
 
     private void menuItemHandler(ActionEvent event) {
-        SuggestionMenu.getTextOnAction(event).ifPresent(this::completeWord);
-        suggestion.hide();
+        SuggestionsMenu.getTextOnAction(event).ifPresent(this::completeWord);
+        suggestions.hide();
     }
 
     /**
