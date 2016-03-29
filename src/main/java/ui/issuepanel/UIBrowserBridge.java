@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
  * A abstract component in charge of creating, displaying, and enabling edits of issues.
  * Its function is to decouple the UI logic and events from the BrowserComponent.
  * In this sense it is similar in function to ui.listpanel.expanded.IssueCommentsDisplay.
- *
+ * <p>
  * Unlike the aforementioned component is owned by the PanelControl, which is not recreated
  * on issue selection. Thus its constructor does not contain a reference to a particular issue.
  * Instead it takes ownership of issues via events.

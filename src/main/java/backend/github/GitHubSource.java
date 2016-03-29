@@ -6,12 +6,15 @@ import backend.interfaces.Repo;
 import backend.interfaces.RepoSource;
 import backend.resource.Model;
 import backend.resource.TurboIssue;
+import backend.resource.TurboMilestone;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.Logger;
+import org.eclipse.egit.github.core.Issue;
 import util.HTLog;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 public class GitHubSource extends RepoSource {
@@ -31,8 +34,8 @@ public class GitHubSource extends RepoSource {
         execute(() -> {
             boolean success = gitHub.login(credentials);
             logger.info(String.format("%s to %s as %s",
-                success ? "Logged in" : "Failed to log in",
-                getName(), credentials.username));
+                                      success ? "Logged in" : "Failed to log in",
+                                      getName(), credentials.username));
             response.complete(success);
         });
 
@@ -64,7 +67,18 @@ public class GitHubSource extends RepoSource {
         return addTask(new ReplaceIssueLabelsTask(this, gitHub, issue.getRepoId(), issue.getId(), labels)).response;
     }
 
-@Override
+    @Override
+    public CompletableFuture<Boolean> replaceIssueMilestone(TurboIssue issue, Optional<Integer> milestone) {
+        return addTask(new ReplaceIssueMilestoneTask(this, gitHub, issue.getRepoId(), issue.getId(), issue.getTitle(),
+                                                     milestone)).response;
+    }
+
+    @Override
+    public CompletableFuture<Boolean> editIssueState(TurboIssue issue, boolean isOpen) {
+        return addTask(new EditIssueStateTask(this, gitHub, issue.getRepoId(), issue.getId(), isOpen)).response;
+    }
+
+    @Override
     public CompletableFuture<ImmutablePair<Integer, Long>> getRateLimitResetTime() {
         return addTask(new CheckRateLimitTask(this, gitHub)).response;
     }

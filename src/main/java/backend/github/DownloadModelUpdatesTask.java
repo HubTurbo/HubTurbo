@@ -46,7 +46,8 @@ public class DownloadModelUpdatesTask extends GitHubRepoTask<GitHubModelUpdatesD
             List<PullRequest> pullRequestsResult = pullRequestsTask.response.get();
 
             GitHubModelUpdatesData updates = new GitHubModelUpdatesData(model,
-                    issuesResult, pullRequestsResult, labelsResult, milestonesResult, usersResult);
+                                                                        issuesResult, pullRequestsResult,
+                                                                        labelsResult, milestonesResult, usersResult);
             logger.info(HTLog.format(model.getRepoId(), "Updates download completed"));
             response.complete(updates);
         } catch (InterruptedException | ExecutionException e) {

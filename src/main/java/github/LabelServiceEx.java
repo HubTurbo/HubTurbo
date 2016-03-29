@@ -23,20 +23,20 @@ public class LabelServiceEx extends LabelService {
     }
 
     public void deleteLabelFromIssue(IRepositoryIdProvider repository, String issueId,
-                                     Label label) throws IOException{
+                                     Label label) throws IOException {
 
 //        Github api format: DELETE /repos/:owner/:repo/issues/:number/labels/:name
         String repoId = getId(repository);
         StringBuilder uri = new StringBuilder(SEGMENT_REPOS);
         uri.append('/').append(repoId)
-            .append(SEGMENT_ISSUES)
-            .append('/').append(issueId)
-            .append('/').append(label.getName());
+                .append(SEGMENT_ISSUES)
+                .append('/').append(issueId)
+                .append('/').append(label.getName());
         client.delete(uri.toString());
     }
 
     public List<Label> addLabelsToIssue(IRepositoryIdProvider repository,
-            String issueId, List<Label> labels) throws IOException {
+                                        String issueId, List<Label> labels) throws IOException {
         String repoId = getId(repository);
         return addLabelsToIssue(repoId, issueId, labels);
     }
@@ -54,9 +54,9 @@ public class LabelServiceEx extends LabelService {
 
         StringBuilder uri = new StringBuilder(SEGMENT_REPOS);
         uri.append('/').append(id)
-            .append(SEGMENT_ISSUES)
-            .append('/').append(issueId)
-            .append(SEGMENT_LABELS);
+                .append(SEGMENT_ISSUES)
+                .append('/').append(issueId)
+                .append(SEGMENT_LABELS);
 
         return client.post(uri.toString(), labels, new TypeToken<List<Label>>() {
         }.getType());
@@ -64,14 +64,13 @@ public class LabelServiceEx extends LabelService {
 
 
     /**
-     *
      * @param repository
-     * @param label label with edited fields
-     * @param name name of label to edit
+     * @param label      label with edited fields
+     * @param name       name of label to edit
      * @return
      * @throws IOException
      */
-    public Label editLabel(IRepositoryIdProvider repository, Label label , String name)
+    public Label editLabel(IRepositoryIdProvider repository, Label label, String name)
             throws IOException {
         String repoId = getId(repository);
         if (label == null) {
@@ -86,8 +85,8 @@ public class LabelServiceEx extends LabelService {
 
         StringBuilder uri = new StringBuilder(SEGMENT_REPOS);
         uri.append('/').append(repoId)
-            .append(SEGMENT_LABELS)
-            .append('/').append(name);
+                .append(SEGMENT_LABELS)
+                .append('/').append(name);
 
         return client.post(uri.toString(), label, Label.class);
     }

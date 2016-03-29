@@ -29,5 +29,6 @@ public final class HTLog {
         logger.error(e.getLocalizedMessage(), e);
     }
 
-    private HTLog() {}
+    private HTLog() {
+    }
 }

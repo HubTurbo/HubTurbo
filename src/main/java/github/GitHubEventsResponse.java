@@ -43,7 +43,7 @@ public class GitHubEventsResponse {
         ArrayList<TurboIssueEvent> eventsInJson = new ArrayList<>();
 
         Gson gson = new Gson();
-        Type type = new TypeToken<Map<String, Object>[]>(){}.getType();
+        Type type = new TypeToken<Map<String, Object>[]>() {}.getType();
         BufferedReader reader;
 
         try {

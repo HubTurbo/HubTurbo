@@ -20,6 +20,9 @@ script:
 after_success:
     - "./gradlew jacocoRootReport coveralls"
 
+after_failure:
+    - "for i in *.png; do curl --upload-file $i https://transfer.sh/$i; done"
+
 branches:
   only:
     - master

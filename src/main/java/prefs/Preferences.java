@@ -1,7 +1,13 @@
 package prefs;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.RepositoryId;
+import util.FileHelper;
+import util.HTLog;
+import util.JsonHelper;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,124 +15,200 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Represents persistent user configuration. Maps to a file on disk.
+ * Represents persistent user configuration.
+ *
+ * The Preferences class is the facade of all configuration and preferences information. All preferences and config
+ * settings can be set in this class.
+ *
+ * Use either Preferences.create() or Preferences.load() to obtain a Preferences instance.
  *
  * Overrides PMD's recommendation that this class should be final.
  * It cannot be as we need to mock it.
+ * 
  */
 public class Preferences { // NOPMD
+
+    private static final Logger logger = LogManager.getLogger(Preferences.class.getName());
+
     public static final String DIRECTORY = "settings";
 
-    // Standard config filenames used for application and testing
-    public static final String GLOBAL_CONFIG_FILE = "global.json";
-    public static final String TEST_CONFIG_FILE = "test.json";
+    public static final String SESSION_CONFIG_FILENAME = "global.json";
+    public static final String USER_CONFIG_FILENAME = "user.json";
 
-    private final ConfigFileHandler fileHandler;
+    private static final String DEFAULT_FILE_CONTENTS = "{}";
 
-    public GlobalConfig global;
+    private final String configDirectory;
+    private final String sessionConfigFileName;
+    private final String userConfigFileName;
 
-    private Preferences(String configFileName, boolean createUnconditionally) {
-        this.fileHandler = new ConfigFileHandler(DIRECTORY, configFileName);
+    private final SessionConfig sessionConfig;
+    private final UserConfig userConfig;
 
-        if (createUnconditionally) {
-            initGlobalConfig();
+    /**
+     * Initialises a Preferences instance that contains the configurations in the config files specified.
+     * @param configDirectory The directory that the config files are held in.
+     * @param sessionConfigFileName The name of the session config file to load.
+     * @param userConfigFileName The name of the user config file to load.
+     * @return The initialised Preferences instance.
+     */
+    public static Preferences load(String configDirectory, String sessionConfigFileName, String userConfigFileName) {
+        return new Preferences(configDirectory, sessionConfigFileName, userConfigFileName, false);
+    }
+
+    /**
+     * Initialises a Preferences instance that creates new config files.
+     * @param configDirectory The directory that the config files are held in.
+     * @param sessionConfigFileName The name of the session config file to create.
+     * @param userConfigFileName The name of the user config file to create.
+     * @return The initialised Preferences instance.
+     */
+    public static Preferences create(String configDirectory, String sessionConfigFileName, String userConfigFileName) {
+        return new Preferences(configDirectory, sessionConfigFileName, userConfigFileName, true);
+    }
+
+    /**
+     * @param configDirectory The directory that the config files are held in.
+     * @param sessionConfigFileName The name of the session config file
+     * @param userConfigFileName The name of the user config file
+     * @param isIgnoreExisting True if existing config file is to be ignored.
+     */
+    private Preferences(String configDirectory,
+                        String sessionConfigFileName,
+                        String userConfigFileName,
+                        boolean isIgnoreExisting) {
+        this.configDirectory = configDirectory;
+        this.sessionConfigFileName = sessionConfigFileName;
+        this.userConfigFileName = userConfigFileName;
+
+        if (isIgnoreExisting) {
+            this.sessionConfig = createConfig(DEFAULT_FILE_CONTENTS, SessionConfig.class);
+            this.userConfig = createConfig(DEFAULT_FILE_CONTENTS, UserConfig.class);
         } else {
-            loadGlobalConfig();
+            this.sessionConfig = loadConfig(configDirectory, sessionConfigFileName, SessionConfig.class);
+            this.userConfig = loadConfig(configDirectory, userConfigFileName, UserConfig.class);
         }
     }
 
     /**
-     * Initialises a Preferences instance which creates its config file, or loads
-     * from it if it already exists.
+     * Creates a new Config instance
+     * @param contents The JSON representation of an contents of the Config object
+     * @param configClass The class of the Config instance
+     * @return The created Config instance
      */
-    public static Preferences load(String configFileName) {
-        return new Preferences(configFileName, false);
+    private <T> T createConfig(String contents, Class<T> configClass) {
+        return JsonHelper.fromJsonString(contents, configClass);
     }
 
     /**
-     * Initialises a Preferences instance which always creates its config file.
-     * This will overwrite it with a default configuration if it already exists.
+     * Loads a Config instance from a file on disk
+     * @param configDirectory The directory that the config file is held in.
+     * @param configFileName The filename of the config file on disk
+     * @param configClass The class of the config to load
+     * @return The loaded Config instance
      */
-    public static Preferences create(String configFileName) {
-        return new Preferences(configFileName, true);
+    private <T> T loadConfig(String configDirectory, String configFileName, Class<T> configClass) {
+        String fileContents = DEFAULT_FILE_CONTENTS;
+        if (FileHelper.isFileExists(configDirectory, configFileName)) {
+            try {
+                fileContents = FileHelper.getFileContents(configDirectory, configFileName);
+            } catch (IOException e) {
+                // if we can't read the file, just ignore the existing files
+                HTLog.error(logger, e);
+                logger.error(e.toString());
+            }
+        }
+
+        return createConfig(fileContents, configClass);
     }
 
-    public void saveGlobalConfig() {
-        fileHandler.saveGlobalConfig(global);
+    /**
+     * Saves the session and user configs to file
+     */
+    private void save() {
+        try {
+            saveConfig(sessionConfig, configDirectory, sessionConfigFileName, SessionConfig.class);
+
+        } catch (IOException e) {
+            HTLog.error(logger, e);
+            logger.error("Could not save session config");
+        }
+
+        try {
+            saveConfig(userConfig, configDirectory, userConfigFileName, UserConfig.class);
+
+        } catch (IOException e) {
+            HTLog.error(logger, e);
+            logger.error("Could not save user config");
+        }
     }
 
-    private void initGlobalConfig() {
-        global = fileHandler.initGlobalConfig();
+    /**
+     * Saves a Config to file
+     * @param config The config object to save.
+     * @param configDirectory The directory that the config file is held in.
+     * @param configFileName The file name of the config file on disk
+     * @param configClass The class of the config object
+     */
+    private <T> void saveConfig(T config, String configDirectory, String configFileName, Class configClass)
+            throws IOException {
+        String jsonString = JsonHelper.toJsonString(config, configClass);
+        FileHelper.writeFileContents(configDirectory, configFileName, jsonString);
     }
 
-    private void loadGlobalConfig() {
-        global = fileHandler.loadGlobalConfig();
-    }
-
-    // Last login credentials. While the main UI is running (i.e. logged in successfully), last login
-    // credentials are guaranteed to be the current user's credentials thanks to setLastLoginCredentials
-    // being called immediately after a successful login in LoginDialog.
     public String getLastLoginPassword() {
-        return global.getLastLoginPassword();
+        return sessionConfig.getLastLoginPassword();
     }
 
     public String getLastLoginUsername() {
-        return global.getLastLoginUsername();
+        return sessionConfig.getLastLoginUsername();
     }
 
-    public void setLastLoginCredentials(String username, String password) {
-        global.setLastLoginCredentials(username, password);
+    public void setLastLoginCredentials(String lastLoginUsername, String lastLoginPassword) {
+        sessionConfig.setLastLoginCredentials(lastLoginUsername, lastLoginPassword);
+        save();
     }
 
-    public List<String> getLastOpenFilters() {
-        return global.getLastOpenFilters();
-    }
-
-    public List<String> getPanelNames() {
-        return global.getPanelNames();
-    }
-    
     public List<PanelInfo> getPanelInfo() {
-        return global.getPanelInfo();
+        return sessionConfig.getPanelInfo();
     }
-    
+
     public void setPanelInfo(List<PanelInfo> panelInfo) {
-        global.setPanelInfo(panelInfo);
+        sessionConfig.setPanelInfo(panelInfo);
+        save();
     }
 
-    /**
-     * Interface to configuration files
-     */
-
-    /**
-     * Boards
-     */
-
-    public void addBoard(String name, List<PanelInfo> panels) {
-        assert name != null && panels != null;
-        global.addBoard(name, panels);
+    public void addBoard(String boardName, List<PanelInfo> panelsInBoard) {
+        assert boardName != null && panelsInBoard != null;
+        sessionConfig.addBoard(boardName, panelsInBoard);
+        save();
     }
 
     public Map<String, List<PanelInfo>> getAllBoards() {
-        return global.getAllBoards();
+        return sessionConfig.getAllBoards();
     }
 
     public List<String> getAllBoardNames() {
         return new ArrayList<>(getAllBoards().keySet());
     }
 
-    public void removeBoard(String name) {
-        global.removeBoard(name);
+    public void removeBoard(String boardName) {
+        sessionConfig.removeBoard(boardName);
+        save();
     }
-    
-    public void setLastOpenBoard(String board) {
-        global.setLastOpenBoard(board);
+
+    public void setLastOpenBoard(String boardName) {
+        sessionConfig.setLastOpenBoard(boardName);
+        save();
     }
-    
+
     public Optional<String> getLastOpenBoard() {
-        return global.getLastOpenBoard();
+        return sessionConfig.getLastOpenBoard();
     }
-    
+
+    /**
+     * Switches the board to the next one. Cycles through the boards one at a time.
+     * @return The new board selected
+     */
     public Optional<String> switchBoard() {
         if (getLastOpenBoard().isPresent() && getAllBoards().size() > 1) {
             List<String> boardNames = getAllBoardNames();
@@ -135,60 +217,76 @@ public class Preferences { // NOPMD
             
             setLastOpenBoard(boardNames.get(index));
         }
-        
         return getLastOpenBoard();
     }
-    
+
     public void clearLastOpenBoard() {
-        global.clearLastOpenBoard();
+        sessionConfig.clearLastOpenBoard();
+        save();
     }
-    
-    public List<PanelInfo> getBoardPanels(String board) {
-        return global.getBoardPanels(board);
+
+    public List<PanelInfo> getBoardPanels(String boardName) {
+        return sessionConfig.getBoardPanels(boardName);
     }
 
     public void clearAllBoards() {
-        global.clearAllBoards();
+        sessionConfig.clearAllBoards();
+        save();
     }
 
-    /**
-     * Session configuration
-     */
-
-    public void setLastViewedRepository(String repository) {
-        global.setLastViewedRepository(repository);
+    public void setLastViewedRepository(String repositoryName) {
+        sessionConfig.setLastViewedRepository(repositoryName);
+        save();
     }
 
     public Optional<RepositoryId> getLastViewedRepository() {
-        if (global.getLastViewedRepository().isEmpty()) {
+        if (sessionConfig.getLastViewedRepository().isEmpty()) {
             return Optional.empty();
-        } else {
-            RepositoryId repositoryId = RepositoryId.createFromId(global.getLastViewedRepository());
-            if (repositoryId == null) {
-                return Optional.empty();
-            } else {
-                return Optional.of(repositoryId);
-            }
         }
+        RepositoryId repositoryId = RepositoryId.createFromId(sessionConfig.getLastViewedRepository());
+        if (repositoryId == null) {
+            return Optional.empty();
+        }
+        return Optional.of(repositoryId);
     }
 
+    /**
+     * Clears marked read at of an issue at the specified repo
+     * @param repoId The repo that this issue resides in
+     * @param issue The issue to clear
+     */
     public void clearMarkedReadAt(String repoId, int issue) {
-        global.clearMarkedReadAt(repoId, issue);
+        sessionConfig.clearMarkedReadAt(repoId, issue);
+        save();
     }
 
-    public void setMarkedReadAt(String repoId, int issue, LocalDateTime time) {
-        global.setMarkedReadAt(repoId, issue, time);
+    /**
+     * Sets the marked read at of an issue in a repo, to a certain time
+     * @param repoId The repo of the issue
+     * @param issue The issue to set
+     * @param timeReadAt The time it was marked read
+     */
+    public void setMarkedReadAt(String repoId, int issue, LocalDateTime timeReadAt) {
+        sessionConfig.setMarkedReadAt(repoId, issue, timeReadAt);
+        save();
     }
 
+    /**
+     * Retrieves the marked read at of a specified issue in a repo
+     * @param repoId The repo of the issue
+     * @param issue The issue to retrieve the marked read at
+     * @return An Optional of the marked read at
+     */
     public Optional<LocalDateTime> getMarkedReadAt(String repoId, int issue) {
-        return global.getMarkedReadAt(repoId, issue);
+        return sessionConfig.getMarkedReadAt(repoId, issue);
     }
 
     public Map<String, String> getKeyboardShortcuts() {
-        return global.getKeyboardShortcuts();
+        return sessionConfig.getKeyboardShortcuts();
     }
 
     public void setKeyboardShortcuts(Map<String, String> keyboardShortcuts) {
-        global.setKeyboardShortcuts(keyboardShortcuts);
+        sessionConfig.setKeyboardShortcuts(keyboardShortcuts);
+        save();
     }
 }

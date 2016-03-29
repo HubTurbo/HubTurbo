@@ -69,7 +69,7 @@ public class UpdateIssuesTest extends UITest {
 
     public int countIssuesShown() throws InterruptedException, ExecutionException {
         FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel)
-                TestController.getUI().getPanelControl().getPanel(0))::getIssueCount);
+                TestController.getUI().getPanelControl().getPanel(0))::getIssuesCount);
         PlatformEx.runAndWait(countIssues);
         return countIssues.get();
     }

@@ -20,12 +20,12 @@ public class LabelPickerState {
 
     public LabelPickerState(List<TurboLabel> initialLabels, List<TurboLabel> allLabels, String userInput) {
         this(initialLabels, new ArrayList<>(), new ArrayList<>(), new ArrayList<>(), allLabels,
-                OptionalInt.empty());
+             OptionalInt.empty());
         update(userInput);
     }
 
-    private LabelPickerState(List<TurboLabel> initialLabels, List<TurboLabel> addedLabels, 
-                             List<TurboLabel> removedLabels, List<TurboLabel> matchedLabels, 
+    private LabelPickerState(List<TurboLabel> initialLabels, List<TurboLabel> addedLabels,
+                             List<TurboLabel> removedLabels, List<TurboLabel> matchedLabels,
                              List<TurboLabel> allLabels, OptionalInt currentSuggestionIndex) {
         this.initialLabels = initialLabels;
         this.addedLabels = addedLabels;
@@ -37,13 +37,14 @@ public class LabelPickerState {
 
     /**
      * Updates current state based on given user input
-     * @param userInput 
+     *
+     * @param userInput
      */
     private final void update(String userInput) {
         List<String> confirmedKeywords = getConfirmedKeywords(userInput);
         for (String confirmedKeyword : confirmedKeywords) {
             TurboLabel.getMatchedLabels(allLabels, confirmedKeyword)
-                .stream().findFirst().ifPresent(this::updateAssignedLabels);
+                    .stream().findFirst().ifPresent(this::updateAssignedLabels);
         }
 
         Optional<String> keywordInProgess = getKeywordInProgress(userInput);
@@ -54,7 +55,8 @@ public class LabelPickerState {
     }
 
     /**
-     * Updates assignedLabels based on properties of a label 
+     * Updates assignedLabels based on properties of a label
+     *
      * @param label
      */
     public final void updateAssignedLabels(TurboLabel selectedLabel) {
@@ -79,6 +81,7 @@ public class LabelPickerState {
     /**
      * Updates the list of labels which labels' names contain the current keyword.
      * This list of labels can then be retrieved later via getMatchedLabels()
+     *
      * @param keyword
      */
     private final void updateMatchedLabels(String keyword) {
@@ -87,6 +90,7 @@ public class LabelPickerState {
 
     /**
      * Updates suggeston index to first label that matches the keyword
+     *
      * @param keyword
      * @param newMatchedLabels
      */
@@ -154,6 +158,7 @@ public class LabelPickerState {
 
     /**
      * Removes labels that belong to the same group as the given label
+     *
      * @param label
      */
     private void removeConflictingLabels(TurboLabel targetLabel) {
@@ -167,8 +172,7 @@ public class LabelPickerState {
 
         // Add to removedLabels all initialLabels that have conflicting group
         removedLabels.addAll(initialLabels.stream()
-                .filter(label -> label.getGroupName().equals(group) 
-                    && !removedLabels.contains(targetLabel))
+                .filter(label -> label.getGroupName().equals(group) && !removedLabels.contains(targetLabel))
                 .collect(Collectors.toList()));
     }
 
@@ -185,7 +189,7 @@ public class LabelPickerState {
     }
 
     /**
-     * @return suggested label 
+     * @return suggested label
      */
     private TurboLabel getSuggestedLabel() {
         return matchedLabels.get(currentSuggestionIndex.getAsInt());
@@ -218,6 +222,7 @@ public class LabelPickerState {
 
     /**
      * If userInput does not end with space, split by space and return last word.
+     *
      * @param userInput
      * @return the keyword in progress based on the userInput
      */
@@ -233,6 +238,7 @@ public class LabelPickerState {
     /**
      * Determines if the keywordIndex-th keyword is confirmed i.e. user has typed a space after it
      * Assumption: userInput has at least keywordIndex+1 keywords, separated by whitespace.
+     *
      * @param userInput
      * @param keywordIndex
      * @return

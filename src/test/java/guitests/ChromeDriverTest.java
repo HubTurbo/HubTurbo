@@ -139,12 +139,6 @@ public class ChromeDriverTest extends UITest {
         assertEquals("a", keyCode);
         clearKeyCode();
 
-        // manage milestone
-        push(KeyCode.M);
-        sleep(EVENT_DELAY);
-        assertEquals("m", keyCode);
-        clearKeyCode();
-
         // jump to comments
         push(KeyCode.R);
         sleep(EVENT_DELAY);

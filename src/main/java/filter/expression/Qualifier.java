@@ -12,18 +12,15 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import backend.resource.*;
-import filter.ParseException;
+import filter.*;
 import util.Utility;
 import backend.interfaces.IModel;
-import filter.MetaQualifierInfo;
-import filter.QualifierApplicationException;
-import filter.SemanticException;
 
 public class Qualifier implements FilterExpression {
 
     public static final Qualifier EMPTY = new Qualifier(QualifierType.EMPTY, "");
     public static final Qualifier FALSE = new Qualifier(QualifierType.FALSE, "");
-
+    public static final String USER_WARNING_ERROR_FORMAT = "Cannot find username containing %s in %s%n";
 
     private final QualifierType type;
 
@@ -95,7 +92,7 @@ public class Qualifier implements FilterExpression {
         }
 
         List<TurboMilestone> milestonesOfReposInPanel = TurboMilestone.filterMilestonesOfRepos(
-                                                                                    model.getMilestones(), repoIds);
+                model.getMilestones(), repoIds);
         List<TurboMilestone> aliasableMilestones = getAliasableMilestones(milestonesOfReposInPanel);
         Map<Integer, TurboMilestone> milestoneAliasIndex = getMilestoneAliasIndex(aliasableMilestones);
 
@@ -114,59 +111,60 @@ public class Qualifier implements FilterExpression {
 
     /**
      * Expands aliases for Qualifier keyword in user input.
-     * Includes aliases for Qualifier that also functions as keyword 
+     * Includes aliases for Qualifier that also functions as keyword
+     *
      * @param input
-     * @return 
+     * @return
      */
     public static String expandKeywordAliases(String input) {
-        
-        switch(input) {
-            case "as":
-                return "assignee";
-            case "body":
-            case "desc":
-            case "de":
-                return "description";
-            case "d":
-                return "date";
-            case "l":
-            case "labels":
-                return "label";
-            case "m":
-            case "milestones":
-                return "milestone";
-            case "r":
-                return "repo";
-            case "st":
-            case "status":
-                return "state";
-            case "t":
-                return "title";
-            case "u":
-                return "updated";
-            case "o":
-                return "open";
-            case "c":
-                return "closed";
-            case "i":
-                return "issue";
-            case "p":
-            case "pullrequest":
-                return "pr";
-            case "mg":
-                return "merged";
-            case "um":
-                return "unmerged";
-            case "rd":
-                return "read";
-            case "ur":
-                return "unread";
-            case "cm":
-                return "comments";
-            case "ns":
-                return "nonSelfUpdate";
-            default:
-                return input;
+
+        switch (input) {
+        case "as":
+            return "assignee";
+        case "body":
+        case "desc":
+        case "de":
+            return "description";
+        case "d":
+            return "date";
+        case "l":
+        case "labels":
+            return "label";
+        case "m":
+        case "milestones":
+            return "milestone";
+        case "r":
+            return "repo";
+        case "st":
+        case "status":
+            return "state";
+        case "t":
+            return "title";
+        case "u":
+            return "updated";
+        case "o":
+            return "open";
+        case "c":
+            return "closed";
+        case "i":
+            return "issue";
+        case "p":
+        case "pullrequest":
+            return "pr";
+        case "mg":
+            return "merged";
+        case "um":
+            return "unmerged";
+        case "rd":
+            return "read";
+        case "ur":
+            return "unread";
+        case "cm":
+            return "comments";
+        case "ns":
+            return "nonSelfUpdate";
+        default:
+            return input;
         }
     }
 
@@ -187,8 +185,8 @@ public class Qualifier implements FilterExpression {
 
         if (!containsRepoQualifier) {
             exprWithNormalQualifiers = new Conjunction(
-                new Qualifier(QualifierType.REPO, model.getDefaultRepo()),
-                exprWithNormalQualifiers);
+                    new Qualifier(QualifierType.REPO, model.getDefaultRepo()),
+                    exprWithNormalQualifiers);
         }
 
         return exprWithNormalQualifiers.isSatisfiedBy(model, issue, new MetaQualifierInfo(metaQualifiers));
@@ -197,7 +195,7 @@ public class Qualifier implements FilterExpression {
     /**
      * Get all milestones which milestone alias (current+-[n]) can resolve to. This will henceforth
      * be called aliasable milestones.
-     *
+     * <p>
      * A milestone is aliasable if it has due date or it is the only open milestone in that repo.
      */
     private static List<TurboMilestone> getAliasableMilestones(List<TurboMilestone> milestonesOfReposInPanel) {
@@ -236,20 +234,18 @@ public class Qualifier implements FilterExpression {
         return IntStream
                 .range(0, sortedMilestones.size())
                 .boxed()
-                .collect(Collectors.toMap(
-                        i -> i - currentMilestoneIndex.get(),
-                        i -> sortedMilestones.get(i)));
+                .collect(Collectors.toMap(i -> i - currentMilestoneIndex.get(), i -> sortedMilestones.get(i)));
     }
 
     /**
      * "Current" milestone is an ongoing milestone with the earliest due date. However, if there
      * is only one open milestone, it will be considered as the "current" milestone, even if it
      * does not have a due date.
-     *
+     * <p>
      * If there is no ongoing or open milestone, sets "current" as one after last milestone -
      * this means that there is no "current" milestone, but it is possible that there is a
      * milestone before the "current" one (i.e. current-[n] where n >= 1)
-     *
+     * <p>
      * This method expects the milestone list to be sorted (by due date)
      */
     private static Optional<Integer> getCurrentMilestoneIndex(List<TurboMilestone> sortedMilestones) {
@@ -398,12 +394,12 @@ public class Qualifier implements FilterExpression {
         case DESCRIPTION:
         case KEYWORD:
             throw new QualifierApplicationException(
-                "Unnecessary filter: issue text cannot be changed by dragging");
+                    "Unnecessary filter: issue text cannot be changed by dragging");
         case ID:
             throw new QualifierApplicationException("Unnecessary filter: id is immutable");
         case CREATED:
             throw new QualifierApplicationException(
-                "Unnecessary filter: cannot change issue creation date");
+                    "Unnecessary filter: cannot change issue creation date");
         case HAS:
         case NO:
         case IS:
@@ -419,10 +415,10 @@ public class Qualifier implements FilterExpression {
             break;
         case AUTHOR:
             throw new QualifierApplicationException(
-                "Unnecessary filter: cannot change author of issue");
+                    "Unnecessary filter: cannot change author of issue");
         case INVOLVES:
             throw new QualifierApplicationException(
-                "Ambiguous filter: cannot change users involved with issue");
+                    "Ambiguous filter: cannot change users involved with issue");
         case STATE:
             applyState(issue);
             break;
@@ -430,6 +426,30 @@ public class Qualifier implements FilterExpression {
             assert false : "Missing case for " + type;
             break;
         }
+    }
+
+    @Override
+    public List<String> getWarnings(IModel model, TurboIssue issue) {
+        switch (type) {
+        case AUTHOR:
+        case ASSIGNEE:
+        case INVOLVES:
+            return getWarningsForTypeAuthorOrAssignee(model, issue);
+        default:
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * If the user referred in the qualifier is not a contributor of the repository of the TurboIssue,
+     * it returns a List<String> containing a warning that explains so, or an empty List<String> otherwise.
+     */
+    private List<String> getWarningsForTypeAuthorOrAssignee(IModel model, TurboIssue issue) {
+        List<String> result = new ArrayList<>();
+        if (content.isPresent() && !model.isUserInRepo(issue.getRepoId(), content.get())) {
+            result.add(String.format(USER_WARNING_ERROR_FORMAT, content.get(), issue.getRepoId()));
+        }
+        return result;
     }
 
     @Override
@@ -624,7 +644,7 @@ public class Qualifier implements FilterExpression {
         case "nonSelfUpdate":
             if (isSortableByNonSelfUpdates) {
                 comparator = (a, b) ->
-                    a.getMetadata().getNonSelfUpdatedAt().compareTo(b.getMetadata().getNonSelfUpdatedAt());
+                        a.getMetadata().getNonSelfUpdatedAt().compareTo(b.getMetadata().getNonSelfUpdatedAt());
             } else {
                 comparator = (a, b) -> a.getUpdatedAt().compareTo(b.getUpdatedAt());
             }
@@ -698,7 +718,7 @@ public class Qualifier implements FilterExpression {
 
             // Matches labels belong to the given group
             Predicate<TurboLabel> sameGroup = l ->
-                l.isInGroup() && l.getGroupName().equals(group);
+                    l.isInGroup() && l.getGroupName().equals(group);
 
             Comparator<TurboLabel> labelComparator = (x, y) -> x.compareTo(y);
 
@@ -720,8 +740,8 @@ public class Qualifier implements FilterExpression {
 
             // Compare lengths
             int result = !inverted
-                ? aLabels.size() - bLabels.size()
-                : bLabels.size() - aLabels.size();
+                    ? aLabels.size() - bLabels.size()
+                    : bLabels.size() - aLabels.size();
 
             if (result != 0) {
                 return result;
@@ -731,8 +751,8 @@ public class Qualifier implements FilterExpression {
             assert aLabels.size() == bLabels.size();
             for (int i = 0; i < aLabels.size(); i++) {
                 result = !inverted
-                    ? labelComparator.compare(aLabels.get(i), bLabels.get(i))
-                    : labelComparator.compare(bLabels.get(i), aLabels.get(i));
+                        ? labelComparator.compare(aLabels.get(i), bLabels.get(i))
+                        : labelComparator.compare(bLabels.get(i), aLabels.get(i));
                 if (result != 0) {
                     return result;
                 }
@@ -857,7 +877,6 @@ public class Qualifier implements FilterExpression {
         if (!content.isPresent()) return false;
 
         String creator = issue.getCreator();
-
         return creator.toLowerCase().contains(content.get().toLowerCase());
     }
 
@@ -885,7 +904,7 @@ public class Qualifier implements FilterExpression {
                 }
             } else {
                 if (candidateLabel.getGroupName().contains(group)
-                    && candidateLabel.getShortName().contains(labelName)) {
+                        && candidateLabel.getShortName().contains(labelName)) {
                     return true;
                 }
             }
@@ -956,12 +975,12 @@ public class Qualifier implements FilterExpression {
         if (!content.isPresent()) throw new SemanticException(type);
         String content = this.content.get().toLowerCase();
         switch (expandKeywordAliases(content)) {
-            case "issue":
-                return !issue.isPullRequest();
-            case "pr":
-                return issue.isPullRequest();
-            default:
-                throw new SemanticException(type);
+        case "issue":
+            return !issue.isPullRequest();
+        case "pr":
+            return issue.isPullRequest();
+        default:
+            throw new SemanticException(type);
         }
     }
 
@@ -973,7 +992,7 @@ public class Qualifier implements FilterExpression {
         // Find milestones containing partial title
         List<TurboMilestone> milestones = model.getMilestones().stream()
                 .filter(m -> m.getTitle().toLowerCase().contains(content.get().toLowerCase()))
-            .collect(Collectors.toList());
+                .collect(Collectors.toList());
 
         if (milestones.isEmpty()) {
             throw new QualifierApplicationException("Invalid milestone " + content.get());
@@ -984,8 +1003,8 @@ public class Qualifier implements FilterExpression {
 
         // Find milestones containing exact title
         milestones = model.getMilestones().stream()
-            .filter(m -> m.getTitle().toLowerCase().equals(content.get().toLowerCase()))
-            .collect(Collectors.toList());
+                .filter(m -> m.getTitle().toLowerCase().equals(content.get().toLowerCase()))
+                .collect(Collectors.toList());
 
         if (milestones.isEmpty()) {
             throw new QualifierApplicationException("Invalid milestone " + content.get());
@@ -995,7 +1014,7 @@ public class Qualifier implements FilterExpression {
         }
 
         throw new QualifierApplicationException(
-            "Ambiguous filter: can apply any of the following milestones: " + milestones.toString());
+                "Ambiguous filter: can apply any of the following milestones: " + milestones.toString());
     }
 
     private void applyLabel(TurboIssue issue, IModel model) throws QualifierApplicationException {
@@ -1006,7 +1025,7 @@ public class Qualifier implements FilterExpression {
         // Find labels containing the label name
         List<TurboLabel> labels = model.getLabels().stream()
                 .filter(l -> l.getFullName().toLowerCase().contains(content.get().toLowerCase()))
-            .collect(Collectors.toList());
+                .collect(Collectors.toList());
 
         if (labels.isEmpty()) {
             throw new QualifierApplicationException("Invalid label " + content.get());
@@ -1017,8 +1036,8 @@ public class Qualifier implements FilterExpression {
 
         // Find labels with the exact label name
         labels = model.getLabels().stream()
-            .filter(l -> l.getFullName().toLowerCase().equals(content.get().toLowerCase()))
-            .collect(Collectors.toList());
+                .filter(l -> l.getFullName().toLowerCase().equals(content.get().toLowerCase()))
+                .collect(Collectors.toList());
 
         if (labels.isEmpty()) {
             throw new QualifierApplicationException("Invalid label " + content.get());
@@ -1028,7 +1047,7 @@ public class Qualifier implements FilterExpression {
         }
 
         throw new QualifierApplicationException(
-            "Ambiguous filter: can apply any of the following labels: " + labels.toString());
+                "Ambiguous filter: can apply any of the following labels: " + labels.toString());
     }
 
     private void applyAssignee(TurboIssue issue, IModel model) throws QualifierApplicationException {
@@ -1038,8 +1057,8 @@ public class Qualifier implements FilterExpression {
 
         // Find assignees containing partial name
         List<TurboUser> assignees = model.getUsers().stream()
-            .filter(c -> c.getLoginName().toLowerCase().contains(content.get().toLowerCase()))
-            .collect(Collectors.toList());
+                .filter(c -> c.getLoginName().toLowerCase().contains(content.get().toLowerCase()))
+                .collect(Collectors.toList());
 
         if (assignees.isEmpty()) {
             throw new QualifierApplicationException("Invalid user " + content.get());
@@ -1050,8 +1069,8 @@ public class Qualifier implements FilterExpression {
 
         // Find assignees containing partial name
         assignees = model.getUsers().stream()
-            .filter(c -> c.getLoginName().toLowerCase().equals(content.get().toLowerCase()))
-            .collect(Collectors.toList());
+                .filter(c -> c.getLoginName().toLowerCase().equals(content.get().toLowerCase()))
+                .collect(Collectors.toList());
 
         if (assignees.isEmpty()) {
             throw new QualifierApplicationException("Invalid user " + content.get());
@@ -1061,7 +1080,7 @@ public class Qualifier implements FilterExpression {
         }
 
         throw new QualifierApplicationException(
-            "Ambiguous filter: can apply any of the following assignees: " + assignees.toString());
+                "Ambiguous filter: can apply any of the following assignees: " + assignees.toString());
     }
 
     private void applyState(TurboIssue issue) throws QualifierApplicationException {
@@ -1140,7 +1159,7 @@ public class Qualifier implements FilterExpression {
      * Determines the count value to be taken from the count qualifier. Throw a ParseException if count
      * qualifier is not valid.
      *
-     * @param issueList Issue list obtained after filtering and sorting.
+     * @param issueList  Issue list obtained after filtering and sorting.
      * @param filterExpr The filter expression of the particular panel.
      * @return The valid count value in the qualifier or the issueList.size() by default
      */

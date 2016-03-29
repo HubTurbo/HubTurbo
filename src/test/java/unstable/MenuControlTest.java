@@ -17,8 +17,7 @@ public class MenuControlTest extends UITest {
         final AtomicInteger triggered = new AtomicInteger(0);
 
         PlatformEx.runAndWait(() ->
-            UI.events.registerEvent((ModelUpdatedEventHandler) e ->
-                triggered.incrementAndGet()));
+                UI.events.registerEvent((ModelUpdatedEventHandler) e -> triggered.incrementAndGet()));
 
         press(REFRESH);
         waitAndAssertEquals(1, triggered::get);

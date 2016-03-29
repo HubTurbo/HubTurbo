@@ -72,7 +72,7 @@ public final class Parser {
             return token;
         } else {
             throw new ParseException(String.format(
-                "Expected %s but got %s", type, input.get(position)));
+                    "Expected %s but got %s", type, input.get(position)));
         }
     }
 
@@ -95,7 +95,7 @@ public final class Parser {
                 throw new IncompleteInputException();
             } else {
                 throw new ParseException(String.format(
-                    "Input unexpectedly ended at position %d", sourcePosition));
+                        "Input unexpectedly ended at position %d", sourcePosition));
             }
         }
 
@@ -120,7 +120,7 @@ public final class Parser {
             break;
         default:
             throw new ParseException(String.format(
-                "Encountered %s, which cannot start an expression", token));
+                    "Encountered %s, which cannot start an expression", token));
         }
 
         if (lookAhead().getType() == TokenType.EOF) {
@@ -181,6 +181,7 @@ public final class Parser {
     }
 
     private static final Pattern datePattern = Pattern.compile("(\\d{4})-(\\d{1,2})-(\\d{1,2})");
+
     private static Optional<LocalDate> parseDate(Token token) {
         Matcher matcher = datePattern.matcher(token.getValue());
         if (matcher.find()) {
@@ -251,11 +252,11 @@ public final class Parser {
                 throw new IncompleteInputException();
             } else {
                 throw new ParseException(String.format(
-                    "Qualifier %s must be given an input", type));
+                        "Qualifier %s must be given an input", type));
             }
         } else {
             throw new ParseException(String.format(
-                "Invalid content for qualifier %s: %s", type, lookAhead()));
+                    "Invalid content for qualifier %s: %s", type, lookAhead()));
         }
     }
 
@@ -345,12 +346,13 @@ public final class Parser {
 
     /**
      * Parses filter for conjunction lookup of repo and id i.e id:test/test#id
+     *
      * @return filter expression
      */
     private FilterExpression parseCompoundId() {
         String repoId = consume().getValue();
         FilterExpression left = new Qualifier(
-            QualifierType.REPO, repoId.substring(0, repoId.length() - 1));
+                QualifierType.REPO, repoId.substring(0, repoId.length() - 1));
 
         return new Conjunction(left, parseQualifierContent(QualifierType.ID));
     }
@@ -440,7 +442,7 @@ public final class Parser {
                 } catch (NumberFormatException e) {
                     // Exit with an exception if it's not a number
                     throw new ParseException(String.format(// NOPMD
-                        "Operator %s can only be applied to number or date", operator));
+                            "Operator %s can only be applied to number or date", operator));
                 }
 
                 // Must be a number
@@ -464,7 +466,7 @@ public final class Parser {
             }
         } else {
             throw new ParseException(String.format(
-                "Operator %s can only be applied to number or date, got %s", operator, lookAhead()));
+                    "Operator %s can only be applied to number or date, got %s", operator, lookAhead()));
         }
     }
 

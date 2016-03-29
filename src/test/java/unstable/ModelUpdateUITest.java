@@ -27,60 +27,60 @@ public class ModelUpdateUITest extends UITest {
 
     @Test
     public void modelUpdate_panel_addedIssuesShowUp()
-        throws InterruptedException, ExecutionException {
+            throws InterruptedException, ExecutionException {
         resetRepo();
         addIssue();
-        FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssueCount);
+        FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssuesCount);
         PlatformEx.runAndWait(countIssues);
-        assertEquals(DummyRepoState.noOfDummyIssues + 1, countIssues.get().intValue());
+        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES + 1, countIssues.get().intValue());
     }
 
     @Test
     public void modelUpdate_panel_multipleAddedIssuesShowUp()
-        throws InterruptedException, ExecutionException {
+            throws InterruptedException, ExecutionException {
         resetRepo();
         addIssue();
         addIssue();
         addIssue();
-        FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssueCount);
+        FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssuesCount);
         PlatformEx.runAndWait(countIssues);
-        assertEquals(DummyRepoState.noOfDummyIssues + 3, countIssues.get().intValue());
+        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES + 3, countIssues.get().intValue());
     }
 
     @Test
     public void modelUpdate_panel_correctNumberOfIssuesShown()
-        throws InterruptedException, ExecutionException {
+            throws InterruptedException, ExecutionException {
         addIssue();
         resetRepo();
-        FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssueCount);
+        FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssuesCount);
         PlatformEx.runAndWait(countIssues);
-        assertEquals(DummyRepoState.noOfDummyIssues, countIssues.get().intValue());
+        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES, countIssues.get().intValue());
     }
 
     @Test
     public void modelUpdate_panel_deletedIssuesNoLongerShowUp()
-        throws InterruptedException, ExecutionException {
+            throws InterruptedException, ExecutionException {
         resetRepo();
         addIssue();
         addIssue();
         deleteIssue(1);
-        FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssueCount);
+        FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssuesCount);
         PlatformEx.runAndWait(countIssues);
-        assertEquals(DummyRepoState.noOfDummyIssues + 1, countIssues.get().intValue());
+        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES + 1, countIssues.get().intValue());
     }
 
     @Test
     public void modelUpdate_panel_multipleDeletedIssuesNoLongerShowUp()
-        throws InterruptedException, ExecutionException {
+            throws InterruptedException, ExecutionException {
         resetRepo();
         addIssue();
         addIssue();
         addIssue();
         deleteIssue(1);
         deleteIssue(2);
-        FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssueCount);
+        FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssuesCount);
         PlatformEx.runAndWait(countIssues);
-        assertEquals(DummyRepoState.noOfDummyIssues + 1, countIssues.get().intValue());
+        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES + 1, countIssues.get().intValue());
     }
 
     // TODO no way to check correctness of these events as of yet as they are not reflected on the UI

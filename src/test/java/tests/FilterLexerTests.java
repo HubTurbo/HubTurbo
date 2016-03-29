@@ -19,31 +19,31 @@ public class FilterLexerTests {
     public void lex_generalInputs() {
 
         assertEquals(tokenise(""), Arrays.asList(
-            new Token(TokenType.EOF, "")));
+                new Token(TokenType.EOF, "")));
 
         assertEquals(tokenise("a' b' c'"), Arrays.asList(
-            new Token(TokenType.SYMBOL, "a'"),
-            new Token(TokenType.SYMBOL, "b'"),
-            new Token(TokenType.SYMBOL, "c'"),
-            new Token(TokenType.EOF, "")));
+                new Token(TokenType.SYMBOL, "a'"),
+                new Token(TokenType.SYMBOL, "b'"),
+                new Token(TokenType.SYMBOL, "c'"),
+                new Token(TokenType.EOF, "")));
     }
 
     @Test
     public void lex_repoIds() {
 
-        assertEquals(tokenise("test/test"), 
-            Arrays.asList(new Token(TokenType.SYMBOL, "test/test"), new Token(TokenType.EOF, "")));
+        assertEquals(tokenise("test/test"),
+                     Arrays.asList(new Token(TokenType.SYMBOL, "test/test"), new Token(TokenType.EOF, "")));
     }
 
     @Test
     public void lex_sortingKeys() {
 
         assertEquals(tokenise("sort: a, b "), Arrays.asList(
-            new Token(TokenType.QUALIFIER, "sort:"),
-            new Token(TokenType.SYMBOL, "a"),
-            new Token(TokenType.COMMA, ","),
-            new Token(TokenType.SYMBOL, "b"),
-            new Token(TokenType.EOF, "")));
+                new Token(TokenType.QUALIFIER, "sort:"),
+                new Token(TokenType.SYMBOL, "a"),
+                new Token(TokenType.COMMA, ","),
+                new Token(TokenType.SYMBOL, "b"),
+                new Token(TokenType.EOF, "")));
 
         assertEquals(tokenise("sort-self-other: a, b "), Arrays.asList(
                 new Token(TokenType.QUALIFIER, "sort-self-other:"),
@@ -63,12 +63,12 @@ public class FilterLexerTests {
                 new Token(TokenType.EOF, "")));
 
         assertEquals(tokenise("sort: a , - b"), Arrays.asList(
-            new Token(TokenType.QUALIFIER, "sort:"),
-            new Token(TokenType.SYMBOL, "a"),
-            new Token(TokenType.COMMA, ","),
-            new Token(TokenType.NOT, "-"),
-            new Token(TokenType.SYMBOL, "b"),
-            new Token(TokenType.EOF, "")));
+                new Token(TokenType.QUALIFIER, "sort:"),
+                new Token(TokenType.SYMBOL, "a"),
+                new Token(TokenType.COMMA, ","),
+                new Token(TokenType.NOT, "-"),
+                new Token(TokenType.SYMBOL, "b"),
+                new Token(TokenType.EOF, "")));
     }
 
     @Test

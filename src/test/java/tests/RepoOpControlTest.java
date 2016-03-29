@@ -23,6 +23,9 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -31,6 +34,8 @@ public class RepoOpControlTest {
     private static final Logger logger = LogManager.getLogger(RepoOpControlTest.class.getName());
 
     private static final String REPO = "test/test";
+    private static final TurboIssue issue = new TurboIssue(REPO, 1, "Issue 1");
+    private static final Optional<Integer> milestone = Optional.of(1);
 
     private final Executor executor = Executors.newCachedThreadPool();
 
@@ -128,6 +133,25 @@ public class RepoOpControlTest {
         assertEquals(3, counter.getMax());
     }
 
+    @Test
+    public void replaceIssueMilestoneLocally() throws ExecutionException, InterruptedException {
+        int issueId = 1;
+        Optional<Integer> milestoneId = Optional.of(1);
+        MultiModel models = mock(MultiModel.class);
+
+        TurboIssue returnedIssue = new TurboIssue("testrepo/testrepo", issueId, "Issue title");
+        returnedIssue.setMilestoneById(1);
+
+        when(models.replaceIssueMilestone("testrepo/testrepo", issueId, milestoneId))
+                .thenReturn(Optional.of(returnedIssue));
+
+        RepoOpControl repoOpControl = new RepoOpControl(mock(RepoIO.class), models);
+        Optional<TurboIssue> result = repoOpControl.replaceIssueMilestoneLocally(returnedIssue, milestoneId).join();
+
+        assertTrue(result.isPresent());
+        assertEquals(returnedIssue, result.get());
+    }
+
     /**
      * Tests that replaceIssueLabelsLocally calls replaceIssueLabels method from models and return corresponding result
      */
@@ -136,10 +160,41 @@ public class RepoOpControlTest {
         MultiModel models = mock(MultiModel.class);
         TurboIssue returnedIssue = new TurboIssue("testrepo/testrepo", 1, "Issue title");
         when(models.replaceIssueLabels("testrepo/testrepo", 1, new ArrayList<>()))
-        .thenReturn(Optional.of(returnedIssue));
+                .thenReturn(Optional.of(returnedIssue));
         RepoOpControl repoOpControl = new RepoOpControl(mock(RepoIO.class), models);
         TurboIssue result = repoOpControl.replaceIssueLabelsLocally(returnedIssue, new ArrayList<>()).join().get();
         assertEquals(returnedIssue, result);
+    }
+
+    /**
+     * Tests that {@code editIssueStateLocally} calls @{code editIssueState} method from models
+     * and return corresponding result
+     */
+    @Test
+    public void editIssueStateLocally() throws ExecutionException, InterruptedException {
+        MultiModel models = mock(MultiModel.class);
+        TurboIssue returnedIssue = new TurboIssue("testrepo/testrepo", 1, "Issue title");
+        when(models.editIssueState("testrepo/testrepo", 1, false))
+                .thenReturn(Optional.of(returnedIssue));
+        RepoOpControl repoOpControl = new RepoOpControl(mock(RepoIO.class), models);
+        TurboIssue result = repoOpControl.editIssueStateLocally(returnedIssue, false).join().get();
+        assertEquals(returnedIssue, result);
+    }
+
+    /**
+     * Tests that {@code editIssueStateOnServer} calls @{code editIssueState} method from RepoIO
+     * and return corresponding success/failure state
+     */
+    @Test
+    public void editIssueStateOnServer() throws ExecutionException, InterruptedException {
+        RepoIO mockedRepoIO = mock(RepoIO.class);
+        when(mockedRepoIO.editIssueState(any(TurboIssue.class), anyBoolean()))
+                .thenReturn(CompletableFuture.completedFuture(true));
+
+        TurboIssue returnedIssue = new TurboIssue("testrepo/testrepo", 1, "Issue title");
+        RepoOpControl repoOpControl = new RepoOpControl(mockedRepoIO, mock(MultiModel.class));
+        boolean result = repoOpControl.editIssueStateOnServer(returnedIssue, false).join();
+        assertEquals(true, result);
     }
 
     /**
@@ -150,20 +205,23 @@ public class RepoOpControlTest {
 
         RepoIO stub = mock(RepoIO.class);
 
+        when(stub.replaceIssueMilestone(issue, milestone))
+                .then(invocation -> createResult(counter, new TurboIssue("dummy/dummy", 1, "Issue title")));
+
         when(stub.openRepository(REPO))
-            .then(invocation -> createResult(counter, new Model(REPO)));
+                .then(invocation -> createResult(counter, new Model(REPO)));
         when(stub.removeRepository(REPO))
-            .then(invocation -> createResult(counter, true));
+                .then(invocation -> createResult(counter, true));
         when(stub.updateModel(new Model(REPO), false))
-            .then(invocation -> createResult(counter, new Model(REPO)));
+                .then(invocation -> createResult(counter, new Model(REPO)));
 
         for (int i = 0; i < 3; i++) {
             when(stub.openRepository(REPO + i))
-                .then(invocation -> createResult(counter, new Model(REPO)));
+                    .then(invocation -> createResult(counter, new Model(REPO)));
             when(stub.removeRepository(REPO + i))
-                .then(invocation -> createResult(counter, true));
+                    .then(invocation -> createResult(counter, true));
             when(stub.updateModel(new Model(REPO + i), false))
-                .then(invocation -> createResult(counter, new Model(REPO)));
+                    .then(invocation -> createResult(counter, new Model(REPO)));
         }
 
         return stub;
@@ -173,7 +231,6 @@ public class RepoOpControlTest {
      * Creates a result value which completes after a short delay, to simulate an async task.
      */
     private <T> CompletableFuture<T> createResult(AtomicMaxInteger counter, T value) {
-
         CompletableFuture<T> result = new CompletableFuture<>();
 
         executor.execute(() -> {

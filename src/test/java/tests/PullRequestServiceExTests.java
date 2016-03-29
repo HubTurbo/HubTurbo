@@ -62,20 +62,18 @@ public class PullRequestServiceExTests {
 
         mockServer.when(
                 request()
-                    .withPath(TestUtils.API_PREFIX + "/repos/hubturbo/hubturbo/pulls/1125/comments")
-                    .withQueryStringParameters(
-                            new Parameter("per_page", "100"),
-                            new Parameter("page", "1")
-                    )
-        ).respond(
-               response()
-                    .withBody(sampleComments)
-        );
+                        .withPath(TestUtils.API_PREFIX + "/repos/hubturbo/hubturbo/pulls/1125/comments")
+                        .withQueryStringParameters(
+                                new Parameter("per_page", "100"),
+                                new Parameter("page", "1")
+                        )
+        ).respond(response().withBody(sampleComments));
 
         GitHubClient client = new GitHubClient("localhost", 8888, "http");
         PullRequestServiceEx service = new PullRequestServiceEx(client);
 
-        Type listOfComments = new TypeToken<List<ReviewComment>>() {}.getType();
+        Type listOfComments = new TypeToken<List<ReviewComment>>() {
+        }.getType();
         List<ReviewComment> expectedComments = new Gson().fromJson(sampleComments, listOfComments);
         List<ReviewComment> actualComments = service.getReviewComments(
                 RepositoryId.createFromId("hubturbo/hubturbo"), 1125);

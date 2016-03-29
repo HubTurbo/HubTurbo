@@ -46,6 +46,7 @@ public final class RepoOpControl {
     /**
      * Updates repository stored locally with data from a GitHubModelUpdatesData object.
      * Set syncOperation to queue this operation in the blocking queue for the updating repository
+     *
      * @param updates
      * @param syncOperation
      * @return
@@ -70,6 +71,20 @@ public final class RepoOpControl {
         return result;
     }
 
+    public CompletableFuture<Boolean> editIssueStateOnServer(TurboIssue issue, boolean isOpen) {
+        init(issue.getRepoId());
+        CompletableFuture<Boolean> result = new CompletableFuture<>();
+        enqueue(new EditIssueStateOnServerOp(repoIO, result, issue, isOpen));
+        return result;
+    }
+
+    public CompletableFuture<Optional<TurboIssue>> editIssueStateLocally(TurboIssue issue, boolean isOpen) {
+        init(issue.getRepoId());
+        CompletableFuture<Optional<TurboIssue>> result = new CompletableFuture<>();
+        enqueue(new EditIssueStateLocallyOp(models, result, issue, isOpen));
+        return result;
+    }
+
     public CompletableFuture<Boolean> replaceIssueLabelsOnServer(TurboIssue issue, List<String> labels) {
         init(issue.getRepoId());
         CompletableFuture<Boolean> result = new CompletableFuture<>();
@@ -81,6 +96,21 @@ public final class RepoOpControl {
         init(issue.getRepoId());
         CompletableFuture<Optional<TurboIssue>> result = new CompletableFuture<>();
         enqueue(new ReplaceIssueLabelsLocallyOp(models, issue, labels, result));
+        return result;
+    }
+
+    public CompletableFuture<Boolean> replaceIssueMilestoneOnServer(TurboIssue issue, Optional<Integer> milestone) {
+        init(issue.getRepoId());
+        CompletableFuture<Boolean> result = new CompletableFuture<>();
+        enqueue(new ReplaceIssueMilestoneOnServerOp(repoIO, result, issue, milestone));
+        return result;
+    }
+
+    public CompletableFuture<Optional<TurboIssue>> replaceIssueMilestoneLocally(TurboIssue issue,
+                                                                                Optional<Integer> milestone) {
+        init(issue.getRepoId());
+        CompletableFuture<Optional<TurboIssue>> result = new CompletableFuture<>();
+        enqueue(new ReplaceIssueMilestoneLocallyOp(models, result, issue, milestone));
         return result;
     }
 

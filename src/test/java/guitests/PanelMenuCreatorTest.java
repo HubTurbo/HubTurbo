@@ -2,7 +2,9 @@ package guitests;
 
 import org.junit.Before;
 import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
+
 import prefs.PanelInfo;
 import ui.TestController;
 import ui.UI;
@@ -18,7 +20,7 @@ import static ui.PanelMenuCreator.MILESTONE_PANEL_NAME;
 import static ui.PanelMenuCreator.UPDATED_FILTER_NAME;
 import static ui.PanelMenuCreator.UPDATED_PANEL_NAME;
 
-public class PanelMenuCreatorTest extends UITest{
+public class PanelMenuCreatorTest extends UITest {
 
     private PanelControl panelControl;
 
@@ -29,22 +31,22 @@ public class PanelMenuCreatorTest extends UITest{
     }
 
     @Test
-    public void assigneePanelMenuItemTest(){
+    public void assigneePanelMenuItemTest() {
         customizedPanelMenuItemTest(ASSIGNEE_PANEL_NAME, ASSIGNEE_FILTER_NAME);
     }
 
     @Test
-    public void milestonePanelMenuItemTest(){
+    public void milestonePanelMenuItemTest() {
         customizedPanelMenuItemTest(MILESTONE_PANEL_NAME, MILESTONE_FILTER_NAME);
     }
 
     @Test
-    public void recentlyUpdatedPanelMenuItemTest(){
+    public void recentlyUpdatedPanelMenuItemTest() {
         customizedPanelMenuItemTest(UPDATED_PANEL_NAME, UPDATED_FILTER_NAME);
     }
 
     @Test
-    public void createPanelTest(){
+    public void createPanelTest() {
         traverseMenu("Panels", "Create");
 
         waitAndAssertEquals(2, panelControl::getPanelCount);
@@ -58,7 +60,7 @@ public class PanelMenuCreatorTest extends UITest{
         traverseMenu("Panels", "Close");
     }
 
-    private void customizedPanelMenuItemTest(String panelName, String panelFilter){
+    private void customizedPanelMenuItemTest(String panelName, String panelFilter) {
         PlatformEx.waitOnFxThread();
         traverseMenu("Panels", "Auto-create", panelName);
 

@@ -43,7 +43,8 @@ public class MultiModel implements IModel {
     public synchronized MultiModel addPending(Model model) {
         String repoId = model.getRepoId();
         Optional<String> matchingRepoId = pendingRepositories.stream()
-                .filter(pendingRepo -> pendingRepo.equalsIgnoreCase(repoId))
+                .filter(pendingRepo -> pendingRepo.equalsIgnoreCase
+                        (repoId))
                 .findFirst();
         assert matchingRepoId.isPresent() : "No pending repository " + repoId + "!";
         pendingRepositories.remove(matchingRepoId.get());
@@ -94,6 +95,7 @@ public class MultiModel implements IModel {
 
     /**
      * Replaces labels of an issue specified by {@code issueId} in {@code repoId} with {@code labels}
+     *
      * @param repoId
      * @param issueId
      * @param labels
@@ -101,9 +103,40 @@ public class MultiModel implements IModel {
      */
     public synchronized Optional<TurboIssue> replaceIssueLabels(String repoId, int issueId, List<String> labels) {
         Optional<Model> modelLookUpResult = getModelById(repoId);
+        return Utility.safeFlatMapOptional(modelLookUpResult, (model) -> {
+            return model.replaceIssueLabels(issueId, labels);
+        }, () -> logger.error("Model " + repoId + " not found in models"));
+    }
+
+    /**
+     * Replaces the milestone of an issue specified by {@code issueId} in {@code repoId} with {@code milestone}
+     *
+     * @param repoId
+     * @param issueId
+     * @param milestone
+     * @return the modified TurboIssue if successful
+     */
+    public synchronized Optional<TurboIssue> replaceIssueMilestone(String repoId, int issueId,
+                                                                   Optional<Integer> milestone) {
+        Optional<Model> modelLookUpResult = getModelById(repoId);
+        return Utility.safeFlatMapOptional(modelLookUpResult, (model) -> {
+            return model.replaceIssueMilestone(issueId, milestone);
+        }, () -> logger.error("Model " + repoId + " not found in models"));
+    }
+
+    /**
+     * Sets the open/closed state of an issue specified by {@code issueId} in {@code repoId} to {@code isOpen}
+     *
+     * @param repoId
+     * @param issueId
+     * @param isOpen
+     * @return the modified TurboIssue if successful
+     */
+    public synchronized Optional<TurboIssue> editIssueState(String repoId, int issueId, boolean isOpen) {
+        Optional<Model> modelLookUpResult = getModelById(repoId);
         return Utility.safeFlatMapOptional(modelLookUpResult,
-                (model) -> model.replaceIssueLabels(issueId, labels),
-                () -> logger.error("Model " + repoId + " not found in models"));
+            (model) -> model.editIssueState(issueId, isOpen),
+            () -> logger.error("Model " + repoId + " not found in models"));
     }
 
     public synchronized void insertMetadata(String repoId, Map<Integer, IssueMetadata> metadata, String currentUser) {
@@ -115,9 +148,11 @@ public class MultiModel implements IModel {
                 // to not replace events while still replacing comments in the case of same ETag.
                 // TODO move ETag comparison here when comments ETag implementation is complete.
                 LocalDateTime nonSelfUpdatedAt = reconcileCreationDate(toBeInserted.getNonSelfUpdatedAt(),
-                        issue.getCreatedAt(), currentUser, issue.getCreator());
+                                                                       issue.getCreatedAt(), currentUser, issue
+                                                                               .getCreator());
                 issue.setMetadata(toBeInserted.reconcile(nonSelfUpdatedAt,
-                    issue.getMetadata().getEvents(), issue.getMetadata().getEventsETag()));
+                                                         issue.getMetadata().getEvents(), issue.getMetadata()
+                                                                 .getEventsETag()));
             }
         });
     }
@@ -153,6 +188,16 @@ public class MultiModel implements IModel {
     }
 
     @Override
+    public boolean isUserInRepo(String repoId, String userName) {
+        List<TurboUser> usersOfRepo = getUsersOfRepo(repoId);
+        return usersOfRepo.stream()
+                .filter(userOfRepo -> userOfRepo.getRealName().toLowerCase().contains(userName.toLowerCase()) ||
+                        userOfRepo.getLoginName().toLowerCase().contains(userName.toLowerCase()))
+                .findFirst()
+                .isPresent();
+    }
+
+    @Override
     public synchronized List<TurboIssue> getIssues() {
         List<TurboIssue> result = new ArrayList<>();
         models.values().forEach(m -> result.addAll(m.getIssues()));
@@ -183,14 +228,14 @@ public class MultiModel implements IModel {
     @Override
     public synchronized Optional<Model> getModelById(String repoId) {
         return models.containsKey(repoId)
-            ? Optional.of(models.get(repoId))
-            : Optional.empty();
+                ? Optional.of(models.get(repoId))
+                : Optional.empty();
     }
 
     @Override
     public Optional<TurboUser> getAssigneeOfIssue(TurboIssue issue) {
         return getModelById(issue.getRepoId())
-            .flatMap(m -> m.getAssigneeOfIssue(issue));
+                .flatMap(m -> m.getAssigneeOfIssue(issue));
     }
 
     @Override
@@ -202,23 +247,29 @@ public class MultiModel implements IModel {
     @Override
     public List<TurboLabel> getLabelsOfIssue(TurboIssue issue, Predicate<TurboLabel> predicate) {
         return getModelById(issue.getRepoId())
-            .flatMap(m -> Optional.of(m.getLabelsOfIssue(issue)))
-            .get().stream()
-            .filter(predicate)
-            .collect(Collectors.toList());
+                .flatMap(m -> Optional.of(m.getLabelsOfIssue(issue)))
+                .get().stream()
+                .filter(predicate)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<TurboUser> getUsersOfRepo(String repoId) {
+        Optional<Model> model = getModelById(repoId);
+        return model.isPresent() ? model.get().getUsers() : new ArrayList<>();
     }
 
     @Override
     public List<TurboLabel> getLabelsOfIssue(TurboIssue issue) {
         return getModelById(issue.getRepoId())
-            .flatMap(m -> Optional.of(m.getLabelsOfIssue(issue)))
-            .get();
+                .flatMap(m -> Optional.of(m.getLabelsOfIssue(issue)))
+                .get();
     }
 
     @Override
     public Optional<TurboMilestone> getMilestoneOfIssue(TurboIssue issue) {
         return getModelById(issue.getRepoId())
-            .flatMap(m -> m.getMilestoneOfIssue(issue));
+                .flatMap(m -> m.getMilestoneOfIssue(issue));
     }
 
     public synchronized boolean isRepositoryPending(String repoId) {
@@ -232,6 +283,7 @@ public class MultiModel implements IModel {
     /**
      * Called on new models which come in.
      * Mutates TurboIssues with meta-information.
+     *
      * @param model
      */
     private void preprocessNewIssues(Model model) {

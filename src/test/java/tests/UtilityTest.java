@@ -1,6 +1,7 @@
 package tests;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static util.Utility.dateToLocalDateTime;
@@ -38,13 +39,15 @@ public class UtilityTest {
         try {
             safeLongToInt(a);
             fail();
-        } catch (IllegalArgumentException ignored) {}
+        } catch (IllegalArgumentException ignored) {
+        }
 
         a = Integer.MIN_VALUE - 30L;
         try {
             safeLongToInt(a);
             fail();
-        } catch (IllegalArgumentException ignored) {}
+        } catch (IllegalArgumentException ignored) {
+        }
     }
 
     @Test
@@ -59,13 +62,14 @@ public class UtilityTest {
         testDate.setTimeZone(TimeZone.getTimeZone("GMT"));
 
         assertEquals(testDate.getTime().toString(),
-            parseHTTPLastModifiedDate("Tue, 15 Nov 1994 12:45:26 GMT").toString());
+                     parseHTTPLastModifiedDate("Tue, 15 Nov 1994 12:45:26 GMT").toString());
 
         try {
             assertEquals(testDate.getTime().toString(),
-                parseHTTPLastModifiedDate("some non-date string").toString());
+                         parseHTTPLastModifiedDate("some non-date string").toString());
             fail();
-        } catch (IllegalArgumentException ignored) {}
+        } catch (IllegalArgumentException ignored) {
+        }
     }
 
     @Test
@@ -127,21 +131,21 @@ public class UtilityTest {
 
         assertEquals(desiredName, Utility.getNameClosestToDesiredName(desiredName, new ArrayList<String>()));
         assertEquals(desiredName, Utility.getNameClosestToDesiredName(desiredName,
-                Arrays.asList("not-test", "other", "even more")));
+                                                                      Arrays.asList("not-test", "other", "even more")));
         assertEquals(desiredName + "1", Utility.getNameClosestToDesiredName(desiredName,
-                Arrays.asList("test")));
+                                                                            Arrays.asList("test")));
         assertEquals(desiredName, Utility.getNameClosestToDesiredName(desiredName,
-                Arrays.asList("test1")));
+                                                                      Arrays.asList("test1")));
         assertEquals(desiredName + "2", Utility.getNameClosestToDesiredName(desiredName,
-                Arrays.asList("test", "test1")));
+                                                                            Arrays.asList("test", "test1")));
         assertEquals(desiredName + "1", Utility.getNameClosestToDesiredName(desiredName,
-                Arrays.asList("test", "test2")));
+                                                                            Arrays.asList("test", "test2")));
         assertEquals(desiredName, Utility.getNameClosestToDesiredName(desiredName,
-                Arrays.asList("tests")));
+                                                                      Arrays.asList("tests")));
         assertEquals(desiredName + "1", Utility.getNameClosestToDesiredName(desiredName,
-                Arrays.asList("test", "tests")));
+                                                                            Arrays.asList("test", "tests")));
         assertEquals(desiredName + "1", Utility.getNameClosestToDesiredName(desiredName,
-                Arrays.asList("test", "test100")));
+                                                                            Arrays.asList("test", "test100")));
     }
 
     @Test
@@ -171,5 +175,15 @@ public class UtilityTest {
         assertEquals(true, convertedSet.contains(entry5.toLowerCase()));
 
 
+    }
+
+    @Test
+    public void containsIgnoreCaseMultipleWords_partialMatchingQueries() {
+        assertFalse(Utility.containsIgnoreCase("this is", Arrays.asList("is", "me")));
+    }
+
+    @Test
+    public void containsIgnoreCaseMultipleWords_allMatchingQueries() {
+        assertTrue(Utility.containsIgnoreCase("this is me", Arrays.asList("is", "me")));
     }
 }

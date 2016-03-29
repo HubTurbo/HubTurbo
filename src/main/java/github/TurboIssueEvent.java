@@ -55,9 +55,11 @@ public class TurboIssueEvent {
     public IssueEventType getType() {
         return type;
     }
+
     public User getActor() {
         return actor;
     }
+
     public Date getDate() {
         return new Date(date.getTime());
     }
@@ -72,48 +74,60 @@ public class TurboIssueEvent {
         assert isLabelUpdateEvent();
         return labelName;
     }
+
     public TurboIssueEvent setLabelName(String labelName) {
         assert isLabelUpdateEvent();
         this.labelName = labelName;
         return this;
     }
+
     public String getLabelColour() {
         assert isLabelUpdateEvent();
         return labelColour;
     }
+
     public TurboIssueEvent setLabelColour(String labelColour) {
         assert isLabelUpdateEvent();
         this.labelColour = labelColour;
         return this;
     }
+
     public String getMilestoneTitle() {
         assert type == IssueEventType.Milestoned || type == IssueEventType.Demilestoned;
         return milestoneTitle;
     }
-    public void setMilestoneTitle(String milestoneTitle) {
+
+    public TurboIssueEvent setMilestoneTitle(String milestoneTitle) {
         assert type == IssueEventType.Milestoned || type == IssueEventType.Demilestoned;
         this.milestoneTitle = milestoneTitle;
+        return this;
     }
+
     public String getRenamedFrom() {
         assert type == IssueEventType.Renamed;
         return renamedFrom;
     }
+
     public void setRenamedFrom(String renamedFrom) {
         assert type == IssueEventType.Renamed;
         this.renamedFrom = renamedFrom;
     }
+
     public String getRenamedTo() {
         assert type == IssueEventType.Renamed;
         return renamedTo;
     }
+
     public void setRenamedTo(String renamedTo) {
         assert type == IssueEventType.Renamed;
         this.renamedTo = renamedTo;
     }
+
     public User getAssignedUser() {
         assert type == IssueEventType.Assigned || type == IssueEventType.Unassigned;
         return assignedUser;
     }
+
     public void setAssignedUser(User assignedUser) {
         assert type == IssueEventType.Assigned || type == IssueEventType.Unassigned;
         this.assignedUser = assignedUser;
@@ -128,6 +142,7 @@ public class TurboIssueEvent {
 
     /**
      * Could be generalised to include other types of formatting in future.
+     *
      * @param bold
      * @param text
      * @return
@@ -144,133 +159,136 @@ public class TurboIssueEvent {
         String time = new PrettyTime().format(getDate());
 
         boolean bold = issue.getMarkedReadAt().isPresent()
-            && issue.getMarkedReadAt().get().isBefore(Utility.dateToLocalDateTime(getDate()));
+                && issue.getMarkedReadAt().get().isBefore(Utility.dateToLocalDateTime(getDate()));
 
         switch (getType()) {
-            case Renamed: {
-                HBox display = new HBox();
-                display.getChildren().addAll(octicon(OCTICON_PENCIL),
-                    conditionallyBold(bold,
-                        new Text(String.format("%s renamed this issue %s.", actorName, time))));
-                return display;
-            }
-            case Milestoned: {
-                HBox display = new HBox();
-                display.getChildren().addAll(octicon(OCTICON_MILESTONE),
-                    conditionallyBold(bold, new Text(String.format(
-                        "%s added milestone %s %s.", actorName, getMilestoneTitle(), time))));
-                return display;
-            }
-            case Demilestoned: {
-                HBox display = new HBox();
-                display.getChildren().addAll(octicon(OCTICON_MILESTONE),
-                    conditionallyBold(bold, new Text(String.format(
-                        "%s removed milestone %s %s.", actorName, getMilestoneTitle(), time))));
-                return display;
-            }
-            // Labeled and Unlabeled are not invoked as createLabelUpdateEventNodes is invoked
-            // instead for these event types (see ListPanelCard.layoutEvents)
-            case Labeled: {
-                Optional<TurboLabel> label = guiElement.getLabelByActualName(getLabelName());
-                HBox display = new HBox();
-                display.getChildren().addAll(
+        case Renamed: {
+            HBox display = new HBox();
+            display.getChildren().addAll(octicon(OCTICON_PENCIL),
+                                         conditionallyBold(bold,
+                                                           new Text(String.format("%s renamed this issue %s.",
+                                                                                  actorName, time))));
+            return display;
+        }
+        case Milestoned: {
+            HBox display = new HBox();
+            display.getChildren().addAll(octicon(OCTICON_MILESTONE),
+                                         conditionallyBold(bold, new Text(String.format(
+                                                 "%s added milestone %s %s.", actorName, getMilestoneTitle(), time))));
+            return display;
+        }
+        case Demilestoned: {
+            HBox display = new HBox();
+            display.getChildren().addAll(octicon(OCTICON_MILESTONE),
+                                         conditionallyBold(bold, new Text(String.format(
+                                                 "%s removed milestone %s %s.", actorName, getMilestoneTitle(), time)
+                                         )));
+            return display;
+        }
+        // Labeled and Unlabeled are not invoked as createLabelUpdateEventNodes is invoked
+        // instead for these event types (see ListPanelCard.layoutEvents)
+        case Labeled: {
+            Optional<TurboLabel> label = guiElement.getLabelByActualName(getLabelName());
+            HBox display = new HBox();
+            display.getChildren().addAll(
                     octicon(OCTICON_TAG),
                     conditionallyBold(bold, new Text(String.format("%s added label ", actorName))),
                     label.isPresent()
-                        ? label.get().getNode()
-                        : new Label(getLabelName()),
+                            ? label.get().getNode()
+                            : new Label(getLabelName()),
                     conditionallyBold(bold, new Text(String.format(" %s.", time)))
-                );
-                return display;
-            }
-            case Unlabeled: {
-                Optional<TurboLabel> label = guiElement.getLabelByActualName(getLabelName());
-                HBox display = new HBox();
-                display.getChildren().addAll(
+            );
+            return display;
+        }
+        case Unlabeled: {
+            Optional<TurboLabel> label = guiElement.getLabelByActualName(getLabelName());
+            HBox display = new HBox();
+            display.getChildren().addAll(
                     octicon(OCTICON_TAG),
                     conditionallyBold(bold, new Text(String.format("%s removed label ", actorName))),
                     label.isPresent()
-                        ? label.get().getNode()
-                        : new Label(getLabelName()),
+                            ? label.get().getNode()
+                            : new Label(getLabelName()),
                     conditionallyBold(bold, new Text(String.format(" %s.", time)))
-                );
-                return display;
-            }
-            case Assigned: {
-                HBox display = new HBox();
-                display.getChildren().addAll(
+            );
+            return display;
+        }
+        case Assigned: {
+            HBox display = new HBox();
+            display.getChildren().addAll(
                     octicon(OCTICON_PERSON),
                     conditionallyBold(bold,
-                        new Text(String.format(
-                            "%s was assigned to this issue %s.", actorName, time)))
-                );
-                return display;
-            }
-            case Unassigned: {
-                HBox display = new HBox();
-                display.getChildren().addAll(
+                                      new Text(String.format(
+                                              "%s was assigned to this issue %s.", actorName, time)))
+            );
+            return display;
+        }
+        case Unassigned: {
+            HBox display = new HBox();
+            display.getChildren().addAll(
                     octicon(OCTICON_PERSON),
                     conditionallyBold(bold, new Text(String.format(
-                        "%s was unassigned from this issue %s.", actorName, time)))
-                );
-                return display;
-            }
-            case Closed: {
-                HBox display = new HBox();
-                display.getChildren().addAll(
+                            "%s was unassigned from this issue %s.", actorName, time)))
+            );
+            return display;
+        }
+        case Closed: {
+            HBox display = new HBox();
+            display.getChildren().addAll(
                     octicon(OCTICON_ISSUE_CLOSED),
                     conditionallyBold(bold,
-                        new Text(String.format("%s closed this issue %s.", actorName, time)))
-                );
-                return display;
-            }
-            case Reopened: {
-                HBox display = new HBox();
-                display.getChildren().addAll(
+                                      new Text(String.format("%s closed this issue %s.", actorName, time)))
+            );
+            return display;
+        }
+        case Reopened: {
+            HBox display = new HBox();
+            display.getChildren().addAll(
                     octicon(OCTICON_ISSUE_OPENED),
                     conditionallyBold(bold,
-                        new Text(String.format("%s reopened this issue %s.", actorName, time)))
-                );
-                return display;
-            }
-            case Locked:
-                return conditionallyBold(bold, new Text(
+                                      new Text(String.format("%s reopened this issue %s.", actorName, time)))
+            );
+            return display;
+        }
+        case Locked:
+            return conditionallyBold(bold, new Text(
                     String.format("%s locked issue %s.", actorName, time)));
-            case Unlocked:
-                return conditionallyBold(bold, new Text(
+        case Unlocked:
+            return conditionallyBold(bold, new Text(
                     String.format("%s unlocked this issue %s.", actorName, time)));
-            case Referenced:
-                return conditionallyBold(bold, new Text(
+        case Referenced:
+            return conditionallyBold(bold, new Text(
                     String.format("%s referenced this issue %s.", actorName, time)));
-            case Subscribed:
-                return conditionallyBold(bold, new Text(
+        case Subscribed:
+            return conditionallyBold(bold, new Text(
                     String.format("%s subscribed to receive notifications for this issue %s.",
-                        actorName, time)));
-            case Unsubscribed:
-                return conditionallyBold(bold, new Text(
+                                  actorName, time)));
+        case Unsubscribed:
+            return conditionallyBold(bold, new Text(
                     String.format("%s unsubscribed from notifications for this issue %s.",
-                        actorName, time)));
-            case Mentioned:
-                return conditionallyBold(bold, new Text(
+                                  actorName, time)));
+        case Mentioned:
+            return conditionallyBold(bold, new Text(
                     String.format("%s was mentioned %s.", actorName, time)));
-            case Merged:
-                return conditionallyBold(bold, new Text(
+        case Merged:
+            return conditionallyBold(bold, new Text(
                     String.format("%s merged this issue %s.", actorName, time)));
-            case HeadRefDeleted:
-                return conditionallyBold(bold, new Text(
+        case HeadRefDeleted:
+            return conditionallyBold(bold, new Text(
                     String.format("%s deleted the pull request's branch %s.", actorName, time)));
-            case HeadRefRestored:
-                return conditionallyBold(bold, new Text(
+        case HeadRefRestored:
+            return conditionallyBold(bold, new Text(
                     String.format("%s restored the pull request's branch %s.", actorName, time)));
-            default:
-                // Not yet implemented, or no events triggered
-                return conditionallyBold(bold, new Text(
+        default:
+            // Not yet implemented, or no events triggered
+            return conditionallyBold(bold, new Text(
                     String.format("%s %s %s.", actorName, getType(), time)));
         }
     }
 
     /**
      * Create a list of JavaFX nodes to display label update events
+     *
      * @param labelUpdateEvents
      * @return list of Node corresponding to groups of label update events
      */
@@ -310,8 +328,8 @@ public class TurboIssueEvent {
     private static Node createLabelNode(GuiElement guiElement, TurboIssueEvent e) {
         // Unlabeled/Labeled events use data from the TurboIssueEvent itself (see GuiElement.getLabels documentation)
         TurboLabel label = new TurboLabel(guiElement.getIssue().getRepoId(),
-                e.getLabelColour(),
-                e.getLabelName());
+                                          e.getLabelColour(),
+                                          e.getLabelName());
         Node node = label.getNode();
         if (e.getType() == IssueEventType.Unlabeled) {
             node.getStyleClass().add("labels-removed");
@@ -323,6 +341,7 @@ public class TurboIssueEvent {
      * Groups label update events into a list of sub-lists of events.
      * Events in the same sub-list will have the same author
      * and with time-stamps less than MAX_TIME_DIFF minutes of each other
+     *
      * @param labelUpdateEvents
      * @return list of sub-lists of label update events
      */
@@ -340,7 +359,7 @@ public class TurboIssueEvent {
 
         for (TurboIssueEvent e : events) {
             if (currentSubList.isEmpty() ||
-                e.isInSameLabelUpdateEventGroup(currentSubList.get(0))) {
+                    e.isInSameLabelUpdateEventGroup(currentSubList.get(0))) {
                 currentSubList.add(e);
             } else {
                 result.add(currentSubList);
@@ -360,17 +379,18 @@ public class TurboIssueEvent {
     /**
      * Checks if this label update event in the same group
      * as another label update event e
+     *
      * @param e another label update event
      * @return true if this event and e have same author and times within
-     *              MAX_TIME_DIFF from each other.
-     *         false otherwise
+     * MAX_TIME_DIFF from each other.
+     * false otherwise
      */
     public boolean isInSameLabelUpdateEventGroup(TurboIssueEvent e) {
         long timeDiffMs = Math.abs(getDate().getTime() - e.getDate().getTime());
         long timeDiffSec = TimeUnit.MILLISECONDS.toSeconds(timeDiffMs);
 
         return getActor().getLogin().equals(e.getActor().getLogin()) &&
-               timeDiffSec <= MAX_TIME_DIFF;
+                timeDiffSec <= MAX_TIME_DIFF;
     }
 
     @Override
@@ -379,46 +399,46 @@ public class TurboIssueEvent {
         String time = new PrettyTime().format(getDate());
 
         switch (getType()) {
-            case Renamed:
-                return String.format("%s renamed this issue %s.", actorName, time);
-            case Milestoned:
-                return String.format("%s added milestone %s %s.", actorName,
-                    getMilestoneTitle(), time);
-            case Demilestoned:
-                return String.format("%s removed milestone %s %s.", actorName,
-                    getMilestoneTitle(), time);
-            case Labeled:
-                return String.format("%s added label %s %s.", actorName, getLabelName(), time);
-            case Unlabeled:
-                return String.format("%s removed label %s %s.", actorName, getLabelName(), time);
-            case Assigned:
-                return String.format("%s was assigned to this issue %s.", actorName, time);
-            case Unassigned:
-                return String.format("%s was unassigned from this issue %s.", actorName, time);
-            case Closed:
-                return String.format("%s closed this issue %s.", actorName, time);
-            case Reopened:
-                return String.format("%s reopened this issue %s.", actorName, time);
-            case Locked:
-                return String.format("%s locked issue %s.", actorName, time);
-            case Unlocked:
-                return String.format("%s unlocked this issue %s.", actorName, time);
-            case Referenced:
-                return String.format("%s referenced this issue %s.", actorName, time);
-            case Subscribed:
-                return String.format("%s subscribed to receive notifications for this issue %s.",
-                    actorName, time);
-            case Mentioned:
-                return String.format("%s was mentioned %s.", actorName, time);
-            case Merged:
-                return String.format("%s merged this issue %s.", actorName, time);
-            case HeadRefDeleted:
-                return String.format("%s deleted the pull request's branch %s.", actorName, time);
-            case HeadRefRestored:
-                return String.format("%s restored the pull request's branch %s.", actorName, time);
-            default:
-                // Not yet implemented, or no events triggered
-                return String.format("%s %s %s.", actorName, getType(), time);
+        case Renamed:
+            return String.format("%s renamed this issue %s.", actorName, time);
+        case Milestoned:
+            return String.format("%s added milestone %s %s.", actorName,
+                                 getMilestoneTitle(), time);
+        case Demilestoned:
+            return String.format("%s removed milestone %s %s.", actorName,
+                                 getMilestoneTitle(), time);
+        case Labeled:
+            return String.format("%s added label %s %s.", actorName, getLabelName(), time);
+        case Unlabeled:
+            return String.format("%s removed label %s %s.", actorName, getLabelName(), time);
+        case Assigned:
+            return String.format("%s was assigned to this issue %s.", actorName, time);
+        case Unassigned:
+            return String.format("%s was unassigned from this issue %s.", actorName, time);
+        case Closed:
+            return String.format("%s closed this issue %s.", actorName, time);
+        case Reopened:
+            return String.format("%s reopened this issue %s.", actorName, time);
+        case Locked:
+            return String.format("%s locked issue %s.", actorName, time);
+        case Unlocked:
+            return String.format("%s unlocked this issue %s.", actorName, time);
+        case Referenced:
+            return String.format("%s referenced this issue %s.", actorName, time);
+        case Subscribed:
+            return String.format("%s subscribed to receive notifications for this issue %s.",
+                                 actorName, time);
+        case Mentioned:
+            return String.format("%s was mentioned %s.", actorName, time);
+        case Merged:
+            return String.format("%s merged this issue %s.", actorName, time);
+        case HeadRefDeleted:
+            return String.format("%s deleted the pull request's branch %s.", actorName, time);
+        case HeadRefRestored:
+            return String.format("%s restored the pull request's branch %s.", actorName, time);
+        default:
+            // Not yet implemented, or no events triggered
+            return String.format("%s %s %s.", actorName, getType(), time);
         }
     }
 }

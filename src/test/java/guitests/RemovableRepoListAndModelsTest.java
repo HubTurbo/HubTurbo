@@ -7,8 +7,6 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCode;
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
-import prefs.ConfigFileHandler;
-import prefs.GlobalConfig;
 import prefs.Preferences;
 import ui.TestController;
 import ui.UI;
@@ -33,27 +31,24 @@ public class RemovableRepoListAndModelsTest extends UITest {
     public void beforeStageStarts() {
         // setup test json with last viewed repo "dummy/dummy"
         // obviously the json for that repo doesn't exist
-        ConfigFileHandler configFileHandler =
-                new ConfigFileHandler(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
-        GlobalConfig globalConfig = new GlobalConfig();
-        globalConfig.setLastLoginCredentials("test", "test");
-        globalConfig.setLastViewedRepository("dummy/dummy");
-        configFileHandler.saveGlobalConfig(globalConfig);
+        Preferences prefs = TestController.createTestPreferences();
+        prefs.setLastLoginCredentials("test", "test");
+        prefs.setLastViewedRepository("dummy/dummy");
     }
 
     /**
      * This test will test:
      * - UI.getCurrentlyUsedRepos() has correct count
-     *   -> especially no duplicate of repo qualifier and default repo
-     *      if they are the same
-     *   -> this is relevant to remove model because used repo list depends
-     *      on this
+     * -> especially no duplicate of repo qualifier and default repo
+     * if they are the same
+     * -> this is relevant to remove model because used repo list depends
+     * on this
      * - Logic.removeUnusedModels makes model count correct
      * - Repo > Remove menu has correct no. of items
-     *   -> especially when different letter casing for repo references
-     *   -> count will be +1 for SeparatorMenuItem
-     *   -> SeparatorMenuItem disabledProperty is false
-     *     -> Testing enabledMenuItems will be +1, disabled no +1
+     * -> especially when different letter casing for repo references
+     * -> count will be +1 for SeparatorMenuItem
+     * -> SeparatorMenuItem disabledProperty is false
+     * -> Testing enabledMenuItems will be +1, disabled no +1
      */
     @Test
     public void repoRemoveListAndModel() {
@@ -64,7 +59,8 @@ public class RemovableRepoListAndModelsTest extends UITest {
             fail();
         }
         Optional<MenuItem> removeRepoMenuOpt = reposMenuOpt.get().getItems().stream()
-                .filter(menuItem -> menuItem.getText().equalsIgnoreCase("Remove")).findFirst();
+                .filter(menuItem -> menuItem.getText().equalsIgnoreCase
+                        ("Remove")).findFirst();
         if (!removeRepoMenuOpt.isPresent()) {
             fail();
         }
@@ -75,7 +71,7 @@ public class RemovableRepoListAndModelsTest extends UITest {
 
 
         // check if test json is present
-        File testConfig = new File(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
+        File testConfig = new File(TestController.TEST_DIRECTORY, TestController.TEST_SESSION_CONFIG_FILENAME);
         if (!(testConfig.exists() && testConfig.isFile())) {
             fail();
         }
@@ -89,7 +85,7 @@ public class RemovableRepoListAndModelsTest extends UITest {
         assertEquals(noOfUsedRepo, ui.logic.getOpenRepositories().size());
         assertEquals(totalRepoInSystem + 1, removeRepoMenu.getItems().size());
         assertEquals(totalRepoInSystem + 1 - noOfUsedRepo,
-                getNoOfEnabledMenuItems(removeRepoMenu.getItems()));
+                     getNoOfEnabledMenuItems(removeRepoMenu.getItems()));
         assertEquals(noOfUsedRepo, getNoOfDisabledMenuItems(removeRepoMenu.getItems()));
 
         // we check that if there is a panel referencing same repo,
@@ -106,7 +102,7 @@ public class RemovableRepoListAndModelsTest extends UITest {
         assertEquals(noOfUsedRepo, ui.logic.getOpenRepositories().size());
         assertEquals(totalRepoInSystem + 1, removeRepoMenu.getItems().size());
         assertEquals(totalRepoInSystem + 1 - noOfUsedRepo,
-                getNoOfEnabledMenuItems(removeRepoMenu.getItems()));
+                     getNoOfEnabledMenuItems(removeRepoMenu.getItems()));
         assertEquals(noOfUsedRepo, getNoOfDisabledMenuItems(removeRepoMenu.getItems()));
 
         // we check for panel referencing different repo(s)
@@ -120,7 +116,7 @@ public class RemovableRepoListAndModelsTest extends UITest {
         assertEquals(noOfUsedRepo, ui.logic.getOpenRepositories().size());
         assertEquals(totalRepoInSystem + 1, removeRepoMenu.getItems().size());
         assertEquals(totalRepoInSystem + 1 - noOfUsedRepo,
-                getNoOfEnabledMenuItems(removeRepoMenu.getItems()));
+                     getNoOfEnabledMenuItems(removeRepoMenu.getItems()));
         assertEquals(noOfUsedRepo, getNoOfDisabledMenuItems(removeRepoMenu.getItems()));
 
         noOfUsedRepo = 3;
@@ -135,7 +131,7 @@ public class RemovableRepoListAndModelsTest extends UITest {
         assertEquals(noOfUsedRepo, ui.logic.getOpenRepositories().size());
         assertEquals(totalRepoInSystem + 1, removeRepoMenu.getItems().size());
         assertEquals(totalRepoInSystem + 1 - noOfUsedRepo,
-                getNoOfEnabledMenuItems(removeRepoMenu.getItems()));
+                     getNoOfEnabledMenuItems(removeRepoMenu.getItems()));
         assertEquals(noOfUsedRepo, getNoOfDisabledMenuItems(removeRepoMenu.getItems()));
 
         noOfUsedRepo = 4;
@@ -151,7 +147,7 @@ public class RemovableRepoListAndModelsTest extends UITest {
         assertEquals(noOfUsedRepo, ui.logic.getOpenRepositories().size());
         assertEquals(totalRepoInSystem + 1, removeRepoMenu.getItems().size());
         assertEquals(totalRepoInSystem + 1 - noOfUsedRepo,
-                getNoOfEnabledMenuItems(removeRepoMenu.getItems()));
+                     getNoOfEnabledMenuItems(removeRepoMenu.getItems()));
         assertEquals(noOfUsedRepo, getNoOfDisabledMenuItems(removeRepoMenu.getItems()));
 
         noOfUsedRepo = 3;
@@ -164,7 +160,7 @@ public class RemovableRepoListAndModelsTest extends UITest {
         assertEquals(noOfUsedRepo, ui.logic.getOpenRepositories().size());
         assertEquals(totalRepoInSystem + 1, removeRepoMenu.getItems().size()); // remove would not decrease
         assertEquals(totalRepoInSystem + 1 - noOfUsedRepo,
-                getNoOfEnabledMenuItems(removeRepoMenu.getItems()));
+                     getNoOfEnabledMenuItems(removeRepoMenu.getItems()));
         assertEquals(noOfUsedRepo, getNoOfDisabledMenuItems(removeRepoMenu.getItems()));
     }
 

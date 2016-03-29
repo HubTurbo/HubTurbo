@@ -29,7 +29,7 @@ import static org.eclipse.egit.github.core.client.IGitHubConstants.SEGMENT_REPOS
  * Only provides the basic framework for fetching updates. Subclasses fill in the details.
  *
  * @param <T> The type of the entity that is updated
- * */
+ */
 public class UpdateService<T> extends GitHubService {
     private static final Logger logger = LogManager.getLogger(UpdateService.class.getName());
 
@@ -45,11 +45,11 @@ public class UpdateService<T> extends GitHubService {
     protected ArrayList<T> updatedItems = null;
 
     /**
-     * @param client an authenticated GitHubClient
+     * @param client    an authenticated GitHubClient
      * @param apiSuffix the API URI for the type of item; defined by subclasses
      * @param lastETags the last-known ETag for these items; may be null
      */
-    public UpdateService(GitHubClientEx client, String apiSuffix, String lastETags){
+    public UpdateService(GitHubClientEx client, String apiSuffix, String lastETags) {
         assert client != null;
         assert apiSuffix != null && !apiSuffix.isEmpty();
 
@@ -63,10 +63,11 @@ public class UpdateService<T> extends GitHubService {
      * the EGit API, such as the types of the results expected (for deserialisation
      * purposes). Should be called by overriding implementations.
      * Will be called by getUpdatedItems.
+     *
      * @param repoId the repository to make the request for
      * @return the request to make
      */
-    protected PagedRequest<T> createUpdatedRequest(IRepositoryIdProvider repoId){
+    protected PagedRequest<T> createUpdatedRequest(IRepositoryIdProvider repoId) {
         PagedRequest<T> request = new PagedRequest<>();
         String path = SEGMENT_REPOS + "/" + repoId.generateId() + apiSuffix;
         request.setUri(path);
@@ -76,12 +77,13 @@ public class UpdateService<T> extends GitHubService {
 
     /**
      * Retrieves the requested items from GitHub
+     *
      * @param repoId the repository to get the items from
      * @return a list of requested items
      */
     public ArrayList<T> getUpdatedItems(IRepositoryIdProvider repoId) {
         // Return cached results if available
-        if (updatedItems != null)  {
+        if (updatedItems != null) {
             return updatedItems;
         }
 
@@ -116,7 +118,7 @@ public class UpdateService<T> extends GitHubService {
                                               Optional<String> updatedETags) throws IOException {
         ArrayList<T> result = new ArrayList<>();
 
-        if (!updatedETags.isPresent() || updatedETags.get().equals(lastETags)){
+        if (!updatedETags.isPresent() || updatedETags.get().equals(lastETags)) {
             logger.info("Nothing to update");
         } else {
             PagedRequest<T> request = createUpdatedRequest(repoId);
@@ -129,6 +131,7 @@ public class UpdateService<T> extends GitHubService {
 
     /**
      * Combine ETags for multiple page into 1 string
+     *
      * @param etags
      * @return string of combined etags
      */
@@ -140,10 +143,11 @@ public class UpdateService<T> extends GitHubService {
      * Gets a list of ETags for all pages returned from an API request and
      * also return the connection used to get the ETags so that their last check time
      * can be recorded elsewhere
+     *
      * @param request
      * @param client
      * @return a Optional list of ETags for all pages returned from an API request and
-     *         corresponding HTTP connection or an empty Optional if an error occurs
+     * corresponding HTTP connection or an empty Optional if an error occurs
      */
     private Optional<ImmutablePair<List<String>, HttpURLConnection>> getPagedEtags(
             GitHubRequest request, GitHubClientEx client) {
@@ -169,6 +173,7 @@ public class UpdateService<T> extends GitHubService {
 
     /**
      * A specialised version of GitHubService::getPage that does logging.
+     *
      * @param iterator the paged request to iterate through
      * @return a list of items
      * @throws IOException
@@ -193,6 +198,7 @@ public class UpdateService<T> extends GitHubService {
     /**
      * Returns the ETag for the updated items.
      * In the event of failure, will be whatever the last provided ETag was.
+     *
      * @return ETag for updated items
      */
     public String getUpdatedETags() {
@@ -206,6 +212,7 @@ public class UpdateService<T> extends GitHubService {
     /**
      * Returns the time at which the updated items were sent from the server.
      * In the event of failure, will be the time the request was made.
+     *
      * @return time at which updated items were sent from server
      */
     public Date getUpdatedCheckTime() {

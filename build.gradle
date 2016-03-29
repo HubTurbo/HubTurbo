@@ -7,7 +7,7 @@
 
 plugins {
     id "com.github.kt3k.coveralls" version "2.4.0"
-    id "com.github.johnrengelman.shadow" version "1.2.1"
+    id "com.github.johnrengelman.shadow" version "1.2.3"
 }
 
 allprojects {
@@ -19,7 +19,7 @@ allprojects {
 
     apply plugin: 'checkstyle'
     checkstyle {
-        toolVersion = "6.7"
+        toolVersion = "6.17"
     }
 
     apply plugin: 'findbugs'
@@ -28,7 +28,7 @@ allprojects {
     apply plugin: 'java'
 
     // TODO: add group here (e.g. group = 'sg.edu.nus.comp.hubturbo')
-    version = '3.24.0'
+    version = '3.25.0'
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 
@@ -153,6 +153,11 @@ pmd {
     toolVersion = "5.4.1"
     ruleSetFiles = files("${projectDir}/config/pmd/mainRuleset.xml", "${projectDir}/config/pmd/testRuleset.xml")
     ruleSets = []
+}
+
+// Ask Gradle not to pass additional auxclasspath parameter to PMD until PMD fixes its false positives
+tasks.withType(Pmd) {
+    classpath = null
 }
 
 task jacocoRootReport(type: JacocoReport) {

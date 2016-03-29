@@ -6,16 +6,18 @@ import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
 import prefs.Preferences;
 import ui.TestController;
+import util.FileHelper;
 
 import java.io.File;
+import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 public class LogoutTest extends UITest {
 
-    String configFileDirectory = Preferences.DIRECTORY;
-    String testConfigFileName = Preferences.TEST_CONFIG_FILE;
+    String configFileDirectory = TestController.TEST_DIRECTORY;
+    String testConfigFileName = TestController.TEST_SESSION_CONFIG_FILENAME;
 
     @Override
     public void launchApp() {
@@ -31,14 +33,15 @@ public class LogoutTest extends UITest {
         type("test");
         click("Sign in");
         sleep(2000);
-        
+
         click("File");
         click("Logout");
 
         // checking that the json file exists and the saved credentials have been emptied
         File testConfig = new File(configFileDirectory, testConfigFileName);
+
         if (!(testConfig.exists() && testConfig.isFile())) {
-            fail();
+            fail("File not found: " + testConfig.getAbsolutePath());
         }
 
         Preferences testPref = TestController.loadTestPreferences();
@@ -48,9 +51,6 @@ public class LogoutTest extends UITest {
 
     @After
     public void teardown() {
-        File testConfig = new File(configFileDirectory, testConfigFileName);
-        if (testConfig.exists() && testConfig.isFile()) {
-            assert testConfig.delete();
-        }
+        clearAllTestConfigs();
     }
 }

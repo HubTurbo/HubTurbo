@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="info">
-  <Properties>
-    <Property name="filename">hubturbo-log.log</Property>
-  </Properties>
+    <Properties>
+        <Property name="filename">hubturbo-log.log</Property>
+    </Properties>
 
-  <!-- TRACE, DEBUG, INFO, WARN, ERROR, FATAL -->
-  <Filter type="ThresholdFilter" level="trace"/>
+    <!-- TRACE, DEBUG, INFO, WARN, ERROR, FATAL -->
+    <Filter type="ThresholdFilter" level="trace"/>
 
-  <!-- http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/PatternLayout.html -->
-  <Appenders>
-    <Console name="STDOUT">
-        <!-- relative time, date, level, class, thread - msg -->
-        <PatternLayout pattern="%r %d{dd/MM/yyyy HH:mm:ss}{GMT+8} %p %C{1} [%t] - %m%n" />
-    </Console>
-    <RollingFile name="RollingFile" fileName="${filename}" filePattern="${filename}-%i.gz">
-      <PatternLayout pattern="%r %d{dd/MM/yyyy HH:mm:ss}{GMT+8} %p %C{1} [%t] - %m%n" />
-      <Policies>
-        <SizeBasedTriggeringPolicy size="5 MB"/>
-      </Policies>
-      <DefaultRolloverStrategy max="5"/>
-    </RollingFile>
-</Appenders>
+    <!-- http://logging.apache.org/log4j/1.2/apidocs/org/apache/log4j/PatternLayout.html -->
+    <Appenders>
+        <Console name="STDOUT">
+            <!-- relative time, date, level, class, thread - msg -->
+            <PatternLayout pattern="%r %d{dd/MM/yyyy HH:mm:ss}{GMT+8} %p %C{1} [%t] - %m%n"/>
+        </Console>
+        <RollingFile name="RollingFile" fileName="${filename}" filePattern="${filename}-%i.gz">
+            <PatternLayout pattern="%r %d{dd/MM/yyyy HH:mm:ss}{GMT+8} %p %C{1} [%t] - %m%n"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="5 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
+    </Appenders>
 
-  <Loggers>
-    <Root level="info">
-      <AppenderRef ref="STDOUT"/>
-      <AppenderRef ref="RollingFile"/>
-    </Root>
-  </Loggers>
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="RollingFile"/>
+        </Root>
+    </Loggers>
 
 </Configuration>

@@ -56,6 +56,11 @@ public class Negation implements FilterExpression {
     }
 
     @Override
+    public List<String> getWarnings(IModel model, TurboIssue issue) {
+        return expr.getWarnings(model, issue);
+    }
+
+    @Override
     public List<QualifierType> getQualifierTypes() {
         return expr.getQualifierTypes();
     }

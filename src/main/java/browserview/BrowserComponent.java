@@ -41,7 +41,7 @@ public class BrowserComponent {
 
     // Chrome, Android 4.2.2, Samsung Galaxy S4
     private static final String MOBILE_USER_AGENT = "Mozilla/5.0 (Linux; Android 4.2.2; GT-I9505 Build/JDQ39)" +
-        "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.59 Mobile Safari/537.36";
+            "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.59 Mobile Safari/537.36";
 
     private static final String CHROME_DRIVER_LOCATION = "browserview/";
     private static final String CHROME_DRIVER_BINARY_NAME = determineChromeDriverBinaryName();
@@ -130,6 +130,7 @@ public class BrowserComponent {
 
     /**
      * Creates, initialises, and returns a ChromeDriver.
+     *
      * @return
      */
     private ChromeDriverEx createChromeDriver() {
@@ -173,6 +174,7 @@ public class BrowserComponent {
      * Executes Javascript in the currently-active driver window.
      * Run on the UI thread (will block until execution is complete,
      * i.e. change implementation if long-running scripts must be run).
+     *
      * @param script
      */
     private void executeJavaScript(String script) {
@@ -220,8 +222,8 @@ public class BrowserComponent {
     }
 
     /**
-    * Navigates to HubTurbo filters doc page, run on separate thread.
-    */
+     * Navigates to HubTurbo filters doc page, run on separate thread.
+     */
     public void showFilterDocs() {
         logger.info("Showing filters documentation page");
         runBrowserOperation(() -> driver.get(GitHubURL.FILTERS_PAGE, false));
@@ -252,7 +254,7 @@ public class BrowserComponent {
         runBrowserOperation(() -> scrollToBottom());
     }
 
-    public void jumpToComment(){
+    public void jumpToComment() {
         if (isTestChromeDriver) {
             UI.events.triggerEvent(new JumpToCommentEvent());
         }
@@ -265,7 +267,7 @@ public class BrowserComponent {
         }
     }
 
-    private boolean isBrowserActive(){
+    private boolean isBrowserActive() {
         if (driver == null) return false;
         try {
             // Throws an exception if unable to switch to original HT tab
@@ -287,7 +289,7 @@ public class BrowserComponent {
     }
 
     //  A helper function for reseting browser.
-    private void resetBrowser(){
+    private void resetBrowser() {
         logger.info("Relaunching chrome.");
         quit(); // if the driver hangs
         driver = createChromeDriver();
@@ -300,7 +302,7 @@ public class BrowserComponent {
      * all types of code.
      */
 
-    private void runBrowserOperation (Runnable operation) {
+    private void runBrowserOperation(Runnable operation) {
         executor.execute(() -> {
             if (isBrowserActive()) {
                 try {
@@ -308,15 +310,15 @@ public class BrowserComponent {
                     pageContentOnLoad = getCurrentPageSource();
                 } catch (WebDriverException e) {
                     switch (BrowserComponentError.fromErrorMessage(e.getMessage())) {
-                        case NoSuchWindow:
-                            resetBrowser();
-                            runBrowserOperation(operation); // Recurse and repeat
-                            break;
-                        case NoSuchElement:
-                            logger.info("Warning: no such element! " + e.getMessage());
-                            break;
-                        default:
-                            break;
+                    case NoSuchWindow:
+                        resetBrowser();
+                        runBrowserOperation(operation); // Recurse and repeat
+                        break;
+                    case NoSuchElement:
+                        logger.info("Warning: no such element! " + e.getMessage());
+                        break;
+                    default:
+                        break;
                     }
                 }
             } else {
@@ -395,9 +397,10 @@ public class BrowserComponent {
         File f = new File(CHROME_DRIVER_BINARY_NAME);
         if (!f.exists()) {
             InputStream in = BrowserComponent.class.getClassLoader()
-                .getResourceAsStream(CHROME_DRIVER_LOCATION + CHROME_DRIVER_BINARY_NAME);
+                    .getResourceAsStream(CHROME_DRIVER_LOCATION +
+                                                 CHROME_DRIVER_BINARY_NAME);
             assert in != null : "Could not find " + CHROME_DRIVER_BINARY_NAME + " at "
-                + CHROME_DRIVER_LOCATION + "; this path must be updated if the executables are moved";
+                    + CHROME_DRIVER_LOCATION + "; this path must be updated if the executables are moved";
             OutputStream out;
             try {
                 out = new FileOutputStream(CHROME_DRIVER_BINARY_NAME);
@@ -415,21 +418,21 @@ public class BrowserComponent {
         System.setProperty("webdriver.chrome.driver", CHROME_DRIVER_BINARY_NAME);
     }
 
-    private void bringToTop(){
+    private void bringToTop() {
         if (PlatformSpecific.isOnWindows()) {
             user32.ShowWindow(browserWindowHandle, WinUser.SW_RESTORE);
             user32.SetForegroundWindow(browserWindowHandle);
         }
     }
 
-    public void focus(HWND mainWindowHandle){
+    public void focus(HWND mainWindowHandle) {
         if (PlatformSpecific.isOnWindows()) {
             // Restores browser window if it is minimized / maximized
             user32.ShowWindow(browserWindowHandle, WinUser.SW_SHOWNOACTIVATE);
             // SWP_NOMOVE and SWP_NOSIZE prevents the 0,0,0,0 parameters from taking effect.
             logger.info("Bringing bView to front");
             boolean success = user32.SetWindowPos(browserWindowHandle, mainWindowHandle, 0, 0, 0, 0,
-                    SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+                                                  SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
             if (!success) {
                 logger.info("Failed to bring bView to front.");
                 logger.info(Kernel32.INSTANCE.GetLastError());
@@ -440,7 +443,7 @@ public class BrowserComponent {
 
     private String getCurrentPageSource() {
         return StringEscapeUtils.escapeHtml4(
-            (String) driver.executeScript("return document.documentElement.outerHTML"));
+                (String) driver.executeScript("return document.documentElement.outerHTML"));
     }
 
     public boolean hasBviewChanged() {
@@ -491,11 +494,6 @@ public class BrowserComponent {
         bringToTop();
     }
 
-    public void manageMilestones(String keyCode) {
-        sendKeysToBrowser(keyCode.toLowerCase());
-        bringToTop();
-    }
-
     public void showIssues() {
         logger.info("Navigating to Issues page");
         runBrowserOperation(() -> driver.get(GitHubURL.getPathForAllIssues(ui.logic.getDefaultRepo()), false));
@@ -538,6 +536,7 @@ public class BrowserComponent {
 
     /**
      * Switches to the specified tab in GitHub PR page
+     *
      * @param tabName Either GithubPageElements.DISCUSSION_TAB, GithubPageElements.COMMITS_TAB
      *                or GithubPageElements.FILES_TAB
      */
@@ -545,19 +544,19 @@ public class BrowserComponent {
         if (GitHubURL.isPullRequestLoaded(getCurrentUrl())) {
             int tabIndex = 0;
 
-            switch(tabName) {
-                case GithubPageElements.DISCUSSION_TAB:
-                    tabIndex = 1;
-                    break;
-                case GithubPageElements.COMMITS_TAB:
-                    tabIndex = 2;
-                    break;
-                case GithubPageElements.FILES_TAB:
-                    tabIndex = 3;
-                    break;
-                default:
-                    assert false;
-                    return;
+            switch (tabName) {
+            case GithubPageElements.DISCUSSION_TAB:
+                tabIndex = 1;
+                break;
+            case GithubPageElements.COMMITS_TAB:
+                tabIndex = 2;
+                break;
+            case GithubPageElements.FILES_TAB:
+                tabIndex = 3;
+                break;
+            default:
+                assert false;
+                return;
             }
 
             String xpath = "//*[@id=\"js-repo-pjax-container\"]/div[2]/div[1]/div/div/div[2]/nav/a[%d]";
@@ -594,7 +593,7 @@ public class BrowserComponent {
             }
         }
     }
-    
+
     public void minimizeWindow() {
         if (PlatformSpecific.isOnWindows()) {
             user32.ShowWindow(browserWindowHandle, WinUser.SW_MINIMIZE);

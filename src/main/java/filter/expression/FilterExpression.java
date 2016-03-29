@@ -28,6 +28,11 @@ public interface FilterExpression {
 
     void applyTo(TurboIssue issue, IModel model) throws QualifierApplicationException;
 
+    // Walks the syntax tree to get all problems with the input which are not severe
+    // enough to cause an error.
+
+    List<String> getWarnings(IModel model, TurboIssue issue);
+
     // Walks the syntax tree to get all the qualifier types that appear.
 
     List<QualifierType> getQualifierTypes();

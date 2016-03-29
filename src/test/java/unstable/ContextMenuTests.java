@@ -53,7 +53,7 @@ public class ContextMenuTests extends UITest {
         sleep(EVENT_DELAY);
 
         ContextMenu contextMenu = issuePanel.getContextMenu();
-        for (MenuItem menuItem : contextMenu.getItems()){
+        for (MenuItem menuItem : contextMenu.getItems()) {
             assertTrue(menuItem.isDisable());
         }
     }
@@ -63,7 +63,7 @@ public class ContextMenuTests extends UITest {
      * context menu items
      */
     @Test
-    public void test2() {
+    public void testMarkAsReadUnread() {
         ListPanelCell listPanelCell = find("#dummy/dummy_col0_9");
 
         click("#dummy/dummy_col0_9");
@@ -85,7 +85,7 @@ public class ContextMenuTests extends UITest {
      * Tests selecting "Change labels" context menu item
      */
     @Test
-    public void test3() {
+    public void testChangeLabels() {
         click("#dummy/dummy_col0_9");
         rightClick("#dummy/dummy_col0_9");
         sleep(EVENT_DELAY);
@@ -95,6 +95,53 @@ public class ContextMenuTests extends UITest {
         assertNotNull(find("#queryField"));
 
         push(KeyCode.ESCAPE);
+        sleep(EVENT_DELAY);
+    }
+
+    /**
+     * Tests selecting "Change milestone" context menu item
+     */
+    @Test
+    public void contextMenu_selectChangeMilestoneMenu_successful() {
+        click("#dummy/dummy_col0_9");
+        rightClick("#dummy/dummy_col0_9");
+        sleep(EVENT_DELAY);
+        click("Change milestone (M)");
+        sleep(DIALOG_DELAY);
+
+        assertNotNull(find("#milestonePickerTextField"));
+
+        push(KeyCode.ESCAPE);
+        sleep(EVENT_DELAY);
+    }
+
+    /**
+     * Tests selecting "Close issue" and "Reopen issue"
+     */
+    @Test
+    public void testCloseReopenIssue() {
+        click("#dummy/dummy_col0_9");
+        rightClick("#dummy/dummy_col0_9");
+        sleep(EVENT_DELAY);
+        click("Close issue (C)");
+        sleep(EVENT_DELAY);
+        waitUntilNodeAppears("OK");
+        click("OK");
+        sleep(EVENT_DELAY);
+        waitUntilNodeAppears("Undo");
+        click("Undo");
+        sleep(EVENT_DELAY);
+
+        click("#dummy/dummy_col0_6");
+        rightClick("#dummy/dummy_col0_6");
+        sleep(EVENT_DELAY);
+        click("Reopen issue (O)");
+        sleep(EVENT_DELAY);
+        waitUntilNodeAppears("OK");
+        click("OK");
+        sleep(EVENT_DELAY);
+        waitUntilNodeAppears("Undo");
+        click("Undo");
         sleep(EVENT_DELAY);
     }
 

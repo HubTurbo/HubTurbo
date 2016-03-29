@@ -27,12 +27,12 @@ public class DownloadLabelsUpdatesTask extends GitHubRepoTask<GitHubRepoTask.Res
     @Override
     public void run() {
         ImmutablePair<List<TurboLabel>, String> changes = repo.getUpdatedLabels(model.getRepoId(),
-            model.getUpdateSignature().labelsETag);
+                                                                                model.getUpdateSignature().labelsETag);
 
         List<TurboLabel> changedLabels = changes.left;
 
         logger.info(HTLog.format(model.getRepoId(), "%s label(s)) changed%s",
-            changedLabels.size(), changedLabels.isEmpty() ? "" : ": " + changedLabels));
+                                 changedLabels.size(), changedLabels.isEmpty() ? "" : ": " + changedLabels));
 
         response.complete(new Result<>(changedLabels, changes.right));
     }

@@ -50,13 +50,13 @@ public class StoreTests {
 
         // Repo not stored, "download" from DummySource
         Model dummy1 = testIO.openRepository("dummy1/dummy1").get();
-        assertEquals(DummyRepoState.noOfDummyIssues, dummy1.getIssues().size());
+        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES, dummy1.getIssues().size());
 
         // Spawn new issue
         UI.events.triggerEvent(UpdateDummyRepoEvent.newIssue("dummy1/dummy1"));
 
         dummy1 = testIO.openRepository("dummy1/dummy1").get();
-        assertEquals(DummyRepoState.noOfDummyIssues + 1, dummy1.getIssues().size());
+        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES + 1, dummy1.getIssues().size());
 
         // A new file should not have been created as we are using a stub
         if (new File("store/test/dummy1-dummy1.json").isFile()) {
@@ -72,13 +72,13 @@ public class StoreTests {
 
         // Repo currently not stored, "download" from DummySource
         Model dummy1 = testIO.openRepository("dummy1/dummy1").get();
-        assertEquals(DummyRepoState.noOfDummyIssues, dummy1.getIssues().size());
+        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES, dummy1.getIssues().size());
 
         // Spawn new issue (to be stored in JSON)
         UI.events.triggerEvent(UpdateDummyRepoEvent.newIssue("dummy1/dummy1"));
         // Trigger store
         dummy1 = testIO.updateModel(dummy1, false).get();
-        assertEquals(DummyRepoState.noOfDummyIssues + 1, dummy1.getIssues().size());
+        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES + 1, dummy1.getIssues().size());
 
         TestUtils.delay(2); // Wait 2 seconds for Gson to convert model to JSON and write
 
@@ -90,13 +90,13 @@ public class StoreTests {
 
         // But since we are indeed loading from the test JSON store, we would end up with 11 issues.
         Model dummy2 = alternateIO.openRepository("dummy1/dummy1").get();
-        assertEquals(DummyRepoState.noOfDummyIssues + 1, dummy2.getIssues().size());
+        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES + 1, dummy2.getIssues().size());
 
         // It even works if we enter the repo name in different case
         RepoIO repoIO = TestController.createTestingRepoIO(Optional.empty());
         repoIO.setRepoOpControl(TestUtils.createRepoOpControlWithEmptyModels(repoIO));
         Model dummy3 = repoIO.openRepository("DUMMY1/DUMMY1").get();
-        assertEquals(DummyRepoState.noOfDummyIssues + 1, dummy3.getIssues().size());
+        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES + 1, dummy3.getIssues().size());
 
         UI.status.clear();
     }
@@ -124,7 +124,7 @@ public class StoreTests {
         Model model = repoIO.openRepository("testrepo/testrepo").get();
 
         TestUtils.delay(1); // allow for file to be written
-        assertEquals(DummyRepoState.noOfDummyIssues, model.getIssues().size());
+        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES, model.getIssues().size());
     }
 
     @Test
@@ -132,7 +132,7 @@ public class StoreTests {
         RepoIO repoIO = TestController.createTestingRepoIO(Optional.empty());
         repoIO.setRepoOpControl(TestUtils.createRepoOpControlWithEmptyModels(repoIO));
         Model model = repoIO.openRepository("nonexistent/nonexistent").get();
-        assertEquals(DummyRepoState.noOfDummyIssues, model.getIssues().size());
+        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES, model.getIssues().size());
     }
 
     @Test

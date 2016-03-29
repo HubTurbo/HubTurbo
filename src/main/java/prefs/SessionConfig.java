@@ -18,12 +18,12 @@ import java.util.stream.Collectors;
 import java.util.Optional;
 
 /**
- * Abstractions for the contents of the global config file.
+ * Represents session and app-defined settings.
  */
 @SuppressWarnings("unused")
-public class GlobalConfig {
+public class SessionConfig {
 
-    private static final Logger logger = LogManager.getLogger(GlobalConfig.class.getName());
+    private static final Logger logger = LogManager.getLogger(SessionConfig.class.getName());
 
     private List<PanelInfo> lastSessionPanels = new ArrayList<>();
     private String lastViewedRepository = "";
@@ -81,15 +81,15 @@ public class GlobalConfig {
     public void removeBoard(String name) {
         savedBoards.remove(name);
     }
-    
+
     public void setLastOpenBoard(String board) {
         lastOpenBoard = Optional.of(board);
     }
-    
+
     public Optional<String> getLastOpenBoard() {
         return lastOpenBoard;
     }
-    
+
     public void clearLastOpenBoard() {
         lastOpenBoard = Optional.empty();
     }
@@ -99,18 +99,10 @@ public class GlobalConfig {
         savedBoards.clear();
     }
 
-    public List<String> getLastOpenFilters() {
-        return lastSessionPanels.stream().map(PanelInfo::getPanelFilter).collect(Collectors.toList());
-    }
-    
-    public List<String> getPanelNames() {
-        return lastSessionPanels.stream().map(PanelInfo::getPanelName).collect(Collectors.toList());
-    }
-    
     public void setPanelInfo(List<PanelInfo> panelInfo) {
         this.lastSessionPanels = new ArrayList<>(panelInfo);
     }
-    
+
     public List<PanelInfo> getPanelInfo() {
         return new ArrayList<>(lastSessionPanels);
     }
@@ -145,7 +137,7 @@ public class GlobalConfig {
             cipher.init(Cipher.ENCRYPT_MODE, aesKey);
             result = cipher.doFinal(lastPassword.getBytes("UTF-8"));
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException
-            | IllegalBlockSizeException | BadPaddingException | UnsupportedEncodingException e) {
+                | IllegalBlockSizeException | BadPaddingException | UnsupportedEncodingException e) {
 
             logger.error("Cannot encrypt data " + e.getMessage(), e);
         }
@@ -161,7 +153,7 @@ public class GlobalConfig {
             cipher.init(Cipher.DECRYPT_MODE, aesKey);
             result = new String(cipher.doFinal(lastLoginEncrypted), "UTF-8");
         } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException
-            | IllegalBlockSizeException | BadPaddingException | UnsupportedEncodingException e) {
+                | IllegalBlockSizeException | BadPaddingException | UnsupportedEncodingException e) {
 
             logger.error("Cannot encrypt data " + e.getMessage(), e);
         }

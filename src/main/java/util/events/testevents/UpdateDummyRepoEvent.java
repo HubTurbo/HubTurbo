@@ -11,7 +11,8 @@ public final class UpdateDummyRepoEvent extends Event {
     public final String updateText;
     public final String actor; // Only for comments
 
-    public enum UpdateType {NEW_ISSUE, UPDATE_ISSUE, DELETE_ISSUE,
+    public enum UpdateType {
+        NEW_ISSUE, UPDATE_ISSUE, DELETE_ISSUE,
         NEW_LABEL, DELETE_LABEL,
         NEW_MILESTONE, UPDATE_MILESTONE, DELETE_MILESTONE,
         NEW_USER, DELETE_USER,
@@ -23,12 +24,12 @@ public final class UpdateDummyRepoEvent extends Event {
      * Most generic constructor for UpdateDummyRepoEvent.
      *
      * @param updateType The type of update to be carried out.
-     * @param repoId The full name of the repository.
-     * @param itemId The id of the element to be updated or deleted, if necessary.
+     * @param repoId     The full name of the repository.
+     * @param itemId     The id of the element to be updated or deleted, if necessary.
      * @param updateText The text to update the element with, if necessary.
      */
     private UpdateDummyRepoEvent(UpdateType updateType, String repoId, int itemId, String idString, String updateText,
-                                String actor) {
+                                 String actor) {
         this.updateType = updateType;
         this.repoId = repoId;
         this.itemId = itemId;

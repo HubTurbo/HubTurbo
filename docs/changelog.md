@@ -1,6 +1,17 @@
 
 # Changelog
 
+# V3.25.0
+
+- Added the milestone picker
+- Added the issue picker
+- Added generalised config files handler
+- Updated Gradle wrapper and Checkstyle
+- Added .github folder
+- Added panel footer with issues breakdown
+- Fixed bugs in to undo notification, context menu, label picker, milestones picker and filtering process.
+- Update Travis to upload screenshots
+
 # V3.24.0
 
 - Tips are now shown to first-time users

@@ -2,7 +2,7 @@ package prefs;
 
 import java.time.LocalDateTime;
 
-public class RepoViewRecord implements Comparable<RepoViewRecord>{
+public class RepoViewRecord implements Comparable<RepoViewRecord> {
 
     private final String repository;
     private final LocalDateTime timestamp;

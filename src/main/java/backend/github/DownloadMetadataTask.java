@@ -50,8 +50,9 @@ public class DownloadMetadataTask extends GitHubRepoTask<Map<Integer, IssueMetad
         });
 
         logger.info(HTLog.format(repoId, "Downloaded " + result.entrySet().stream()
-            .map(entry -> "(" + entry.getValue().summarise() + ") for #" + entry.getKey())
-            .collect(Collectors.joining(", "))));
+                .map(entry -> "(" + entry.getValue().summarise() + ") " +
+                        "for #" + entry.getKey())
+                .collect(Collectors.joining(", "))));
 
         response.complete(result);
     }

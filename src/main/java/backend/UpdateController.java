@@ -15,6 +15,7 @@ import ui.issuepanel.FilterPanel;
 import util.Futures;
 import util.HTLog;
 import util.events.FilterExceptionEvent;
+import util.events.FilterWarningEvent;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
 
 /**
  * Manages the flow of logic during a data retrieval cycle from the repository source.
- *
+ * <p>
  * The central logic is contained in processAndRefresh, while the remaining methods are auxiliary methods to be
  * called by processAndRefresh.
  */
@@ -37,7 +38,7 @@ public class UpdateController {
 
     /**
      * Given a list of panels, opens the repositories specified in the panels' filters.
-     *
+     * <p>
      * After which, dispatches metadata update if needed and then processes them to return
      * a map of filtered and sorted issues corresponding to each filter expression, based on the most recent data
      * from the repository source.
@@ -53,29 +54,29 @@ public class UpdateController {
 
         // Open specified repos
         openRepositoriesInFilters(filterPanels)
-        .thenRun(() -> {
-            // First filter, for issues requiring a metadata update.
-            Map<String, List<TurboIssue>> toUpdate = tallyMetadataUpdate(filterExprs);
+                .thenRun(() -> {
+                    // First filter, for issues requiring a metadata update.
+                    Map<String, List<TurboIssue>> toUpdate = tallyMetadataUpdate(filterExprs);
 
-            if (toUpdate.isEmpty()) {
-                // If no issues requiring metadata update, just run the filter and sort.
-                logic.updateUI(processFilters(filterExprs));
-                return;
-            }
+                    if (toUpdate.isEmpty()) {
+                        // If no issues requiring metadata update, just run the filter and sort.
+                        logic.updateUI(processFilters(filterExprs));
+                        return;
+                    }
 
-            // If there are issues requiring metadata update, we dispatch the metadata requests...
-            ArrayList<CompletableFuture<Boolean>> metadataRetrievalTasks = new ArrayList<>();
-            toUpdate.forEach((repoId, issues) ->
-                    metadataRetrievalTasks.add(logic.getIssueMetadata(repoId, issues)));
-            // ...and then wait for all of them to complete.
-            Futures.sequence(metadataRetrievalTasks)
-                    .thenAccept(results -> logger.info("Metadata retrieval successful for "
-                            + results.stream().filter(result -> result).count() + "/"
-                            + results.size() + " repos"))
-                    .thenCompose(n -> logic.getRateLimitResetTime())
-                    .thenApply(logic::updateRemainingRate)
-                    .thenRun(() -> logic.updateUI(processFilters(filterExprs))); // Then filter the second time.
-        });
+                    // If there are issues requiring metadata update, we dispatch the metadata requests...
+                    ArrayList<CompletableFuture<Boolean>> metadataRetrievalTasks = new ArrayList<>();
+                    toUpdate.forEach((repoId, issues) ->
+                            metadataRetrievalTasks.add(logic.getIssueMetadata(repoId, issues)));
+                    // ...and then wait for all of them to complete.
+                    Futures.sequence(metadataRetrievalTasks)
+                            .thenAccept(results -> logger.info("Metadata retrieval successful for "
+                                    + results.stream().filter(result -> result).count()
+                                    + "/" + results.size() + " repos"))
+                            .thenCompose(n -> logic.getRateLimitResetTime())
+                            .thenApply(logic::updateRemainingRate)
+                            .thenRun(() -> logic.updateUI(processFilters(filterExprs))); // Then filter the second time.
+                });
     }
 
     private List<FilterExpression> getFilterExpressions(List<FilterPanel> panels) {
@@ -91,10 +92,11 @@ public class UpdateController {
      */
     private CompletableFuture<List<Boolean>> openRepositoriesInFilters(List<FilterPanel> filterPanels) {
         return Futures.sequence(filterPanels.stream()
-                .flatMap(panel -> Qualifier.getMetaQualifierContent(panel.getCurrentFilterExpression(),
-                        QualifierType.REPO).stream()
-                        .map(repoId -> logic.openRepositoryFromFilter(repoId, panel)))
-                .collect(Collectors.toList()));
+                .flatMap(panel -> {
+                    return Qualifier.getMetaQualifierContent(panel.getCurrentFilterExpression(), QualifierType.REPO)
+                            .stream()
+                            .map(repoId -> logic.openRepositoryFromFilter(repoId, panel));
+                }).collect(Collectors.toList()));
     }
 
     /**
@@ -112,10 +114,12 @@ public class UpdateController {
                 .flatMap(filterExpr -> allModelIssues.stream()
                         .filter(issue -> {
                             try {
-                                return Qualifier.process(models, filterExpr, issue);
+                                return Qualifier.process(models, filterExpr,
+                                                         issue);
                             } catch (FilterException e) {
                                 Platform.runLater(() -> UI.events.triggerEvent(
-                                        new FilterExceptionEvent(filterExpr, e.getMessage())));
+                                        new FilterExceptionEvent(filterExpr, e
+                                                .getMessage())));
                                 return false;
                             }
                         }))
@@ -143,12 +147,25 @@ public class UpdateController {
                 FilterExpression filterExprNoAlias = Qualifier.replaceMilestoneAliases(models, filterExpr);
 
                 List<TurboIssue> processedIssues = allModelIssues.stream()
-                        .filter(issue -> Qualifier.process(models, filterExprNoAlias, issue))
-                        .sorted(determineComparator(filterExprNoAlias, hasUpdatedQualifier))
-                        .limit(Qualifier.determineCount(allModelIssues, filterExprNoAlias))
+                        .filter(issue -> Qualifier.process(models,
+                                                           filterExprNoAlias, issue))
+                        .sorted(determineComparator(filterExprNoAlias,
+                                                    hasUpdatedQualifier))
+                        .limit(Qualifier.determineCount(allModelIssues,
+                                                        filterExprNoAlias))
                         .collect(Collectors.toList());
 
                 List<GuiElement> processedElements = produceGuiElements(models, processedIssues);
+
+                List<String> warnings = allModelIssues.stream()
+                        .map(issue -> filterExprNoAlias.getWarnings(models, issue))
+                        .flatMap(List::stream)
+                        .distinct()
+                        .collect(Collectors.toList());
+
+                if (!warnings.isEmpty()) {
+                    Platform.runLater(() -> UI.events.triggerEvent(new FilterWarningEvent(filterExpr, warnings)));
+                }
 
                 processed.put(filterExpr, processedElements);
             } catch (FilterException e) {
@@ -189,7 +206,7 @@ public class UpdateController {
      * Constructs GuiElements (including all necessary references to labels/milestones/users to properly display
      * the issue) corresponding to a list of issues without changing the order.
      *
-     * @param models The MultiModel from which necessary references are extracted.
+     * @param models          The MultiModel from which necessary references are extracted.
      * @param processedIssues The list of issues to construct GUIElements for.
      * @return A list of GUIElements corresponding to the given list of issues.
      */
@@ -199,10 +216,10 @@ public class UpdateController {
             assert modelOfIssue.isPresent();
 
             return new GuiElement(issue,
-                    models.getLabelsOfIssue(issue),
-                    models.getMilestoneOfIssue(issue),
-                    models.getAssigneeOfIssue(issue),
-                    models.getAuthorOfIssue(issue)
+                                  models.getLabelsOfIssue(issue),
+                                  models.getMilestoneOfIssue(issue),
+                                  models.getAssigneeOfIssue(issue),
+                                  models.getAuthorOfIssue(issue)
             );
         }).collect(Collectors.toList());
     }

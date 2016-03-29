@@ -23,10 +23,10 @@ public class PanelMenuCreator {
 
     private static final Logger logger = LogManager.getLogger(MenuControl.class.getName());
 
-    public static final String MILESTONE_FILTER_NAME =  "milestone:curr sort:status";
+    public static final String MILESTONE_FILTER_NAME = "milestone:curr sort:status";
     public static final String MILESTONE_PANEL_NAME = "Current Milestone";
 
-    public static final String ASSIGNEE_FILTER_NAME =  "is:open ((is:issue assignee:me) OR (is:pr author:me))";
+    public static final String ASSIGNEE_FILTER_NAME = "is:open ((is:issue assignee:me) OR (is:pr author:me))";
     public static final String ASSIGNEE_PANEL_NAME = "Open issues and PR's";
 
     public static final String UPDATED_FILTER_NAME = "assignee:me updated:<48";
@@ -40,7 +40,7 @@ public class PanelMenuCreator {
         this.panelControl = panelControl;
     }
 
-    public Menu generatePanelMenu(){
+    public Menu generatePanelMenu() {
         Menu panelMenu = new Menu("Panels");
         Menu autoCreatePanelMenu = new Menu("Auto-create");
         List<MenuItem> items = new ArrayList<>();
@@ -57,7 +57,7 @@ public class PanelMenuCreator {
         return panelMenu;
     }
 
-    public MenuItem createLeftPanelMenuItem(){
+    public MenuItem createLeftPanelMenuItem() {
         MenuItem createLeft = new MenuItem("Create (Left)");
         createLeft.setOnAction(e -> {
             logger.info("Menu: Panels > Create (Left)");
@@ -68,7 +68,7 @@ public class PanelMenuCreator {
         return createLeft;
     }
 
-    public MenuItem createRightPanelMenuItem(){
+    public MenuItem createRightPanelMenuItem() {
         MenuItem createRight = new MenuItem("Create");
         createRight.setOnAction(e -> {
             logger.info("Menu: Panels > Create");
@@ -97,7 +97,7 @@ public class PanelMenuCreator {
         return createRight;
     }
 
-    public MenuItem closePanelMenuItem(){
+    public MenuItem closePanelMenuItem() {
         MenuItem closePanel = new MenuItem("Close");
         closePanel.setOnAction(e -> {
             logger.info("Menu: Panels > Close");
@@ -107,10 +107,10 @@ public class PanelMenuCreator {
         return closePanel;
     }
 
-    public MenuItem createCustomizedPanelMenuItem(String panelName, String panelFilter){
+    public MenuItem createCustomizedPanelMenuItem(String panelName, String panelFilter) {
         MenuItem customizedPanel = new MenuItem(panelName);
         customizedPanel.setOnAction(e -> {
-            logger.info("Menu: Panels > Auto-create > " +  panelName + "panel");
+            logger.info("Menu: Panels > Auto-create > " + panelName + "panel");
             panelControl.generatePanelWithNameAndFilter(panelName, panelFilter);
             panelControl.selectLastPanel();
         });

@@ -58,7 +58,7 @@ public class IssueMetadataTests {
     @Test
     public void invalidation() {
         IssueMetadata metadata = IssueMetadata.intermediate(stubEvents(), stubComments(), "events", "comments")
-            .full("test");
+                .full("test");
         IssueMetadata trueMetadata = metadata.invalidate();
         assertEquals(false, trueMetadata.isLatest());
     }
@@ -95,7 +95,7 @@ public class IssueMetadataTests {
         List<TurboIssueEvent> originalEvents = stubEvents();
         List<Comment> originalComments = stubComments();
 
-        IssueMetadata original =  IssueMetadata.intermediate(originalEvents, originalComments, "events", "comments");
+        IssueMetadata original = IssueMetadata.intermediate(originalEvents, originalComments, "events", "comments");
         IssueMetadata derived = original.full("test");
 
         assertEquals(originalEvents, derived.getEvents());

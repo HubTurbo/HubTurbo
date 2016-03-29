@@ -13,6 +13,7 @@ import static org.loadui.testfx.controls.Commons.hasText;
 
 public class BoardTests extends UITest {
     PanelControl panelControl;
+
     @Before
     public void setup() {
         UI ui = TestController.getUI();

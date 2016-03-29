@@ -48,7 +48,7 @@ public class GUIController {
 
     /**
      * The handler method for a ModelUpdatedEvent.
-     *
+     * <p>
      * It processes each panel in the current GUI, and checks the ModelUpdatedEvent for issues to be displayed
      * that match the current panel's filter expression:
      * - If not, the panel does not change its appearance.
@@ -72,7 +72,7 @@ public class GUIController {
     /**
      * Handler method for an applyFilterExpression call from an FilterPanel, which is in turn triggered by
      * the user pressing ENTER while the cursor is on the FilterPanel's filterTextField.
-     *
+     * <p>
      * Triggers a processAndRefresh call in Logic with only the given panel's filterExpression. Contrast this
      * with refreshAllPanels in Logic, triggers processAndRefresh with all FilterExpressions from the GUI.
      *
@@ -104,8 +104,8 @@ public class GUIController {
 
     private void updateAPIBox(UpdateRateLimitsEvent e) {
         Platform.runLater(() -> apiBox.setText(String.format("%s/%s",
-                    e.remainingRequests,
-                    Utility.minutesFromNow(e.nextRefreshInMillisecs)))
+                                                             e.remainingRequests,
+                                                             Utility.minutesFromNow(e.nextRefreshInMillisecs)))
         );
     }
 

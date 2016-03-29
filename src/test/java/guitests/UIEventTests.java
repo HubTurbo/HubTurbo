@@ -2,10 +2,10 @@ package guitests;
 
 import javafx.scene.control.ComboBox;
 import javafx.scene.input.KeyCode;
+
 import org.junit.Test;
 import ui.UI;
 import ui.components.KeyboardShortcuts;
-import util.PlatformEx;
 import util.events.*;
 import util.events.testevents.PrimaryRepoChangedEvent;
 import util.events.testevents.PrimaryRepoChangedEventHandler;
@@ -25,7 +25,7 @@ public class UIEventTests extends UITest {
     private static void resetEventTestCount() {
         eventTestCount = 0;
     }
-    
+
     private static void getEventRepoId(PrimaryRepoChangedEvent e) {
         defaultRepoId = e.repoId;
     }
@@ -73,7 +73,7 @@ public class UIEventTests extends UITest {
         click("#dummy/dummy_col0_filterTextField");
         assertEquals(1, eventTestCount);
     }
-    
+
     @Test
     public void defaultRepoSwitchedTest() {
         UI.events.registerEvent((PrimaryRepoChangedEventHandler) e -> UIEventTests.increaseEventTestCount());
@@ -95,5 +95,14 @@ public class UIEventTests extends UITest {
         assertEquals(1, eventTestCount);
         press(KeyboardShortcuts.SWITCH_DEFAULT_REPO);
         assertEquals("dummy3/dummy3", defaultRepoId);
+    }
+
+    @Test
+    public void triggerIssuePicker_dialogAppears() {
+        UI.events.registerEvent((ShowIssuePickerEventHandler) e -> UIEventTests.increaseEventTestCount());
+        resetEventTestCount();
+        press(KeyboardShortcuts.SHOW_ISSUE_PICKER);
+        assertEquals(1, eventTestCount);
+        press(KeyCode.ESCAPE);
     }
 }
