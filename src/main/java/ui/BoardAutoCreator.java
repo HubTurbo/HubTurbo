@@ -59,18 +59,37 @@ public class BoardAutoCreator {
     public Menu generateBoardAutoCreateMenu() {
         Menu autoCreate = new Menu("Auto-create");
         MenuItem sample = new MenuItem(SAMPLE_BOARD);
-        sample.setOnAction(e -> createSampleBoard(true));
+        sample.setOnAction(e -> {
+            saveBoardAfterUserConfirmation(SAMPLE_BOARD);
+            createSampleBoard(true);
+        });
         autoCreate.getItems().add(sample);
 
         MenuItem milestone = new MenuItem(MILESTONES);
-        milestone.setOnAction(e -> createMilestoneBoard());
+        milestone.setOnAction(e -> {
+            saveBoardAfterUserConfirmation(MILESTONES);
+            createMilestoneBoard();
+        });
         autoCreate.getItems().add(milestone);
 
         MenuItem workAllocation = new MenuItem(WORK_ALLOCATION);
-        workAllocation.setOnAction(e -> createWorkAllocationBoard());
+        workAllocation.setOnAction(e -> {
+            saveBoardAfterUserConfirmation(WORK_ALLOCATION);
+            createWorkAllocationBoard();
+        });
         autoCreate.getItems().add(workAllocation);
 
         return autoCreate;
+    }
+
+    private void saveBoardAfterUserConfirmation(String boardName) {
+        if (shouldSave(boardName)) ui.getMenuControl().saveBoardAs();
+    }
+
+    private boolean shouldSave(String boardName) {
+        return DialogMessage.showYesNoWarningDialog("Confirmation", "Save current board?",
+                "You are about to create the '" + boardName + "' board.\n\n"
+                + "Would you like the save the current board before continuing?", "Yes", "No");
     }
 
     private void createMilestoneBoard() {
