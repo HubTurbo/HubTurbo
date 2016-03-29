@@ -2,5 +2,5 @@ package util.events.testevents;
 
 import util.events.Event;
 
-public class JumpToCommentEvent extends Event {
+public class JumpToNewCommentBoxEvent extends Event {
 }
