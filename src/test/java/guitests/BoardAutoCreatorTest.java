@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -38,8 +41,36 @@ public class BoardAutoCreatorTest extends UITest {
     }
 
     @Test
-    public void milestoneBoardAutoCreationTest() {
+    public void boardAutoCreator_clickYesInSavePrompt_currentBoardSaved() {
+        int panelCount = panelControl.getPanelCount();
+        assertEquals(0, panelControl.getNumberOfSavedBoards());
 
+        // create 3 new panels
+        pushKeys(new KeyCodeCombination(KeyCode.P, KeyCombination.SHORTCUT_DOWN));
+        pushKeys(new KeyCodeCombination(KeyCode.P, KeyCombination.SHORTCUT_DOWN));
+        pushKeys(new KeyCodeCombination(KeyCode.P, KeyCombination.SHORTCUT_DOWN));
+        assertEquals(panelCount + 3, panelControl.getPanelCount());
+
+        // create milestones board
+        traverseMenu("Boards", "Auto-create", "Milestones");
+        PlatformEx.waitOnFxThread();
+        waitUntilNodeAppears(String.format(SAVE_MESSAGE, "Milestones"));
+        // opt to save current board
+        click("Yes");
+        // save as "New Board"
+        click("OK");
+
+        assertEquals(2, panelControl.getNumberOfSavedBoards());
+        assertEquals(5, panelControl.getPanelCount());
+
+        // check that "New Board" is saved correctly
+        traverseMenu("Boards", "Open", "New Board");
+        PlatformEx.waitOnFxThread();
+        assertEquals(panelCount + 3, panelControl.getPanelCount());
+    }
+
+    @Test
+    public void milestoneBoardAutoCreationTest() {
         assertEquals(0, panelControl.getNumberOfSavedBoards());
 
         traverseMenu("Boards", "Auto-create", "Milestones");
