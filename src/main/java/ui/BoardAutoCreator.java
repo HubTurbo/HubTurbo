@@ -26,7 +26,7 @@ public class BoardAutoCreator {
     private static final String FIRST_SAMPLE_REPO_NAME = "HubTurbo/SampleRepo";
     private static final String SECOND_SAMPLE_REPO_NAME = "HubTurbo/SampleRepo2";
     private static final String TIPS_REPO_NAME = "HubTurbo/TipsRepo";
-    public static final String SAVE_MESSAGE = "You are about to create the '%s' board.\n\n"
+    public static final String SAVE_MESSAGE = "You are about to create the '%s' board.%n%n"
             + "Would you like the save the current board before continuing?";
     public static final String SAMPLE_BOARD_DIALOG = String.format("%s has been created and loaded.", SAMPLE_BOARD);
 
