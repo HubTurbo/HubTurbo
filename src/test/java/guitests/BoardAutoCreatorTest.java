@@ -21,6 +21,7 @@ import util.PlatformEx;
 
 import static ui.BoardAutoCreator.SAMPLE_BOARD;
 import static ui.BoardAutoCreator.SAMPLE_BOARD_DIALOG;
+import static ui.BoardAutoCreator.SAVE_MESSAGE;
 
 public class BoardAutoCreatorTest extends UITest {
 
@@ -44,6 +45,8 @@ public class BoardAutoCreatorTest extends UITest {
         traverseMenu("Boards", "Auto-create", "Milestones");
 
         PlatformEx.waitOnFxThread();
+        waitUntilNodeAppears(String.format(SAVE_MESSAGE, "Milestones"));
+        click("No");
         assertNodeExists(hasText("Milestones board has been created and loaded.\n\n"
                 + "It is saved under the name \"Milestones\"."));
         click("OK");
@@ -74,6 +77,8 @@ public class BoardAutoCreatorTest extends UITest {
         traverseMenu("Boards", "Auto-create", "Work Allocation");
 
         PlatformEx.waitOnFxThread();
+        waitUntilNodeAppears(String.format(SAVE_MESSAGE, "Work Allocation"));
+        click("No");
         assertNodeExists(hasText("Work Allocation board has been created and loaded.\n\n"
                 + "It is saved under the name \"Work Allocation\"."));
         click("OK");
@@ -102,7 +107,8 @@ public class BoardAutoCreatorTest extends UITest {
         assertEquals(0, panelControl.getNumberOfSavedBoards());
 
         traverseMenu("Boards", "Auto-create", SAMPLE_BOARD);
-
+        waitUntilNodeAppears(String.format(SAVE_MESSAGE, SAMPLE_BOARD));
+        click("No");
         waitUntilNodeAppears(SAMPLE_BOARD_DIALOG);
         click("OK");
         verifyBoard(panelControl, BoardAutoCreator.getSamplePanelDetails());
