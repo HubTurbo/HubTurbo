@@ -14,13 +14,17 @@ import java.util.stream.Stream;
  */
 public class MilestonePickerState {
     public static final int BEST_MATCHING_LIMIT = 5;
-    private final List<PickerMilestone> currentMilestones;
+    private final List<PickerMilestone> allMilestones;
     private final List<PickerMilestone> bestMatchingMilestones;
 
-    public MilestonePickerState(List<PickerMilestone> milestones, String userInput) {
-        currentMilestones = cloneList(milestones);
+    public MilestonePickerState(List<PickerMilestone> milestones, String userQuery) {
+        allMilestones = cloneList(milestones);
         bestMatchingMilestones = new ArrayList<>();
-        processInput(userInput);
+        processQuery(userQuery);
+    }
+
+    public MilestonePickerState(List<PickerMilestone> milestones) {
+        this(milestones, "");
     }
 
     private List<PickerMilestone> cloneList(List<PickerMilestone> sourceList) {
@@ -29,20 +33,20 @@ public class MilestonePickerState {
                 .collect(Collectors.toList());
     }
 
-    private void processInput(String userInput) {
-        filterMilestonesByQuerySentence(currentMilestones, userInput);
-        determineBestMatchingMilestones(userInput);
-        if (userInput.isEmpty()) return;
+    private void processQuery(String querySentence) {
+        processMatchingMilestonesByQuerySentence(allMilestones, querySentence);
+        populateBestMatchingMilestones(querySentence);
+        if (querySentence.isEmpty()) return;
         toggleFirstMilestone(bestMatchingMilestones);
     }
 
-    private void filterMilestonesByQuerySentence(List<PickerMilestone> milestones, String querySentence) {
-        String[] userInputWords = querySentence.split(" ");
-        Stream.of(userInputWords)
-                .forEach(query -> filterMilestonesByQueryWord(milestones, query));
+    private void processMatchingMilestonesByQuerySentence(List<PickerMilestone> milestones, String querySentence) {
+        String[] queryWords = querySentence.split(" ");
+        Stream.of(queryWords)
+                .forEach(queryWord -> processMatchingMilestonesByQueryWord(milestones, queryWord));
     }
 
-    private void filterMilestonesByQueryWord(List<PickerMilestone> milestones, String queryWord) {
+    private void processMatchingMilestonesByQueryWord(List<PickerMilestone> milestones, String queryWord) {
         milestones.stream()
                 .forEach(milestone -> {
                     if (milestone.isMatching()) milestone.setMatching(isMatchingQuery(milestone, queryWord));
@@ -50,42 +54,41 @@ public class MilestonePickerState {
     }
 
     /**
-     * Toggles the milestone that has milestoneName as its exact name
-     * <p>
-     * This method is case-sensitive
-     *
+     * Toggles the selection status of the milestone whose name is exactly milestoneName. This method is
+     * case-sensitive
+     * 
      * @param milestoneName
      */
     public final void toggleExactMatchMilestone(String milestoneName) {
-        Optional<PickerMilestone> exactMatchMilestone = getExactMatchMilestone(currentMilestones, milestoneName);
+        Optional<PickerMilestone> exactMatchMilestone = getExactMatchMilestone(allMilestones, milestoneName);
         exactMatchMilestone.ifPresent(this::toggleMilestone);
     }
 
     /**
-     * Toggles the first milestone of the list
+     * Toggles the selection status of the first milestone in the list
      *
-     * @param milestoneList
+     * @param milestones
      */
-    private final void toggleFirstMilestone(List<PickerMilestone> milestoneList) {
-        Optional<PickerMilestone> firstMatchingMilestone = milestoneList.stream()
-                .findFirst();
-        firstMatchingMilestone.ifPresent(this::toggleMilestone);
+    private final void toggleFirstMilestone(List<PickerMilestone> milestones) {
+        Optional<PickerMilestone> firstMilestone = milestones.stream()
+                                                            .findFirst();
+        firstMilestone.ifPresent(this::toggleMilestone);
     }
 
     /**
-     * Changes the selection statuses of all milestones in the currentMilestones,
-     * such that the given milestone is toggled, and the rest are not selected
+     * Changes the selection statuses of all milestones in allMilestones,
+     * such that the given milestone is toggled and the rest are not selected
      *
      * @param milestone
      */
     private void toggleMilestone(PickerMilestone milestone) {
-        this.currentMilestones.stream()
+        allMilestones.stream()
                 .forEach(listMilestone -> listMilestone.setSelected(listMilestone.equals(milestone)
                         && !listMilestone.isSelected()));
     }
 
-    public List<PickerMilestone> getCurrentMilestones() {
-        return currentMilestones;
+    public List<PickerMilestone> getAllMilestones() {
+        return allMilestones;
     }
 
     public List<PickerMilestone> getBestMatchingMilestones() {
@@ -93,134 +96,151 @@ public class MilestonePickerState {
     }
 
     /**
-     * Generates the best matching milestones which will then be added to bestMatchingMilestones
+     * Populates bestMatchingMilestones with milestones from allMilestones that best match
+     * {@code querySentence}.
      *
-     * The added milestones are references to the actual elements in currentMilestones, and thus should not be
-     * unnecessarily mutated
-     * @param userInput
+     * The added milestones are references to the actual elements in allMilestones, and thus should not be
+     * unnecessarily mutated.
+     * @param querySentence
      */
-    private void determineBestMatchingMilestones(String userInput) {
-        addMatchingMilestones(bestMatchingMilestones, getNumberOfMilestonesToAdd(), currentMilestones);
-        addPreviouslyMatchingMilestones(bestMatchingMilestones, getNumberOfMilestonesToAdd(), userInput,
-                                        currentMilestones);
-        addLikelyUnmatchedMilestones(bestMatchingMilestones, getNumberOfMilestonesToAdd(), currentMilestones);
+    private void populateBestMatchingMilestones(String querySentence) {
+        bestMatchingMilestones.clear();
+        addMatchingMilestones(bestMatchingMilestones, getRemainingBestMatchesToLimit(), allMilestones);
+        if (isMilestonesSizeBelowLimit(bestMatchingMilestones, BEST_MATCHING_LIMIT)) {
+            addPartiallyMatchingMilestones(bestMatchingMilestones, getRemainingBestMatchesToLimit(), querySentence,
+                                            allMilestones);
+        }
+        if (isMilestonesSizeBelowLimit(bestMatchingMilestones, BEST_MATCHING_LIMIT)) {
+            addLikelyUnmatchedMilestones(bestMatchingMilestones, getRemainingBestMatchesToLimit(), allMilestones);
+        }
     }
 
-    private int getNumberOfMilestonesToAdd() {
+    private boolean isMilestonesSizeBelowLimit(List<PickerMilestone> milestones, int limit) {
+        return milestones.size() < limit;
+    }
+
+    private int getRemainingBestMatchesToLimit() {
         return BEST_MATCHING_LIMIT - bestMatchingMilestones.size();
     }
 
     /**
-     * Adds up to {@code limit} number of milestones to {@code bestMatchingMilestones}
-     * These milestones are taken from {@code milestones}, in the same order given,
-     * if they are not already in {@code bestMatchingMilestones}
+     * Adds a limited number of milestones to {@code milestonesToBePopulated}.
+     * These milestones are taken from {@code allMilestones}, in the same order given,
+     * if they are not already in {@code milestonesToBePopulated}.
      *
-     * This method will do nothing if {@code limit} is not a positive integer
-     * @param bestMatchingMilestones
+     * Assumption: {@code limit} is a positive integer
+     * @param milestonesToBePopulated
      * @param limit
-     * @param milestones
+     * @param allMilestones
      */
-    private void addLikelyUnmatchedMilestones(List<PickerMilestone> bestMatchingMilestones, int limit,
-                                              List<PickerMilestone> milestones) {
-        if (limit <= 0) return;
-        List<PickerMilestone> likelyUnmatchedMilestones = getLimitedFirstMilestones(bestMatchingMilestones,
-                limit, milestones);
-        bestMatchingMilestones.addAll(likelyUnmatchedMilestones);
+    private void addLikelyUnmatchedMilestones(List<PickerMilestone> milestonesToBePopulated, int limit,
+                                              List<PickerMilestone> allMilestones) {
+        assert limit > 0;
+        List<PickerMilestone> likelyUnmatchedMilestones =
+                getLimitedFirstMilestones(milestonesToBePopulated, limit, allMilestones);
+        milestonesToBePopulated.addAll(likelyUnmatchedMilestones);
     }
 
     /**
-     * Adds up to {@code limit} number of milestones to {@code bestMatchingMilestones}
-     * These milestones are taken from {@code milestones} if they match subsets of {@code userInput}, and are
-     * not already in {@code bestMatchingMilestones}
+     * Adds a limited number of milestones to {@code milestonesToBePopulated}.
+     * These milestones are taken from {@code allMilestones} if they match subsets of {@code querySentence} and are
+     * not already in {@code milestonesToBePopulated}.
      *
-     * This method will do nothing if {@code limit} is not a positive integer
-     * @param bestMatchingMilestones
+     * Assumption: {@code limit} is a positive integer
+     * @param milestonesToBePopulated
      * @param limit
-     * @param userInput
-     * @param milestones
+     * @param querySentence
+     * @param allMilestones
      */
-    private void addPreviouslyMatchingMilestones(List<PickerMilestone> bestMatchingMilestones, int limit,
-                                                 String userInput, List<PickerMilestone> milestones) {
-        if (limit <= 0) return;
-        List<PickerMilestone> previouslyMatchingMilestones = getLimitedMatchesFromPreviousInput(userInput,
-                bestMatchingMilestones, limit, milestones);
-        bestMatchingMilestones.addAll(previouslyMatchingMilestones);
+    private void addPartiallyMatchingMilestones(List<PickerMilestone> milestonesToBePopulated, int limit,
+                                                String querySentence, List<PickerMilestone> allMilestones) {
+        assert limit > 0;
+        List<PickerMilestone> partiallyMatchingMilestones =
+                getLimitedMatchesFromPreviousQuery(querySentence, milestonesToBePopulated, limit, allMilestones);
+        milestonesToBePopulated.addAll(partiallyMatchingMilestones);
     }
 
     /**
-     * Adds up to {@code limit} number of milestones to {@code bestMatchingMilestones}
-     * These milestones are taken from {@code milestones} if its isMatching() returns true
+     * Adds a limited number of milestones to {@code milestonesToBePopulated}.
+     * These milestones are taken from {@code allMilestones} if its isMatching() returns true.
      *
-     * This method will do nothing if {@code limit} is not a positive integer
-     * @param bestMatchingMilestones
+     * Assumption: {@code limit} is a positive integer
+     * @param milestonesToBePopulated
      * @param limit
-     * @param milestones
+     * @param allMilestones
      */
-    private void addMatchingMilestones(List<PickerMilestone> bestMatchingMilestones, int limit,
-                                       List<PickerMilestone> milestones) {
-        if (limit <= 0) return;
-        List<PickerMilestone> matchingMilestones = getLimitedMatchingMilestones(limit, milestones);
-        bestMatchingMilestones.addAll(matchingMilestones);
+    private void addMatchingMilestones(List<PickerMilestone> milestonesToBePopulated, int limit,
+                                       List<PickerMilestone> allMilestones) {
+        assert limit > 0;
+        List<PickerMilestone> matchingMilestones = getLimitedMatchingMilestones(limit, allMilestones);
+        milestonesToBePopulated.addAll(matchingMilestones);
     }
 
     /**
-     * Gets first {@code limit} milestones from {@code milestones} which are not already in {@code currentMilestones}
+     * Gets a limited number of milestones from {@code allMilestones} matching previous querySentence(s)
+     * which are not already in {@code currentMilestones}.
      *
-     * Assumption: {@code limit} is not negative
-     * @param currentMilestones
-     * @param limit
-     * @param milestones
-     * @return
-     */
-    private List<PickerMilestone> getLimitedFirstMilestones(List<PickerMilestone> currentMilestones,
-                                                            int limit, List<PickerMilestone> milestones) {
-        return milestones.stream()
-                .filter(milestone -> !currentMilestones.contains(milestone))
-                .limit(limit)
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Concatenates all the matching milestones for previous userInput(s), then gets the first {@code limit}
-     * milestones which are not already in {@code currentMilestones}
-     *
-     * Previous userInput(s) refer to userInput as it gets shorter after repetitively removing the last char
-     * e.g. previous userInputs of "milestones" are "milestone", "mileston", "milesto", ..., and they will be
+     * Previous querySentence(s) refer to querySentence as it gets shorter after repetitively removing the last char
+     * e.g. previous querySentences of "milestones" are "milestone", "mileston", "milesto", ..., and they will be
      * checked for matching milestones in that order
      *
      * Assumption: {@code limit} is not negative
-     * @param userInput
+     * @param querySentence
      * @param currentMilestones
      * @param limit
-     * @param milestones
+     * @param allMilestones
      */
-    private List<PickerMilestone> getLimitedMatchesFromPreviousInput(String userInput,
+    private List<PickerMilestone> getLimitedMatchesFromPreviousQuery(String querySentence,
                                                                      List<PickerMilestone> currentMilestones,
-                                                                     int limit, List<PickerMilestone> milestones) {
-        List<PickerMilestone> bestMatchesForPreviousInput = new ArrayList<>();
-        String curUserInput = userInput;
-        while (bestMatchesForPreviousInput.size() < limit && curUserInput.length() > 0) {
+                                                                     int limit, List<PickerMilestone> allMilestones) {
+        List<PickerMilestone> matchesForPreviousQuery = new ArrayList<>();
+        String curQuerySentence = querySentence;
+        while (matchesForPreviousQuery.size() < limit && curQuerySentence.length() > 0) {
             List<PickerMilestone> totalList = new ArrayList<>(currentMilestones);
-            totalList.addAll(bestMatchesForPreviousInput);
+            totalList.addAll(matchesForPreviousQuery);
 
-            List<PickerMilestone> matchingMilestones = getNewMatchingMilestones(curUserInput, totalList, milestones);
-            bestMatchesForPreviousInput.addAll(matchingMilestones);
+            List<PickerMilestone> matchingMilestones = getNewMatchingMilestones(curQuerySentence, totalList,
+                                                                                allMilestones);
+            matchesForPreviousQuery.addAll(matchingMilestones);
 
-            curUserInput = curUserInput.substring(0, curUserInput.length() - 1);
+            curQuerySentence = curQuerySentence.substring(0, curQuerySentence.length() - 1);
         }
 
-        return bestMatchesForPreviousInput.stream()
+        return matchesForPreviousQuery.stream()
                 .limit(limit)
                 .collect(Collectors.toList());
     }
 
     /**
-     * Gets up to {@code limit} number of milestones from {@code milestones} whose isMatching() returns true
+     * Gets milestones from {@code allMilestones} which match {@code querySentence} and are not already
+     * included in {@code currentMilestones}
+     *
+     * @param querySentence
+     * @param currentMilestones
+     * @param allMilestones
+     */
+    private List<PickerMilestone> getNewMatchingMilestones(String querySentence,
+                                                           List<PickerMilestone> currentMilestones,
+                                                           List<PickerMilestone> allMilestones) {
+        String[] curQueryWords = querySentence.split(" ");
+
+        List<PickerMilestone> matchingMilestones = allMilestones;
+        for (String word : curQueryWords) {
+            matchingMilestones = matchingMilestones.stream()
+                    .filter(milestone -> isMatchingQuery(milestone, word))
+                    .collect(Collectors.toList());
+        }
+        return matchingMilestones.stream()
+                .filter(milestone -> !currentMilestones.contains(milestone))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Gets a limited number of milestones from {@code milestones} whose isMatching() returns true
      *
      * Assumption: {@code limit} is not negative
      * @param limit non-negative integer
      * @param milestones milestones to get the matching milestones from
-     * @return
      */
     private List<PickerMilestone> getLimitedMatchingMilestones(int limit, List<PickerMilestone> milestones) {
         return milestones.stream()
@@ -230,36 +250,30 @@ public class MilestonePickerState {
     }
 
     /**
-     * Gets milestones from {@code milestones} which match {@code userInput},
-     * and are not already included in {@code chosenMilestones}
+     * Gets the first {@code limit} milestones from {@code allMilestones} which are not already in
+     * {@code currentMilestones}.
      *
-     * @param userInput
-     * @param chosenMilestones
-     * @param milestones
-     * @return
+     * Assumptions: {@code limit} is not negative and {@code allMilestones} should already be ordered
+     * in the desired priority
+     * @param currentMilestones
+     * @param limit
+     * @param allMilestones
      */
-    private List<PickerMilestone> getNewMatchingMilestones(String userInput, List<PickerMilestone> chosenMilestones,
-                                                           List<PickerMilestone> milestones) {
-        String[] curUserInputWords = userInput.split(" ");
-
-        List<PickerMilestone> matchingMilestones = milestones;
-        for (String word : curUserInputWords) {
-            matchingMilestones = matchingMilestones.stream()
-                    .filter(milestone -> isMatchingQuery(milestone, word))
-                    .collect(Collectors.toList());
-        }
-        return matchingMilestones.stream()
-                .filter(milestone -> !chosenMilestones.contains(milestone))
+    private List<PickerMilestone> getLimitedFirstMilestones(List<PickerMilestone> currentMilestones,
+                                                            int limit, List<PickerMilestone> allMilestones) {
+        return allMilestones.stream()
+                .filter(milestone -> !currentMilestones.contains(milestone))
+                .limit(limit)
                 .collect(Collectors.toList());
+    }
+
+    private Optional<PickerMilestone> getExactMatchMilestone(List<PickerMilestone> milestones, String query) {
+        return milestones.stream()
+                .filter(milestone -> milestone.getTitle().equals(query))
+                .findFirst();
     }
 
     private boolean isMatchingQuery(PickerMilestone milestone, String query) {
         return Utility.containsIgnoreCase(milestone.getTitle(), query);
-    }
-
-    private Optional<PickerMilestone> getExactMatchMilestone(List<PickerMilestone> milestoneList, String query) {
-        return milestoneList.stream()
-                .filter(milestone -> milestone.getTitle().equals(query))
-                .findFirst();
     }
 }

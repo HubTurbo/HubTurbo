@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 public class MilestonePickerStateTests {
@@ -25,6 +26,7 @@ public class MilestonePickerStateTests {
         PickerMilestone milestone2 = new PickerMilestone(new TurboMilestone("testrepo", 2, "milestone2"));
         milestoneList.add(milestone1);
         milestoneList.add(milestone2);
+        // userInput is set to 'milestone2'
         return new MilestonePickerState(milestoneList, milestone2.getTitle());
     }
 
@@ -32,22 +34,32 @@ public class MilestonePickerStateTests {
     public void toggleMilestone_noMilestone_milestoneAssigned() {
         MilestonePickerState state = prepareUnassignedState();
         state.toggleExactMatchMilestone("milestone1");
-        assertTrue(state.getCurrentMilestones().get(0).isSelected());
+        assertTrue(state.getAllMilestones().get(0).isSelected());
     }
 
     @Test
     public void toggleMilestone_hasMilestone_milestoneReplaced() {
         MilestonePickerState state = prepareAssignedState();
         state.toggleExactMatchMilestone("milestone1");
-        assertTrue(state.getCurrentMilestones().get(0).isSelected());
-        assertFalse(state.getCurrentMilestones().get(1).isSelected());
+        assertTrue(state.getAllMilestones().get(0).isSelected());
+        assertFalse(state.getAllMilestones().get(1).isSelected());
     }
 
     @Test
     public void toggleMilestone_hasMilestone_milestoneUnassigned() {
         MilestonePickerState state = prepareAssignedState();
         state.toggleExactMatchMilestone("milestone2");
-        assertFalse(state.getCurrentMilestones().get(0).isSelected());
-        assertFalse(state.getCurrentMilestones().get(1).isSelected());
+        assertFalse(state.getAllMilestones().get(0).isSelected());
+        assertFalse(state.getAllMilestones().get(1).isSelected());
+    }
+
+    @Test
+    public void bestMatches_withUserInput_previousMatchingMilestoneIncluded() {
+        MilestonePickerState state = prepareAssignedState();
+        assertEquals("milestone2", state.getBestMatchingMilestones().get(0).getTitle());
+        assertTrue(state.getBestMatchingMilestones().get(0).isSelected());
+        assertTrue(state.getBestMatchingMilestones().get(0).isMatching());
+        assertEquals("milestone1", state.getBestMatchingMilestones().get(1).getTitle());
+        assertFalse(state.getBestMatchingMilestones().get(1).isMatching());
     }
 }

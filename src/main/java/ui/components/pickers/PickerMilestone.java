@@ -46,7 +46,7 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
         Label milestone = createLabel();
         setStatusColour(milestone);
         if (isSelected) setSelectedInUI(milestone);
-        if (!isMatching) setNotMatchingInUI(milestone);
+        if (!isMatching) setFadedInUI(milestone);
         adjustWidthToFont(milestone);
         return milestone;
     }
@@ -153,13 +153,12 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
                 .findFirst();
     }
 
-    private void setNotMatchingInUI(Label milestone) {
+    private void setFadedInUI(Label milestone) {
         milestone.setStyle(milestone.getStyle() + " -fx-opacity: 60%;");
     }
 
-    public PickerMilestone setMatching(boolean isMatching) {
+    public void setMatching(boolean isMatching) {
         this.isMatching = isMatching;
-        return this;
     }
 
     public boolean isMatching() {
