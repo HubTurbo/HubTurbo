@@ -319,8 +319,8 @@ public class MenuControl extends MenuBar {
             Platform.runLater(() -> updateRepoRemoveList(remove));
         });
 
-        choose.setAccelerator(SHOW_REPO_PICKER);
-        choose.setOnAction(e -> ui.triggerEvent(new ShowRepositoryPickerEvent()));
+        // choose.setAccelerator(SHOW_REPO_PICKER);
+        // choose.setOnAction(e -> ui.triggerEvent(new ShowRepositoryPickerEvent()));
 
         return new MenuItem[] { remove, choose };
     }
