@@ -1,4 +1,4 @@
-package guitests;
+package unstable;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -6,6 +6,7 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 
+import guitests.UITest;
 import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
