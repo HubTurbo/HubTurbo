@@ -8,16 +8,9 @@ import java.util.concurrent.TimeoutException;
 
 import backend.stub.DummyRepoState;
 import org.junit.Test;
-import org.loadui.testfx.GuiTest;
 import org.testfx.api.FxToolkit;
 
-<<<<<<< HEAD:src/test/java/unstable/ModelUpdateUITest.java
-import guitests.UITest;
-import ui.IdGenerator;
-=======
->>>>>>> Confirms rate of failure for tests that only fail on Travis:src/test/java/guitests/ModelUpdateUITest.java
 import ui.UI;
-import ui.listpanel.ListPanel;
 import util.PlatformEx;
 import util.events.testevents.UILogicRefreshEvent;
 import util.events.testevents.UpdateDummyRepoEvent;

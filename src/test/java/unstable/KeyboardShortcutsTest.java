@@ -8,9 +8,7 @@ import javafx.scene.input.KeyCode;
 
 import javafx.scene.layout.VBox;
 import org.junit.Test;
-import org.loadui.testfx.GuiTest;
 
-import ui.IdGenerator;
 import ui.UI;
 import ui.components.KeyboardShortcuts;
 import ui.listpanel.ListPanel;

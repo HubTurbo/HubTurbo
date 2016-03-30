@@ -29,6 +29,6 @@ public class ValidLoginTest extends UITest {
         type("test");
         clickOn("Sign in");
         ComboBox<String> repositorySelector = findOrWaitFor(IdGenerator.getRepositorySelectorIdReference());
-        awaitCondition(() -> "test/test".equals(repositorySelector.getValue()));
+        awaitCondition(() -> "test/test".equals(repositorySelector.getValue()), 10);
     }
 }

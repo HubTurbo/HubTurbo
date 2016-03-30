@@ -21,8 +21,6 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import javafx.scene.control.*;
-import org.apache.commons.lang3.reflect.FieldUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hamcrest.Matcher;
@@ -42,13 +40,11 @@ import backend.interfaces.RepoStore;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseButton;
 import javafx.stage.Stage;
-import prefs.Preferences;
 import ui.IdGenerator;
 import ui.MenuControl;
 import ui.TestController;
@@ -328,28 +324,28 @@ public class UITest extends FxRobot {
      * Clicks the repository selector's ComboBox
      */
     public void clickRepositorySelector() {
-        click(IdGenerator.getRepositorySelectorIdReference());
+        clickOn(IdGenerator.getRepositorySelectorIdReference());
     }
 
     /**
      * Gets the repository selector's ComboBox
      */
     public ComboBox getRepositorySelector() {
-        return find(IdGenerator.getRepositorySelectorIdReference());
+        return GuiTest.find(IdGenerator.getRepositorySelectorIdReference());
     }
 
     /**
      * Clicks the label picker's TextField
      */
     public void clickLabelPickerTextField() {
-        click(IdGenerator.getLabelPickerTextFieldIdReference());
+        clickOn(IdGenerator.getLabelPickerTextFieldIdReference());
     }
 
     /**
      * Gets the label picker's TextField
      */
     public TextField getLabelPickerTextField() {
-        return find(IdGenerator.getLabelPickerTextFieldIdReference());
+        return GuiTest.find(IdGenerator.getLabelPickerTextFieldIdReference());
     }
 
     /**
@@ -357,7 +353,8 @@ public class UITest extends FxRobot {
      * @param panelIndex
      */
     public void clickFilterTextFieldAtPanel(int panelIndex) {
-        click(IdGenerator.getPanelFilterTextFieldIdReference(panelIndex));
+        waitUntilNodeAppears(IdGenerator.getPanelFilterTextFieldIdReference(panelIndex));
+        clickOn(IdGenerator.getPanelFilterTextFieldIdReference(panelIndex));
     }
 
     /**
@@ -365,7 +362,7 @@ public class UITest extends FxRobot {
      * @param panelIndex
      */
     public FilterTextField getFilterTextFieldAtPanel(int panelIndex) {
-        return find(IdGenerator.getPanelFilterTextFieldIdReference(panelIndex));
+        return GuiTest.find(IdGenerator.getPanelFilterTextFieldIdReference(panelIndex));
     }
 
     /**
@@ -374,7 +371,8 @@ public class UITest extends FxRobot {
      * @param issueId
      */
     public void clickIssue(int panelIndex, int issueId) {
-        click(IdGenerator.getPanelCellIdReference(panelIndex, issueId));
+        waitUntilNodeAppears(IdGenerator.getPanelCellIdReference(panelIndex, issueId));
+        clickOn(IdGenerator.getPanelCellIdReference(panelIndex, issueId));
     }
 
     /**
@@ -383,7 +381,7 @@ public class UITest extends FxRobot {
      * @param issueId
      */
     public void rightClickIssue(int panelIndex, int issueId) {
-        rightClick(IdGenerator.getPanelCellIdReference(panelIndex, issueId));
+        rightClickOn(IdGenerator.getPanelCellIdReference(panelIndex, issueId));
     }
 
     /**
@@ -391,7 +389,7 @@ public class UITest extends FxRobot {
      * @param panelIndex
      */
     public void clickPanel(int panelIndex) {
-        click(IdGenerator.getPanelIdReference(panelIndex));
+        clickOn(IdGenerator.getPanelIdReference(panelIndex));
     }
 
     /**
@@ -399,7 +397,7 @@ public class UITest extends FxRobot {
      * @param panelIndex
      */
     public void rightClickPanel(int panelIndex) {
-        rightClick(IdGenerator.getPanelIdReference(panelIndex));
+        rightClickOn(IdGenerator.getPanelIdReference(panelIndex));
     }
 
     /**
@@ -407,7 +405,8 @@ public class UITest extends FxRobot {
      * @param panelIndex
      */
     public ListPanel getPanel(int panelIndex) {
-        return find(IdGenerator.getPanelIdReference(panelIndex));
+        waitUntilNodeAppears(IdGenerator.getPanelIdReference(panelIndex));
+        return GuiTest.find(IdGenerator.getPanelIdReference(panelIndex));
     }
 
     /**
@@ -416,7 +415,7 @@ public class UITest extends FxRobot {
      * @param issueId
      */
     public ListPanelCell getIssueCell(int panelIndex, int issueId) {
-        return find(IdGenerator.getPanelCellIdReference(panelIndex, issueId));
+        return GuiTest.find(IdGenerator.getPanelCellIdReference(panelIndex, issueId));
     }
 
     /**

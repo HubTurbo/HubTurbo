@@ -71,13 +71,13 @@ public class PanelFocusTest extends UITest {
         // More shortcut checks to ensure the focus is always correct
         pushKeys(JUMP_TO_FILTER_BOX);
         awaitCondition(() ->
-            1 == panelControl.getCurrentlySelectedPanel().get());
+            1 == panelControl.getCurrentlySelectedPanel().get(), 10);
         pushKeys(JUMP_TO_FIRST_ISSUE);
         awaitCondition(() ->
-            1 == panelControl.getCurrentlySelectedPanel().get());
+            1 == panelControl.getCurrentlySelectedPanel().get(), 10);
         pushKeys(KeyCode.F);
         awaitCondition(() ->
-            2 == panelControl.getCurrentlySelectedPanel().get());
+            2 == panelControl.getCurrentlySelectedPanel().get(), 10);
     }
 
     private void panelFocus_focusedPanel_focusCorrectOnCreatingPanels(PanelControl panelControl) {

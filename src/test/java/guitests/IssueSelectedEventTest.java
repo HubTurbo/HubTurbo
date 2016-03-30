@@ -4,7 +4,6 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCode;
 import org.junit.Test;
-import org.loadui.testfx.GuiTest;
 
 import ui.UI;
 import ui.listpanel.ListPanel;
@@ -23,8 +22,6 @@ public class IssueSelectedEventTest extends UITest {
         UI.events.registerEvent((IssueSelectedEventHandler) e -> eventCount.incrementAndGet());
         ListPanel issuePanel = getPanel(0);
 
-        waitUntilNodeAppears(PANEL_IDENTIFIER);
-        ListPanel issuePanel = GuiTest.find(PANEL_IDENTIFIER);
         //testing whether right click occurred by checking the presence of context menu items
         rightClickIssue(0, 9);
         ContextMenu contextMenu = issuePanel.getContextMenu();

@@ -2,10 +2,8 @@ package guitests;
 
 import backend.stub.DummyRepoState;
 import javafx.scene.input.KeyCode;
-import ui.listpanel.ListPanel;
 
 import org.junit.Test;
-import org.loadui.testfx.GuiTest;
 
 import static org.junit.Assert.assertEquals;
 
@@ -20,7 +18,6 @@ public class RangeTest extends UITest {
         press(KeyCode.ENTER).release(KeyCode.ENTER);
         sleep(EVENT_DELAY);
         assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES - 5, getPanel(0).getIssuesCount());
-        assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES - 5, ((ListPanel) GuiTest.find("#dummy/dummy_col0")).getIssuesCount());
     }
 
     @Test

@@ -6,8 +6,6 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCode;
 import org.junit.Before;
 import org.junit.Test;
-import ui.IdGenerator;
-import org.loadui.testfx.GuiTest;
 
 import ui.components.FilterTextField;
 import ui.components.IssueListView;

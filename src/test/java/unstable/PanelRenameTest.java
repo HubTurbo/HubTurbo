@@ -108,13 +108,8 @@ public class PanelRenameTest extends UITest {
         PlatformEx.waitOnFxThread();
         boolean isPresentDuringEdit = true; //stub value, this should change to false.
         try {
-<<<<<<< HEAD
             GuiTest.exists(panelCloseButtonId);
         } catch (NoNodesFoundException e) {
-=======
-            GuiTest.exists("#dummy/dummy_col3_closeButton");
-        } catch (NoNodesFoundException e){
->>>>>>> Fix clickOn issue by waiting first
             isPresentDuringEdit = false;
         }
 
@@ -160,10 +155,10 @@ public class PanelRenameTest extends UITest {
     public void panelRenameButton_onClick_panelGetsSelected() {
         // Test for the currently selected panel when trying to rename
 
-        click(IdGenerator.getOcticonButtonIdReference(0, "renameButton"));
+        clickOn(IdGenerator.getOcticonButtonIdReference(0, "renameButton"));
         assertEquals(Optional.of(0), panels.getCurrentlySelectedPanel());
         pushKeys(CREATE_RIGHT_PANEL);
-        click(IdGenerator.getOcticonButtonIdReference(1, "renameButton"));
+        clickOn(IdGenerator.getOcticonButtonIdReference(1, "renameButton"));
         assertEquals(Optional.of(1), panels.getCurrentlySelectedPanel());
         pushKeys(CLOSE_PANEL);
         pushKeys(KeyCode.ESCAPE);

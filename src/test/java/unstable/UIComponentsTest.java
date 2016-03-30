@@ -2,7 +2,6 @@ package unstable;
 
 import javafx.scene.input.KeyCode;
 import org.junit.Test;
-import org.loadui.testfx.GuiTest;
 
 import guitests.UITest;
 import ui.UI;
@@ -13,7 +12,6 @@ import static org.junit.Assert.assertEquals;
 
 public class UIComponentsTest extends UITest {
     
-    private static final String TEXT_ID = "#dummy/dummy_col0_filterTextField";
 
     // TODO check that filter text field does indeed do autocomplete correctly, etc
     @Test
