@@ -320,7 +320,7 @@ public class MenuControl extends MenuBar {
         });
 
         // choose.setAccelerator(SHOW_REPO_PICKER);
-        // choose.setOnAction(e -> ui.triggerEvent(new ShowRepositoryPickerEvent()));
+        choose.setOnAction(e -> ui.triggerEvent(new ShowRepositoryPickerEvent()));
 
         return new MenuItem[] { remove, choose };
     }
