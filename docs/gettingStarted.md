@@ -5,7 +5,7 @@
 To use HubTurbo, you'll need:
 
 - A [GitHub account](https://github.com/login)
-- [Java 8u40](http://www.oracle.com/technetwork/java/javase/downloads/index.html) or later
+- [Java 8u60](http://www.oracle.com/technetwork/java/javase/downloads/index.html) or later
 - [Google Chrome](http://www.google.com/chrome/)
 
 ## Installation
