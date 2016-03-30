@@ -64,7 +64,8 @@ public class ContextMenuTests extends UITest {
 
         clickIssue(0, 9);
         traverseContextMenu(listPanel.getContextMenu(), "Mark as read (E)");
-        PlatformEx.waitOnFxThread();
+        PlatformEx.waitOnFxThread(); // wait for traverseContextMenu's action to be carried out
+        PlatformEx.waitOnFxThread(); // wait for panel refresh caused by mark as read
         assertTrue(getIssueCell(0, 9).getIssue().isCurrentlyRead());
 
         clickIssue(0, 9);

@@ -467,12 +467,18 @@ public class UITest extends FxRobot {
     }
 
     /**
-     * Traverses a generic Menu represented "current" as its root, looking for a chain of nodes
-     * with given names and triggering their associated action.
+     * Traverses menu from the given menu list, looking for a chain of nodes with given names and triggering
+     * their associated action.
      */
-    private void traverseMenu(MenuItem root, String... names) {
-        MenuItem current = root;
-        for (int i = 0; i < names.length; i++) {
+    private void traverseMenu(List<? extends MenuItem> menus, String... names) {
+        MenuItem current = menus.stream()
+                .filter(m -> m.getText().equals(names[0]))
+                .findFirst()
+                .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                String.format("%s is not a valid menu item", names[0])));
+
+        for (int i = 1; i < names.length; i++) {
             final int j = i;
             if (!(current instanceof Menu)) {
                 throw new IllegalArgumentException(
@@ -507,17 +513,7 @@ public class UITest extends FxRobot {
 
         Platform.runLater(() -> {
             MenuControl root = TestController.getUI().getMenuControl();
-            MenuItem current = root.getMenus().stream()
-                    .filter(m -> m.getText().equals(names[0]))
-                    .findFirst()
-                    .orElseThrow(() ->
-                            new IllegalArgumentException(String.format("%s is not a valid menu item", names[0])));
-
-            if (names.length > 1) {
-                traverseMenu(current, Arrays.copyOfRange(names, 1, names.length));
-            } else {
-                traverseMenu(current);
-            }
+            traverseMenu(root.getMenus(), names);
         });
     }
 
@@ -527,20 +523,7 @@ public class UITest extends FxRobot {
     public void traverseContextMenu(ContextMenu contextMenu, String... names) {
         assert names.length > 0 : "traverseContextMenu called with no arguments";
 
-        Platform.runLater(() -> {
-            MenuItem current = contextMenu.getItems().stream()
-                    .filter(m -> m.getText().equals(names[0]))
-                    .findFirst()
-                    .orElseThrow(() ->
-                        new IllegalArgumentException(
-                                String.format("%s is not a valid menu item", names[0])));
-
-            if (names.length > 1) {
-                traverseMenu(current, Arrays.copyOfRange(names, 1, names.length));
-            } else {
-                traverseMenu(current);
-            }
-        });
+        Platform.runLater(() -> traverseMenu(contextMenu.getItems(), names));
     }
 
     private List<KeyCode> getKeyCodes(KeyCodeCombination combination) {
