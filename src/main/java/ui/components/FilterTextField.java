@@ -1,7 +1,8 @@
 package ui.components;
 
-import javafx.application.Platform;
-import javafx.scene.control.IndexRange;
+import filter.expression.QualifierType;
+import javafx.event.ActionEvent;
+import javafx.geometry.Side;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -14,6 +15,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static ui.components.KeyboardShortcuts.SHOW_DOCS;
 
@@ -23,6 +25,8 @@ import static ui.components.KeyboardShortcuts.SHOW_DOCS;
  */
 public class FilterTextField extends TextField {
 
+    private static final int MAX_SUGGESTIONS = 20;
+
     // A character class that indicates the characters considered to be word boundaries.
     // Specialised to HubTurbo's filter syntax.
     private static final String WORD_BOUNDARY_REGEX = "[ (:)]";
@@ -31,6 +35,10 @@ public class FilterTextField extends TextField {
     // The background colour set depends on whether the text in the textfield is a valid filter.
     public static final String VALID_FILTER_STYLE = "-fx-control-inner-background: white";
     public static final String INVALID_FILTER_STYLE = "-fx-control-inner-background: #EE8993";
+
+    // For on-the-fly parsing and checking
+    private final ValidationSupport validationSupport = new ValidationSupport();
+    private final SuggestionsMenu suggestions;
 
     // Callback functions
     private Runnable onCancel = () -> {
@@ -42,15 +50,21 @@ public class FilterTextField extends TextField {
     // For reverting edits
     private String previousText = "";
 
-    // The list of keywords which will be used in completion
-    private List<String> keywords = new ArrayList<>();
+    // Shows that is navigating the suggestion menu
+    private boolean isNavigating = false;
 
-    // For on-the-fly parsing and checking
-    private final ValidationSupport validationSupport = new ValidationSupport();
+    // The list of keywords which will be used in completion
+    private List<String> keywords = initCompletionKeywords();
+
 
     public FilterTextField(Predicate<String> validation) {
         super("");
+        suggestions = setupSuggestion();
         setup(validation);
+    }
+
+    private List<String> initCompletionKeywords() {
+        return QualifierType.getCompletionKeywords().stream().sorted().collect(Collectors.toList());
     }
 
     private void setup(Predicate<String> validation) {
@@ -72,15 +86,15 @@ public class FilterTextField extends TextField {
             if (key == null || key.isEmpty() || isModifierKeyPress) {
                 return;
             }
-            char typed = e.getCharacter().charAt(0);
-            // \b will allow us to detect deletion, but we can't find out the characters deleted
-            if (typed == '\t') {
-                e.consume();
-                if (!getSelectedText().isEmpty()) {
-                    confirmCompletion();
-                }
-            } else if (Character.isAlphabetic(typed) && shouldStartCompletion()) {
-                startCompletion(e);
+            
+            char typed = key.charAt(0);
+            
+            if (typed == '\t' && suggestions.isShowing()) {
+                suggestions.hide();
+                suggestions.getSelectedContent().ifPresent(this::completeWord);
+            } else {
+                suggestions.loadSuggestions(getMatchingKeywords(getCurrentWord()));
+                if (!suggestions.isShowing()) suggestions.show(this, Side.BOTTOM, 0, 0);
             }
         });
         setOnKeyPressed(e -> {
@@ -91,14 +105,17 @@ public class FilterTextField extends TextField {
         });
         setOnKeyReleased(e -> {
             e.consume();
+
             if (e.getCode() == KeyCode.ENTER) {
-                confirmEdit();
+                handleOnEnter();
             } else if (e.getCode() == KeyCode.ESCAPE) {
-                if (getText().equals(previousText)) {
-                    onCancel.run();
-                } else {
-                    revertEdit();
-                }
+                handleOnEscape();
+            }
+
+            isNavigating = e.getCode() == KeyCode.UP || e.getCode() == KeyCode.DOWN;
+
+            if (suggestions.isShowing() && !isNavigating) {
+                suggestions.loadSuggestions(getMatchingKeywords(getCurrentWord()));
             }
         });
         addEventHandler(KeyEvent.KEY_PRESSED, event -> {
@@ -107,6 +124,26 @@ public class FilterTextField extends TextField {
             }
         });
     }
+
+    private void handleOnEnter() {
+        suggestions.hide();
+        if (isNavigating) {
+            suggestions.getSelectedContent().ifPresent(this::completeWord);
+        } else {
+            confirmEdit();
+        }
+    }
+
+    private void handleOnEscape() {
+        if (getText().equals(previousText)) {
+            onCancel.run();
+        } else if (suggestions.isShowing()){
+            suggestions.hide();
+        } else {
+            revertEdit();
+        }
+    }
+
 
     /**
      * Sets the style of FilterTextField to the style for valid filter
@@ -123,78 +160,32 @@ public class FilterTextField extends TextField {
     }
 
     /**
-     * Completion is only started when there's effectively nothing (only whitespace)
-     * after the caret, or if there is selected text (indicating either that we are in
-     * the midst of completion, or that the user does not want the selected text and is
-     * typing to replace it)
-     *
-     * @return true if completion should be started
+     * @param query
+     * @return suggested keyword that contains a given query
      */
-    private boolean shouldStartCompletion() {
-        return getCharAfterCaret().trim().isEmpty() || !getSelectedText().isEmpty();
+    private List<String> getMatchingKeywords(String query) {
+        return keywords.stream().filter(keyword -> keyword.contains(query)).collect(Collectors.toList());
     }
 
-    /**
-     * Determines if the word being edited begins a registered completion word.
-     * If so, performs completion.
-     */
-    private void startCompletion(KeyEvent e) {
-        String editedWord = getCurrentWord() + e.getCharacter();
-        for (String candidateWord : keywords) {
-            if (candidateWord.startsWith(editedWord)) {
-                performCompletionOfWord(e, editedWord, candidateWord);
-                break;
-            }
-        }
-    }
-
-    /**
-     * Low-level manipulation of field selection to implement completion
-     */
-    private void performCompletionOfWord(KeyEvent e, String word, String candidateWord) {
-        e.consume();
-        int caret = getCaretPosition();
-        if (getSelectedText().isEmpty()) {
-            String before = getText().substring(0, caret);
-            String insertion = e.getCharacter();
-            String after = getText().substring(caret, getText().length());
-            String addition = candidateWord.substring(word.length());
-            setText(before + insertion + addition + after);
-            Platform.runLater(() -> selectRange(
-                    before.length() + insertion.length() + addition.length(),
-                    before.length() + insertion.length()));
-        } else {
-            IndexRange sel = getSelection();
-            int start = Math.min(sel.getStart(), sel.getEnd());
-            int end = Math.max(sel.getStart(), sel.getEnd());
-            String before = getText().substring(0, start);
-            String after = getText().substring(end, getText().length());
-            String insertion = e.getCharacter();
-            String addition = candidateWord.substring(word.length());
-            setText(before + insertion + addition + after);
-            Platform.runLater(() -> selectRange(
-                    before.length() + insertion.length() + addition.length(),
-                    before.length() + insertion.length()));
-        }
-    }
-
-    /**
-     * Confirms a completion by moving to the extreme right side of the selection
-     */
-    private void confirmCompletion() {
-        positionCaret(Math.max(getSelection().getStart(), getSelection().getEnd()));
-    }
 
     /**
      * Determines the word currently being edited.
      */
     private String getCurrentWord() {
         int caret = Math.min(getSelection().getStart(), getSelection().getEnd());
+        return getText().substring(getInitialCaretPosition(caret), caret);
+    }
+
+    /**
+     * @param caret
+     * @return index before first char in current word 
+     */
+    private int getInitialCaretPosition(int caret) {
         int pos = regexLastIndexOf(getText().substring(0, caret), WORD_BOUNDARY_REGEX);
         if (pos == -1) {
             pos = 0;
         }
-        return getText().substring(pos > 0 ? pos + 1 : pos, caret);
+        return pos > 0 ? pos + 1 : pos;
     }
 
     /**
@@ -213,17 +204,6 @@ public class FilterTextField extends TextField {
         }
     }
 
-    /**
-     * Returns the character following the caret as a string. The string returned
-     * is guaranteed to be of length 1, unless the caret is at the end of the field,
-     * in which case it is empty.
-     */
-    private String getCharAfterCaret() {
-        if (getCaretPosition() < getText().length()) {
-            return getText().substring(getCaretPosition(), getCaretPosition() + 1);
-        }
-        return "";
-    }
 
     /**
      * Reverts the contents of the field to its last confirmed value.
@@ -243,6 +223,30 @@ public class FilterTextField extends TextField {
         int caretPosition = getCaretPosition();
         setText(newText);
         positionCaret(caretPosition);
+    }
+
+    // SuggestionMenu 
+    
+    private SuggestionsMenu setupSuggestion() {
+        SuggestionsMenu suggestion = new SuggestionsMenu(MAX_SUGGESTIONS).setActionHandler(this::menuItemHandler);
+        suggestion.loadSuggestions(keywords);
+        return suggestion;
+    }
+
+    /**
+     * Replaces current word with suggested word
+     * @param suggestedWord
+     */
+    private void completeWord(String suggestedWord) {
+        int caret = getCaretPosition();
+        selectRange(getInitialCaretPosition(caret), caret);
+        replaceSelection(suggestedWord);
+    }
+
+
+    private void menuItemHandler(ActionEvent event) {
+        SuggestionsMenu.getTextOnAction(event).ifPresent(this::completeWord);
+        suggestions.hide();
     }
 
     /**

@@ -6,11 +6,9 @@ import static ui.components.KeyboardShortcuts.MAXIMIZE_WINDOW;
 import static ui.components.KeyboardShortcuts.MINIMIZE_WINDOW;
 import static ui.components.KeyboardShortcuts.SWITCH_BOARD;
 
-import filter.expression.QualifierType;
 import javafx.application.Platform;
 import ui.*;
 import ui.components.PanelMenuBar;
-import backend.resource.TurboUser;
 import filter.FilterException;
 import filter.Parser;
 import filter.expression.FilterExpression;
@@ -28,8 +26,7 @@ import util.events.*;
 import util.events.testevents.UIComponentFocusEvent;
 import prefs.PanelInfo;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
 
 /**
  * A FilterPanel is an AbstractPanel meant for containing issues and an accompanying filter text field,
@@ -107,20 +104,6 @@ public abstract class FilterPanel extends AbstractPanel {
         ui.registerEvent((FilterWarningEventHandler) this::handleFilterWarning);
     }
 
-    private final ModelUpdatedEventHandler onModelUpdate = e -> {
-
-        // Update keywords
-        List<String> all = new ArrayList<>(QualifierType.getCompletionKeywords());
-        all.addAll(e.users.stream()
-                .map(TurboUser::getLoginName)
-                .collect(Collectors.toList()));
-
-        // Ensure that completions appear in lexicographical order
-        Collections.sort(all);
-
-        filterTextField.setCompletionKeywords(all);
-    };
-
     private Node createFilterBox() {
         filterTextField = new FilterTextField(Parser::check)
                 .setOnCancel(this::requestFocus)
@@ -133,8 +116,6 @@ public abstract class FilterPanel extends AbstractPanel {
         filterTextField.setId(IdGenerator.getPanelFilterTextFieldId(panelIndex));
         filterTextField.setMinWidth(388);
         filterTextField.setMaxWidth(388);
-
-        ui.registerEvent(onModelUpdate);
 
         filterTextField.setOnMouseClicked(e -> ui.triggerEvent(new PanelClickedEvent(panelIndex)));
 
@@ -298,10 +279,5 @@ public abstract class FilterPanel extends AbstractPanel {
     public void updatePanel(List<GuiElement> filteredAndSortedElements) {
         setElementsList(filteredAndSortedElements);
         refreshItems();
-    }
-
-    @Override
-    public void close() {
-        ui.unregisterEvent(onModelUpdate);
     }
 }

@@ -71,7 +71,6 @@ allprojects {
         compile "org.ocpsoft.prettytime:prettytime:$prettytimeVersion"
         compile "org.seleniumhq.selenium:selenium-java:$seleniumJavaVersion"
         compile "org.seleniumhq.selenium:selenium-server:$seleniumServerVersion"
-
         testCompile "junit:junit:$junitVersion"
         testCompile "org.loadui:testFx:$testFxVersion"
         testCompile "org.mockito:mockito-core:$mockitoVersion"
