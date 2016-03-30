@@ -18,9 +18,11 @@ import org.loadui.testfx.utils.FXTestUtils;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 import prefs.Preferences;
+import ui.IdGenerator;
 import ui.TestController;
 import ui.UI;
 import ui.components.pickers.PickerRepository;
+import ui.listpanel.ListPanel;
 import util.PlatformEx;
 import util.events.testevents.PrimaryRepoChangedEventHandler;
 
@@ -68,6 +70,7 @@ public class RepositoryPickerTest extends UITest {
             fail();
         }
 
+        ListPanel listPanel;
         VBox suggestedRepositoryList;
         TextField userInputField;
 
@@ -81,14 +84,13 @@ public class RepositoryPickerTest extends UITest {
         assertEquals(1, suggestedRepositoryList.getChildren().size());
         assertEquals("dummy/dummy", primaryRepo);
         push(KeyCode.ESCAPE);
+        PlatformEx.waitOnFxThread();
 
         // we check if the "dummy2/dummy2" is added to the repository picker
         // but the primary repo isn't changed
-        Platform.runLater(getFilterTextFieldAtPanel(0)::requestFocus);
-        PlatformEx.waitOnFxThread();
-        type("repo:dummy2/dummy2");
-        push(KeyCode.ENTER);
-        PlatformEx.waitOnFxThread();
+        listPanel = getPanel(0);
+        listPanel.setFilterByString("repo:dummy2/dummy2");
+        waitUntilNodeAppears(IdGenerator.getPanelCellIdReference(0, 11));
         traverseMenu("Repos", "Show Repository Picker");
         PlatformEx.waitOnFxThread();
         suggestedRepositoryList = findOrWaitFor("#suggestedRepositoryList");
