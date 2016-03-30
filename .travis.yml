@@ -15,7 +15,7 @@ cache:
     - $HOME/.gradle/wrapper/
 
 script:
-    - "./gradlew clean -Dtest.single=UIEventTest check -i"
+    - "./gradlew clean check -i"
 
 after_success:
     - "./gradlew jacocoRootReport coveralls"

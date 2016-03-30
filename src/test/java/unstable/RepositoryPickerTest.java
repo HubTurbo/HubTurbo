@@ -75,7 +75,8 @@ public class RepositoryPickerTest extends UITest {
         // doesn't exist and there are no other valid repo json files
         type("dummy").push(KeyCode.TAB);
         type("dummy").push(KeyCode.ENTER);
-        push(KeyCode.CONTROL, KeyCode.R);
+        traverseMenu("Repos", "Show Repository Picker");
+        PlatformEx.waitOnFxThread();
         suggestedRepositoryList = findOrWaitFor("#suggestedRepositoryList");
         assertEquals(1, suggestedRepositoryList.getChildren().size());
         assertEquals("dummy/dummy", primaryRepo);
@@ -88,7 +89,8 @@ public class RepositoryPickerTest extends UITest {
         type("repo:dummy2/dummy2");
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
-        push(KeyCode.CONTROL, KeyCode.R);
+        traverseMenu("Repos", "Show Repository Picker");
+        PlatformEx.waitOnFxThread();
         suggestedRepositoryList = findOrWaitFor("#suggestedRepositoryList");
         assertEquals(2, suggestedRepositoryList.getChildren().size());
         assertEquals("dummy/dummy", primaryRepo);
@@ -96,21 +98,24 @@ public class RepositoryPickerTest extends UITest {
 
         // we check if "dummy3/dummy3" is added to the repository picker
         // and that the primary repo is also changed
-        push(KeyCode.CONTROL, KeyCode.R);
+        traverseMenu("Repos", "Show Repository Picker");
+        PlatformEx.waitOnFxThread();
         userInputField = findOrWaitFor("#repositoryPickerUserInputField");
         doubleClick(userInputField);
         doubleClick();
         type("dummy3/dummy3");
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
-        push(KeyCode.CONTROL, KeyCode.R);
+        traverseMenu("Repos", "Show Repository Picker");
+        PlatformEx.waitOnFxThread();
         suggestedRepositoryList = findOrWaitFor("#suggestedRepositoryList");
         assertEquals(3, suggestedRepositoryList.getChildren().size());
         assertEquals("dummy3/dummy3", primaryRepo);
         push(KeyCode.ESCAPE);
 
         // we check whether the UI is updated under various scenarios
-        push(KeyCode.CONTROL, KeyCode.R);
+        traverseMenu("Repos", "Show Repository Picker");
+        PlatformEx.waitOnFxThread();
         suggestedRepositoryList = findOrWaitFor("#suggestedRepositoryList");
         userInputField = findOrWaitFor("#repositoryPickerUserInputField");
         click(userInputField);
@@ -134,13 +139,15 @@ public class RepositoryPickerTest extends UITest {
         push(KeyCode.ESCAPE);
 
         // we check if repo's id with white spaces are handled correctly
-        push(KeyCode.CONTROL, KeyCode.R);
+        traverseMenu("Repos", "Show Repository Picker");
+        PlatformEx.waitOnFxThread();
         userInputField = findOrWaitFor("#repositoryPickerUserInputField");
         doubleClick(userInputField);
         doubleClick();
         type(" dummy4 / dummy4 ");
         push(KeyCode.ENTER);
-        push(KeyCode.CONTROL, KeyCode.R);
+        traverseMenu("Repos", "Show Repository Picker");
+        PlatformEx.waitOnFxThread();
         suggestedRepositoryList = findOrWaitFor("#suggestedRepositoryList");
         assertEquals(4, suggestedRepositoryList.getChildren().size());
         assertEquals("dummy4/dummy4", primaryRepo);
@@ -150,7 +157,8 @@ public class RepositoryPickerTest extends UITest {
         traverseMenu("Repos", "Remove", "dummy4/dummy4 [in use, not removable]"); // first used repo
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
-        push(KeyCode.CONTROL, KeyCode.R);
+        traverseMenu("Repos", "Show Repository Picker");
+        PlatformEx.waitOnFxThread();
         suggestedRepositoryList = findOrWaitFor("#suggestedRepositoryList");
         assertEquals(4, suggestedRepositoryList.getChildren().size());
         push(KeyCode.ESCAPE);
@@ -159,7 +167,8 @@ public class RepositoryPickerTest extends UITest {
         traverseMenu("Repos", "Remove", "dummy/dummy");
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
-        push(KeyCode.CONTROL, KeyCode.R);
+        traverseMenu("Repos", "Show Repository Picker");
+        PlatformEx.waitOnFxThread();
         suggestedRepositoryList = findOrWaitFor("#suggestedRepositoryList");
         assertEquals(3, suggestedRepositoryList.getChildren().size());
         push(KeyCode.ESCAPE);
@@ -168,7 +177,8 @@ public class RepositoryPickerTest extends UITest {
         traverseMenu("Repos", "Remove", "dummy2/dummy2 [in use, not removable]"); // second used repo
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
-        push(KeyCode.CONTROL, KeyCode.R);
+        traverseMenu("Repos", "Show Repository Picker");
+        PlatformEx.waitOnFxThread();
         suggestedRepositoryList = findOrWaitFor("#suggestedRepositoryList");
         assertEquals(3, suggestedRepositoryList.getChildren().size());
         push(KeyCode.ESCAPE);
