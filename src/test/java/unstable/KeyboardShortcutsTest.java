@@ -135,7 +135,7 @@ public class KeyboardShortcutsTest extends UITest {
         assertEquals("dummy1/dummy1", repoSelectorComboBox.getValue());
         // test shortcut on repo dropdown
         doubleClick(repoSelectorComboBox);
-        pushKeys(SWITCH_DEFAULT_REPO);
+        press(SWITCH_DEFAULT_REPO);
         // wait for issue 11 to appear then click on it
         // issue 11 is chosen instead of issue 12
         // as there is a problem with finding issue 12's node due to it being the first card in the panel
