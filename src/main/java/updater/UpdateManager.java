@@ -39,6 +39,8 @@ public class UpdateManager {
     private static final String ERROR_DOWNLOAD_UPDATE_APP = "Failed to download updated application";
 
     // Directories and file names
+    public static final String OLD_VERSION_PREFERENCES_DIRECTORY = Preferences.DIRECTORY + "_old";
+
     private static final String UPDATE_DIRECTORY = "updates";
     private static final String UPDATE_DATA_SERVER_LINK =
             "https://raw.githubusercontent.com/HubTurbo/HubTurbo/master/HubTurboUpdate.json";
@@ -82,6 +84,8 @@ public class UpdateManager {
         }
 
         // TODO Here run preference migration
+
+        // if major version difference is more than 1, alert user that data cannot be migrated - quit option
 
         updateConfig.setLastUsedHtVersion(currentVersion);
     }
