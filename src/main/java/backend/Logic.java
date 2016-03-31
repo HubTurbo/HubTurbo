@@ -551,6 +551,7 @@ public class Logic {
      * @return True for success, false otherwise
      */
     public CompletableFuture<Boolean> editIssueState(TurboIssue issue, boolean isOpen) {
+        CompletableFuture<Boolean> result = new CompletableFuture<>();
         boolean isOpenOriginally = issue.isOpen();
 
         String action = isOpen ? "Reopening" : "Closing";
@@ -560,11 +561,20 @@ public class Logic {
                 repoOpControl.editIssueStateLocally(issue, isOpen);
         localStateEditFuture.thenRun(this::refreshUI);
 
-        return repoOpControl.editIssueStateOnServer(issue, isOpen)
-                .thenCombine(localStateEditFuture, (isUpdateSuccessful, locallyModifiedIssue) -> {
-                    return handleIssueStateUpdateResult(
-                            isUpdateSuccessful, locallyModifiedIssue, isOpenOriginally);
+        repoOpControl.editIssueStateOnServer(issue, isOpen)
+                .exceptionally((e) -> {
+                    result.completeExceptionally(e);
+                    return false;
+                })
+                .thenCombine(localStateEditFuture, (isUpdateSuccessful, locallyModifiedIssue) ->
+                    handleIssueStateUpdateResult(isUpdateSuccessful, locallyModifiedIssue, isOpenOriginally))
+                .thenAccept((isReplacementSuccessful) -> {
+                    if (!result.isCompletedExceptionally()) {
+                        result.complete(isReplacementSuccessful);
+                    }
                 });
+
+        return result;
     }
 
     /**

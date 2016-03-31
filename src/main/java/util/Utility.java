@@ -308,6 +308,19 @@ public final class Utility {
         return Optional.empty();
     }
 
+    /**
+     * Removes the first word from a string. Useful for removing the java exception name from the
+     * full exception message.
+     * @param s
+     */
+    public static String removeFirstWord(String s) {
+        String[] words = s.split(" ", 2);
+        if (words.length <= 1) {
+            return "";
+        }
+        return words[1];
+    }
+
     private Utility() {}
 
 }
