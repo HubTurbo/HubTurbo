@@ -19,6 +19,7 @@ import prefs.Preferences;
 import ui.BoardAutoCreator;
 import ui.TestController;
 import ui.UI;
+import ui.components.KeyboardShortcuts;
 import ui.issuepanel.PanelControl;
 import util.PlatformEx;
 
@@ -46,9 +47,9 @@ public class BoardAutoCreatorTest extends UITest {
         assertEquals(0, panelControl.getNumberOfSavedBoards());
 
         // create 3 new panels
-        pushKeys(new KeyCodeCombination(KeyCode.P, KeyCombination.SHORTCUT_DOWN));
-        pushKeys(new KeyCodeCombination(KeyCode.P, KeyCombination.SHORTCUT_DOWN));
-        pushKeys(new KeyCodeCombination(KeyCode.P, KeyCombination.SHORTCUT_DOWN));
+        pushKeys(KeyboardShortcuts.CREATE_RIGHT_PANEL);
+        pushKeys(KeyboardShortcuts.CREATE_RIGHT_PANEL);
+        pushKeys(KeyboardShortcuts.CREATE_RIGHT_PANEL);
         assertEquals(panelCount + 3, panelControl.getPanelCount());
 
         // create milestones board
