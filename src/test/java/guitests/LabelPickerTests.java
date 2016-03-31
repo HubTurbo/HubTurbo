@@ -1,8 +1,6 @@
-package unstable;
+package guitests;
 
-import guitests.UITest;
 import javafx.application.Platform;
-import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.FlowPane;
 
@@ -15,6 +13,7 @@ import ui.UI;
 import util.events.ShowLabelPickerEvent;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class LabelPickerTests extends UITest {
 
@@ -34,8 +33,7 @@ public class LabelPickerTests extends UITest {
         triggerLabelPicker(new TurboIssue("dummy/dummy", 1, ""));
         waitUntilNodeAppears(ASSIGNED_LABELS_PANE_ID);
         FlowPane assignedLabels = GuiTest.find(ASSIGNED_LABELS_PANE_ID);
-        Label label = (Label) assignedLabels.getChildren().get(0);
-        assertEquals("No currently selected labels. ", label.getText());
+        assertTrue(assignedLabels.getChildren().isEmpty());
         exitCleanly();
     }
 

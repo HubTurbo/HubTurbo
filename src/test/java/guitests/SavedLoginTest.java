@@ -3,7 +3,6 @@ package guitests;
 import backend.RepoIO;
 import javafx.scene.control.ComboBox;
 import org.junit.Test;
-import org.loadui.testfx.GuiTest;
 import org.testfx.api.FxToolkit;
 
 import prefs.Preferences;

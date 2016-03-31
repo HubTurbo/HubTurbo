@@ -324,6 +324,7 @@ public class UITest extends FxRobot {
      * Clicks the repository selector's ComboBox
      */
     public void clickRepositorySelector() {
+        waitUntilNodeAppears(IdGenerator.getRepositorySelectorIdReference());
         clickOn(IdGenerator.getRepositorySelectorIdReference());
     }
 
@@ -338,7 +339,16 @@ public class UITest extends FxRobot {
      * Clicks the label picker's TextField
      */
     public void clickLabelPickerTextField() {
+        waitUntilNodeAppears(IdGenerator.getLabelPickerTextFieldIdReference());
         clickOn(IdGenerator.getLabelPickerTextFieldIdReference());
+    }
+
+    /**
+     * Clicks the milestone picker's TextField
+     */
+    public void clickMilestonePickerTextField() {
+        waitUntilNodeAppears(IdGenerator.getMilestonePickerTextFieldIdReference());
+        clickOn(IdGenerator.getMilestonePickerTextFieldIdReference());
     }
 
     /**
@@ -346,6 +356,13 @@ public class UITest extends FxRobot {
      */
     public TextField getLabelPickerTextField() {
         return GuiTest.find(IdGenerator.getLabelPickerTextFieldIdReference());
+    }
+
+    /**
+     * Gets the label picker's TextField
+     */
+    public TextField getMilestonePickerTextField() {
+        return GuiTest.find(IdGenerator.getMilestonePickerTextFieldIdReference());
     }
 
     /**
@@ -415,6 +432,7 @@ public class UITest extends FxRobot {
      * @param issueId
      */
     public ListPanelCell getIssueCell(int panelIndex, int issueId) {
+        waitUntilNodeAppears(IdGenerator.getPanelCellIdReference(panelIndex, issueId));
         return GuiTest.find(IdGenerator.getPanelCellIdReference(panelIndex, issueId));
     }
 

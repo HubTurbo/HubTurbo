@@ -1,7 +1,7 @@
-package unstable;
+package guitests;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertFalse;
 import static ui.components.KeyboardShortcuts.JUMP_TO_FIRST_ISSUE;
 
 import github.IssueEventType;
@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import guitests.UITest;
 import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
@@ -25,7 +24,6 @@ import org.eclipse.egit.github.core.User;
 import org.junit.Test;
 
 import org.loadui.testfx.GuiTest;
-import org.loadui.testfx.exceptions.NoNodesFoundException;
 import tests.TurboIssueEventTests;
 import ui.GuiElement;
 import ui.UI;
@@ -73,11 +71,9 @@ public class IssuePanelTests extends UITest {
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
         // Issue #8 was assigned label 11, but it was removed
-        try {
-            GuiTest.exists("Label 11");
-            fail();
-        } catch (NoNodesFoundException e) { /* Successful, we should not be able to see label 11 */ }
 
+
+        assertFalse(existsQuiet("Label 11"));
         type(" updated:5");
         push(KeyCode.ENTER);
         // After we load the metadata, label 11 should appear.
@@ -190,10 +186,7 @@ public class IssuePanelTests extends UITest {
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
         // author should not show since it is an issue
-        try {
-            GuiTest.exists("User 12");
-            fail();
-        } catch (NoNodesFoundException e) { /* Successful since it should not show */ }
+        assertFalse(existsQuiet("User 12"));
         // assignee should still show
         assertEquals(true, GuiTest.exists("User 2"));
     }
