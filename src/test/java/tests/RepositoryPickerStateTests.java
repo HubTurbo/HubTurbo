@@ -29,6 +29,16 @@ public class RepositoryPickerStateTests {
     }
 
     @Test
+    public void processUserQuery_queryMatchesExistingRepo_queryNotAddedToSuggestedRepos() {
+        Set<String> existingRepositories = new HashSet<>(Arrays.asList("A/A", "B/B", "C/d"));
+        RepositoryPickerState state = new RepositoryPickerState(existingRepositories);
+        state.processUserQuery("A/A");
+        PickerRepository repoA = new PickerRepository("A/A");
+        List<PickerRepository> expected = Arrays.asList(repoA);
+        assertEquals(expected, state.getSuggestedRepositories());
+    }
+
+    @Test
     public void processUserQuery_queryIsNotEmpty_queryAddedToSuggestedRepos() {
         Set<String> existingRepositories = new HashSet<>(Arrays.asList("A/AB", "B/B", "C/d"));
         RepositoryPickerState state = new RepositoryPickerState(existingRepositories);
