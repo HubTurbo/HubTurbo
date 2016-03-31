@@ -20,6 +20,7 @@ import ui.GUIController;
 import ui.IdGenerator;
 import ui.UI;
 import ui.issuepanel.FilterPanel;
+import util.events.PanelClickedEvent;
 import util.events.ShowRenamePanelEvent;
 
 /**
@@ -101,6 +102,7 @@ public class PanelMenuBar extends HBox {
 
     private void activateInplaceRename() {
         ui.triggerEvent(new ShowRenamePanelEvent(panel.panelIndex));
+        clickThisPanel();
     }
 
     private HBox createRenameButton() {
@@ -192,6 +194,14 @@ public class PanelMenuBar extends HBox {
     }
 
     /**
+     * Clears selection on the rest of the panels to avoid multiple
+     * panels being selected at the same time.
+     */
+    private void clickThisPanel() {
+        ui.triggerEvent(new PanelClickedEvent(panel.panelIndex));
+    }
+
+    /**
      * Augments components of PanelMenuBar when the renaming of the panel happens.
      * The confirm button and the undo button are added to the panel.
      */
@@ -216,6 +226,7 @@ public class PanelMenuBar extends HBox {
         menuBarNameArea.getChildren().add(nameBox);
         this.getChildren().addAll(menuBarRenameButton, menuBarCloseButton);
         panel.requestFocus();
+        clickThisPanel();
     }
 
     private void panelNameValidator() {

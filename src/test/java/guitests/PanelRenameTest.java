@@ -4,6 +4,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.text.Text;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.loadui.testfx.exceptions.NoNodesFoundException;
 import org.loadui.testfx.utils.FXTestUtils;
@@ -17,7 +18,10 @@ import ui.issuepanel.PanelControl;
 import util.PlatformEx;
 import util.events.ShowRenamePanelEvent;
 
+import java.util.Optional;
+
 import static org.junit.Assert.assertEquals;
+import static ui.components.KeyboardShortcuts.CLOSE_PANEL;
 import static ui.components.KeyboardShortcuts.CREATE_RIGHT_PANEL;
 import static ui.components.KeyboardShortcuts.MAXIMIZE_WINDOW;
 
@@ -25,22 +29,28 @@ public class PanelRenameTest extends UITest {
 
     public static final int EVENT_DELAY = 1000;
     public static final int PANEL_MAX_NAME_LENGTH = 36;
+    private PanelControl panels;
 
     @Override
     public void launchApp() {
         FXTestUtils.launchApp(TestUI.class, "--bypasslogin=true");
     }
 
+    @Before
+    public void before() {
+        panels = TestController.getUI().getPanelControl();
+        int panelCount = panels.getPanelCount();
+        while (panelCount-- > 1) {
+            pushKeys(CLOSE_PANEL);
+        }
+        pushKeys(MAXIMIZE_WINDOW);
+        sleep(EVENT_DELAY);
+    }
+
     @Test
     public void panelRenameTest() {
 
-        UI ui = TestController.getUI();
-        PanelControl panels = ui.getPanelControl();
-
         // Test for saving panel name
-
-        pushKeys(MAXIMIZE_WINDOW);
-        sleep(EVENT_DELAY);
 
         // Testing case where rename is canceled with ESC
         // Expected: change not reflected
@@ -132,6 +142,20 @@ public class PanelRenameTest extends UITest {
         // Quitting to update json
         traverseMenu("File", "Quit");
         push(KeyCode.ENTER);
+        sleep(EVENT_DELAY);
+    }
+
+    @Test
+    public void panelRenameButton_onClick_panelGetsSelected() {
+        // Test for the currently selected panel when trying to rename
+
+        click(IdGenerator.getOcticonButtonIdReference(0, "renameButton"));
+        assertEquals(Optional.of(0), panels.getCurrentlySelectedPanel());
+        pushKeys(CREATE_RIGHT_PANEL);
+        click(IdGenerator.getOcticonButtonIdReference(1, "renameButton"));
+        assertEquals(Optional.of(1), panels.getCurrentlySelectedPanel());
+        pushKeys(CLOSE_PANEL);
+        pushKeys(KeyCode.ESCAPE);
         sleep(EVENT_DELAY);
     }
 }
