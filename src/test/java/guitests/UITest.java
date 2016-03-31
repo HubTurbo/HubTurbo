@@ -24,7 +24,6 @@ import javafx.scene.control.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hamcrest.Matcher;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.loadui.testfx.GuiTest;
@@ -63,6 +62,7 @@ public class UITest extends FxRobot {
     
     // Sets properties to run tests headless
     static {
+        System.setProperty("headless", "true");
         if (Boolean.getBoolean("headless")) {
             System.setProperty("java.awt.robot", "true");
             System.setProperty("testfx.robot", "glass");
@@ -105,11 +105,6 @@ public class UITest extends FxRobot {
         FxToolkit.setupApplication(TestUI.class, "--test=true", "--bypasslogin=true");
     }
     
-    @After
-    public void teardown() throws TimeoutException {
-        FxToolkit.hideStage();
-    }
-
     public Stage getStage() {
         return FxToolkit.toolkitContext().getRegisteredStage();
     }
@@ -169,8 +164,8 @@ public class UITest extends FxRobot {
         specialChars.put(')', KeyCode.DIGIT0);
         specialChars.put('_', KeyCode.MINUS);
         specialChars.put('+', KeyCode.EQUALS);
-        specialChars.put('{', KeyCode.OPEN_BRACKET);
-        specialChars.put('}', KeyCode.CLOSE_BRACKET);
+        specialChars.put('{', KeyCode.BRACELEFT);
+        specialChars.put('}', KeyCode.BRACERIGHT);
         specialChars.put(':', KeyCode.SEMICOLON);
         specialChars.put('"', KeyCode.QUOTE);
         specialChars.put('<', KeyCode.COMMA);
@@ -332,6 +327,7 @@ public class UITest extends FxRobot {
      * Gets the repository selector's ComboBox
      */
     public ComboBox getRepositorySelector() {
+        waitUntilNodeAppears(IdGenerator.getRepositorySelectorIdReference());
         return GuiTest.find(IdGenerator.getRepositorySelectorIdReference());
     }
 
@@ -562,7 +558,6 @@ public class UITest extends FxRobot {
             if (specialCharsMap.containsKey(text.charAt(i))) {
                 press(KeyCode.SHIFT).press(specialCharsMap.get(text.charAt(i)))
                         .release(specialCharsMap.get(text.charAt(i))).release(KeyCode.SHIFT);
-
             } else {
                 char typed = text.charAt(i);
                 KeyCode identified = KeyCodeUtils.findKeyCode(typed);

@@ -1,9 +1,8 @@
-package unstable;
+package guitests;
 
 import javafx.scene.input.KeyCode;
 import org.junit.Test;
 
-import guitests.UITest;
 import ui.UI;
 import ui.components.FilterTextField;
 import util.events.UpdateProgressEvent;

@@ -1,4 +1,4 @@
-package unstable;
+package guitests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -13,7 +13,6 @@ import org.junit.Test;
 import org.loadui.testfx.GuiTest;
 import org.testfx.api.FxToolkit;
 
-import guitests.UITest;
 import javafx.scene.control.ComboBox;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
@@ -28,26 +27,10 @@ public class RepositorySelectorTest extends UITest {
 
     private static String primaryRepo;
 
-    protected static class RepositorySelectorTestUI extends UI {
-        public RepositorySelectorTestUI() {
-            super();
-        }
-
-        @Override
-        public void start(Stage primaryStage) {
-            super.start(primaryStage);
-            STAGE_FUTURE.set(primaryStage);
-        }
-
-        @Override
-        protected void registerTestEvents() {
-            UI.events.registerEvent((PrimaryRepoChangedEventHandler) e -> primaryRepo = e.repoId);
-        }
-    }
-
     @Override
     public void setup() throws TimeoutException {
-        FxToolkit.setupApplication(RepositorySelectorTestUI.class, "--testconfig=true");
+        FxToolkit.setupApplication(TestUI.class, "--testconfig=true");
+        UI.events.registerEvent((PrimaryRepoChangedEventHandler) e -> primaryRepo = e.repoId);
     }
 
     @Override

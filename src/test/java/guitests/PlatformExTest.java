@@ -1,23 +1,15 @@
-package unstable;
+package guitests;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
-import org.testfx.api.FxToolkit;
 
-import guitests.UITest;
 import javafx.application.Platform;
 import util.PlatformEx;
 
 public class PlatformExTest extends UITest {
-
-    @Override
-    public void setup() throws TimeoutException {
-        FxToolkit.setupApplication(TestUI.class);
-    }
 
     /**
      * This method is needed to sequence concurrent tests. Order matters for these

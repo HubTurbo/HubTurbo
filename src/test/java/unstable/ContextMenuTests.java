@@ -11,6 +11,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCode;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.loadui.testfx.GuiTest;
 
@@ -101,13 +102,12 @@ public class ContextMenuTests extends UITest {
      */
     @Test
     public void contextMenu_selectChangeMilestoneMenu_successful() {
-        clickOn("#dummy/dummy_col0_9");
-        rightClickOn("#dummy/dummy_col0_9");
+        rightClickIssue(0, 9);
         sleep(EVENT_DELAY);
         clickOn("Change milestone (M)");
         sleep(DIALOG_DELAY);
 
-        assertNotNull(GuiTest.find("#milestonePickerTextField"));
+        assertNotNull(getMilestonePickerTextField());
 
         push(KeyCode.ESCAPE);
         sleep(EVENT_DELAY);
@@ -118,8 +118,7 @@ public class ContextMenuTests extends UITest {
      */
     @Test
     public void testCloseReopenIssue() {
-        clickOn("#dummy/dummy_col0_9");
-        rightClickOn("#dummy/dummy_col0_9");
+        rightClickIssue(0, 9);
         sleep(EVENT_DELAY);
         clickOn("Close issue (C)");
         sleep(EVENT_DELAY);
@@ -130,8 +129,7 @@ public class ContextMenuTests extends UITest {
         clickOn("Undo");
         sleep(EVENT_DELAY);
 
-        clickOn("#dummy/dummy_col0_6");
-        rightClickOn("#dummy/dummy_col0_6");
+        rightClickIssue(0, 6);
         sleep(EVENT_DELAY);
         clickOn("Reopen issue (O)");
         sleep(EVENT_DELAY);

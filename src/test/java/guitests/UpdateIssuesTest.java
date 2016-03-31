@@ -1,8 +1,8 @@
-package unstable;
+package guitests;
 
-import guitests.UITest;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
+import mx4j.tools.adaptor.http.GetAttributeCommandProcessor;
 
 import org.junit.Test;
 import org.loadui.testfx.GuiTest;
@@ -32,8 +32,8 @@ public class UpdateIssuesTest extends UITest {
         push(KeyCode.ENTER);
 
         // Updated view should contain Issue 9 and 10, which was commented on recently (as part of default test dataset)
-        awaitCondition(() -> 3496 == getApiCount(apiBox.getText())); // 4 calls for issues 9 and 10.
-        assertEquals(2, countIssuesShown());
+        awaitCondition(() -> 3494 == getApiCount(apiBox.getText())); // 4 calls for issues 9 and 10.
+        assertEquals(3, countIssuesShown());
 
         // After updating, issue with ID 5 should have title Issue 5.1
         updateIssue(5, "Issue 5.1"); // 2 calls for issue 5, 1 for issue 9, 1 for issue 10 when refreshing UI.
@@ -42,19 +42,20 @@ public class UpdateIssuesTest extends UITest {
 
         // Updated view should now contain Issue 5.1, Issue 9 and Issue 10.
         awaitCondition(() -> 3489 == getApiCount(apiBox.getText()));
-        assertEquals(3, countIssuesShown());
+        assertEquals(4, countIssuesShown());
+        
 
         // Then have a non-self comment for Issue 9.
         UI.events.triggerEvent(UpdateDummyRepoEvent.addComment("dummy/dummy", 9, "Test comment", "test-nonself"));
         UI.events.triggerEvent(new UILogicRefreshEvent()); // 1 call for issues 5, 9, 10.
         clickFilterTextFieldAtPanel(0);
         push(KeyCode.ENTER); // 1 call for issues 5, 9, 10.
-        awaitCondition(() -> 3483 == getApiCount(apiBox.getText()));
-        assertEquals(3, countIssuesShown());
+        awaitCondition(() -> 3481 == getApiCount(apiBox.getText()));
+        assertEquals(4, countIssuesShown());
 
         clickFilterTextFieldAtPanel(0);
         push(KeyCode.ENTER); // 1 call for issues 5, 9, 10.
-        awaitCondition(() -> 3480 == getApiCount(apiBox.getText()));
+        awaitCondition(() -> 3477 == getApiCount(apiBox.getText()));
     }
 
     public void resetRepo() {
