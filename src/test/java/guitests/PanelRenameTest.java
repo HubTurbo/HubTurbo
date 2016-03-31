@@ -1,4 +1,4 @@
-package unstable;
+package guitests;
 
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -7,11 +7,7 @@ import javafx.scene.text.Text;
 import org.junit.Before;
 import org.junit.Test;
 import org.loadui.testfx.GuiTest;
-import org.loadui.testfx.exceptions.NoNodesFoundException;
 import org.testfx.api.FxToolkit;
-
-import guitests.UITest;
-
 import org.apache.commons.lang3.RandomStringUtils;
 
 import ui.IdGenerator;
@@ -25,6 +21,7 @@ import util.events.ShowRenamePanelEvent;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static ui.components.KeyboardShortcuts.CLOSE_PANEL;
 import static ui.components.KeyboardShortcuts.CREATE_RIGHT_PANEL;
 import static ui.components.KeyboardShortcuts.MAXIMIZE_WINDOW;
@@ -106,12 +103,7 @@ public class PanelRenameTest extends UITest {
         boolean isPresentBeforeEdit = GuiTest.exists(panelCloseButtonId);
         PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(3)));
         PlatformEx.waitOnFxThread();
-        boolean isPresentDuringEdit = true; //stub value, this should change to false.
-        try {
-            GuiTest.exists(panelCloseButtonId);
-        } catch (NoNodesFoundException e) {
-            isPresentDuringEdit = false;
-        }
+        assertFalse(existsQuiet(panelCloseButtonId));
 
         String randomName3 = RandomStringUtils.randomAlphanumeric(PANEL_MAX_NAME_LENGTH - 1);
         TextField renameTextField3 = GuiTest.find(panelRenameTextFieldId);
@@ -120,7 +112,6 @@ public class PanelRenameTest extends UITest {
         boolean isPresentAfterEdit = GuiTest.exists(panelCloseButtonId);
         Text panelNameText3 = GuiTest.find(panelNameAreaId);
         assertEquals(true, isPresentBeforeEdit);
-        assertEquals(false, isPresentDuringEdit);
         assertEquals(true, isPresentAfterEdit);
         assertEquals(randomName3, panelNameText3.getText());
         PlatformEx.waitOnFxThread();
