@@ -85,10 +85,10 @@ public class BoardAutoCreator {
     }
 
     private void saveBoardAfterUserConfirmation(String boardName) {
-        if (promptUserIfShouldSave(boardName)) ui.getMenuControl().saveBoardAs();
+        if (isSaveBoardDialogResponsePositive(boardName)) ui.getMenuControl().saveBoardAs();
     }
 
-    private boolean promptUserIfShouldSave(String boardName) {
+    private boolean isSaveBoardDialogResponsePositive(String boardName) {
         return DialogMessage.showYesNoWarningDialog("Confirmation", "Save current board?",
                  String.format(SAVE_MESSAGE, boardName), "Yes", "No");
     }
