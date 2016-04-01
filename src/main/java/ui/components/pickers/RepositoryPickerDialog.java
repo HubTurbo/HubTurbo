@@ -8,6 +8,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import ui.IdGenerator;
 import util.Utility;
 
 import java.util.*;
@@ -99,7 +100,7 @@ public class RepositoryPickerDialog extends Dialog<String> {
     private void createSuggestedRepositoriesList() {
         suggestedRepositoryList = new VBox();
         suggestedRepositoryList.setPadding(DEFAULT_PADDING);
-        suggestedRepositoryList.setId("suggestedRepositoryList");
+        suggestedRepositoryList.setId(IdGenerator.getRepositoryPickerSuggestedRepoListId());
         suggestedRepositoryList.setStyle("-fx-background-color: white; -fx-border-color:black;");
         suggestedRepositoryList.setPrefHeight(DEFAULT_SUGGESTED_REPO_LIST_HEIGHT);
         suggestedRepositoryList.setPrefWidth(DEFAULT_SUGGESTED_REPO_LIST_WIDTH);
@@ -119,7 +120,7 @@ public class RepositoryPickerDialog extends Dialog<String> {
 
     private void createUserInputTextField() {
         userInputTextField = new TextField();
-        userInputTextField.setId("repositoryPickerUserInputField");
+        userInputTextField.setId(IdGenerator.getRepositoryPickerTextFieldId());
         userInputTextField.textProperty().addListener((observable, oldValue, newValue) -> {
             String repositoryId = Utility.removeAllWhitespace(newValue);
             if (!repositoryId.equals(newValue)) {

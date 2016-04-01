@@ -19,6 +19,14 @@ public final class IdGenerator {
         return "repositorySelector";
     }
 
+    public static String getRepositoryPickerTextFieldId() {
+        return "repositoryPickerUserInputField";
+    }
+
+    public static String getRepositoryPickerSuggestedRepoListId() {
+        return "suggestedRepositoryList";
+    }
+
     public static String getPanelNameAreaId(int panelIndex) {
         return "panel" + panelIndex + "_nameText";
     }
@@ -73,6 +81,14 @@ public final class IdGenerator {
 
     public static String getRepositorySelectorIdReference() {
         return "#" + getRepositorySelectorId();
+    }
+
+    public static String getRepositoryPickerTextFieldReference() {
+        return "#" + getRepositoryPickerTextFieldId();
+    }
+
+    public static String getRepositoryPickerSuggestedRepoListReference() {
+        return "#" + getRepositoryPickerSuggestedRepoListId();
     }
 
     public static String getPanelNameAreaIdReference(int panelIndex) {

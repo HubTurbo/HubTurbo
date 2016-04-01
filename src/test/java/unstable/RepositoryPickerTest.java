@@ -81,7 +81,7 @@ public class RepositoryPickerTest extends UITest {
         type("dummy").push(KeyCode.ENTER);
         traverseMenu("Repos", "Show Repository Picker");
         PlatformEx.waitOnFxThread();
-        suggestedRepositoryList = findOrWaitFor("#suggestedRepositoryList");
+        suggestedRepositoryList = findOrWaitFor(IdGenerator.getRepositoryPickerSuggestedRepoListReference());
         assertEquals(1, suggestedRepositoryList.getChildren().size());
         assertEquals("dummy/dummy", primaryRepo);
         push(KeyCode.ESCAPE);
@@ -94,7 +94,7 @@ public class RepositoryPickerTest extends UITest {
         waitUntilNodeAppears(IdGenerator.getPanelCellIdReference(0, 11));
         traverseMenu("Repos", "Show Repository Picker");
         PlatformEx.waitOnFxThread();
-        suggestedRepositoryList = findOrWaitFor("#suggestedRepositoryList");
+        suggestedRepositoryList = findOrWaitFor(IdGenerator.getRepositoryPickerSuggestedRepoListReference());
         assertEquals(2, suggestedRepositoryList.getChildren().size());
         assertEquals("dummy/dummy", primaryRepo);
         push(KeyCode.ESCAPE);
@@ -103,7 +103,7 @@ public class RepositoryPickerTest extends UITest {
         // and that the primary repo is also changed
         traverseMenu("Repos", "Show Repository Picker");
         PlatformEx.waitOnFxThread();
-        userInputField = findOrWaitFor("#repositoryPickerUserInputField");
+        userInputField = findOrWaitFor(IdGenerator.getRepositoryPickerTextFieldReference());
         doubleClick(userInputField);
         doubleClick();
         type("dummy3/dummy3");
@@ -111,7 +111,7 @@ public class RepositoryPickerTest extends UITest {
         PlatformEx.waitOnFxThread();
         traverseMenu("Repos", "Show Repository Picker");
         PlatformEx.waitOnFxThread();
-        suggestedRepositoryList = findOrWaitFor("#suggestedRepositoryList");
+        suggestedRepositoryList = findOrWaitFor(IdGenerator.getRepositoryPickerSuggestedRepoListReference());
         assertEquals(3, suggestedRepositoryList.getChildren().size());
         assertEquals("dummy3/dummy3", primaryRepo);
         push(KeyCode.ESCAPE);
@@ -119,8 +119,8 @@ public class RepositoryPickerTest extends UITest {
         // we check whether the UI is updated under various scenarios
         traverseMenu("Repos", "Show Repository Picker");
         PlatformEx.waitOnFxThread();
-        suggestedRepositoryList = findOrWaitFor("#suggestedRepositoryList");
-        userInputField = findOrWaitFor("#repositoryPickerUserInputField");
+        suggestedRepositoryList = findOrWaitFor(IdGenerator.getRepositoryPickerSuggestedRepoListReference());
+        userInputField = findOrWaitFor(IdGenerator.getRepositoryPickerTextFieldReference());
         click(userInputField);
         type("dummy");
         assertEquals(4, suggestedRepositoryList.getChildren().size());
@@ -144,14 +144,14 @@ public class RepositoryPickerTest extends UITest {
         // we check if repo's id with white spaces are handled correctly
         traverseMenu("Repos", "Show Repository Picker");
         PlatformEx.waitOnFxThread();
-        userInputField = findOrWaitFor("#repositoryPickerUserInputField");
+        userInputField = findOrWaitFor(IdGenerator.getRepositoryPickerTextFieldReference());
         doubleClick(userInputField);
         doubleClick();
         type(" dummy4 / dummy4 ");
         push(KeyCode.ENTER);
         traverseMenu("Repos", "Show Repository Picker");
         PlatformEx.waitOnFxThread();
-        suggestedRepositoryList = findOrWaitFor("#suggestedRepositoryList");
+        suggestedRepositoryList = findOrWaitFor(IdGenerator.getRepositoryPickerSuggestedRepoListReference());
         assertEquals(4, suggestedRepositoryList.getChildren().size());
         assertEquals("dummy4/dummy4", primaryRepo);
         push(KeyCode.ESCAPE);
@@ -162,7 +162,7 @@ public class RepositoryPickerTest extends UITest {
         PlatformEx.waitOnFxThread();
         traverseMenu("Repos", "Show Repository Picker");
         PlatformEx.waitOnFxThread();
-        suggestedRepositoryList = findOrWaitFor("#suggestedRepositoryList");
+        suggestedRepositoryList = findOrWaitFor(IdGenerator.getRepositoryPickerSuggestedRepoListReference());
         assertEquals(4, suggestedRepositoryList.getChildren().size());
         push(KeyCode.ESCAPE);
 
@@ -172,7 +172,7 @@ public class RepositoryPickerTest extends UITest {
         PlatformEx.waitOnFxThread();
         traverseMenu("Repos", "Show Repository Picker");
         PlatformEx.waitOnFxThread();
-        suggestedRepositoryList = findOrWaitFor("#suggestedRepositoryList");
+        suggestedRepositoryList = findOrWaitFor(IdGenerator.getRepositoryPickerSuggestedRepoListReference());
         assertEquals(3, suggestedRepositoryList.getChildren().size());
         push(KeyCode.ESCAPE);
 
@@ -182,7 +182,7 @@ public class RepositoryPickerTest extends UITest {
         PlatformEx.waitOnFxThread();
         traverseMenu("Repos", "Show Repository Picker");
         PlatformEx.waitOnFxThread();
-        suggestedRepositoryList = findOrWaitFor("#suggestedRepositoryList");
+        suggestedRepositoryList = findOrWaitFor(IdGenerator.getRepositoryPickerSuggestedRepoListReference());
         assertEquals(3, suggestedRepositoryList.getChildren().size());
         push(KeyCode.ESCAPE);
 

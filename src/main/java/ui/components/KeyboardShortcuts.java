@@ -67,8 +67,6 @@ public final class KeyboardShortcuts {
             new KeyCodeCombination(KeyCode.M, KeyCombination.SHORTCUT_DOWN);
     public static final KeyCodeCombination DEFAULT_SIZE_WINDOW =
             new KeyCodeCombination(KeyCode.D, KeyCombination.SHORTCUT_DOWN);
-    public static final KeyCodeCombination SWITCH_DEFAULT_REPO =
-            new KeyCodeCombination(KeyCode.R, KeyCombination.SHORTCUT_DOWN);
     public static final KeyCodeCombination SHOW_ISSUES =
             new KeyCodeCombination(KeyCode.I);
     public static final KeyCodeCombination SHOW_ISSUE_PICKER =
@@ -126,7 +124,7 @@ public final class KeyboardShortcuts {
     public static final KeyCodeCombination REMOVE_FOCUS =
             new KeyCodeCombination(KeyCode.ESCAPE);
     public static final KeyCodeCombination SHOW_REPO_PICKER =
-            new KeyCodeCombination(KeyCode.R, KeyCombination.CONTROL_DOWN);
+            new KeyCodeCombination(KeyCode.R, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN);
 
     // ui.MenuControl
     public static final KeyCodeCombination NEW_ISSUE =
