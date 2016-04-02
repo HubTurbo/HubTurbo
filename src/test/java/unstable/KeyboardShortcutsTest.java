@@ -137,7 +137,6 @@ public class KeyboardShortcutsTest extends UITest {
         click(IdGenerator.getPanelCellIdReference(1, 11));
         int issueIdBeforeMark = selectedIssueId;
         int issueIdExpected = issueIdBeforeMark - 1;
-        sleep(2000);
         push(getKeyCode("MARK_AS_READ"));
         PlatformEx.waitOnFxThread();
         assertEquals(issueIdExpected, selectedIssueId);

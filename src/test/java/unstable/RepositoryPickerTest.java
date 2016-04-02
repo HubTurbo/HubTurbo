@@ -192,9 +192,7 @@ public class RepositoryPickerTest extends UITest {
 
         // testing that the correct repo was saved in the json
         // check if the test JSON is still there...
-        if (!(testConfig.exists() && testConfig.isFile())) {
-            fail();
-        }
+        assertTrue(testConfig.exists() && testConfig.isFile());
 
         // ...then check that the JSON file contents are correct.
         Preferences testPref = TestController.loadTestPreferences();

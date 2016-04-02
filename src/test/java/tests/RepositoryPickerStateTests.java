@@ -11,41 +11,42 @@ import static org.junit.Assert.assertEquals;
 public class RepositoryPickerStateTests {
     @Test
     public void constructor_constructRepoPickerState_oneRepoSelected() {
-        Set<String> existingRepositories = new HashSet<>(Arrays.asList("A/A", "B/B"));
+        Set<String> existingRepositories = new HashSet<>(Arrays.asList("atom/atom", "HubTurbo/HubTurbo"));
         RepositoryPickerState state = new RepositoryPickerState(existingRepositories);
-        assertEquals("A/A", state.getSelectedRepositoryId());
+        assertEquals("atom/atom", state.getSelectedRepositoryId());
     }
 
     @Test
     public void processUserQuery_queryIsEmpty_queryNotAddedToSuggestedRepos() {
-        Set<String> existingRepositories = new HashSet<>(Arrays.asList("A/A", "B/B", "C/d"));
+        Set<String> existingRepositories = new HashSet<>(Arrays.asList("atom/atom", "HubTurbo/HubTurbo", "org/repoId"));
         RepositoryPickerState state = new RepositoryPickerState(existingRepositories);
         state.processUserQuery("");
-        PickerRepository repoA = new PickerRepository("A/A");
-        PickerRepository repoB = new PickerRepository("B/B");
-        PickerRepository repoC = new PickerRepository("C/d");
+        PickerRepository repoA = new PickerRepository("atom/atom");
+        PickerRepository repoB = new PickerRepository("HubTurbo/HubTurbo");
+        PickerRepository repoC = new PickerRepository("org/repoId");
         List<PickerRepository> expected = Arrays.asList(repoA, repoB, repoC);
         assertEquals(expected, state.getSuggestedRepositories());
     }
 
     @Test
     public void processUserQuery_queryMatchesExistingRepo_queryNotAddedToSuggestedRepos() {
-        Set<String> existingRepositories = new HashSet<>(Arrays.asList("A/A", "B/B", "C/d"));
+        Set<String> existingRepositories = new HashSet<>(Arrays.asList("atom/atom", "HubTurbo/HubTurbo", "org/repoId"));
         RepositoryPickerState state = new RepositoryPickerState(existingRepositories);
-        state.processUserQuery("A/A");
-        PickerRepository repoA = new PickerRepository("A/A");
+        state.processUserQuery("atom/atom");
+        PickerRepository repoA = new PickerRepository("atom/atom");
         List<PickerRepository> expected = Arrays.asList(repoA);
         assertEquals(expected, state.getSuggestedRepositories());
     }
 
     @Test
     public void processUserQuery_queryIsNotEmpty_queryAddedToSuggestedRepos() {
-        Set<String> existingRepositories = new HashSet<>(Arrays.asList("A/AB", "B/B", "C/d"));
+        Set<String> existingRepositories = new HashSet<>(Arrays.asList("atom/atom", "atom/tree-view", "org/repoId"));
         RepositoryPickerState state = new RepositoryPickerState(existingRepositories);
-        state.processUserQuery("a/a");
-        PickerRepository userQueryRepo = new PickerRepository("a/a");
-        PickerRepository repoA = new PickerRepository("A/AB");
-        List<PickerRepository> expected = Arrays.asList(userQueryRepo, repoA);
+        state.processUserQuery("atom");
+        PickerRepository userQueryRepo = new PickerRepository("atom");
+        PickerRepository repoA = new PickerRepository("atom/atom");
+        PickerRepository repoB = new PickerRepository("atom/tree-view");
+        List<PickerRepository> expected = Arrays.asList(userQueryRepo, repoA, repoB);
         assertEquals(expected, state.getSuggestedRepositories());
         state.processUserQuery("z");
         userQueryRepo = new PickerRepository("z");
@@ -55,46 +56,46 @@ public class RepositoryPickerStateTests {
 
     @Test
     public void selectNextSuggestedRepository_currentSelectedNotAtTheEnd_nextRepositoryInSuggestedIsSelected() {
-        Set<String> existingRepositories = new HashSet<>(Arrays.asList("A/A", "B/B", "C/d"));
+        Set<String> existingRepositories = new HashSet<>(Arrays.asList("atom/atom", "HubTurbo/HubTurbo", "org/repoId"));
         RepositoryPickerState state = new RepositoryPickerState(existingRepositories);
         state.processUserQuery("");
-        assertEquals("A/A", state.getSelectedRepositoryId());
+        assertEquals("atom/atom", state.getSelectedRepositoryId());
         state.selectNextSuggestedRepository();
-        assertEquals("B/B", state.getSelectedRepositoryId());
+        assertEquals("HubTurbo/HubTurbo", state.getSelectedRepositoryId());
         state.selectNextSuggestedRepository();
-        assertEquals("C/d", state.getSelectedRepositoryId());
+        assertEquals("org/repoId", state.getSelectedRepositoryId());
     }
 
     @Test
     public void selectPrevSuggestedRepository_currentSelectedNotAtTheBeginning_prevRepositoryInSuggestedIsSelected() {
-        Set<String> existingRepositories = new HashSet<>(Arrays.asList("A/A", "B/B", "C/d"));
+        Set<String> existingRepositories = new HashSet<>(Arrays.asList("atom/atom", "HubTurbo/HubTurbo", "org/repoId"));
         RepositoryPickerState state = new RepositoryPickerState(existingRepositories);
         state.processUserQuery("");
-        state.setSelectedRepositoryInSuggestedList("C/d");
-        assertEquals("C/d", state.getSelectedRepositoryId());
+        state.setSelectedRepositoryInSuggestedList("org/repoId");
+        assertEquals("org/repoId", state.getSelectedRepositoryId());
         state.selectPreviousSuggestedRepository();
-        assertEquals("B/B", state.getSelectedRepositoryId());
+        assertEquals("HubTurbo/HubTurbo", state.getSelectedRepositoryId());
         state.selectPreviousSuggestedRepository();
-        assertEquals("A/A", state.getSelectedRepositoryId());
+        assertEquals("atom/atom", state.getSelectedRepositoryId());
     }
 
     @Test
     public void selectNextSuggestedRepository_currentSelectedRepoAtTheEnd_firstRepoInSuggestedListSelected() {
-        Set<String> existingRepositories = new HashSet<>(Arrays.asList("A/A", "B/B", "C/d"));
+        Set<String> existingRepositories = new HashSet<>(Arrays.asList("atom/atom", "HubTurbo/HubTurbo", "org/repoId"));
         RepositoryPickerState state = new RepositoryPickerState(existingRepositories);
         state.processUserQuery("");
-        state.setSelectedRepositoryInSuggestedList("C/d");
+        state.setSelectedRepositoryInSuggestedList("org/repoId");
         state.selectNextSuggestedRepository();
-        assertEquals("A/A", state.getSelectedRepositoryId());
+        assertEquals("atom/atom", state.getSelectedRepositoryId());
     }
 
     @Test
     public void selectPrevSuggestedRepository_currentSelectedRepoAtTheBeginning_lastRepoInSuggestedListSelected() {
-        Set<String> existingRepositories = new HashSet<>(Arrays.asList("A/A", "B/B", "C/d"));
+        Set<String> existingRepositories = new HashSet<>(Arrays.asList("atom/atom", "HubTurbo/HubTurbo", "org/repoId"));
         RepositoryPickerState state = new RepositoryPickerState(existingRepositories);
         state.processUserQuery("");
-        state.setSelectedRepositoryInSuggestedList("A/A");
+        state.setSelectedRepositoryInSuggestedList("atom/atom");
         state.selectPreviousSuggestedRepository();
-        assertEquals("C/d", state.getSelectedRepositoryId());
+        assertEquals("org/repoId", state.getSelectedRepositoryId());
     }
 }
