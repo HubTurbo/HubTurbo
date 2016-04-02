@@ -45,6 +45,10 @@ public class RepositoryPickerDialog extends Dialog<String> {
         Platform.runLater(() -> userInputTextField.requestFocus());
     }
 
+    /**
+     * Assumes empty to be the default user query. This in turn also adds all existing repositories in form of label
+     * into suggestedRepositoryList.
+     */
     private void initialiseDefaultValues() {
         updateUserQuery("");
     }

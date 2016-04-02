@@ -1,5 +1,7 @@
 package ui.components.pickers;
 
+import org.controlsfx.control.spreadsheet.Picker;
+
 import java.util.*;
 import java.util.stream.IntStream;
 
@@ -22,6 +24,10 @@ public class RepositoryPickerState {
         initialiseDefaultValues();
     }
 
+    /**
+     * Adds all repositories to the list of suggested repositories.
+     * This also selects the first repository in suggestedRepository.
+     */
     private void initialiseDefaultValues() {
         suggestedRepositories.addAll(repositories);
         suggestedRepositories.get(0).setSelected(true);
@@ -89,8 +95,8 @@ public class RepositoryPickerState {
      * Updates List<PickerRepository> suggestedRepositories so that it contains PickerRepositories that match
      * the user input.
      *
-     * If there is no existing repository that matches the user's query exactly and the user's query is a well formed
-     * repo id, it will be added to the list of suggested repositories so that the user can pick the new repository.
+     * If there is no existing repository that matches the user's query exactly, it will be added to the list of
+     * suggested repositories so that the user can pick the new repository.
      */
     private void updateSuggestedRepositories(String query) {
         suggestedRepositories.clear();
@@ -100,18 +106,20 @@ public class RepositoryPickerState {
             }
         });
         Optional<PickerRepository> possibleExactMatch = getPickerRepositoryById(suggestedRepositories, query);
-        if (!possibleExactMatch.isPresent() && !query.isEmpty()) {
-            PickerRepository newRepository = new PickerRepository(query);
-            newRepository.setSelected(true);
-            suggestedRepositories.add(0, newRepository);
-        } else if (!query.isEmpty()) {
-            PickerRepository exactMatch = possibleExactMatch.get();
-            exactMatch.setSelected(true);
-        } else {
+        if (query.isEmpty()) {
             assert !suggestedRepositories.isEmpty();
             PickerRepository firstMatching = suggestedRepositories.get(0);
             firstMatching.setSelected(true);
+            return;
         }
+        if (!possibleExactMatch.isPresent()) {
+            PickerRepository newRepository = new PickerRepository(query);
+            newRepository.setSelected(true);
+            suggestedRepositories.add(0, newRepository);
+            return;
+        }
+        PickerRepository exactMatch = possibleExactMatch.get();
+        exactMatch.setSelected(true);
     }
 
     /**
