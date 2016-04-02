@@ -61,9 +61,11 @@ public class UI extends Application implements EventDispatcher {
     private static final int REFRESH_PERIOD = 60;
 
     /**
-     * Minimum Java Version Required by HT
+     * Minimum Java Version Required by HT.
+     *
+     * Due to usage of ControlsFX 8.40.10, HubTurbo requires minimum Java version of 1.8.0_60.
      */
-    public static final String REQUIRED_JAVA_VERSION = "1.8.0_60";
+    public static final String REQUIRED_JAVA_VERSION = "1.8.0_60"; // update gettingStarted.md if this is changed
 
     public static final String WINDOW_TITLE = "HubTurbo %s (%s)";
 
