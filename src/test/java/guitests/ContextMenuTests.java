@@ -31,7 +31,7 @@ public class ContextMenuTests extends UITest {
         filterTextField.setText("");
         Platform.runLater(filterTextField::requestFocus);
 
-        clickFilterTextFieldAtPanel(0);
+        clickOn(filterTextField);
         push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
         issuePanel = getPanel(0);

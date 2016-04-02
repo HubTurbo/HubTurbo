@@ -38,6 +38,7 @@ import com.google.common.util.concurrent.SettableFuture;
 import backend.interfaces.RepoStore;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
+import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
@@ -49,6 +50,7 @@ import ui.MenuControl;
 import ui.TestController;
 import ui.UI;
 import ui.components.FilterTextField;
+import ui.issuepanel.FilterPanel;
 import ui.listpanel.ListPanel;
 import ui.listpanel.ListPanelCell;
 import util.PlatformEx;
@@ -56,8 +58,8 @@ import util.PlatformSpecific;
 
 public class UITest extends FxRobot {
     
-    private static final Logger logger = LogManager.getLogger(UITest.class.getName());
     protected static final SettableFuture<Stage> STAGE_FUTURE = SettableFuture.create();
+    private static final Logger logger = LogManager.getLogger(UITest.class.getName());
     private static final Map<Character, KeyCode> specialCharsMap = getSpecialCharsMap();
     
     // Sets properties to run tests headless
@@ -297,11 +299,29 @@ public class UITest extends FxRobot {
     /**
      * Like drag(from).to(to), but does not relocate the mouse if the target moves.
      */
-    public void dragUnconditionally(Node from, Node to) {
-        moveTo(from);
+    public void dragUnconditionally(FilterPanel panelFrom, FilterPanel panelTo) {
+        Node from = dragSrc(panelFrom);
+        Node to = dragDest(panelTo);
+        Bounds fromBound = from.localToScene(from.getBoundsInLocal());
+        Bounds toBound = to.localToScene(to.getBoundsInLocal());
+        drag(fromBound.getMinX(), fromBound.getMaxY(), MouseButton.PRIMARY).moveTo(toBound.getMaxX(), toBound.getMaxY());
+        drop();
+        /*
+        moveTo(fromBound.getMinX(), fromBound.getMaxY());
+        sleep(EVENT_DELAY);
         press(MouseButton.PRIMARY);
         moveTo(to);
+        sleep(EVENT_DELAY);
         release(MouseButton.PRIMARY);
+        */
+    }
+
+    private Node dragSrc(FilterPanel panel) {
+        return panel.getCloseButton();
+    }
+
+    private Node dragDest(FilterPanel panel) {
+        return panel.getFilterTextField();
     }
 
     /**
