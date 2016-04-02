@@ -65,6 +65,7 @@ public class IssuePanelTests extends UITest {
 
     @Test
     public void guiElementsTest() {
+        sleep(EVENT_DELAY);
         clickFilterTextFieldAtPanel(0);
         selectAll();
         type("id:8");

@@ -26,6 +26,8 @@ import static ui.components.KeyboardShortcuts.CREATE_RIGHT_PANEL;
 
 public class RemovableRepoListAndModelsTest extends UITest {
 
+    private static final int EVENT_DELAY = 2000;
+
     @Override
     public void setup() throws TimeoutException {
         FxToolkit.setupApplication(TestUI.class, "--testconfig=true");
@@ -86,6 +88,7 @@ public class RemovableRepoListAndModelsTest extends UITest {
         assertNodeExists(IdGenerator.getLoginDialogOwnerFieldIdReference());
         type("dummy").push(KeyCode.TAB);
         type("dummy").push(KeyCode.ENTER);
+        sleep(EVENT_DELAY);
         waitAndAssertEquals(noOfUsedRepo, ui.getCurrentlyUsedRepos()::size);
         waitAndAssertEquals(noOfUsedRepo, ui.logic.getOpenRepositories()::size);
         waitAndAssertEquals(totalRepoInSystem + 1, removeRepoMenu.getItems()::size);

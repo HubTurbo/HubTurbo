@@ -28,11 +28,10 @@ public class NoPanelAtQuitTest extends UITest {
         // Test for saving panel information when there are no panels at termination.
 
         // close open panel
-        clickOn(panelCloseButtonId);
+        waitBeforeClick(panelCloseButtonId);
 
         // Quitting to update json
-        clickOn("File");
-        clickOn("Quit");
+        traverseMenu("File", "Quit");
         
         Preferences testPref = TestController.loadTestPreferences();
         List<PanelInfo> lastSessionPanels = testPref.getPanelInfo();

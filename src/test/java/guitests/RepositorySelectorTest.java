@@ -57,7 +57,7 @@ public class RepositorySelectorTest extends UITest {
         type("dummy").push(KeyCode.TAB);
         type("dummy").push(KeyCode.ENTER);
         ComboBox<String> comboBox = getRepositorySelector();
-        assertEquals(1, comboBox.getItems().size());
+        waitAndAssertEquals(1, comboBox.getItems()::size);
         assertEquals("dummy/dummy", primaryRepo);
 
         // we check if the "dummy2/dummy2" is added to the repository selector
@@ -75,7 +75,7 @@ public class RepositorySelectorTest extends UITest {
         doubleClickOn();
         type("dummy3/dummy3");
         push(KeyCode.ENTER);
-        assertEquals(3, comboBox.getItems().size());
+        waitAndAssertEquals(3, comboBox.getItems()::size);
         assertEquals("dummy3/dummy3", primaryRepo);
 
         // we check if repo's id with white spaces are handled correctly
@@ -83,7 +83,7 @@ public class RepositorySelectorTest extends UITest {
         doubleClickOn();
         type(" dummy4 / dummy4 ");
         push(KeyCode.ENTER);
-        assertEquals(4, comboBox.getItems().size());
+        waitAndAssertEquals(4, comboBox.getItems()::size);
         assertEquals("dummy4/dummy4", primaryRepo);
 
         // we check if deleting used repo does not remove it

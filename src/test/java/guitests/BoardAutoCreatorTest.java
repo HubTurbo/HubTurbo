@@ -8,12 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyCodeCombination;
-import javafx.scene.input.KeyCombination;
 import org.junit.Before;
 import org.junit.Test;
-import org.loadui.testfx.GuiTest;
 
 import prefs.PanelInfo;
 import prefs.Preferences;
@@ -58,9 +54,9 @@ public class BoardAutoCreatorTest extends UITest {
         PlatformEx.waitOnFxThread();
         waitUntilNodeAppears(String.format(SAVE_MESSAGE, "Milestones"));
         // opt to save current board
-        click("Yes");
+        clickOn("Yes");
         // save as "New Board"
-        click("OK");
+        clickOn("OK");
 
         assertEquals(2, panelControl.getNumberOfSavedBoards());
         assertEquals(5, panelControl.getPanelCount());
@@ -141,7 +137,7 @@ public class BoardAutoCreatorTest extends UITest {
 
         traverseMenu("Boards", "Auto-create", SAMPLE_BOARD);
         waitUntilNodeAppears(String.format(SAVE_MESSAGE, SAMPLE_BOARD));
-        click("No");
+        clickOn("No");
         waitUntilNodeAppears(SAMPLE_BOARD_DIALOG);
         clickOn("OK");
         verifyBoard(panelControl, BoardAutoCreator.getSamplePanelDetails());
