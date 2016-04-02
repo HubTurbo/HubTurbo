@@ -1,22 +1,22 @@
 package guitests;
 
-import javafx.scene.input.KeyCode;
-import org.junit.After;
-import org.junit.Test;
-import org.testfx.api.FxToolkit;
-
-import prefs.Preferences;
-import ui.TestController;
-import util.FileHelper;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.util.concurrent.TimeoutException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import org.junit.After;
+import org.junit.Test;
+import org.testfx.api.FxToolkit;
+
+import javafx.scene.input.KeyCode;
+import prefs.Preferences;
+import ui.TestController;
 
 public class LogoutTest extends UITest {
 
+    private static final int EVENT_DELAY = 2000;
     String configFileDirectory = TestController.TEST_DIRECTORY;
     String testConfigFileName = TestController.TEST_SESSION_CONFIG_FILENAME;
 
@@ -33,8 +33,7 @@ public class LogoutTest extends UITest {
         type("test").push(KeyCode.TAB);
         type("test");
         clickOn("Sign in");
-        sleep(2000);
-        
+        sleep(EVENT_DELAY);
         clickOn("File");
         clickOn("Logout");
 

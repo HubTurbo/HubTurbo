@@ -20,7 +20,6 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import javafx.scene.control.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hamcrest.Matcher;
@@ -40,6 +39,12 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.ComboBoxBase;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -57,11 +62,11 @@ import util.PlatformEx;
 import util.PlatformSpecific;
 
 public class UITest extends FxRobot {
-    
+
     protected static final SettableFuture<Stage> STAGE_FUTURE = SettableFuture.create();
     private static final Logger logger = LogManager.getLogger(UITest.class.getName());
     private static final Map<Character, KeyCode> specialCharsMap = getSpecialCharsMap();
-    
+
     // Sets properties to run tests headless
     static {
         System.setProperty("headless", "true");
@@ -106,7 +111,7 @@ public class UITest extends FxRobot {
     public void setup() throws Exception {
         FxToolkit.setupApplication(TestUI.class, "--test=true", "--bypasslogin=true");
     }
-    
+
     public Stage getStage() {
         return FxToolkit.toolkitContext().getRegisteredStage();
     }
@@ -179,7 +184,7 @@ public class UITest extends FxRobot {
     protected void beforeStageStarts() {
         // method to be overridden if anything needs to be done (e.g. to the json) before the stage starts
     }
-    
+
     // ================
     // Waiting routines
     // ================
@@ -291,10 +296,6 @@ public class UITest extends FxRobot {
             throw new RuntimeException(e);
         }
     }
-    
-    // ====================
-    // Interaction routines
-    // ====================
 
     /**
      * Like drag(from).to(to), but does not relocate the mouse if the target moves.
@@ -304,16 +305,9 @@ public class UITest extends FxRobot {
         Node to = dragDest(panelTo);
         Bounds fromBound = from.localToScene(from.getBoundsInLocal());
         Bounds toBound = to.localToScene(to.getBoundsInLocal());
-        drag(fromBound.getMinX(), fromBound.getMaxY(), MouseButton.PRIMARY).moveTo(toBound.getMaxX(), toBound.getMaxY());
-        drop();
-        /*
-        moveTo(fromBound.getMinX(), fromBound.getMaxY());
-        sleep(EVENT_DELAY);
-        press(MouseButton.PRIMARY);
-        moveTo(to);
-        sleep(EVENT_DELAY);
-        release(MouseButton.PRIMARY);
-        */
+        drag(fromBound.getMinX(), fromBound.getMaxY(), MouseButton.PRIMARY)
+            .moveTo(toBound.getMaxX(), toBound.getMaxY())
+            .drop();
     }
 
     private Node dragSrc(FilterPanel panel) {
@@ -615,7 +609,7 @@ public class UITest extends FxRobot {
     }
 
     /**
-     * Click on menu item with target text
+     * Clicks on menu item with target text
      * @param menu
      * @param target
      */
@@ -627,7 +621,7 @@ public class UITest extends FxRobot {
                 Platform.runLater(item::fire);
             });
     }
-    
+
     public void waitBeforeClick(String nodeQuery) {
         waitUntilNodeAppears(nodeQuery);
         clickOn(nodeQuery);

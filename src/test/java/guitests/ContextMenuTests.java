@@ -5,13 +5,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import javafx.application.Platform;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.input.KeyCode;
-
 import org.junit.Before;
 import org.junit.Test;
 
+import javafx.application.Platform;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.input.KeyCode;
 import ui.components.FilterTextField;
 import ui.listpanel.ListPanel;
 
@@ -19,8 +18,8 @@ public class ContextMenuTests extends UITest {
 
     private static final int EVENT_DELAY = 1000;
     private static final int DIALOG_DELAY = 1500;
-    
-    private ListPanel issuePanel; 
+
+    private ListPanel issuePanel;
 
     @Before
     public void setupUIComponent() {
@@ -137,9 +136,9 @@ public class ContextMenuTests extends UITest {
         clickOn("Undo");
         sleep(EVENT_DELAY);
     }
-    
+
     /**
-     * Click on menu item with target text
+     * Clicks on menu item with target text
      * @param menu
      * @param target
      */
