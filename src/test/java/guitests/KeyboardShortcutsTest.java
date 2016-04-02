@@ -5,7 +5,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.input.KeyCode;
 
 import org.junit.Test;
-import org.loadui.testfx.GuiTest;
 
 import ui.UI;
 import ui.components.KeyboardShortcuts;
@@ -39,12 +38,10 @@ public class KeyboardShortcutsTest extends UITest {
         // maximize
         assertEquals(false, getStage().getWidth() > 500);
         press(MAXIMIZE_WINDOW);
-        PlatformEx.waitOnFxThread();
         assertEquals(true, getStage().getWidth() > 500);
 
         // mid-sized window
         press(DEFAULT_SIZE_WINDOW);
-        PlatformEx.waitOnFxThread();
         assertEquals(false, getStage().getWidth() > 500);
 
         // jump from panel focus to first issue
@@ -117,8 +114,8 @@ public class KeyboardShortcutsTest extends UITest {
         clearPanelIndex();
 
         // remove focus from repo selector
-        ComboBox<String> repoSelectorComboBox = GuiTest.find("#repositorySelector");
-        clickOn(repoSelectorComboBox);
+        ComboBox<String> repoSelectorComboBox = getRepositorySelector();
+        clickRepositorySelector();
         assertEquals(true, repoSelectorComboBox.isFocused());
         press(KeyCode.ESCAPE).release(KeyCode.ESCAPE);
         assertEquals(false, repoSelectorComboBox.isFocused());
@@ -127,7 +124,8 @@ public class KeyboardShortcutsTest extends UITest {
         // switch default repo tests
         assertEquals(1, repoSelectorComboBox.getItems().size());
         // setup - add a new repo
-        doubleClickOn(repoSelectorComboBox);
+        clickRepositorySelector();
+        selectAll();
         type("dummy1/dummy1");
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
@@ -135,14 +133,14 @@ public class KeyboardShortcutsTest extends UITest {
         assertEquals("dummy1/dummy1", repoSelectorComboBox.getValue());
         // test shortcut on repo dropdown
         doubleClickOn(repoSelectorComboBox);
-        pushKeys(SWITCH_DEFAULT_REPO);
-        // wait for issue 9 to appear then click on it
-        // issue 9 is chosen instead of issue 10
-        // as there is a problem with finding issue 10's node due to it being the first card in the panel
-        waitAndAssertEquals("dummy/dummy", () -> repoSelectorComboBox.getValue());
+        press(SWITCH_DEFAULT_REPO);
+        // wait for issue 11 to appear then click on it
+        // issue 11 is chosen instead of issue 12
+        // as there is a problem with finding issue 12's node due to it being the first card in the panel
+        waitUntilNodeAppears(getIssueCell(1, DummyRepoState.NO_OF_DUMMY_ISSUES - 1));
+        assertEquals("dummy/dummy", repoSelectorComboBox.getValue());
         // test shortcut when focus is on panel
-        clickIssue(1, 10);
-        // clickOn("#dummy/dummy_col1_" + (DummyRepoState.NO_OF_DUMMY_ISSUES - 1));
+        clickIssue(1, DummyRepoState.NO_OF_DUMMY_ISSUES - 1);
         press(SWITCH_DEFAULT_REPO);
         PlatformEx.waitOnFxThread();
         assertEquals("dummy1/dummy1", repoSelectorComboBox.getValue());
@@ -180,6 +178,22 @@ public class KeyboardShortcutsTest extends UITest {
         assertEquals(false, issuePanel.getSelectedElement().get().getIssue().isCurrentlyRead());
         clearSelectedIssueId();
 
+        // close issue
+        push(getKeyCode("CLOSE_ISSUE"));
+        push(KeyCode.ENTER);
+        waitUntilNodeAppears("Undo");
+        assertEquals(true, issuePanel.getSelectedElement().isPresent());
+        assertEquals(false, issuePanel.getSelectedElement().get().getIssue().isOpen());
+        clearSelectedIssueId();
+
+        // reopen issue
+        push(getKeyCode("REOPEN_ISSUE"));
+        push(KeyCode.ENTER);
+        waitUntilNodeAppears("Undo");
+        assertEquals(true, issuePanel.getSelectedElement().isPresent());
+        assertEquals(true, issuePanel.getSelectedElement().get().getIssue().isOpen());
+        clearSelectedIssueId();
+
         // testing corner case for mark as read where there is only one issue displayed
         clickFilterTextFieldAtPanel(1);
         type("id:5");
@@ -193,6 +207,7 @@ public class KeyboardShortcutsTest extends UITest {
         // minimize window
         press(MINIMIZE_WINDOW);
         assertEquals(true, getStage().isIconified());
+
     }
 
     public KeyCode getKeyCode(String shortcut) {

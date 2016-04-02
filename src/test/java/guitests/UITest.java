@@ -394,6 +394,7 @@ public class UITest extends FxRobot {
      * @param issueId
      */
     public void rightClickIssue(int panelIndex, int issueId) {
+        waitUntilNodeAppears(IdGenerator.getPanelCellIdReference(panelIndex, issueId));
         rightClickOn(IdGenerator.getPanelCellIdReference(panelIndex, issueId));
     }
 
@@ -591,5 +592,24 @@ public class UITest extends FxRobot {
      */
     public void logout(){
         clickMenu("File", "Logout");
+    }
+
+    /**
+     * Click on menu item with target text
+     * @param menu
+     * @param target
+     */
+    public void clickMenuItem(ContextMenu menu, String target) {
+        menu.getItems()
+            .stream()
+            .filter(item -> item.getText().equals(target))
+            .findFirst().ifPresent(item -> {
+                Platform.runLater(item::fire);
+            });
+    }
+    
+    public void waitBeforeClick(String nodeQuery) {
+        waitUntilNodeAppears(nodeQuery);
+        clickOn(nodeQuery);
     }
 }

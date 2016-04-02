@@ -1,6 +1,5 @@
-package unstable;
+package guitests;
 
-import guitests.UITest;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCode;
@@ -18,6 +17,8 @@ import java.lang.reflect.*;
 import static org.junit.Assert.assertEquals;
 
 public class MarkAllIssuesAsReadUnreadTests extends UITest {
+
+    private static final int EVENT_DELAY = 1000;
 
     @Before
     public void setupUIComponent() {
@@ -88,10 +89,11 @@ public class MarkAllIssuesAsReadUnreadTests extends UITest {
         }
 
         if (isMarkAsRead){
-            clickOn(ListPanel.MARK_ALL_AS_READ_MENU_ITEM_TEXT);
+            clickMenuItem(contextMenu, ListPanel.MARK_ALL_AS_READ_MENU_ITEM_TEXT);
         } else {
-            clickOn(ListPanel.MARK_ALL_AS_UNREAD_MENU_ITEM_TEXT);
+            clickMenuItem(contextMenu, ListPanel.MARK_ALL_AS_UNREAD_MENU_ITEM_TEXT);
         }
+        sleep(EVENT_DELAY);
     }
 
     /**
@@ -100,7 +102,7 @@ public class MarkAllIssuesAsReadUnreadTests extends UITest {
     private void verifyReadStatusOfIssuesBelow(int index, boolean isExpectedStatusRead) {
         for (int i = index; i >= 1; i--) {
             ListPanelCell listPanelCell = getIssueCell(0, index);
-            assertEquals(listPanelCell.getIssue().isCurrentlyRead(), isExpectedStatusRead);
+            assertEquals(isExpectedStatusRead, listPanelCell.getIssue().isCurrentlyRead());
         }
     }
 }
