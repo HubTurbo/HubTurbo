@@ -89,19 +89,25 @@ public class MenuControl extends MenuBar {
     }
 
     /**
-     * Creates an empty board. User will be prompted to
-     * confirm the action if there are unclosed panels.
+     * Called upon the Boards > New being clicked
      */
     private void onBoardNew() {
         logger.info("Menu: Boards > New");
+        newBoard();
+    }
 
+    /**
+     * Creates an empty board. User will be prompted to
+     * confirm the action if there are unclosed panels
+     */
+    public final void newBoard() {
         if (!isNewBoardCreationDialogConfirmed()) {
             logger.info("New board creation cancelled");
             return;
         }
 
         panels.closeAllPanels();
-        onBoardSaveAs();
+        saveBoardAs();
     }
 
     /**
@@ -126,11 +132,20 @@ public class MenuControl extends MenuBar {
                 response.get().getButtonData() == ButtonData.OK_DONE;
     }
 
+    /**
+     * Called upon the Boards > Save being clicked
+     */
     private void onBoardSave() {
         logger.info("Menu: Boards > Save");
+        saveBoard();
+    }
 
+    /**
+     * Tries to save current board. If current board is dangling, it calls {@code saveBoardAs()}
+     */
+    public final void saveBoard() {
         if (!prefs.getLastOpenBoard().isPresent()) {
-            onBoardSaveAs();
+            saveBoardAs();
             return;
         }
 
@@ -178,14 +193,23 @@ public class MenuControl extends MenuBar {
     /**
      * Called upon the Boards > Open being clicked
      */
-    private void onBoardOpen(String boardName, List<PanelInfo> panelInfo) {
+    private void onBoardOpen(String boardName, List<PanelInfo> panelInfos) {
         logger.info("Menu: Boards > Open > " + boardName);
+        openBoard(boardName, panelInfos);
+    }
 
+    /**
+     * Opens the board named {@code boardName}.
+     *
+     * @param boardName name of the board
+     * @param panelInfos list of panel infos of the board
+     */
+    public final void openBoard(String boardName, List<PanelInfo> panelInfos) {
         panels.closeAllPanels();
-        panels.openPanels(panelInfo);
+        panels.openPanels(panelInfos);
         panels.selectFirstPanel();
         prefs.setLastOpenBoard(boardName);
-        prefs.setLastOpenBoardPanelInfos(panelInfo);
+        prefs.setLastOpenBoardPanelInfos(panelInfos);
         ui.updateTitle();
 
         ui.triggerEvent(new UsedReposChangedEvent());
@@ -196,7 +220,15 @@ public class MenuControl extends MenuBar {
      */
     private void onBoardDelete(String boardName) {
         logger.info("Menu: Boards > Delete > " + boardName);
+        deleteBoard(boardName);
+    }
 
+    /**
+     * Delete the board named {@boardName}
+     *
+     * @param boardName name of the board to delete
+     */
+    public final void deleteBoard(String boardName) {
         Alert dlg = new Alert(AlertType.CONFIRMATION, "");
         dlg.initModality(Modality.APPLICATION_MODAL);
         dlg.setTitle("Confirmation");
@@ -210,6 +242,7 @@ public class MenuControl extends MenuBar {
                     prefs.getLastOpenBoard().get().equals(boardName)) {
 
                 prefs.clearLastOpenBoard();
+                prefs.clearLastOpenBoardPanelInfos();
             }
             ui.triggerEvent(new BoardSavedEvent());
             logger.info(boardName + " was deleted");
