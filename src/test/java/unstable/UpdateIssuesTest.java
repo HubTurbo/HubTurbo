@@ -7,6 +7,7 @@ import javafx.scene.input.KeyCode;
 import org.junit.Test;
 import org.loadui.testfx.utils.TestUtils;
 
+import ui.IdGenerator;
 import ui.TestController;
 import ui.UI;
 import ui.listpanel.ListPanel;
@@ -23,10 +24,10 @@ public class UpdateIssuesTest extends UITest {
 
     @Test
     public void updateIssues() throws InterruptedException, ExecutionException {
-        Label apiBox = find("#apiBox");
+        Label apiBox = find(IdGenerator.getApiBoxIdReference());
         resetRepo();
 
-        click("#dummy/dummy_col0_filterTextField");
+        clickFilterTextFieldAtPanel(0);
         type("updated:24");
         push(KeyCode.ENTER);
 
@@ -36,7 +37,7 @@ public class UpdateIssuesTest extends UITest {
 
         // After updating, issue with ID 5 should have title Issue 5.1
         updateIssue(5, "Issue 5.1"); // 2 calls for issue 5, 1 for issue 9, 1 for issue 10 when refreshing UI.
-        click("#dummy/dummy_col0_filterTextField");
+        clickFilterTextFieldAtPanel(0);
         push(KeyCode.ENTER); // 1 call for issue 5, 1 for issue 9, 1 for issue 10.
 
         // Updated view should now contain Issue 5.1, Issue 9 and Issue 10.
@@ -46,12 +47,12 @@ public class UpdateIssuesTest extends UITest {
         // Then have a non-self comment for Issue 9.
         UI.events.triggerEvent(UpdateDummyRepoEvent.addComment("dummy/dummy", 9, "Test comment", "test-nonself"));
         UI.events.triggerEvent(new UILogicRefreshEvent()); // 1 call for issues 5, 9, 10.
-        click("#dummy/dummy_col0_filterTextField");
+        clickFilterTextFieldAtPanel(0);
         push(KeyCode.ENTER); // 1 call for issues 5, 9, 10.
         TestUtils.awaitCondition(() -> 3483 == getApiCount(apiBox.getText()));
         assertEquals(3, countIssuesShown());
 
-        click("#dummy/dummy_col0_filterTextField");
+        clickFilterTextFieldAtPanel(0);
         push(KeyCode.ENTER); // 1 call for issues 5, 9, 10.
         TestUtils.awaitCondition(() -> 3480 == getApiCount(apiBox.getText()));
     }

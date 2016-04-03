@@ -14,6 +14,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import javafx.scene.control.*;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,19 +34,19 @@ import javafx.event.ActionEvent;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.ComboBoxBase;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseButton;
 import javafx.stage.Stage;
 import prefs.Preferences;
+import ui.IdGenerator;
 import ui.MenuControl;
 import ui.TestController;
 import ui.UI;
+import ui.components.FilterTextField;
+import ui.listpanel.ListPanel;
+import ui.listpanel.ListPanelCell;
 import util.PlatformEx;
 import util.PlatformSpecific;
 
@@ -119,14 +120,24 @@ public class UITest extends GuiTest {
         }
     }
 
-    @Before
-    @Override
-    public void setupStage() throws Throwable {
+    public static void clearAllTestConfigs() {
+        clearTestConfig(TestController.TEST_DIRECTORY, TestController.TEST_SESSION_CONFIG_FILENAME);
+        clearTestConfig(TestController.TEST_DIRECTORY, TestController.TEST_USER_CONFIG_FILENAME);
+    }
+
+    private static void clearTestConfig(String directory, String filename) {
         // delete test.json if it exists
-        File testConfig = new File(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
+        File testConfig = new File(directory, filename);
         if (testConfig.exists() && testConfig.isFile()) {
             assert testConfig.delete();
         }
+    }
+
+    @Before
+    @Override
+    public void setupStage() throws Throwable {
+        // delete test configs if they exist
+        clearAllTestConfigs();
         clearTestFolder();
         beforeStageStarts();
 
@@ -395,6 +406,101 @@ public class UITest extends GuiTest {
         for (String menuName : menuNames) {
             click(menuName);
         }
+    }
+
+    /**
+     * Clicks the repository selector's ComboBox
+     */
+    public void clickRepositorySelector() {
+        click(IdGenerator.getRepositorySelectorIdReference());
+    }
+
+    /**
+     * Gets the repository selector's ComboBox
+     */
+    public ComboBox getRepositorySelector() {
+        return find(IdGenerator.getRepositorySelectorIdReference());
+    }
+
+    /**
+     * Clicks the label picker's TextField
+     */
+    public void clickLabelPickerTextField() {
+        click(IdGenerator.getLabelPickerTextFieldIdReference());
+    }
+
+    /**
+     * Gets the label picker's TextField
+     */
+    public TextField getLabelPickerTextField() {
+        return find(IdGenerator.getLabelPickerTextFieldIdReference());
+    }
+
+    /**
+     * Clicks the FilterTextField of the panel at {@code panelIndex}
+     * @param panelIndex
+     */
+    public void clickFilterTextFieldAtPanel(int panelIndex) {
+        click(IdGenerator.getPanelFilterTextFieldIdReference(panelIndex));
+    }
+
+    /**
+     * Gets the FilterTextField of the panel at {@code panelIndex}
+     * @param panelIndex
+     */
+    public FilterTextField getFilterTextFieldAtPanel(int panelIndex) {
+        return find(IdGenerator.getPanelFilterTextFieldIdReference(panelIndex));
+    }
+
+    /**
+     * Clicks the issue with id {@code issueId} at panel {@code panelIndex}
+     * @param panelIndex
+     * @param issueId
+     */
+    public void clickIssue(int panelIndex, int issueId) {
+        click(IdGenerator.getPanelCellIdReference(panelIndex, issueId));
+    }
+
+    /**
+     * Right clicks the issue with id {@code issueId} at panel {@code panelIndex}
+     * @param panelIndex
+     * @param issueId
+     */
+    public void rightClickIssue(int panelIndex, int issueId) {
+        rightClick(IdGenerator.getPanelCellIdReference(panelIndex, issueId));
+    }
+
+    /**
+     * Clicks the panel {@code panelIndex}
+     * @param panelIndex
+     */
+    public void clickPanel(int panelIndex) {
+        click(IdGenerator.getPanelIdReference(panelIndex));
+    }
+
+    /**
+     * Right clicks the panel {@code panelIndex}
+     * @param panelIndex
+     */
+    public void rightClickPanel(int panelIndex) {
+        rightClick(IdGenerator.getPanelIdReference(panelIndex));
+    }
+
+    /**
+     * Gets the panel {@code panelIndex}
+     * @param panelIndex
+     */
+    public ListPanel getPanel(int panelIndex) {
+        return find(IdGenerator.getPanelIdReference(panelIndex));
+    }
+
+    /**
+     * Gets the issue cell of issue {@code issueId} at panel {@code panelIndex}
+     * @param panelIndex
+     * @param issueId
+     */
+    public ListPanelCell getIssueCell(int panelIndex, int issueId) {
+        return find(IdGenerator.getPanelCellIdReference(panelIndex, issueId));
     }
 
     /**

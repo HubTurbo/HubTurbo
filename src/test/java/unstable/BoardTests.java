@@ -13,6 +13,7 @@ import guitests.UITest;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import prefs.Preferences;
+import ui.IdGenerator;
 import ui.TestController;
 import ui.UI;
 import ui.issuepanel.PanelControl;
@@ -20,6 +21,9 @@ import util.PlatformEx;
 import util.Utility;
 
 public class BoardTests extends UITest {
+
+    private static final String boardNameInputId = IdGenerator.getBoardNameInputFieldIdReference();
+    private static final String boardNameSaveButtonId = IdGenerator.getBoardNameSaveButtonIdReference();
 
     /**
      * The initial state is one panel with no filter, and no saved boards
@@ -107,8 +111,8 @@ public class BoardTests extends UITest {
 
     private void saveBoardWithName(String name) {
         traverseMenu("Boards", "Save as");
-        waitUntilNodeAppears("#boardnameinput");
-        ((TextField) find("#boardnameinput")).setText(name);
+        waitUntilNodeAppears(boardNameInputId);
+        ((TextField) find(boardNameInputId)).setText(name);
         click("OK");
     }
 
@@ -156,11 +160,11 @@ public class BoardTests extends UITest {
 
     private void tryBoardName(String name) {
         traverseMenu("Boards", "Save as");
-        waitUntilNodeAppears("#boardnameinput");
-        ((TextField) find("#boardnameinput")).setText(name);
-        assertTrue(find("#boardsavebutton").isDisabled());
+        waitUntilNodeAppears(boardNameInputId);
+        ((TextField) find(boardNameInputId)).setText(name);
+        assertTrue(find(boardNameSaveButtonId).isDisabled());
         pushKeys(KeyCode.ESCAPE);
-        waitUntilNodeDisappears("#boardnameinput");
+        waitUntilNodeDisappears(boardNameInputId);
     }
 
     @Test
@@ -239,8 +243,8 @@ public class BoardTests extends UITest {
 
         // Saving will prompt the user to save as a new board
         traverseMenu("Boards", "Save");
-        waitUntilNodeAppears("#boardnameinput");
-        ((TextField) find("#boardnameinput")).setText("Board 1");
+        waitUntilNodeAppears(boardNameInputId);
+        ((TextField) find(boardNameInputId)).setText("Board 1");
         click("OK");
 
         assertEquals(1, panelControl.getNumberOfSavedBoards());
@@ -276,8 +280,8 @@ public class BoardTests extends UITest {
         waitUntilNodeAppears(hasText("OK"));
         click("OK");
 
-        waitUntilNodeAppears("#boardnameinput");
-        ((TextField) find("#boardnameinput")).setText("empty");
+        waitUntilNodeAppears(boardNameInputId);
+        ((TextField) find(boardNameInputId)).setText("empty");
         waitUntilNodeAppears(hasText("OK"));
         click("OK");
 

@@ -6,18 +6,17 @@ import static org.loadui.testfx.Assertions.assertNodeExists;
 
 import java.io.File;
 
-import guitests.UITest;
 import javafx.application.Platform;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
 
+import guitests.UITest;
 import javafx.scene.control.ComboBox;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
-import prefs.ConfigFileHandler;
-import prefs.GlobalConfig;
 import prefs.Preferences;
+import ui.IdGenerator;
 import ui.TestController;
 import ui.UI;
 import util.PlatformEx;
@@ -53,18 +52,15 @@ public class RepositorySelectorTest extends UITest {
     public void beforeStageStarts() {
         // setup test json with last viewed repo "dummy/dummy"
         // obviously the json for that repo doesn't exist
-        ConfigFileHandler configFileHandler =
-                new ConfigFileHandler(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
-        GlobalConfig globalConfig = new GlobalConfig();
-        globalConfig.setLastLoginCredentials("test", "test");
-        globalConfig.setLastViewedRepository("dummy/dummy");
-        configFileHandler.saveGlobalConfig(globalConfig);
+        Preferences prefs = TestController.createTestPreferences();
+        prefs.setLastLoginCredentials("test", "test");
+        prefs.setLastViewedRepository("dummy/dummy");
     }
 
     @Test
     public void repositorySelectorTest() {
         // check if test json is present
-        File testConfig = new File(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
+        File testConfig = new File(TestController.TEST_DIRECTORY, TestController.TEST_SESSION_CONFIG_FILENAME);
         boolean testConfigExists = testConfig.exists() && testConfig.isFile();
         if (!testConfigExists) {
             fail();
@@ -72,16 +68,16 @@ public class RepositorySelectorTest extends UITest {
 
         // now we check if the login dialog pops up because the "dummy/dummy" json
         // doesn't exist and there are no other valid repo json files
-        assertNodeExists("#repoOwnerField");
+        assertNodeExists(IdGenerator.getLoginDialogOwnerFieldIdReference());
         type("dummy").push(KeyCode.TAB);
         type("dummy").push(KeyCode.ENTER);
-        ComboBox<String> comboBox = find("#repositorySelector");
+        ComboBox<String> comboBox = getRepositorySelector();
         assertEquals(1, comboBox.getItems().size());
         assertEquals("dummy/dummy", primaryRepo);
 
         // we check if the "dummy2/dummy2" is added to the repository selector
         // but the primary repo isn't changed
-        Platform.runLater(find("#dummy/dummy_col0_filterTextField")::requestFocus);
+        Platform.runLater(getFilterTextFieldAtPanel(0)::requestFocus);
         PlatformEx.waitOnFxThread();
         type("repo:dummy2/dummy2");
         push(KeyCode.ENTER);

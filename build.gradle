@@ -28,7 +28,7 @@ allprojects {
     apply plugin: 'java'
 
     // TODO: add group here (e.g. group = 'sg.edu.nus.comp.hubturbo')
-    version = '3.24.0'
+    version = '3.25.0'
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 
@@ -71,7 +71,6 @@ allprojects {
         compile "org.ocpsoft.prettytime:prettytime:$prettytimeVersion"
         compile "org.seleniumhq.selenium:selenium-java:$seleniumJavaVersion"
         compile "org.seleniumhq.selenium:selenium-server:$seleniumServerVersion"
-
         testCompile "junit:junit:$junitVersion"
         testCompile "org.loadui:testFx:$testFxVersion"
         testCompile "org.mockito:mockito-core:$mockitoVersion"

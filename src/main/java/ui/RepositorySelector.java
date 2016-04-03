@@ -25,7 +25,7 @@ public class RepositorySelector extends HBox {
         setupLayout();
         setupComboBox();
         getChildren().addAll(comboBox);
-        comboBox.setId("repositorySelector");
+        comboBox.setId(IdGenerator.getRepositorySelectorId());
     }
 
     private void setupLayout() {

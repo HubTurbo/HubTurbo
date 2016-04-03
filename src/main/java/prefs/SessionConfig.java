@@ -18,12 +18,12 @@ import java.util.stream.Collectors;
 import java.util.Optional;
 
 /**
- * Abstractions for the contents of the global config file.
+ * Represents session and app-defined settings.
  */
 @SuppressWarnings("unused")
-public class GlobalConfig {
+public class SessionConfig {
 
-    private static final Logger logger = LogManager.getLogger(GlobalConfig.class.getName());
+    private static final Logger logger = LogManager.getLogger(SessionConfig.class.getName());
 
     private List<PanelInfo> lastSessionPanels = new ArrayList<>();
     private String lastViewedRepository = "";
@@ -97,14 +97,6 @@ public class GlobalConfig {
     public void clearAllBoards() {
         clearLastOpenBoard();
         savedBoards.clear();
-    }
-
-    public List<String> getLastOpenFilters() {
-        return lastSessionPanels.stream().map(PanelInfo::getPanelFilter).collect(Collectors.toList());
-    }
-
-    public List<String> getPanelNames() {
-        return lastSessionPanels.stream().map(PanelInfo::getPanelName).collect(Collectors.toList());
     }
 
     public void setPanelInfo(List<PanelInfo> panelInfo) {

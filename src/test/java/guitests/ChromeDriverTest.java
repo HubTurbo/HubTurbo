@@ -10,7 +10,7 @@ import util.events.IssueSelectedEvent;
 import util.events.LabelCreatedEvent;
 import util.events.MilestoneCreatedEvent;
 import util.events.testevents.ExecuteScriptEventHandler;
-import util.events.testevents.JumpToCommentEventHandler;
+import util.events.testevents.JumpToNewCommentBoxEventHandler;
 import util.events.testevents.NavigateToPageEventHandler;
 import util.events.testevents.SendKeysToBrowserEventHandler;
 
@@ -40,7 +40,7 @@ public class ChromeDriverTest extends UITest {
         UI.events.registerEvent((NavigateToPageEventHandler) e -> url = e.url);
         UI.events.registerEvent((ExecuteScriptEventHandler) e -> script = e.script);
         UI.events.registerEvent((SendKeysToBrowserEventHandler) e -> keyCode = e.keyCode);
-        UI.events.registerEvent((JumpToCommentEventHandler) e -> jumpToComment = true);
+        UI.events.registerEvent((JumpToNewCommentBoxEventHandler) e -> jumpToComment = true);
 
         UI.events.triggerEvent(new IssueSelectedEvent("dummy/dummy", 1, 0, false));
         sleep(EVENT_DELAY);
@@ -59,7 +59,7 @@ public class ChromeDriverTest extends UITest {
         assertEquals(GitHubURL.getPathForNewMilestone("dummy/dummy"), url);
         clearUrl();
 
-        click("#dummy/dummy_col0_9");
+        clickIssue(0, 9);
         sleep(EVENT_DELAY);
         clearUrl();
 

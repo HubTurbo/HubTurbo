@@ -111,7 +111,7 @@ public class PanelControl extends HBox {
     }
 
     public FilterPanel addPanelAt(int index) {
-        FilterPanel panel = new ListPanel(ui, guiController, mainStage, this, index);
+        FilterPanel panel = new ListPanel(ui, mainStage, this, index);
         getChildren().add(index, panel);
 
         // Populates the panel with the default repo issues.

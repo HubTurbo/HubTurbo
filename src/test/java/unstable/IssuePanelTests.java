@@ -46,8 +46,8 @@ public class IssuePanelTests extends UITest {
     public void keepSelectionTest() {
         // checks to see if ListPanel keeps the same issue selected even after
         // the list is updated
-        ListPanel issuePanel = find("#dummy/dummy_col0");
-        click("#dummy/dummy_col0_filterTextField");
+        ListPanel issuePanel = getPanel(0);
+        clickFilterTextFieldAtPanel(0);
         selectAll();
         type("sort:date");
         push(KeyCode.ENTER);
@@ -67,7 +67,7 @@ public class IssuePanelTests extends UITest {
 
     @Test
     public void guiElementsTest() {
-        click("#dummy/dummy_col0_filterTextField");
+        clickFilterTextFieldAtPanel(0);
         selectAll();
         type("id:8");
         push(KeyCode.ENTER);
@@ -87,7 +87,7 @@ public class IssuePanelTests extends UITest {
 
         // Next we check for a label that was deleted from the repository, but should still be displayed under
         // metadata (label update events).
-        click("#dummy/dummy_col0_filterTextField");
+        clickFilterTextFieldAtPanel(0);
         selectAll();
         type("id:9 updated:5");
         PlatformEx.waitOnFxThread();
@@ -171,7 +171,7 @@ public class IssuePanelTests extends UITest {
 
     @Test
     public void showAuthorAssignee_assignedPullRequest_authorAssigneeShown() {
-        click("#dummy/dummy_col0_filterTextField");
+        clickFilterTextFieldAtPanel(0);
         selectAll();
         type("id:11");
         push(KeyCode.ENTER);
@@ -184,7 +184,7 @@ public class IssuePanelTests extends UITest {
 
     @Test
     public void showAuthorAssignee_assignedIssue_onlyAssigneeShown() {
-        click("#dummy/dummy_col0_filterTextField");
+        clickFilterTextFieldAtPanel(0);
         selectAll();
         type("id:12");
         push(KeyCode.ENTER);

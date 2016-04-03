@@ -4,10 +4,9 @@ import backend.RepoIO;
 import javafx.scene.control.ComboBox;
 import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
-import prefs.ConfigFileHandler;
-import prefs.GlobalConfig;
 import prefs.Preferences;
 import tests.TestUtils;
+import ui.IdGenerator;
 import ui.TestController;
 import ui.UI;
 import ui.components.StatusUIStub;
@@ -32,12 +31,10 @@ public class WrongLastViewedTest extends UITest {
 
         // setup test json with last viewed repo "test/test"
         // but we create a repo json file for "test2/test2" instead and see if it gets loaded
-        ConfigFileHandler configFileHandler =
-                new ConfigFileHandler(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
-        GlobalConfig globalConfig = new GlobalConfig();
-        globalConfig.setLastLoginCredentials("test", "test");
-        globalConfig.setLastViewedRepository("test/test");
-        configFileHandler.saveGlobalConfig(globalConfig);
+        Preferences prefs = TestController.createTestPreferences();
+        prefs.setLastLoginCredentials("test", "test");
+        prefs.setLastViewedRepository("test/test");
+
         RepoIO testIO = TestController.createTestingRepoIO(Optional.empty());
         testIO.setRepoOpControl(TestUtils.createRepoOpControlWithEmptyModels(testIO));
         try {
@@ -49,7 +46,6 @@ public class WrongLastViewedTest extends UITest {
 
     @Test
     public void wrongLastViewedTest() throws InterruptedException {
-        ComboBox<String> repositorySelector = find("#repositorySelector");
-        assertEquals("test2/test2", repositorySelector.getValue());
+        assertEquals("test2/test2", getRepositorySelector().getValue());
     }
 }

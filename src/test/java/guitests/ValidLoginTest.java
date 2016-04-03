@@ -6,6 +6,7 @@ import org.loadui.testfx.utils.FXTestUtils;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
+import ui.IdGenerator;
 
 public class ValidLoginTest extends UITest {
 
@@ -16,7 +17,7 @@ public class ValidLoginTest extends UITest {
 
     @Test
     public void validLoginTest() throws InterruptedException {
-        TextField repoOwnerField = find("#repoOwnerField");
+        TextField repoOwnerField = find(IdGenerator.getLoginDialogOwnerFieldIdReference());
         click(repoOwnerField);
         selectAll();
         type("test").push(KeyCode.TAB);
@@ -24,7 +25,7 @@ public class ValidLoginTest extends UITest {
         type("test").push(KeyCode.TAB);
         type("test");
         click("Sign in");
-        ComboBox<String> repositorySelector = findOrWaitFor("#repositorySelector");
+        ComboBox<String> repositorySelector = findOrWaitFor(IdGenerator.getRepositorySelectorIdReference());
         awaitCondition(() -> "test/test".equals(repositorySelector.getValue()));
     }
 }

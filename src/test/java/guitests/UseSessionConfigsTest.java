@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.loadui.testfx.utils.FXTestUtils;
 import prefs.PanelInfo;
 import prefs.Preferences;
+import ui.IdGenerator;
 import ui.TestController;
 import ui.UI;
 import ui.components.FilterTextField;
@@ -22,11 +23,12 @@ import util.events.ShowRenamePanelEvent;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-public class UseGlobalConfigsTest extends UITest {
+public class UseSessionConfigsTest extends UITest {
     @Override
     public void launchApp() {
         // isTestMode in UI checks for testconfig too so we don't need to specify --test=true here.
@@ -49,7 +51,7 @@ public class UseGlobalConfigsTest extends UITest {
         pushKeys(KeyCode.TAB);
         type("test");
         click("Sign in");
-        ComboBox<String> repositorySelector = findOrWaitFor("#repositorySelector");
+        ComboBox<String> repositorySelector = findOrWaitFor(IdGenerator.getRepositorySelectorIdReference());
         waitForValue(repositorySelector);
         assertEquals("dummy/dummy", repositorySelector.getValue());
 
@@ -61,7 +63,7 @@ public class UseGlobalConfigsTest extends UITest {
 
         // Somehow the text field cannot be populated by typing on the CI, use setText instead.
         // TODO find out why
-        ((TextField) find("#boardnameinput")).setText("Empty Board");
+        ((TextField) find(IdGenerator.getBoardNameInputFieldIdReference())).setText("Empty Board");
         click("OK");
 
         PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(0)));
@@ -122,7 +124,7 @@ public class UseGlobalConfigsTest extends UITest {
         click("Save as");
 
         // Text field cannot be populated by typing on the CI, use setText instead
-        ((TextField) find("#boardnameinput")).setText("Dummy Board");
+        ((TextField) find(IdGenerator.getBoardNameInputFieldIdReference())).setText("Dummy Board");
         click("OK");
 
         // Then exit program...
@@ -130,7 +132,7 @@ public class UseGlobalConfigsTest extends UITest {
         click("Quit");
 
         // ...and check if the test JSON is still there...
-        File testConfig = new File(Preferences.DIRECTORY, Preferences.TEST_CONFIG_FILE);
+        File testConfig = new File(TestController.TEST_DIRECTORY, TestController.TEST_SESSION_CONFIG_FILENAME);
         if (!(testConfig.exists() && testConfig.isFile())) {
             fail();
         }
@@ -163,8 +165,16 @@ public class UseGlobalConfigsTest extends UITest {
         assertEquals("Dummy 2 panel", dummyBoard.get(2).getPanelName());
 
         // Panels
-        List<String> lastOpenFilters = testPref.getLastOpenFilters();
-        List<String> lastOpenPanelNames = testPref.getPanelNames();
+        List<String> lastOpenFilters =
+                testPref.getPanelInfo()
+                        .stream()
+                        .map(PanelInfo::getPanelFilter)
+                        .collect(Collectors.toList());
+        List<String> lastOpenPanelNames =
+                testPref.getPanelInfo()
+                        .stream()
+                        .map(PanelInfo::getPanelName)
+                        .collect(Collectors.toList());
 
         assertEquals("is:open", lastOpenFilters.get(0));
         assertEquals("is:issue", lastOpenFilters.get(1));

@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import guitests.UITest;
 import javafx.scene.input.KeyCode;
+import ui.IdGenerator;
 import ui.UI;
 import ui.components.FilterTextField;
 import util.events.testevents.UpdateDummyRepoEvent;
@@ -35,10 +36,8 @@ public class MetadataUpdateTest extends UITest {
     }
 
     private void updated24(String qualifier) {
-        FilterTextField field = find("#dummy/dummy_col0_filterTextField");
-
         // Select everything in the field
-        click(field);
+        clickFilterTextFieldAtPanel(0);
         selectAll();
 
         type(String.format("%s:24", qualifier));
