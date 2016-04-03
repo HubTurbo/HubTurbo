@@ -5,44 +5,36 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
+import org.loadui.testfx.utils.FXTestUtils;
 import prefs.PanelInfo;
-import ui.TestController;
-import ui.UI;
+import ui.*;
 import ui.issuepanel.PanelControl;
 import util.PlatformEx;
 
+import java.lang.reflect.Field;
+import java.util.Map;
 import java.util.Optional;
-
-import static ui.PanelMenuCreator.ASSIGNEE_FILTER_NAME;
-import static ui.PanelMenuCreator.ASSIGNEE_PANEL_NAME;
-import static ui.PanelMenuCreator.MILESTONE_FILTER_NAME;
-import static ui.PanelMenuCreator.MILESTONE_PANEL_NAME;
-import static ui.PanelMenuCreator.UPDATED_FILTER_NAME;
-import static ui.PanelMenuCreator.UPDATED_PANEL_NAME;
 
 public class PanelMenuCreatorTest extends UITest {
 
     private PanelControl panelControl;
+    private MenuControl menuBar;
 
     @Before
     public void setup() {
         UI ui = TestController.getUI();
         panelControl = ui.getPanelControl();
+        menuBar = ui.getMenuControl();
     }
 
     @Test
-    public void assigneePanelMenuItemTest() {
-        customizedPanelMenuItemTest(ASSIGNEE_PANEL_NAME, ASSIGNEE_FILTER_NAME);
-    }
-
-    @Test
-    public void milestonePanelMenuItemTest() {
-        customizedPanelMenuItemTest(MILESTONE_PANEL_NAME, MILESTONE_FILTER_NAME);
-    }
-
-    @Test
-    public void recentlyUpdatedPanelMenuItemTest() {
-        customizedPanelMenuItemTest(UPDATED_PANEL_NAME, UPDATED_FILTER_NAME);
+    public void customPanelMenuItemTest() throws NoSuchFieldException, IllegalAccessException {
+        Field panelMenuCreatorField = MenuControl.class.getDeclaredField("panelMenuCreator");
+        panelMenuCreatorField.setAccessible(true);
+        PanelMenuCreator value = (PanelMenuCreator) panelMenuCreatorField.get(menuBar);
+        for (Map.Entry<String, String> entry : value.generateCustomizedPanelDetails().entrySet()) {
+            customizedPanelMenuItemTest(entry.getKey(), entry.getValue());
+        }
     }
 
     @Test
@@ -66,11 +58,9 @@ public class PanelMenuCreatorTest extends UITest {
 
         waitAndAssertEquals(2, panelControl::getPanelCount);
         assertEquals(Optional.of(1), panelControl.getCurrentlySelectedPanel());
-
         PanelInfo panelInfo = panelControl.getCurrentPanelInfos().get(1);
         waitAndAssertEquals(panelFilter, panelInfo::getPanelFilter);
         assertEquals(panelName, panelInfo.getPanelName());
         traverseMenu("Panels", "Close");
     }
-
 }

@@ -11,9 +11,12 @@ import javafx.scene.control.ScrollPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ui.issuepanel.PanelControl;
+import prefs.Preferences;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import static ui.components.KeyboardShortcuts.CLOSE_PANEL;
 import static ui.components.KeyboardShortcuts.CREATE_LEFT_PANEL;
@@ -21,23 +24,17 @@ import static ui.components.KeyboardShortcuts.CREATE_RIGHT_PANEL;
 
 public class PanelMenuCreator {
 
+    private Preferences prefs;
+
     private static final Logger logger = LogManager.getLogger(MenuControl.class.getName());
-
-    public static final String MILESTONE_FILTER_NAME = "milestone:curr sort:status";
-    public static final String MILESTONE_PANEL_NAME = "Current Milestone";
-
-    public static final String ASSIGNEE_FILTER_NAME = "is:open ((is:issue assignee:me) OR (is:pr author:me))";
-    public static final String ASSIGNEE_PANEL_NAME = "Open issues and PR's";
-
-    public static final String UPDATED_FILTER_NAME = "assignee:me updated:<48";
-    public static final String UPDATED_PANEL_NAME = "Recently Updated issues";
 
     private final PanelControl panelControl;
     private final ScrollPane panelsScrollPane;
 
-    public PanelMenuCreator(PanelControl panelControl, ScrollPane panelsScrollPane) {
+    public PanelMenuCreator(PanelControl panelControl, ScrollPane panelsScrollPane, Preferences prefs) {
         this.panelsScrollPane = panelsScrollPane;
         this.panelControl = panelControl;
+        this.prefs = prefs;
     }
 
     public Menu generatePanelMenu() {
@@ -48,13 +45,22 @@ public class PanelMenuCreator {
         items.add(createLeftPanelMenuItem());
         items.add(createRightPanelMenuItem());
         items.add(closePanelMenuItem());
-        autoCreateItems.add(createCustomizedPanelMenuItem(ASSIGNEE_PANEL_NAME, ASSIGNEE_FILTER_NAME));
-        autoCreateItems.add(createCustomizedPanelMenuItem(MILESTONE_PANEL_NAME, MILESTONE_FILTER_NAME));
-        autoCreateItems.add(createCustomizedPanelMenuItem(UPDATED_PANEL_NAME, UPDATED_FILTER_NAME));
+        for (Map.Entry<String, String> entry : generateCustomizedPanelDetails().entrySet()) {
+            autoCreateItems.add(createCustomizedPanelMenuItem(entry.getKey(), entry.getValue()));
+        }
         autoCreatePanelMenu.getItems().addAll(autoCreateItems);
         panelMenu.getItems().addAll(items);
         panelMenu.getItems().add(autoCreatePanelMenu);
         return panelMenu;
+    }
+
+    public Map<String, String> generateCustomizedPanelDetails(){
+        Map<String, String> customPanelMap = new LinkedHashMap<>();
+        customPanelMap.put("Open issues and PR's", "is:open ((is:issue assignee:" + prefs.getLastLoginUsername() +
+                ") OR (is:pr author:"+ prefs.getLastLoginUsername() + "))");
+        customPanelMap.put("Current Milestone", "milestone:curr sort:status");
+        customPanelMap.put("Recently Updated issues", "assignee:" + prefs.getLastLoginUsername() + " updated:<48");
+        return customPanelMap;
     }
 
     public MenuItem createLeftPanelMenuItem() {
