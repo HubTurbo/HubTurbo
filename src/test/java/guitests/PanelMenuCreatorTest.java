@@ -26,7 +26,8 @@ public class PanelMenuCreatorTest extends UITest {
     }
 
     @Test
-    public void customPanelMenuItemTest() throws NoSuchFieldException, IllegalAccessException {
+    public void autoCreatePanels_createCustomPanelsFromMenu_panelsCreatedWithAppropriatePanelNameAndFilter()
+            throws NoSuchFieldException, IllegalAccessException {
         Field panelMenuCreatorField = MenuControl.class.getDeclaredField("panelMenuCreator");
         panelMenuCreatorField.setAccessible(true);
         PanelMenuCreator value = (PanelMenuCreator) panelMenuCreatorField.get(ui.getMenuControl());
