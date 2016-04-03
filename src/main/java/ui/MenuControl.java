@@ -313,12 +313,16 @@ public class MenuControl extends MenuBar {
 
     private MenuItem[] createReposMenu() {
         Menu remove = new Menu("Remove");
+        MenuItem choose = new MenuItem("Show Repository Picker");
 
         ui.registerEvent((UnusedStoredReposChangedEventHandler) e -> {
             Platform.runLater(() -> updateRepoRemoveList(remove));
         });
 
-        return new MenuItem[] { remove };
+        choose.setAccelerator(SHOW_REPO_PICKER);
+        choose.setOnAction(e -> ui.triggerEvent(new ShowRepositoryPickerEvent()));
+
+        return new MenuItem[] { remove, choose };
     }
 
     private void updateRepoRemoveList(Menu remove) {

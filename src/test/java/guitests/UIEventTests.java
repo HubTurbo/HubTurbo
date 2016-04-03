@@ -14,7 +14,6 @@ import static ui.components.KeyboardShortcuts.*;
 
 public class UIEventTests extends UITest {
 
-    private static String defaultRepoId;
     static int eventTestCount;
 
     public static void increaseEventTestCount() {
@@ -23,10 +22,6 @@ public class UIEventTests extends UITest {
 
     private static void resetEventTestCount() {
         eventTestCount = 0;
-    }
-
-    private static void getEventRepoId(PrimaryRepoChangedEvent e) {
-        defaultRepoId = e.repoId;
     }
 
     @Test
@@ -71,28 +66,6 @@ public class UIEventTests extends UITest {
         resetEventTestCount();
         clickFilterTextFieldAtPanel(0);
         assertEquals(1, eventTestCount);
-    }
-
-    @Test
-    public void defaultRepoSwitchedTest() {
-        UI.events.registerEvent((PrimaryRepoChangedEventHandler) e -> UIEventTests.increaseEventTestCount());
-        UI.events.registerEvent((PrimaryRepoChangedEventHandler) e -> UIEventTests.getEventRepoId(e));
-        resetEventTestCount();
-        press(KeyboardShortcuts.SWITCH_DEFAULT_REPO);
-        assertEquals(1, eventTestCount);
-        resetEventTestCount();
-
-        // Test with multiple repositories
-        clickRepositorySelector();
-        selectAll();
-        type("dummy3/dummy3");
-        push(KeyCode.ENTER);
-        clickFilterTextFieldAtPanel(0);
-        resetEventTestCount();
-        press(KeyboardShortcuts.SWITCH_DEFAULT_REPO);
-        assertEquals(1, eventTestCount);
-        press(KeyboardShortcuts.SWITCH_DEFAULT_REPO);
-        assertEquals("dummy3/dummy3", defaultRepoId);
     }
 
     @Test

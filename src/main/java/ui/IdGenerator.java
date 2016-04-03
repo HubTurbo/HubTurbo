@@ -59,6 +59,22 @@ public final class IdGenerator {
         return "apiBox";
     }
 
+    public static String getRepositoryPickerTextFieldId() {
+        return "repositoryPickerUserInputField";
+    }
+
+    public static String getRepositoryPickerSuggestedRepoListId() {
+        return "suggestedRepositoryList";
+    }
+
+    public static String getRepositoryPickerTextFieldReference() {
+        return "#" + getRepositoryPickerTextFieldId();
+    }
+
+    public static String getRepositoryPickerSuggestedRepoListReference() {
+        return "#" + getRepositoryPickerSuggestedRepoListId();
+    }
+
     public static String getPanelCellIdReference(int panelIndex, int issueId) {
         return "#" + getPanelCellId(panelIndex, issueId);
     }
