@@ -58,6 +58,7 @@ public class PanelMenuCreatorTest extends UITest {
 
         waitAndAssertEquals(2, panelControl::getPanelCount);
         assertEquals(Optional.of(1), panelControl.getCurrentlySelectedPanel());
+
         PanelInfo panelInfo = panelControl.getCurrentPanelInfos().get(1);
         waitAndAssertEquals(panelFilter, panelInfo::getPanelFilter);
         assertEquals(panelName, panelInfo.getPanelName());
