@@ -21,7 +21,9 @@ import java.util.Optional;
  */
 public class MilestonePickerDialog extends Dialog<MilestonePickerDialogResponse> {
     private static final String OCTICON_ARROW = "\uf03e";
-    private static final String DIALOG_TITLE = "Select Milestone";
+    private static final String TITLE_DIALOG = "Select Milestone";
+    private static final String TITLE_RESULT = "Search results";
+    private static final String TITLE_ALL = "All milestones";
     private static final int DETAILED_MILESTONE_HEIGHT = 30;
     private static final int PREV_ASSIGNED_MILESTONE_HEIGHT = 30;
 
@@ -37,7 +39,7 @@ public class MilestonePickerDialog extends Dialog<MilestonePickerDialogResponse>
     public MilestonePickerDialog(Stage stage, TurboIssue issue, List<TurboMilestone> milestones) {
         assert areFromSameRepo(issue, milestones);
         initOwner(stage);
-        setTitle(DIALOG_TITLE);
+        setTitle(TITLE_DIALOG);
         setupButtons(getDialogPane());
         setConfirmResultConverter();
         originalMilestones.addAll(convertToPickerMilestones(issue, milestones));
@@ -126,12 +128,32 @@ public class MilestonePickerDialog extends Dialog<MilestonePickerDialogResponse>
         assignedMilestoneBox = createAssignedMilestoneBox();
         matchingMilestonesBox = createMatchingMilestonesBox();
         inputField = createInputField();
+        ScrollPane allMilestoneScrollPane = createAllMilestonesScrollPane();
 
-        milestoneDialogBox.getChildren().addAll(assignedMilestoneBox, inputField, matchingMilestonesBox);
+        milestoneDialogBox.getChildren().addAll(
+                assignedMilestoneBox,
+                inputField,
+                new Label(TITLE_RESULT),
+                matchingMilestonesBox,
+                new Label(TITLE_ALL), allMilestoneScrollPane);
 
         getDialogPane().setContent(milestoneDialogBox);
         refreshUI(state);
         Platform.runLater(inputField::requestFocus);
+    }
+
+    private ScrollPane createAllMilestonesScrollPane() {
+        VBox milestonesBox = new VBox();
+        milestonesBox.setStyle("-fx-border-radius: 3;-fx-background-color: white;-fx-border-color: black;");
+        originalMilestones.forEach(milestone ->
+                milestonesBox.getChildren().add(
+                setMouseClickForNode(milestone.getDetailedMilestoneNode(), milestone.getTitle()))
+        );
+
+        ScrollPane milestonesScrollPane = new ScrollPane();
+        milestonesScrollPane.setMaxHeight(163);
+        milestonesScrollPane.setContent(milestonesBox);
+        return milestonesScrollPane;
     }
 
     private void refreshUI(MilestonePickerState state) {
@@ -185,7 +207,7 @@ public class MilestonePickerDialog extends Dialog<MilestonePickerDialogResponse>
 
     private VBox createMilestoneDialogBox() {
         VBox dialogBox = new VBox();
-        dialogBox.setSpacing(3);
+        dialogBox.setSpacing(5);
         return dialogBox;
     }
 
