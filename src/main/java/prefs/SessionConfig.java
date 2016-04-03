@@ -30,6 +30,7 @@ public class SessionConfig {
     private String lastLoginUsername = "";
     private byte[] lastLoginPassword = new byte[0];
     private Optional<String> lastOpenBoard = Optional.empty();
+    private Optional<List<PanelInfo>> lastOpenBoardPanelInfos = Optional.empty();
     private final Map<String, List<PanelInfo>> savedBoards = new LinkedHashMap<>();
     private final Map<String, Map<Integer, LocalDateTime>> markedReadTimes = new HashMap<>();
     private Map<String, String> keyboardShortcuts = new HashMap<>();
@@ -88,6 +89,14 @@ public class SessionConfig {
 
     public Optional<String> getLastOpenBoard() {
         return lastOpenBoard;
+    }
+
+    public Optional<List<PanelInfo>> getLastOpenBoardPanelInfos() {
+        return lastOpenBoardPanelInfos;
+    }
+
+    public void setLastOpenBoardPanelInfos(List<PanelInfo> lastOpenBoardPanelInfos) {
+        this.lastOpenBoardPanelInfos = Optional.of(lastOpenBoardPanelInfos);
     }
 
     public void clearLastOpenBoard() {
