@@ -103,6 +103,10 @@ public class SessionConfig {
         lastOpenBoard = Optional.empty();
     }
 
+    public void clearLastOpenBoardPanelInfos() {
+        lastOpenBoardPanelInfos = Optional.empty();
+    }
+
     public void clearAllBoards() {
         clearLastOpenBoard();
         savedBoards.clear();

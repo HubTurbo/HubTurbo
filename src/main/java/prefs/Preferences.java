@@ -233,6 +233,11 @@ public class Preferences { // NOPMD
         save();
     }
 
+    public void clearLastOpenBoardPanelInfos() {
+        sessionConfig.clearLastOpenBoardPanelInfos();
+        save();
+    }
+
     public List<PanelInfo> getBoardPanels(String boardName) {
         return sessionConfig.getBoardPanels(boardName);
     }
