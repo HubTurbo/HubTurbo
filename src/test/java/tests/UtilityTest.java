@@ -13,15 +13,13 @@ import static util.Utility.replaceNull;
 import static util.Utility.safeLongToInt;
 import static util.Utility.snakeCaseToCamelCase;
 import static util.Utility.stripQuotes;
+import org.junit.Test;
+import util.Utility;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.*;
-
-import org.junit.Test;
-
-import util.Utility;
 
 public class UtilityTest {
 
@@ -177,5 +175,20 @@ public class UtilityTest {
     @Test
     public void containsIgnoreCaseMultipleWords_allMatchingQueries() {
         assertTrue(Utility.containsIgnoreCase("this is me", Arrays.asList("is", "me")));
+    }
+
+    @Test
+    public void removeFirstWord_emptyString() {
+        assertTrue(Utility.removeFirstWord("").isEmpty());
+    }
+
+    @Test
+    public void removeFirstWord_oneWord() {
+        assertTrue(Utility.removeFirstWord("Hello").isEmpty());
+    }
+
+    @Test
+    public void removeFirstWord_moreThanOneWord() {
+        assertEquals("my name is Bond ", Utility.removeFirstWord("Hello, my name is Bond "));
     }
 }

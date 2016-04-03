@@ -7,7 +7,9 @@ import backend.resource.Model;
 import backend.resource.MultiModel;
 import backend.resource.TurboIssue;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.InOrder;
 import prefs.Preferences;
 import ui.UI;
@@ -26,12 +28,16 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.anyBoolean;
 import static org.mockito.Mockito.*;
 
 public class LogicTests {
     private final Logic logic;
     private final RepoIO mockedRepoIO;
     private final MultiModel mockedMultiModel;
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     public LogicTests() throws NoSuchFieldException, IllegalAccessException {
         Preferences mockedPreferences = mock(Preferences.class);
@@ -85,6 +91,19 @@ public class LogicTests {
         mockMultiModelReplaceIssueMilestone(Optional.of(issue), Optional.empty());
 
         assertFalse(logic.replaceIssueMilestone(issue, Optional.of(1)).get());
+    }
+
+    /**
+     * Tests that replaceIssueMilestone propagates exceptions when repoIO encounter exceptions
+     */
+    @Test
+    public void replaceIssueMilestone_repoIOException() throws ExecutionException, InterruptedException {
+        TurboIssue issue = createIssueWithMilestone(1, Optional.empty());
+        mockRepoIOReplaceIssueMilestoneException(new Exception("Some exception"));
+        mockMultiModelReplaceIssueMilestone(Optional.of(issue), Optional.empty());
+
+        thrown.expect(ExecutionException.class);
+        logic.replaceIssueMilestone(issue, Optional.of(1)).get();
     }
 
     /**
@@ -202,6 +221,19 @@ public class LogicTests {
         mockMultiModelReplaceIssueAssignee(Optional.of(issue), Optional.empty());
 
         assertFalse(logic.replaceIssueAssignee(issue, Optional.of("")).get());
+    }
+
+    /**
+     * Tests that replaceIssueLabels propagates exception when repoIO encounter exceptions
+     */
+    @Test
+    public void replaceIssueLabels_repoIOException() throws ExecutionException, InterruptedException {
+        TurboIssue issue = createIssueWithLabels(1, Arrays.asList("label1", "label2"));
+        mockRepoIOReplaceIssueLabelsException(new Exception("Some exception"));
+        mockMultiModelReplaceIssueLabels(Optional.of(issue), Optional.empty());
+
+        thrown.expect(ExecutionException.class);
+        logic.replaceIssueLabels(issue, new ArrayList<>()).get();
     }
 
     /**
@@ -323,6 +355,20 @@ public class LogicTests {
     }
 
     /**
+     * Tests that {@code editIssueState} propagates exception when repoIO encounters exception
+     */
+    @Test
+    public void editIssueState_repoIOException() throws ExecutionException, InterruptedException {
+        mockRepoIOEditIssueStateException(new Exception("Some exception"));
+
+        TurboIssue openIssue = createOpenIssue();
+        mockMultiModelEditIssueState(Optional.of(openIssue), Optional.empty());
+
+        thrown.expect(ExecutionException.class);
+        logic.editIssueState(openIssue, false).get();
+    }
+
+    /**
      * Tests that {@link MultiModel#editIssueState(String, int, boolean)} is first called with the
      * new open/closed state then revert back to original state when repoIO failed to update labels
      */
@@ -430,9 +476,21 @@ public class LogicTests {
                 .thenReturn(CompletableFuture.completedFuture(replaceResult));
     }
 
+    private void mockRepoIOReplaceIssueLabelsException(Throwable exception) {
+        CompletableFuture<Boolean> result = new CompletableFuture<>();
+        result.completeExceptionally(exception);
+        when(mockedRepoIO.replaceIssueLabels(any(TurboIssue.class), anyListOf(String.class))).thenReturn(result);
+    }
+
     private void mockRepoIOReplaceIssueMilestoneResult(boolean replaceResult) {
         when(mockedRepoIO.replaceIssueMilestone(any(TurboIssue.class), any(Optional.class)))
                 .thenReturn(CompletableFuture.completedFuture(replaceResult));
+    }
+
+    private void mockRepoIOReplaceIssueMilestoneException(Throwable exception) {
+        CompletableFuture<Boolean> result = new CompletableFuture<>();
+        result.completeExceptionally(exception);
+        when(mockedRepoIO.replaceIssueMilestone(any(TurboIssue.class), any(Optional.class))).thenReturn(result);
     }
 
     private void mockMultiModelReplaceIssueLabels(Optional<TurboIssue> replaceResult,
@@ -452,6 +510,12 @@ public class LogicTests {
     private void mockRepoIOEditIssueStateResult(boolean editResult) {
         when(mockedRepoIO.editIssueState(any(TurboIssue.class), anyBoolean()))
                 .thenReturn(CompletableFuture.completedFuture(editResult));
+    }
+
+    private void mockRepoIOEditIssueStateException(Throwable exception) {
+        CompletableFuture<Boolean> result = new CompletableFuture<>();
+        result.completeExceptionally(exception);
+        when(mockedRepoIO.editIssueState(any(TurboIssue.class), anyBoolean())).thenReturn(result);
     }
 
     private void mockMultiModelEditIssueState(Optional<TurboIssue> editResult,

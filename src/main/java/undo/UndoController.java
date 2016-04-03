@@ -77,6 +77,15 @@ public class UndoController {
         return success;
     }
 
+    /**
+     * Shows an error dialog for an {@code action} that has been been carried out with an {@code issue} but
+     * encountered an {@code Exception}. The error dialog shows the message obtained from calling {@code} getMessage
+     * on the exception and removing the Exception Class from the message.
+     * @param issue
+     * @param action
+     * @param exception
+     * @return
+     */
     private boolean handleActionException(TurboIssue issue, Action<TurboIssue> action, Throwable exception) {
         showErrorDialog(issue, action, Utility.removeFirstWord(exception.getMessage()));
         return false;
