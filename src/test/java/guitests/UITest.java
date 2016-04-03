@@ -67,9 +67,12 @@ public class UITest extends FxRobot {
     private static final Logger logger = LogManager.getLogger(UITest.class.getName());
     private static final Map<Character, KeyCode> specialCharsMap = getSpecialCharsMap();
 
-    // Sets properties to run tests headless
+    /**
+     * Sets TestFX properties to run in headless mode with
+     * system properties that ensures tests run without any issues
+     * as suggested by TestFX founder
+     */
     static {
-        System.setProperty("headless", "true");
         if (Boolean.getBoolean("headless")) {
             System.setProperty("java.awt.robot", "true");
             System.setProperty("testfx.robot", "glass");
@@ -185,11 +188,8 @@ public class UITest extends FxRobot {
         // method to be overridden if anything needs to be done (e.g. to the json) before the stage starts
     }
 
-    // ================
-    // Waiting routines
-    // ================
-
     public void waitUntilNodeAppears(Node node) {
+
         GuiTest.waitUntil(node, n -> n.isVisible() && n.getParent() != null);
     }
 
