@@ -5,19 +5,18 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.util.concurrent.TimeoutException;
+
+import org.eclipse.egit.github.core.RepositoryId;
+import org.junit.Test;
+import org.testfx.api.FxToolkit;
 
 import guitests.UITest;
-import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
-import org.eclipse.egit.github.core.RepositoryId;
-import org.junit.Test;
-import org.loadui.testfx.utils.FXTestUtils;
-
 import javafx.scene.input.KeyCode;
-import javafx.stage.Stage;
+import javafx.scene.layout.VBox;
 import prefs.Preferences;
 import ui.IdGenerator;
 import ui.TestController;
@@ -31,26 +30,10 @@ public class RepositoryPickerTest extends UITest {
 
     private static String primaryRepo;
 
-    protected static class RepositoryPickerTestUI extends UI {
-        public RepositoryPickerTestUI() {
-            super();
-        }
-
-        @Override
-        public void start(Stage primaryStage) {
-            super.start(primaryStage);
-            STAGE_FUTURE.set(primaryStage);
-        }
-
-        @Override
-        protected void registerTestEvents() {
-            UI.events.registerEvent((PrimaryRepoChangedEventHandler) e -> primaryRepo = e.repoId);
-        }
-    }
-
     @Override
-    public void launchApp() {
-        FXTestUtils.launchApp(RepositoryPickerTestUI.class, "--testconfig=true");
+    public void setup() throws TimeoutException {
+        FxToolkit.setupApplication(TestUI.class, "--testconfig=true");
+        UI.events.registerEvent((PrimaryRepoChangedEventHandler) e -> primaryRepo = e.repoId);
     }
 
     @Override
@@ -104,8 +87,8 @@ public class RepositoryPickerTest extends UITest {
         traverseMenu("Repos", "Show Repository Picker");
         PlatformEx.waitOnFxThread();
         userInputField = findOrWaitFor(IdGenerator.getRepositoryPickerTextFieldReference());
-        doubleClick(userInputField);
-        doubleClick();
+        doubleClickOn(userInputField);
+        doubleClickOn();
         type("dummy3/dummy3");
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
@@ -121,7 +104,7 @@ public class RepositoryPickerTest extends UITest {
         PlatformEx.waitOnFxThread();
         suggestedRepositoryList = findOrWaitFor(IdGenerator.getRepositoryPickerSuggestedRepoListReference());
         userInputField = findOrWaitFor(IdGenerator.getRepositoryPickerTextFieldReference());
-        click(userInputField);
+        clickOn(userInputField);
         type("dummy");
         assertEquals(4, suggestedRepositoryList.getChildren().size());
         assertSelectedPickerRepositoryNode("dummy", suggestedRepositoryList.getChildren().get(0));
@@ -135,7 +118,7 @@ public class RepositoryPickerTest extends UITest {
         assertSelectedPickerRepositoryNode("dummy", suggestedRepositoryList.getChildren().get(0));
         push(KeyCode.UP);
         assertSelectedPickerRepositoryNode("dummy3/dummy3", suggestedRepositoryList.getChildren().get(3));
-        doubleClick(userInputField);
+        doubleClickOn(userInputField);
         type("dummmy");
         assertEquals(1, suggestedRepositoryList.getChildren().size());
         assertSelectedPickerRepositoryNode("dummmy", suggestedRepositoryList.getChildren().get(0));
@@ -145,8 +128,8 @@ public class RepositoryPickerTest extends UITest {
         traverseMenu("Repos", "Show Repository Picker");
         PlatformEx.waitOnFxThread();
         userInputField = findOrWaitFor(IdGenerator.getRepositoryPickerTextFieldReference());
-        doubleClick(userInputField);
-        doubleClick();
+        doubleClickOn(userInputField);
+        doubleClickOn();
         type(" dummy4 / dummy4 ");
         push(KeyCode.ENTER);
         traverseMenu("Repos", "Show Repository Picker");
