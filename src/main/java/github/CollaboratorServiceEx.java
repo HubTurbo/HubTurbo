@@ -34,7 +34,14 @@ public class CollaboratorServiceEx extends CollaboratorService {
      */
     @Override
     public List<User> getCollaborators(IRepositoryIdProvider repository) throws IOException {
-        return super.getCollaborators(repository).stream()
+        return getUsersCompleteData(super.getCollaborators(repository));
+    }
+
+    /**
+     * Gets the complete data for every user since most of GitHub APIs do not return users' complete data
+     */
+    public List<User> getUsersCompleteData(List<User> users) {
+        return users.stream()
                 .map(user -> {
                     try {
                         return userService.getUser(user.getLogin());
