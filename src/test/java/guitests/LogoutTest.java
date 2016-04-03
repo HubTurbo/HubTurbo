@@ -45,8 +45,8 @@ public class LogoutTest extends UITest {
         }
 
         Preferences testPref = TestController.loadTestPreferences();
-        assertEquals("", testPref.getLastLoginUsername());
-        assertEquals("", testPref.getLastLoginPassword());
+        assertEquals("test", testPref.getLastLoginUsername());
+        assertEquals("test", testPref.getLastLoginPassword());
     }
 
     @After
