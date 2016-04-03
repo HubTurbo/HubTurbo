@@ -17,10 +17,11 @@ import java.util.Optional;
 public class PanelMenuCreatorTest extends UITest {
 
     private PanelControl panelControl;
+    private UI ui;
 
     @Before
     public void setup() {
-        UI ui = TestController.getUI();
+        ui = TestController.getUI();
         panelControl = ui.getPanelControl();
     }
 
@@ -28,8 +29,9 @@ public class PanelMenuCreatorTest extends UITest {
     public void customPanelMenuItemTest() throws NoSuchFieldException, IllegalAccessException {
         Field panelMenuCreatorField = MenuControl.class.getDeclaredField("panelMenuCreator");
         panelMenuCreatorField.setAccessible(true);
-        PanelMenuCreator value = (PanelMenuCreator) panelMenuCreatorField.get(TestController.getUI().getMenuControl());
-        for (Map.Entry<String, String> entry : value.generateCustomizedPanelDetails().entrySet()) {
+        PanelMenuCreator value = (PanelMenuCreator) panelMenuCreatorField.get(ui.getMenuControl());
+        for (Map.Entry<String, String> entry :
+                value.generateCustomizedPanelDetails(ui.prefs.getLastLoginUsername()).entrySet()) {
             customizedPanelMenuItemTest(entry.getKey(), entry.getValue());
         }
     }

@@ -42,7 +42,8 @@ public class PanelMenuCreator {
         items.add(createLeftPanelMenuItem());
         items.add(createRightPanelMenuItem());
         items.add(closePanelMenuItem());
-        for (Map.Entry<String, String> entry : generateCustomizedPanelDetails().entrySet()) {
+        for (Map.Entry<String, String> entry :
+                generateCustomizedPanelDetails(prefs.getLastLoginUsername()).entrySet()) {
             autoCreateItems.add(createCustomizedPanelMenuItem(entry.getKey(), entry.getValue()));
         }
         autoCreatePanelMenu.getItems().addAll(autoCreateItems);
@@ -51,14 +52,20 @@ public class PanelMenuCreator {
         return panelMenu;
     }
 
-    public Map<String, String> generateCustomizedPanelDetails(){
+    /**
+     * Returns a map of custom panels that can be created using the auto-create menu
+     * with the key of the map as the panel name and the value as the corresponding filter name.
+     * Uses the username as a parameter to construct the filter names.
+     * @param lastLoginUsername
+     */
+    public static Map<String, String> generateCustomizedPanelDetails(String lastLoginUsername){
         Map<String, String> customPanelMap = new LinkedHashMap<>();
         customPanelMap.put("Open issues and PR's",
-                String.format("is:open ((is:issue assignee:%s) OR (is:pr author:%s))", prefs.getLastLoginUsername(),
-                        prefs.getLastLoginUsername()));
+                String.format("is:open ((is:issue assignee:%s) OR (is:pr author:%s))", lastLoginUsername,
+                        lastLoginUsername));
         customPanelMap.put("Current Milestone", "milestone:curr sort:status");
         customPanelMap.put("Recently Updated issues",
-                String.format("assignee:%s updated:<48", prefs.getLastLoginUsername()));
+                String.format("assignee:%s updated:<48", lastLoginUsername));
         return Collections.unmodifiableMap(customPanelMap);
     }
 
