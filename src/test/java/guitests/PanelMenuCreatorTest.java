@@ -5,7 +5,6 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-import org.loadui.testfx.utils.FXTestUtils;
 import prefs.PanelInfo;
 import ui.*;
 import ui.issuepanel.PanelControl;
@@ -18,20 +17,18 @@ import java.util.Optional;
 public class PanelMenuCreatorTest extends UITest {
 
     private PanelControl panelControl;
-    private MenuControl menuBar;
 
     @Before
     public void setup() {
         UI ui = TestController.getUI();
         panelControl = ui.getPanelControl();
-        menuBar = ui.getMenuControl();
     }
 
     @Test
     public void customPanelMenuItemTest() throws NoSuchFieldException, IllegalAccessException {
         Field panelMenuCreatorField = MenuControl.class.getDeclaredField("panelMenuCreator");
         panelMenuCreatorField.setAccessible(true);
-        PanelMenuCreator value = (PanelMenuCreator) panelMenuCreatorField.get(menuBar);
+        PanelMenuCreator value = (PanelMenuCreator) panelMenuCreatorField.get(TestController.getUI().getMenuControl());
         for (Map.Entry<String, String> entry : value.generateCustomizedPanelDetails().entrySet()) {
             customizedPanelMenuItemTest(entry.getKey(), entry.getValue());
         }

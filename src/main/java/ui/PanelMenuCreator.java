@@ -13,10 +13,7 @@ import org.apache.logging.log4j.Logger;
 import ui.issuepanel.PanelControl;
 import prefs.Preferences;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static ui.components.KeyboardShortcuts.CLOSE_PANEL;
 import static ui.components.KeyboardShortcuts.CREATE_LEFT_PANEL;
@@ -24,7 +21,7 @@ import static ui.components.KeyboardShortcuts.CREATE_RIGHT_PANEL;
 
 public class PanelMenuCreator {
 
-    private Preferences prefs;
+    private final Preferences prefs;
 
     private static final Logger logger = LogManager.getLogger(MenuControl.class.getName());
 
@@ -56,11 +53,13 @@ public class PanelMenuCreator {
 
     public Map<String, String> generateCustomizedPanelDetails(){
         Map<String, String> customPanelMap = new LinkedHashMap<>();
-        customPanelMap.put("Open issues and PR's", "is:open ((is:issue assignee:" + prefs.getLastLoginUsername() +
-                ") OR (is:pr author:"+ prefs.getLastLoginUsername() + "))");
+        customPanelMap.put("Open issues and PR's",
+                String.format("is:open ((is:issue assignee:%s) OR (is:pr author:%s))", prefs.getLastLoginUsername(),
+                        prefs.getLastLoginUsername()));
         customPanelMap.put("Current Milestone", "milestone:curr sort:status");
-        customPanelMap.put("Recently Updated issues", "assignee:" + prefs.getLastLoginUsername() + " updated:<48");
-        return customPanelMap;
+        customPanelMap.put("Recently Updated issues",
+                String.format("assignee:%s updated:<48", prefs.getLastLoginUsername()));
+        return Collections.unmodifiableMap(customPanelMap);
     }
 
     public MenuItem createLeftPanelMenuItem() {
