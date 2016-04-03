@@ -141,6 +141,7 @@ public class MenuControl extends MenuBar {
         }
 
         prefs.addBoard(prefs.getLastOpenBoard().get(), panelList);
+        prefs.setLastOpenBoardPanelInfos(panelList);
         ui.triggerEvent(new BoardSavedEvent());
         logger.info("Board " + prefs.getLastOpenBoard().get() + " saved");
     }
@@ -167,6 +168,7 @@ public class MenuControl extends MenuBar {
             String boardName = response.get().trim();
             prefs.addBoard(boardName, panelList);
             prefs.setLastOpenBoard(boardName);
+            prefs.setLastOpenBoardPanelInfos(panelList);
             ui.triggerEvent(new BoardSavedEvent());
             logger.info("New board " + boardName + " saved");
             ui.updateTitle();
@@ -183,6 +185,7 @@ public class MenuControl extends MenuBar {
         panels.openPanels(panelInfo);
         panels.selectFirstPanel();
         prefs.setLastOpenBoard(boardName);
+        prefs.setLastOpenBoardPanelInfos(panelInfo);
         ui.updateTitle();
 
         ui.triggerEvent(new UsedReposChangedEvent());
