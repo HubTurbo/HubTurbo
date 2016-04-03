@@ -3,8 +3,11 @@ package ui.components.pickers;
 import backend.resource.TurboMilestone;
 import com.sun.javafx.tk.FontLoader;
 import com.sun.javafx.tk.Toolkit;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
 
 import java.util.List;
@@ -26,6 +29,8 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
     private boolean isExisting = false;
     private boolean isMatching = true;
 
+    private double progress = 0;
+
     public PickerMilestone(TurboMilestone milestone) {
         super(milestone.getRepoId(), milestone.getId(), milestone.getTitle());
         setDueDate(milestone.getDueDate());
@@ -33,6 +38,7 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
         setOpen(milestone.isOpen());
         setOpenIssues(milestone.getOpenIssues());
         setClosedIssues(milestone.getClosedIssues());
+        this.progress = calculateProgress(milestone.getOpenIssues(), milestone.getClosedIssues());
     }
 
     public PickerMilestone(PickerMilestone milestone) {
@@ -40,15 +46,6 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
         setSelected(milestone.isSelected());
         setExisting(milestone.isExisting());
         setMatching(milestone.isMatching());
-    }
-
-    public Node getNode() {
-        Label milestone = createLabel();
-        setStatusColour(milestone);
-        if (isSelected) setSelectedInUI(milestone);
-        if (!isMatching) setFadedInUI(milestone);
-        adjustWidthToFont(milestone);
-        return milestone;
     }
 
     public Node getExistingMilestoneNode() {
@@ -65,6 +62,61 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
         return milestone;
     }
 
+    public Node getDetailedMilestoneNode() {
+        HBox matchingMilestone = new HBox();
+        matchingMilestone.setSpacing(3);
+        matchingMilestone.setPadding(new Insets(3, 3, 3, 3));
+        matchingMilestone.setStyle("-fx-border-width: 0 0 1 0; -fx-border-style: solid;");
+
+        HBox milestoneNodeBox = createMilestoneNodeBox();
+        Label separator = new Label("|");
+        HBox milestoneDetailsBox = createMilestoneDetailsBox();
+
+        matchingMilestone.getChildren().setAll(milestoneNodeBox, separator, milestoneDetailsBox);
+        return matchingMilestone;
+    }
+
+    private double calculateProgress(int openIssues, int closedIssues) {
+        int totalIssues = openIssues + closedIssues;
+        return totalIssues > 0 ? (double) closedIssues / totalIssues : 0;
+    }
+
+    private HBox createMilestoneDetailsBox() {
+        HBox milestoneDetailsBox = new HBox();
+        milestoneDetailsBox.setSpacing(3);
+        milestoneDetailsBox.setPrefWidth(250);
+        milestoneDetailsBox.setAlignment(Pos.CENTER_RIGHT);
+
+        if (getDueDate().isPresent()) {
+            Label dueDate = new Label("Due on: " + getDueDate().get().toString());
+            dueDate.setPrefWidth(150);
+            milestoneDetailsBox.getChildren().add(dueDate);
+        }
+
+        MilestoneProgressBar progressBar = new MilestoneProgressBar(getProgress());
+        Label progressLabel = new Label(String.format("%3.0f%%", getProgress() * 100));
+        progressLabel.setPrefWidth(50);
+        milestoneDetailsBox.getChildren().addAll(progressBar, progressLabel);
+        return milestoneDetailsBox;
+    }
+
+    private HBox createMilestoneNodeBox() {
+        HBox milestoneNodeBox = new HBox();
+        milestoneNodeBox.setPrefWidth(129);
+        milestoneNodeBox.setAlignment(Pos.CENTER);
+        milestoneNodeBox.getChildren().add(createMilestoneNode());
+        return milestoneNodeBox;
+    }
+
+    private Node createMilestoneNode() {
+        Label milestone = createLabel();
+        setStatusColour(milestone);
+        if (isSelected) setSelectedInUI(milestone);
+        if (!isMatching) setFadedInUI(milestone);
+        adjustWidthToFont(milestone);
+        return milestone;
+    }
+    
     private Label createLabel() {
         return new Label(getTitle());
     }
@@ -179,6 +231,14 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
 
     public boolean isExisting() {
         return this.isExisting;
+    }
+
+    public void setProgress(double progress) {
+        this.progress = progress;
+    }
+
+    public double getProgress() {
+        return this.progress;
     }
 
     @Override
