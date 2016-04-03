@@ -1,6 +1,5 @@
 package guitests;
 
-import static org.junit.Assert.assertEquals;
 import static ui.components.KeyboardShortcuts.REFRESH;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -25,6 +24,6 @@ public class MenuControlTest extends UITest {
     @Test
     public void refresh_refreshCount_refreshTriggersCorrectEvent() {
         push(REFRESH);
-        assertEquals(2, triggered.get());
+        waitAndAssertEquals(2, triggered::get);
     }
 }
