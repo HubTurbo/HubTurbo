@@ -1,12 +1,15 @@
 package guitests;
 
-import javafx.scene.control.Label;
-import javafx.scene.input.KeyCode;
-import mx4j.tools.adaptor.http.GetAttributeCommandProcessor;
+import static org.junit.Assert.assertEquals;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 
 import org.junit.Test;
 import org.loadui.testfx.GuiTest;
 
+import javafx.scene.control.Label;
+import javafx.scene.input.KeyCode;
 import ui.IdGenerator;
 import ui.TestController;
 import ui.UI;
@@ -14,11 +17,6 @@ import ui.listpanel.ListPanel;
 import util.PlatformEx;
 import util.events.testevents.UILogicRefreshEvent;
 import util.events.testevents.UpdateDummyRepoEvent;
-
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
-
-import static org.junit.Assert.assertEquals;
 
 public class UpdateIssuesTest extends UITest {
 
@@ -32,7 +30,7 @@ public class UpdateIssuesTest extends UITest {
         push(KeyCode.ENTER);
 
         // Updated view should contain Issue 9 and 10, which was commented on recently (as part of default test dataset)
-        awaitCondition(() -> 3494 == getApiCount(apiBox.getText())); // 4 calls for issues 9 and 10.
+        awaitCondition(() -> 3494 == getApiCount(apiBox.getText()), 10); // 4 calls for issues 9 and 10.
         assertEquals(3, countIssuesShown());
 
         // After updating, issue with ID 5 should have title Issue 5.1
@@ -43,7 +41,7 @@ public class UpdateIssuesTest extends UITest {
         // Updated view should now contain Issue 5.1, Issue 9 and Issue 10.
         awaitCondition(() -> 3489 == getApiCount(apiBox.getText()));
         assertEquals(4, countIssuesShown());
-        
+
 
         // Then have a non-self comment for Issue 9.
         UI.events.triggerEvent(UpdateDummyRepoEvent.addComment("dummy/dummy", 9, "Test comment", "test-nonself"));

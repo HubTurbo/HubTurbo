@@ -1,19 +1,21 @@
 package guitests;
 
-import org.junit.Test;
-import org.testfx.api.FxToolkit;
-
-import prefs.Preferences;
-import prefs.PanelInfo;
-import ui.IdGenerator;
-import ui.TestController;
+import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+import org.testfx.api.FxToolkit;
+
+import prefs.PanelInfo;
+import prefs.Preferences;
+import ui.IdGenerator;
+import ui.TestController;
 
 public class NoPanelAtQuitTest extends UITest {
+
+    private static final int EVENT_DELAY = 1000;
 
     @Override
     public void setup() throws TimeoutException {
@@ -23,6 +25,7 @@ public class NoPanelAtQuitTest extends UITest {
 
     @Test
     public void emptyPanelsInfoTest() {
+        sleep(EVENT_DELAY);
         String panelCloseButtonId = IdGenerator.getPanelCloseButtonIdReference(0);
 
         // Test for saving panel information when there are no panels at termination.
@@ -32,7 +35,7 @@ public class NoPanelAtQuitTest extends UITest {
 
         // Quitting to update json
         traverseMenu("File", "Quit");
-        
+
         Preferences testPref = TestController.loadTestPreferences();
         List<PanelInfo> lastSessionPanels = testPref.getPanelInfo();
 

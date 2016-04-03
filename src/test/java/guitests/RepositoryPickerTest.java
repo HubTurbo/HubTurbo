@@ -1,4 +1,4 @@
-package unstable;
+package guitests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -11,7 +11,6 @@ import org.eclipse.egit.github.core.RepositoryId;
 import org.junit.Test;
 import org.testfx.api.FxToolkit;
 
-import guitests.UITest;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -46,7 +45,7 @@ public class RepositoryPickerTest extends UITest {
     }
 
     @Test
-    public void repositoryPickerTest() {
+    public void testrepositoryPickerTest() {
         // check if test json is present
         File testConfig = new File(TestController.TEST_DIRECTORY, TestController.TEST_SESSION_CONFIG_FILENAME);
         boolean testConfigExists = testConfig.exists() && testConfig.isFile();

@@ -7,15 +7,13 @@ import static org.loadui.testfx.Assertions.assertNodeExists;
 import java.io.File;
 import java.util.concurrent.TimeoutException;
 
-import javafx.application.Platform;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.junit.Test;
-import org.loadui.testfx.GuiTest;
 import org.testfx.api.FxToolkit;
 
+import javafx.application.Platform;
 import javafx.scene.control.ComboBox;
 import javafx.scene.input.KeyCode;
-import javafx.stage.Stage;
 import prefs.Preferences;
 import ui.IdGenerator;
 import ui.TestController;

@@ -50,9 +50,7 @@ public class ContextMenuTests extends UITest {
         sleep(EVENT_DELAY);
 
         ContextMenu contextMenu = issuePanel.getContextMenu();
-        // Problem verifying menu item disable state in headless testing mode
-        // Instead checks for null on first menu item which happens when disabled
-        assertNull(contextMenu.getItems().get(0).getText());
+        isDisabledContextMenu(contextMenu);
     }
 
     /**
@@ -145,4 +143,14 @@ public class ContextMenuTests extends UITest {
     private void clickMenuItem(String target) {
         clickMenuItem(issuePanel.getContextMenu(), target);
     }
+
+    /**
+     * Verifies that context menu is disabled
+     * contextMenu.isDisabled() not used because of unreliability in headless test environment
+     * @param contextMenu
+     */
+    private void isDisabledContextMenu(ContextMenu contextMenu) {
+        assertNull(contextMenu.getItems().get(0).getText());
+    }
+
 }

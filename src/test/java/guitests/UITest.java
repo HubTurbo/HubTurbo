@@ -70,7 +70,7 @@ public class UITest extends FxRobot {
     /**
      * Sets TestFX properties to run in headless mode with
      * system properties that ensures tests run without any issues
-     * as suggested by TestFX founder
+     * as suggested by TestFX documentation
      */
     static {
         if (Boolean.getBoolean("headless")) {
