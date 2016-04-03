@@ -32,9 +32,11 @@ public class LogoutTest extends UITest {
         type("dummy").push(KeyCode.TAB);
         type("test").push(KeyCode.TAB);
         type("test");
+
         clickOn("Sign in");
         sleep(EVENT_DELAY);
-        clickOn("File");
+
+        clickOn("App");
         clickOn("Logout");
 
         // checking that the json file exists and the saved credentials have been emptied

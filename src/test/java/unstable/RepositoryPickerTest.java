@@ -192,7 +192,8 @@ public class RepositoryPickerTest extends UITest {
         push(KeyCode.ESCAPE);
 
         // exit program
-        traverseHubTurboMenu("File", "Quit");
+        traverseHubTurboMenu("App", "Quit");
+
         push(KeyCode.ENTER);
 
         // testing that the correct repo was saved in the json
