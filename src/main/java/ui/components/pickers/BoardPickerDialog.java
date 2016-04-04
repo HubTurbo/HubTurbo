@@ -54,7 +54,7 @@ public class BoardPickerDialog extends Dialog<String> {
     @FXML
     public void initialize() {
         queryField.textProperty().addListener(
-                    (observable, oldText, newText) -> handleUserInput(queryField.getText()));
+            (observable, oldText, newText) -> handleUserInput(queryField.getText()));
     }
 
     private void initUI(Stage stage) {
