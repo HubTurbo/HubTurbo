@@ -6,8 +6,6 @@ import java.util.stream.IntStream;
 /**
  * This class represents a state in RepositoryPicker which stores the list of existing repositories and currently
  * selected repository and handles all logic related to RepositoryPickerDialog.
- *
- * It is guaranteed that at all time, there will be exactly one selected repository.
  */
 public class RepositoryPickerState {
 
@@ -36,12 +34,12 @@ public class RepositoryPickerState {
         updateSuggestedRepositories(query);
     }
 
-    public String getSelectedRepositoryId() {
-        Optional<PickerRepository> selectedRepository = suggestedRepositories.stream()
+    public Optional<String> getSelectedRepositoryId() {
+        Optional<String> selectedRepository = suggestedRepositories.stream()
                 .filter(repo -> repo.isSelected())
+                .map(repo -> repo.getRepositoryId())
                 .findFirst();
-        assert selectedRepository.isPresent();
-        return selectedRepository.get().getRepositoryId();
+        return selectedRepository;
     }
 
     /**
@@ -51,7 +49,9 @@ public class RepositoryPickerState {
      */
     public void selectNextSuggestedRepository() {
         OptionalInt selectedPositionInSuggested = getSelectedRepositoryPositionInSuggested();
-        assert selectedPositionInSuggested.isPresent();
+        if (!selectedPositionInSuggested.isPresent()) {
+            return;
+        }
         int currentPosition = selectedPositionInSuggested.getAsInt();
         int nextPosition = currentPosition == suggestedRepositories.size() - 1 ? 0 : currentPosition + 1;
         suggestedRepositories.get(currentPosition).setSelected(false);
@@ -65,7 +65,9 @@ public class RepositoryPickerState {
      */
     public void selectPreviousSuggestedRepository() {
         OptionalInt selectedPositionInSuggested = getSelectedRepositoryPositionInSuggested();
-        assert selectedPositionInSuggested.isPresent();
+        if (!selectedPositionInSuggested.isPresent()) {
+            return;
+        }
         int currentPosition = selectedPositionInSuggested.getAsInt();
         int nextPosition = currentPosition == 0 ? suggestedRepositories.size() - 1 : currentPosition - 1;
         suggestedRepositories.get(currentPosition).setSelected(false);
@@ -75,6 +77,8 @@ public class RepositoryPickerState {
     /**
      * Selects a repository in the suggested list. The selected repositoryId must exist
      * in suggestedRepositories list.
+     *
+     * Condition: repositoryId must exist in the suggestedRepositoryList
      */
     public void setSelectedRepositoryInSuggestedList(String repositoryId) {
         Optional<PickerRepository> pickerRepository = getPickerRepositoryById(suggestedRepositories, repositoryId);
@@ -92,9 +96,6 @@ public class RepositoryPickerState {
     /**
      * Updates List<PickerRepository> suggestedRepositories so that it contains PickerRepositories that match
      * the user input.
-     *
-     * If there is no existing repository that matches the user's query exactly, it will be added to the list of
-     * suggested repositories so that the user can pick the new repository.
      */
     private void updateSuggestedRepositories(String query) {
         suggestedRepositories.clear();
@@ -103,21 +104,9 @@ public class RepositoryPickerState {
                 suggestedRepositories.add(repo);
             }
         });
-        Optional<PickerRepository> possibleExactMatch = getPickerRepositoryById(suggestedRepositories, query);
-        if (query.isEmpty()) {
-            assert !suggestedRepositories.isEmpty();
-            PickerRepository firstMatching = suggestedRepositories.get(0);
-            firstMatching.setSelected(true);
-            return;
+        if (suggestedRepositories.size() > 0) {
+            suggestedRepositories.get(0).setSelected(true);
         }
-        if (!possibleExactMatch.isPresent()) {
-            PickerRepository newRepository = new PickerRepository(query);
-            newRepository.setSelected(true);
-            suggestedRepositories.add(0, newRepository);
-            return;
-        }
-        PickerRepository exactMatch = possibleExactMatch.get();
-        exactMatch.setSelected(true);
     }
 
     /**

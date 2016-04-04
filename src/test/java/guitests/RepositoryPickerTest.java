@@ -7,15 +7,15 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.util.concurrent.TimeoutException;
 
+import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.junit.Test;
 import org.testfx.api.FxToolkit;
 
-import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.VBox;
 import prefs.Preferences;
 import ui.IdGenerator;
 import ui.TestController;
@@ -94,7 +94,7 @@ public class RepositoryPickerTest extends UITest {
         traverseMenu("Repos", "Show Repository Picker");
         PlatformEx.waitOnFxThread();
         suggestedRepositoryList = findOrWaitFor(IdGenerator.getRepositoryPickerSuggestedRepoListReference());
-        assertEquals(3, suggestedRepositoryList.getChildren().size());
+        assertEquals(2, suggestedRepositoryList.getChildren().size());
         assertEquals("dummy3/dummy3", primaryRepo);
         push(KeyCode.ESCAPE);
 
@@ -149,7 +149,7 @@ public class RepositoryPickerTest extends UITest {
         traverseMenu("Repos", "Show Repository Picker");
         PlatformEx.waitOnFxThread();
         suggestedRepositoryList = findOrWaitFor(IdGenerator.getRepositoryPickerSuggestedRepoListReference());
-        assertEquals(4, suggestedRepositoryList.getChildren().size());
+        assertEquals(3, suggestedRepositoryList.getChildren().size());
         assertEquals("dummy4/dummy4", primaryRepo);
         push(KeyCode.ESCAPE);
 

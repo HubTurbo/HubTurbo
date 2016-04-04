@@ -145,8 +145,12 @@ public class RepositoryPickerDialog extends Dialog<String> {
                 return null;
             }
 
-            String selectedRepositoryId = state.getSelectedRepositoryId();
-            return Utility.isWellFormedRepoId(selectedRepositoryId) ? selectedRepositoryId : null;
+            Optional<String> selectedRepositoryId = state.getSelectedRepositoryId();
+            if (!selectedRepositoryId.isPresent()) {
+                return null;
+            }
+
+            return Utility.isWellFormedRepoId(selectedRepositoryId.get()) ? selectedRepositoryId.get() : null;
         });
     }
 
