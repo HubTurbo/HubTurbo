@@ -293,13 +293,4 @@ public class Preferences { // NOPMD
     public Optional<LocalDateTime> getMarkedReadAt(String repoId, int issue) {
         return sessionConfig.getMarkedReadAt(repoId, issue);
     }
-
-    public Map<String, String> getKeyboardShortcuts() {
-        return sessionConfig.getKeyboardShortcuts();
-    }
-
-    public void setKeyboardShortcuts(Map<String, String> keyboardShortcuts) {
-        sessionConfig.setKeyboardShortcuts(keyboardShortcuts);
-        save();
-    }
 }
