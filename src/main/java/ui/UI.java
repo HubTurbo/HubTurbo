@@ -51,7 +51,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static ui.components.KeyboardShortcuts.SHOW_ISSUE_PICKER;
-import static ui.components.KeyboardShortcuts.SHOW_REPO_PICKER;
+
 
 public class UI extends Application implements EventDispatcher {
 
@@ -62,8 +62,6 @@ public class UI extends Application implements EventDispatcher {
     private static final Logger logger = LogManager.getLogger(UI.class.getName());
     private static HWND mainWindowHandle;
     private final GlobalHotkey globalHotkey = new GlobalHotkey(this);
-
-    private static final int REFRESH_PERIOD = 60;
 
     /**
      * Minimum Java Version Required by HT.
@@ -96,12 +94,13 @@ public class UI extends Application implements EventDispatcher {
     public static StatusUI status;
     public static EventDispatcher events;
     public EventBus eventBus;
-    private TickingTimer refreshTimer;
     public GUIController guiController;
     private NotificationController notificationController;
     public UndoController undoController;
+
     public UpdateManager updateManager;
 
+    public TickingTimerManager timerManager;
 
     // Main UI elements
 
@@ -245,11 +244,17 @@ public class UI extends Application implements EventDispatcher {
     private void initApplicationState() {
         // In the future, when more arguments are passed to logic,
         // we can pass them in the form of an array.
+
         logic = new Logic(uiManager, prefs, Optional.empty(), Optional.empty());
+
         // TODO clear cache if necessary
-        refreshTimer = new TickingTimer("Refresh Timer", REFRESH_PERIOD,
-                                        status::updateTimeToRefresh, logic::refresh, TimeUnit.SECONDS);
-        refreshTimer.start();
+        
+        TickingTimer refreshTimer = new TickingTimer("Refresh Timer", TickingTimerManager.DEFAULT_REFRESH_PERIOD_IN_SEC,
+            status::updateTimeToRefresh, logic::refresh, TimeUnit.SECONDS);
+
+        timerManager = new TickingTimerManager(refreshTimer);
+        timerManager.startTimer();
+
         undoController = new UndoController(notificationController);
     }
 
@@ -355,7 +360,7 @@ public class UI extends Application implements EventDispatcher {
                     if (shouldRefresh) {
                         logger.info("Browser view has changed; refreshing");
                         logic.refresh();
-                        refreshTimer.restart();
+                        timerManager.restartTimer();
                     }
                 }
             });

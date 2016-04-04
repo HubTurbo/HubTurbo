@@ -25,7 +25,20 @@ public class GUIController {
     private final PanelControl panelControl;
     private final UI ui;
     private final Label apiBox;
+
+    /**
+     * To store the previous amount of the available remaining API request.
+     */
+    private int previousRemainingApiRequests = 0;
+
+    /**
+     * To store the previous amount of api calls used.
+     */
+    private int lastNumberOfApiCallsUsed = 0;
+
     private String defaultRepoId;
+
+    long refreshTimeInMins = 1;
 
     public GUIController(UI ui, PanelControl panelControl, Label apiBox) {
         this.ui = ui;
@@ -41,14 +54,15 @@ public class GUIController {
 
     public final void registerEvents() {
         UI.events.registerEvent((ModelUpdatedEventHandler) this::modelUpdated);
-        UI.events.registerEvent((UpdateRateLimitsEventHandler) this::updateAPIBox);
+        UI.events.registerEvent((UpdateRemainingRateEventHandler) this::updateRemainingRateEvent);
+        UI.events.registerEvent((UpdateSyncRefreshRateEventHandler) this::updateSyncRefreshRate);
         UI.events.registerEvent((ShowErrorDialogEventHandler) this::showErrorDialog);
         UI.events.registerEvent((PrimaryRepoChangedEventHandler) this::setDefaultRepo);
     }
 
     /**
      * The handler method for a ModelUpdatedEvent.
-     * <p>
+     * <p/>
      * It processes each panel in the current GUI, and checks the ModelUpdatedEvent for issues to be displayed
      * that match the current panel's filter expression:
      * - If not, the panel does not change its appearance.
@@ -72,7 +86,7 @@ public class GUIController {
     /**
      * Handler method for an applyFilterExpression call from an FilterPanel, which is in turn triggered by
      * the user pressing ENTER while the cursor is on the FilterPanel's filterTextField.
-     * <p>
+     * <p/>
      * Triggers a processAndRefresh call in Logic with only the given panel's filterExpression. Contrast this
      * with refreshAllPanels in Logic, triggers processAndRefresh with all FilterExpressions from the GUI.
      *
@@ -102,11 +116,40 @@ public class GUIController {
                 .collect(Collectors.toList());
     }
 
-    private void updateAPIBox(UpdateRateLimitsEvent e) {
-        Platform.runLater(() -> apiBox.setText(String.format("%s/%s",
-                                                             e.remainingRequests,
-                                                             Utility.minutesFromNow(e.nextRefreshInMillisecs)))
-        );
+    private void updateRemainingRateEvent(UpdateRateLimitsEvent e) {
+        updateAPIBox(e.remainingRequests, e.nextRefreshInMillisecs);
+    }
+
+    /**
+     * Updates the sync refresh rate of updating on the current data store.
+     * @param e The current api rate limits for calculation of the refresh rate.
+     */
+    private void updateSyncRefreshRate(UpdateRateLimitsEvent e) {
+        lastNumberOfApiCallsUsed = computePreviousRemainingApiRequests(e);
+        refreshTimeInMins = ui.timerManager.computeTickerTimerPeriod(e.remainingRequests,
+                Utility.minutesFromNow(e.nextRefreshInMillisecs), lastNumberOfApiCallsUsed);
+        ui.timerManager.changeTickingTimerPeriodInMins((int) refreshTimeInMins);
+    }
+
+    private int computePreviousRemainingApiRequests(UpdateRateLimitsEvent e) {
+        int difference = previousRemainingApiRequests - e.remainingRequests;
+        previousRemainingApiRequests = e.remainingRequests;
+
+        if (difference >= 0) {
+            return difference;
+        }
+        return lastNumberOfApiCallsUsed;
+    }
+
+    /**
+     * Updates the GUI APIBox to indicate the no of remaining api request, time until next api renewal and
+     * the current sync refresh rate.
+     * @param remainingRequests The number of remaining api request.
+     * @param nextRefreshInMillisecs The next refresh time in epoch format.
+     */
+    private void updateAPIBox(int remainingRequests, long nextRefreshInMillisecs) {
+        Platform.runLater(() -> apiBox.setText(String.format("%s/%s[x%d]", remainingRequests,
+                Utility.minutesFromNow(nextRefreshInMillisecs), (int) Math.ceil(refreshTimeInMins))));
     }
 
     private void showErrorDialog(ShowErrorDialogEvent e) {

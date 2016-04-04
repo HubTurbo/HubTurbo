@@ -229,6 +229,14 @@ public final class Utility {
         return millisecDuration / 1000 / 60;
     }
 
+    public static long minsToSecs(long minsDuration) {
+        return minsDuration * 60;
+    }
+
+    public static long secsToMins(long secsDuration) {
+        return secsDuration / 60; 
+    }
+
     public static long minutesFromNow(long targetTime) {
         return millisecToMinutes(targetTime - new Date().getTime());
     }
