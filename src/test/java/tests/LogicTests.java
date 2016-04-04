@@ -227,6 +227,19 @@ public class LogicTests {
      * Tests that replaceIssueLabels propagates exception when repoIO encounter exceptions
      */
     @Test
+    public void replaceIssueAssignee_repoIOException() throws ExecutionException, InterruptedException {
+        TurboIssue issue = createIssueWithAssignee(1, "testAssignee");
+        mockRepoIOReplaceIssueAssigneeException(new Exception("Some exception"));
+        mockMultiModelReplaceIssueAssignee(Optional.of(issue), Optional.empty());
+
+        thrown.expect(ExecutionException.class);
+        assertFalse(logic.replaceIssueAssignee(issue, Optional.of("")).get());
+    }
+
+    /**
+     * Tests that replaceIssueLabels propagates exception when repoIO encounter exceptions
+     */
+    @Test
     public void replaceIssueLabels_repoIOException() throws ExecutionException, InterruptedException {
         TurboIssue issue = createIssueWithLabels(1, Arrays.asList("label1", "label2"));
         mockRepoIOReplaceIssueLabelsException(new Exception("Some exception"));
@@ -474,6 +487,12 @@ public class LogicTests {
     private void mockRepoIOReplaceIssueAssigneeResult(boolean replaceResult) {
         when(mockedRepoIO.replaceIssueAssignee(any(TurboIssue.class), any(Optional.class)))
                 .thenReturn(CompletableFuture.completedFuture(replaceResult));
+    }
+
+    private void mockRepoIOReplaceIssueAssigneeException(Throwable exception) {
+        CompletableFuture<Boolean> result = new CompletableFuture<>();
+        result.completeExceptionally(exception);
+        when(mockedRepoIO.replaceIssueAssignee(any(TurboIssue.class), any(Optional.class))).thenReturn(result);
     }
 
     private void mockRepoIOReplaceIssueLabelsException(Throwable exception) {

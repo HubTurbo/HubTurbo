@@ -35,7 +35,8 @@ public class ReplaceIssueAssigneeOnServerOp implements RepoOp<Boolean> {
     @Override
     public CompletableFuture<Boolean> perform() {
         return repoIO.replaceIssueAssignee(issue, assigneeLoginName)
-                .thenApply(chain(result));
+                .thenApply(chain(result))
+                .exceptionally(result::completeExceptionally);
     }
 
 }

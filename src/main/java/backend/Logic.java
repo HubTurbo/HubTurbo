@@ -272,11 +272,7 @@ public class Logic {
                 })
                 .thenCombine(localLabelsReplaceFuture, (isUpdateSuccessful, locallyModifiedIssue) ->
                         handleIssueLabelsUpdateResult(isUpdateSuccessful, locallyModifiedIssue, originalLabels))
-                .thenAccept((isReplacementSuccessful) -> {
-                    if (!result.isCompletedExceptionally()) {
-                        result.complete(isReplacementSuccessful);
-                    }
-                });
+                .thenAccept(result::complete);
 
         return result;
     }
@@ -306,11 +302,7 @@ public class Logic {
                 .thenCombine(localMilestoneReplaceFuture, (isUpdateSuccessful, locallyModifiedIssue) ->
                         handleIssueMilestoneUpdateOnServerResult(
                                 isUpdateSuccessful, locallyModifiedIssue, oldMilestone))
-                .thenAccept((isReplacementSuccessful) -> {
-                    if (!result.isCompletedExceptionally()) {
-                        result.complete(isReplacementSuccessful);
-                    }
-                });
+                .thenAccept(result::complete);
 
         return result;
     }
@@ -325,12 +317,20 @@ public class Logic {
      */
     public CompletableFuture<Boolean> replaceIssueAssignee(TurboIssue issue, Optional<String> newAssigneeLoginName){
         logger.info("Changing assignee for " + issue + " on UI");
+        CompletableFuture<Boolean> result = new CompletableFuture<>();
         CompletableFuture<Optional<TurboIssue>> localAssigneeReplaceFuture =
                 repoOpControl.replaceIssueAssigneeLocally(issue, newAssigneeLoginName);
         localAssigneeReplaceFuture.thenRun(this::refreshUI);
 
-        return updateIssueAssigneesOnServer(issue, newAssigneeLoginName)
-                .thenCombine(localAssigneeReplaceFuture, this::handleIssueAssigneeUpdateResult);
+        updateIssueAssigneesOnServer(issue, newAssigneeLoginName)
+                .exceptionally((e) -> {
+                    result.completeExceptionally(e);
+                    return false;
+                })
+                .thenCombine(localAssigneeReplaceFuture, this::handleIssueAssigneeUpdateResult)
+                .thenAccept(result::complete);
+
+        return result;
     }
 
     /**
@@ -568,11 +568,7 @@ public class Logic {
                 })
                 .thenCombine(localStateEditFuture, (isUpdateSuccessful, locallyModifiedIssue) ->
                     handleIssueStateUpdateResult(isUpdateSuccessful, locallyModifiedIssue, isOpenOriginally))
-                .thenAccept((isReplacementSuccessful) -> {
-                    if (!result.isCompletedExceptionally()) {
-                        result.complete(isReplacementSuccessful);
-                    }
-                });
+                .thenAccept(result::complete);
 
         return result;
     }
