@@ -8,18 +8,18 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class AssigneePickerState {
-    private List<PickerAssignee> currentAssigneesList;
+    private List<PickerAssignee> usersList;
 
-    public AssigneePickerState(List<PickerAssignee> assignees) {
-        currentAssigneesList = cloneAssignees(assignees);
+    public AssigneePickerState(List<PickerAssignee> users) {
+        usersList = cloneUsers(users);
     }
 
-    public AssigneePickerState(List<PickerAssignee> assignees, String userInput) {
-        this(assignees);
+    public AssigneePickerState(List<PickerAssignee> users, String userInput) {
+        this(users);
         processInput(userInput);
     }
 
-    private static List<PickerAssignee> cloneAssignees(List<PickerAssignee> sourceList) {
+    private static List<PickerAssignee> cloneUsers(List<PickerAssignee> sourceList) {
         return sourceList.stream()
                 .map(PickerAssignee::new)
                 .collect(Collectors.toList());
@@ -32,51 +32,51 @@ public class AssigneePickerState {
 
         String[] userInputWords = userInput.split(" ");
         Stream.of(userInputWords)
-                .forEach(this::filterAssignees);
-        toggleFirstMatchingAssignee();
+                .forEach(this::filterUsers);
+        toggleFirstMatchingUser();
     }
 
-    public List<PickerAssignee> getCurrentAssigneesList() {
-        return this.currentAssigneesList;
+    public List<PickerAssignee> getCurrentUsersList() {
+        return this.usersList;
     }
 
-    public List<PickerAssignee> getMatchingAssigneesList() {
-        return currentAssigneesList.stream()
+    public List<PickerAssignee> getMatchingUsersList() {
+        return usersList.stream()
                 .filter(PickerAssignee::isMatching)
                 .collect(Collectors.toList());
     }
 
-    public void toggleExactMatchAssignee(String assigneeLoginName) {
-        Optional<PickerAssignee> exactMatchAssignee = getExactMatchAssignee(assigneeLoginName);
-        exactMatchAssignee.ifPresent(this::toggleAssignee);
+    public void toggleExactMatchUser(String username) {
+        Optional<PickerAssignee> exactMatchUser = getExactMatchUser(username);
+        exactMatchUser.ifPresent(this::toggleUser);
     }
 
-    private void toggleFirstMatchingAssignee() {
-        Optional<PickerAssignee> firstMatchingAssignee = getFirstMatchingAssignee();
-        firstMatchingAssignee.ifPresent(this::toggleAssignee);
+    private void toggleFirstMatchingUser() {
+        Optional<PickerAssignee> firstMatchingUser = getFirstMatchingUser();
+        firstMatchingUser.ifPresent(this::toggleUser);
     }
 
-    private void toggleAssignee(PickerAssignee matchingAssignee) {
-        currentAssigneesList.forEach(assignee -> assignee.setSelected(matchingAssignee.equals(assignee)
-                && !assignee.isSelected()));
+    private void toggleUser(PickerAssignee matchingUser) {
+        usersList.forEach(user -> user.setSelected(matchingUser.equals(user)
+                && !user.isSelected()));
     }
 
-    private void filterAssignees(String query) {
-        currentAssigneesList.forEach(assignee -> {
-            boolean matchQuery = Utility.containsIgnoreCase(assignee.getLoginName(), query);
-            assignee.setMatching(matchQuery);
+    private void filterUsers(String query) {
+        usersList.forEach(user -> {
+            boolean matchQuery = Utility.containsIgnoreCase(user.getLoginName(), query);
+            user.setMatching(matchQuery);
         });
     }
 
-    private Optional<PickerAssignee> getFirstMatchingAssignee() {
-        return currentAssigneesList.stream()
+    private Optional<PickerAssignee> getFirstMatchingUser() {
+        return usersList.stream()
                 .filter(PickerAssignee::isMatching)
                 .findFirst();
     }
 
-    private Optional<PickerAssignee> getExactMatchAssignee(String query) {
-        return currentAssigneesList.stream()
-                .filter(assignee -> assignee.getLoginName().equals(query))
+    private Optional<PickerAssignee> getExactMatchUser(String query) {
+        return usersList.stream()
+                .filter(user -> user.getLoginName().equals(query))
                 .findFirst();
     }
 }

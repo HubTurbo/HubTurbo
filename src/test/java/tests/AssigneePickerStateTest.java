@@ -16,24 +16,24 @@ public class AssigneePickerStateTest {
     @Test
     public void toggleAssignee_noAssignee_assigneeAssigned() {
         AssigneePickerState state = getUnassignedState();
-        state.toggleExactMatchAssignee("username1");
-        assertTrue(state.getCurrentAssigneesList().get(0).isSelected());
+        state.toggleExactMatchUser("username1");
+        assertTrue(state.getCurrentUsersList().get(0).isSelected());
     }
 
     @Test
     public void toggleAssignee_hasAssignee_assigneeChanged() {
         AssigneePickerState state = getAssignedState();
-        state.toggleExactMatchAssignee("username1");
-        assertTrue(state.getCurrentAssigneesList().get(0).isSelected());
-        assertFalse(state.getCurrentAssigneesList().get(1).isSelected());
+        state.toggleExactMatchUser("username1");
+        assertTrue(state.getCurrentUsersList().get(0).isSelected());
+        assertFalse(state.getCurrentUsersList().get(1).isSelected());
     }
 
     @Test
     public void toggleAssignee_hasAssignee_assigneeUnassigned() {
         AssigneePickerState state = getAssignedState();
-        state.toggleExactMatchAssignee("username2");
-        assertFalse(state.getCurrentAssigneesList().get(0).isSelected());
-        assertFalse(state.getCurrentAssigneesList().get(1).isSelected());
+        state.toggleExactMatchUser("username2");
+        assertFalse(state.getCurrentUsersList().get(0).isSelected());
+        assertFalse(state.getCurrentUsersList().get(1).isSelected());
     }
 
     private AssigneePickerState getUnassignedState() {

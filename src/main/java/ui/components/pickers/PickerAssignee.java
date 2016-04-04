@@ -54,34 +54,32 @@ public class PickerAssignee extends TurboUser implements Comparable<PickerAssign
         return getAssigneeLabelWithAvatar();
     }
 
-    public Node getExistingAssigneeNode(boolean hasSelectedAssigneeInPicker) {
+    public Node getExistingAssigneeNode() {
         Label assignee = getAssigneeLabelWithAvatar();
-        if (hasSelectedAssigneeInPicker || !isSelected()) {
-            assignee.getStyleClass().add("labels-removed"); // add strikethrough
-        }
+        assignee.getStyleClass().add("labels-removed"); // add strikethrough
         return assignee;
     }
 
     /**
-     * Gets the existing assignee from the assignees list
+     * Gets the existing assignee from the users list
      *
-     * @param assignees
+     * @param users
      * @return Optional of existing assignee
      */
-    public static Optional<PickerAssignee> getExistingAssignee(List<PickerAssignee> assignees) {
-        return assignees.stream()
+    public static Optional<PickerAssignee> getExistingAssignee(List<PickerAssignee> users) {
+        return users.stream()
                 .filter(PickerAssignee::isExisting)
                 .findAny();
     }
 
     /**
-     * Gets the selected assignee from the assignees list
+     * Gets the selected assignee from the users list
      *
-     * @param assignees
+     * @param users
      * @return Optional of selected assignee
      */
-    public static Optional<PickerAssignee> getSelectedAssignee(List<PickerAssignee> assignees) {
-        return assignees.stream()
+    public static Optional<PickerAssignee> getSelectedAssignee(List<PickerAssignee> users) {
+        return users.stream()
                 .filter(PickerAssignee::isSelected)
                 .findAny();
     }
