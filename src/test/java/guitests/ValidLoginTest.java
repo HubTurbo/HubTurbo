@@ -1,7 +1,10 @@
 package guitests;
 
+import java.util.concurrent.TimeoutException;
+
 import org.junit.Test;
-import org.loadui.testfx.utils.FXTestUtils;
+import org.loadui.testfx.GuiTest;
+import org.testfx.api.FxToolkit;
 
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
@@ -11,21 +14,21 @@ import ui.IdGenerator;
 public class ValidLoginTest extends UITest {
 
     @Override
-    public void launchApp() {
-        FXTestUtils.launchApp(TestUI.class, "--test=true");
+    public void setup() throws TimeoutException {
+        FxToolkit.setupApplication(TestUI.class, "--test=true");
     }
 
     @Test
     public void validLoginTest() throws InterruptedException {
-        TextField repoOwnerField = find(IdGenerator.getLoginDialogOwnerFieldIdReference());
-        click(repoOwnerField);
+        TextField repoOwnerField = GuiTest.find(IdGenerator.getLoginDialogOwnerFieldIdReference());
+        clickOn(repoOwnerField);
         selectAll();
         type("test").push(KeyCode.TAB);
         type("test").push(KeyCode.TAB);
         type("test").push(KeyCode.TAB);
         type("test");
-        click("Sign in");
+        clickOn("Sign in");
         ComboBox<String> repositorySelector = findOrWaitFor(IdGenerator.getRepositorySelectorIdReference());
-        awaitCondition(() -> "test/test".equals(repositorySelector.getValue()));
+        awaitCondition(() -> "test/test".equals(repositorySelector.getValue()), 10);
     }
 }

@@ -2,6 +2,7 @@ package guitests;
 
 import backend.stub.DummyRepoState;
 import javafx.scene.input.KeyCode;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

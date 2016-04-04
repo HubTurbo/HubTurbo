@@ -1,40 +1,39 @@
-package unstable;
+package guitests;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
-import guitests.UITest;
-import javafx.application.Platform;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.input.KeyCode;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import ui.IdGenerator;
+import javafx.application.Platform;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.input.KeyCode;
 import ui.components.FilterTextField;
 import ui.listpanel.ListPanel;
-
 
 public class ContextMenuTests extends UITest {
 
     private static final int EVENT_DELAY = 1000;
     private static final int DIALOG_DELAY = 1500;
 
+    private ListPanel issuePanel;
+
     @Before
-    public void setup() {
-        Platform.runLater(stage::show);
-        Platform.runLater(stage::requestFocus);
+    public void setupUIComponent() {
+        Platform.runLater(getStage()::show);
+        Platform.runLater(getStage()::requestFocus);
 
         FilterTextField filterTextField = getFilterTextFieldAtPanel(0);
         filterTextField.setText("");
         Platform.runLater(filterTextField::requestFocus);
 
-        clickFilterTextFieldAtPanel(0);
+        clickOn(filterTextField);
         push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
+        issuePanel = getPanel(0);
     }
 
     /**
@@ -43,8 +42,6 @@ public class ContextMenuTests extends UITest {
      */
     @Test
     public void contextMenuDisabling_noIssueInListView_contextMenuItemsDisabled() {
-        ListPanel issuePanel = getPanel(0);
-
         clickFilterTextFieldAtPanel(0);
         type("asdf");
         push(KeyCode.ENTER);
@@ -53,9 +50,7 @@ public class ContextMenuTests extends UITest {
         sleep(EVENT_DELAY);
 
         ContextMenu contextMenu = issuePanel.getContextMenu();
-        for (MenuItem menuItem : contextMenu.getItems()) {
-            assertTrue(menuItem.isDisable());
-        }
+        isDisabledContextMenu(contextMenu);
     }
 
     /**
@@ -67,14 +62,14 @@ public class ContextMenuTests extends UITest {
         clickIssue(0, 9);
         rightClickIssue(0, 9);
         sleep(EVENT_DELAY);
-        click("Mark as read (E)");
+        clickMenuItem("Mark as read (E)");
         sleep(EVENT_DELAY);
         assertTrue(getIssueCell(0, 9).getIssue().isCurrentlyRead());
 
         clickIssue(0, 9);
         rightClickIssue(0, 9);
         sleep(EVENT_DELAY);
-        click("Mark as unread (U)");
+        clickMenuItem("Mark as unread (U)");
         sleep(EVENT_DELAY);
         assertFalse(getIssueCell(0, 9).getIssue().isCurrentlyRead());
     }
@@ -87,7 +82,7 @@ public class ContextMenuTests extends UITest {
         clickIssue(0, 9);
         rightClickIssue(0, 9);
         sleep(EVENT_DELAY);
-        click("Change labels (L)");
+        clickMenuItem("Change labels (L)");
         sleep(DIALOG_DELAY);
 
         assertNotNull(getLabelPickerTextField());
@@ -101,13 +96,12 @@ public class ContextMenuTests extends UITest {
      */
     @Test
     public void contextMenu_selectChangeMilestoneMenu_successful() {
-        click("#dummy/dummy_col0_9");
-        rightClick("#dummy/dummy_col0_9");
+        rightClickIssue(0, 9);
         sleep(EVENT_DELAY);
-        click("Change milestone (M)");
+        clickMenuItem("Change milestone (M)");
         sleep(DIALOG_DELAY);
 
-        assertNotNull(find("#milestonePickerTextField"));
+        assertNotNull(getMilestonePickerTextField());
 
         push(KeyCode.ESCAPE);
         sleep(EVENT_DELAY);
@@ -118,29 +112,45 @@ public class ContextMenuTests extends UITest {
      */
     @Test
     public void testCloseReopenIssue() {
-        click("#dummy/dummy_col0_9");
-        rightClick("#dummy/dummy_col0_9");
+        rightClickIssue(0, 9);
         sleep(EVENT_DELAY);
-        click("Close issue (C)");
+        clickMenuItem("Close issue (C)");
         sleep(EVENT_DELAY);
         waitUntilNodeAppears("OK");
-        click("OK");
+        clickOn("OK");
         sleep(EVENT_DELAY);
         waitUntilNodeAppears("Undo");
-        click("Undo");
+        clickOn("Undo");
         sleep(EVENT_DELAY);
 
-        click("#dummy/dummy_col0_6");
-        rightClick("#dummy/dummy_col0_6");
+        rightClickIssue(0, 6);
         sleep(EVENT_DELAY);
-        click("Reopen issue (O)");
+        clickMenuItem("Reopen issue (O)");
         sleep(EVENT_DELAY);
         waitUntilNodeAppears("OK");
-        click("OK");
+        clickOn("OK");
         sleep(EVENT_DELAY);
         waitUntilNodeAppears("Undo");
-        click("Undo");
+        clickOn("Undo");
         sleep(EVENT_DELAY);
+    }
+
+    /**
+     * Clicks on menu item with target text
+     * @param menu
+     * @param target
+     */
+    private void clickMenuItem(String target) {
+        clickMenuItem(issuePanel.getContextMenu(), target);
+    }
+
+    /**
+     * Verifies that context menu is disabled
+     * contextMenu.isDisabled() not used because of unreliability in headless test environment
+     * @param contextMenu
+     */
+    private void isDisabledContextMenu(ContextMenu contextMenu) {
+        assertNull(contextMenu.getItems().get(0).getText());
     }
 
 }

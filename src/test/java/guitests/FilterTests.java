@@ -8,6 +8,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import org.junit.Test;
+
 import ui.listpanel.ListPanel;
 import util.PlatformEx;
 
@@ -136,6 +137,7 @@ public class FilterTests extends UITest {
     @Test
     public void countFilterTest() {
         ListPanel issuePanel = getPanel(0);
+
 
         // Checking 7 issues shown for count:7
         clickFilterTextFieldAtPanel(0);

@@ -26,6 +26,8 @@ import static org.mockito.Mockito.when;
 
 public class MultiModelTest {
 
+    private static final String REPO = "dummy/dummy";
+
     MultiModel multiModel = new MultiModel(mock(Preferences.class));
 
     @BeforeClass
@@ -93,8 +95,6 @@ public class MultiModelTest {
     public void isUserInRepo_queryExistingUser_userFound() {
         MultiModel models = new MultiModel(mock(Preferences.class));
 
-        final String REPO = "dummy/dummy";
-
         TurboUser user1 = new TurboUser(REPO, "alice", "Alice");
         TurboUser user2 = new TurboUser(REPO, "bob", "Fox");
         List<TurboUser> users = Arrays.asList(user1, user2);
@@ -115,8 +115,6 @@ public class MultiModelTest {
     @Test
     public void isUserInRepo_queryNonExistingUser_userNotFound() {
         MultiModel models = new MultiModel(mock(Preferences.class));
-
-        final String REPO = "dummy/dummy";
 
         TurboUser user1 = new TurboUser(REPO, "alice", "Alice");
         TurboUser user2 = new TurboUser(REPO, "bob", "Fox");
