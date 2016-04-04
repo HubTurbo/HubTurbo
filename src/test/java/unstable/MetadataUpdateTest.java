@@ -1,12 +1,10 @@
-package guitests;
+package unstable;
 
 import org.junit.Test;
-import org.loadui.testfx.GuiTest;
 
+import guitests.UITest;
 import javafx.scene.input.KeyCode;
-import ui.IdGenerator;
 import ui.UI;
-import ui.components.FilterTextField;
 import util.events.testevents.UpdateDummyRepoEvent;
 
 public class MetadataUpdateTest extends UITest {

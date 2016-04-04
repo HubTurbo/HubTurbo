@@ -44,7 +44,7 @@ public class RepositoryPickerTest extends UITest {
     }
 
     @Test
-    public void testrepositoryPickerTest() {
+    public void repositoryPickerTest() {
         // check if test json is present
         File testConfig = new File(TestController.TEST_DIRECTORY, TestController.TEST_SESSION_CONFIG_FILENAME);
         boolean testConfigExists = testConfig.exists() && testConfig.isFile();
@@ -62,6 +62,7 @@ public class RepositoryPickerTest extends UITest {
         type("dummy").push(KeyCode.ENTER);
         traverseHubTurboMenu("Repos", "Show Repository Picker");
         PlatformEx.waitOnFxThread();
+        waitUntilNodeAppears(IdGenerator.getRepositoryPickerTextFieldReference());
         suggestedRepositoryList = findOrWaitFor(IdGenerator.getRepositoryPickerSuggestedRepoListReference());
         assertEquals(1, suggestedRepositoryList.getChildren().size());
         assertEquals("dummy/dummy", primaryRepo);
@@ -153,7 +154,7 @@ public class RepositoryPickerTest extends UITest {
         traverseHubTurboMenu("Repos", "Show Repository Picker");
         PlatformEx.waitOnFxThread();
         suggestedRepositoryList = findOrWaitFor(IdGenerator.getRepositoryPickerSuggestedRepoListReference());
-        assertEquals(4, suggestedRepositoryList.getChildren().size());
+        waitAndAssertEquals(4, suggestedRepositoryList.getChildren()::size);
         assertEquals("dummy4/dummy4", primaryRepo);
         push(KeyCode.ESCAPE);
 

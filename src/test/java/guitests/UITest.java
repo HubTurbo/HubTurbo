@@ -74,6 +74,7 @@ public class UITest extends FxRobot {
      * as suggested by TestFX documentation
      */
     static {
+        System.setProperty("headless", "true");
         if (Boolean.getBoolean("headless")) {
             System.setProperty("java.awt.robot", "true");
             System.setProperty("testfx.robot", "glass");
@@ -125,7 +126,7 @@ public class UITest extends FxRobot {
         clearAllTestConfigs();
         clearTestFolder();
         beforeStageStarts();
-        stage.show();
+        PlatformEx.runAndWait(stage::show);
     }
 
     public static void clearTestFolder() {
@@ -388,6 +389,7 @@ public class UITest extends FxRobot {
      */
     public void clickFilterTextFieldAtPanel(int panelIndex) {
         waitUntilNodeAppears(IdGenerator.getPanelFilterTextFieldIdReference(panelIndex));
+        awaitCondition(getFilterTextFieldAtPanel(panelIndex)::isVisible, 10);
         clickOn(IdGenerator.getPanelFilterTextFieldIdReference(panelIndex));
     }
 
@@ -396,6 +398,7 @@ public class UITest extends FxRobot {
      * @param panelIndex
      */
     public FilterTextField getFilterTextFieldAtPanel(int panelIndex) {
+        waitUntilNodeAppears(IdGenerator.getPanelFilterTextFieldIdReference(panelIndex));
         return GuiTest.find(IdGenerator.getPanelFilterTextFieldIdReference(panelIndex));
     }
 
