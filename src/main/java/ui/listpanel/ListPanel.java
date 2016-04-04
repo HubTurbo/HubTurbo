@@ -75,11 +75,12 @@ public class ListPanel extends FilterPanel {
     private static final Boolean READ = true;
     private final MenuItem changeLabelsMenuItem = new MenuItem();
     private static final String CHANGE_LABELS_MENU_ITEM_TEXT = "Change labels (L)";
-
     private static final MenuItem changeMilestoneMenuItem = new MenuItem();
     private static final String CHANGE_MILESTONE_MENU_ITEM_TEXT = "Change milestone (M)";
+    private final MenuItem changeAssigneeMenuItem = new MenuItem();
+    private static final String CHANGE_ASSIGNEE_MENU_ITEM_TEXT = "Change Assignee (A)";
 
-    private static final MenuItem closeReopenIssueMenuItem = new MenuItem();
+    private final MenuItem closeReopenIssueMenuItem = new MenuItem();
     private static final String closeIssueMenuItemText = "Close issue (C)";
     private static final String reopenIssueMenuItemText = "Reopen issue (O)";
 
@@ -334,10 +335,8 @@ public class ListPanel extends FilterPanel {
                     changeLabels();
                 }
             }
-            if (MANAGE_ASSIGNEES.match(event) && ui.getBrowserComponent().isCurrentUrlIssue()) {
-                ui.getBrowserComponent().openPrTab(getCurrentlySelectedIssue(), PrTab.DISCUSSION);
-                ui.getBrowserComponent().waitUntilDiscussionPageLoaded();
-                ui.getBrowserComponent().manageAssignees(event.getCode().toString());
+            if (SHOW_ASSIGNEES.match(event)) {
+                changeAssignee();
             }
             if (SHOW_MILESTONES.match(event)) {
                 if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
@@ -408,9 +407,15 @@ public class ListPanel extends FilterPanel {
             changeLabels();
         });
 
+
         changeMilestoneMenuItem.setText(CHANGE_MILESTONE_MENU_ITEM_TEXT);
         changeMilestoneMenuItem.setOnAction(e -> {
             getSelectedElement().ifPresent(this::changeMilestone);
+        });
+
+        changeAssigneeMenuItem.setText(CHANGE_ASSIGNEE_MENU_ITEM_TEXT);
+        changeAssigneeMenuItem.setOnAction(e -> {
+            changeAssignee();
         });
 
         markAllBelowAsReadMenuItem.setText(MARK_ALL_AS_READ_MENU_ITEM_TEXT);
@@ -427,7 +432,9 @@ public class ListPanel extends FilterPanel {
                                       markAllBelowAsReadMenuItem, markAllBelowAsUnreadMenuItem,
                                       changeLabelsMenuItem,
                                       changeMilestoneMenuItem,
+                                      changeAssigneeMenuItem,
                                       closeReopenIssueMenuItem);
+
         contextMenu.setOnShowing(e -> updateContextMenu(contextMenu));
         listView.setContextMenu(contextMenu);
 
@@ -439,12 +446,23 @@ public class ListPanel extends FilterPanel {
         updateCloseReopenIssueMenuItem();
         updateChangeLabelsMenuItem();
         updateChangeMilestoneMenuItem();
-
+        updateChangeAssigneeMenuItem();
         return contextMenu;
     }
 
     public ContextMenu getContextMenu() {
         return contextMenu;
+    }
+
+    private MenuItem updateChangeAssigneeMenuItem() {
+        Optional<GuiElement> item = listView.getSelectedItem();
+        if (item.isPresent()) {
+            changeAssigneeMenuItem.setDisable(false);
+        } else {
+            changeAssigneeMenuItem.setDisable(true);
+        }
+
+        return changeAssigneeMenuItem;
     }
 
     private MenuItem updateChangeLabelsMenuItem() {
@@ -588,8 +606,15 @@ public class ListPanel extends FilterPanel {
         }
     }
 
+
     private void changeMilestone(GuiElement issueGuiElement) {
         ui.triggerEvent(new ShowMilestonePickerEvent(issueGuiElement.getIssue()));
+    }
+
+    private void changeAssignee() {
+        if (getSelectedElement().isPresent()) {
+            ui.triggerEvent(new ShowAssigneePickerEvent(getSelectedElement().get().getIssue()));
+        }
     }
 
     @Override

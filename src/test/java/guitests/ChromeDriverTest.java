@@ -13,7 +13,6 @@ import util.events.MilestoneCreatedEvent;
 import util.events.testevents.ExecuteScriptEventHandler;
 import util.events.testevents.JumpToNewCommentBoxEventHandler;
 import util.events.testevents.NavigateToPageEventHandler;
-import util.events.testevents.SendKeysToBrowserEventHandler;
 
 import static org.junit.Assert.assertEquals;
 
@@ -24,7 +23,6 @@ public class ChromeDriverTest extends UITest {
     private static final int EVENT_DELAY = 2000;
     private String url;
     private String script;
-    private String keyCode;
 
     private boolean jumpToComment = false; // NOPMD
 
@@ -38,11 +36,9 @@ public class ChromeDriverTest extends UITest {
     public void chromeDriverStubTest() {
         clearUrl();
         clearScript();
-        clearKeyCode();
 
         UI.events.registerEvent((NavigateToPageEventHandler) e -> url = e.url);
         UI.events.registerEvent((ExecuteScriptEventHandler) e -> script = e.script);
-        UI.events.registerEvent((SendKeysToBrowserEventHandler) e -> keyCode = e.keyCode);
         UI.events.registerEvent((JumpToNewCommentBoxEventHandler) e -> jumpToComment = true);
 
         UI.events.triggerEvent(new IssueSelectedEvent("dummy/dummy", 1, 0, false));
@@ -136,12 +132,6 @@ public class ChromeDriverTest extends UITest {
         assertEquals(GitHubURL.KEYBOARD_SHORTCUTS_PAGE, url);
         clearUrl();
 
-        // manage assignee
-        push(KeyCode.A);
-        sleep(EVENT_DELAY);
-        assertEquals("a", keyCode);
-        clearKeyCode();
-
         // jump to comments
         push(KeyCode.R);
         sleep(EVENT_DELAY);
@@ -166,7 +156,4 @@ public class ChromeDriverTest extends UITest {
         script = "";
     }
 
-    public void clearKeyCode() {
-        keyCode = "";
-    }
 }

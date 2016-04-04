@@ -145,7 +145,19 @@ public class LogicTests {
     }
 
     /**
-     * Tests that replaceIssueLabels fails when model's replaceIssueLabels returns an empty result
+     * Tests that replaceIssueAssigneeOnServer succeed when both models and repoIO succeeded
+     */
+    @Test
+    public void replaceIssueAssignee_successful() throws ExecutionException, InterruptedException {
+        TurboIssue issue = createIssueWithAssignee(1, "testAssignee");
+        mockRepoIOReplaceIssueAssigneeResult(true);
+        mockMultiModelReplaceIssueAssignee(Optional.of(issue), Optional.empty());
+
+        assertTrue(logic.replaceIssueAssignee(issue, Optional.of("")).get());
+    }
+
+    /**
+     * Tests that replaceIssueLabels failed when models return empty result
      */
     @Test
     public void replaceIssueLabels_modelsEmpty_unsuccessful() throws ExecutionException, InterruptedException {
@@ -157,7 +169,19 @@ public class LogicTests {
     }
 
     /**
-     * Tests that replaceIssueLabels fails when repoIO fails to update labels
+     * Tests that replaceIssueAssignee failed when models return empty result
+     */
+    @Test
+    public void replaceIssueAssignee_modelsEmpty() throws ExecutionException, InterruptedException {
+        TurboIssue issue = createIssueWithAssignee(1, "testAssignee");
+        mockRepoIOReplaceIssueAssigneeResult(true);
+        mockMultiModelReplaceIssueAssignee(Optional.empty(), Optional.empty());
+
+        assertFalse(logic.replaceIssueAssignee(issue, Optional.of("")).get());
+    }
+
+    /**
+     * Tests that replaceIssueLabels failed when repoIO failed to update labels
      */
     @Test
     public void replaceIssueLabels_repoIOFails_unsuccessful() throws ExecutionException, InterruptedException {
@@ -166,6 +190,18 @@ public class LogicTests {
         mockMultiModelReplaceIssueLabels(Optional.of(issue), Optional.empty());
 
         assertFalse(logic.replaceIssueLabels(issue, new ArrayList<>()).get());
+    }
+
+    /**
+     * Tests that replaceIssueAssignee failed when repoIO failed to update assignee
+     */
+    @Test
+    public void replaceIssueAssignee_repoIOUnsuccessful() throws ExecutionException, InterruptedException {
+        TurboIssue issue = createIssueWithAssignee(1, "testAssignee");
+        mockRepoIOReplaceIssueAssigneeResult(false);
+        mockMultiModelReplaceIssueAssignee(Optional.of(issue), Optional.empty());
+
+        assertFalse(logic.replaceIssueAssignee(issue, Optional.of("")).get());
     }
 
     /**
@@ -186,6 +222,26 @@ public class LogicTests {
         InOrder inOrder = inOrder(mockedMultiModel);
         inOrder.verify(mockedMultiModel).replaceIssueLabels(issue.getRepoId(), issue.getId(), newLabels);
         inOrder.verify(mockedMultiModel).replaceIssueLabels(issue.getRepoId(), issue.getId(), originalLabels);
+    }
+
+    /**
+     * Tests that {@link MultiModel#replaceIssueAssignee(String, int, Optional<String>)} is first called with the
+     * new assignee then revert back to original assignee when repoIO failed to update assignee
+     */
+    @Test
+    public void replaceIssueAssignee_repoIOUnsuccessful_revert() throws ExecutionException, InterruptedException {
+        Optional<String> originalAssignee = Optional.of("user1");
+        Optional<String> newAssignee = Optional.of("user2");
+
+        TurboIssue issue = createIssueWithAssignee(1, originalAssignee.get());
+        mockRepoIOReplaceIssueAssigneeResult(false);
+        mockMultiModelReplaceIssueAssignee(Optional.of(issue), Optional.empty());
+
+        logic.replaceIssueAssignee(issue, newAssignee).get();
+
+        InOrder inOrder = inOrder(mockedMultiModel);
+        inOrder.verify(mockedMultiModel).replaceIssueAssignee(issue.getRepoId(), issue.getId(), newAssignee);
+        inOrder.verify(mockedMultiModel).replaceIssueAssignee(issue.getRepoId(), issue.getId(), originalAssignee);
     }
 
     /**
@@ -339,8 +395,38 @@ public class LogicTests {
                 .editIssueState(anyString(), anyInt(), anyBoolean());
     }
 
+    /**
+     * Tests that no revert is taken place if the issue's assignee are modified elsewhere after
+     * {@link Logic#replaceIssueAssignee(TurboIssue, Optional<String>)} is called
+     */
+    @Test
+    public void replaceIssueAssignee_timeNotMatched_noRevert() throws ExecutionException, InterruptedException {
+        Optional<String> originalAssignee = Optional.of("user1");
+        Optional<String> newAssignee = Optional.of("user2");
+
+        TurboIssue issue = createIssueWithAssignee(1, originalAssignee.get());
+        TurboIssue modifiedIssue = TestUtils.delayThenGet(
+                10, () -> createIssueWithAssignee(1, originalAssignee.get()));
+
+        Model mockedModel = mock(Model.class);
+        when(mockedModel.replaceIssueAssignee(issue.getId(), newAssignee)).thenReturn(Optional.of(issue));
+        when(mockedModel.getIssueById(issue.getId())).thenReturn(Optional.of(modifiedIssue));
+        mockRepoIOReplaceIssueAssigneeResult(false);
+        mockMultiModelReplaceIssueAssignee(Optional.of(issue), Optional.of(mockedModel));
+
+        logic.replaceIssueAssignee(issue, newAssignee).get();
+
+        verify(mockedMultiModel, atMost(1))
+                .replaceIssueAssignee(anyString(), anyInt(), any(Optional.class));
+    }
+
     private void mockRepoIOReplaceIssueLabelsResult(boolean replaceResult) {
         when(mockedRepoIO.replaceIssueLabels(any(TurboIssue.class), anyListOf(String.class)))
+                .thenReturn(CompletableFuture.completedFuture(replaceResult));
+    }
+
+    private void mockRepoIOReplaceIssueAssigneeResult(boolean replaceResult) {
+        when(mockedRepoIO.replaceIssueAssignee(any(TurboIssue.class), any(Optional.class)))
                 .thenReturn(CompletableFuture.completedFuture(replaceResult));
     }
 
@@ -376,6 +462,13 @@ public class LogicTests {
         when(mockedMultiModel.getModelById(anyString())).thenReturn(modelLookUpResult);
     }
 
+    private void mockMultiModelReplaceIssueAssignee(Optional<TurboIssue> replaceResult,
+                                                    Optional<Model> modelLookUpResult) {
+        when(mockedMultiModel.replaceIssueAssignee(anyString(), anyInt(), any(Optional.class)))
+                .thenReturn(replaceResult);
+        when(mockedMultiModel.getModelById(anyString())).thenReturn(modelLookUpResult);
+    }
+
     public static TurboIssue createIssueWithLabels(int issueId, List<String> labels) {
         TurboIssue issue = new TurboIssue("testowner/testrepo", issueId, "Issue title");
         issue.setLabels(labels);
@@ -399,6 +492,12 @@ public class LogicTests {
     public static TurboIssue createOpenIssue() {
         TurboIssue issue = new TurboIssue("testowner/testrepo", 3, "Issue title");
         issue.setOpen(true);
+        return issue;
+    }
+
+    public static TurboIssue createIssueWithAssignee(int issueId, String assigneeLoginName) {
+        TurboIssue issue = new TurboIssue("testowner/testrepo", issueId, "Issue title");
+        issue.setAssignee(assigneeLoginName);
         return issue;
     }
 }

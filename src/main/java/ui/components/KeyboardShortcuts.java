@@ -92,6 +92,8 @@ public final class KeyboardShortcuts {
             new KeyCodeCombination(KeyCode.L);
     public static final KeyCodeCombination SHOW_MILESTONES =
             new KeyCodeCombination(KeyCode.M);
+    public static final KeyCodeCombination SHOW_ASSIGNEES =
+            new KeyCodeCombination(KeyCode.A);
     public static final KeyCodeCombination SHOW_PULL_REQUESTS =
             new KeyCodeCombination(KeyCode.P);
     public static final KeyCodeCombination SHOW_HELP =
@@ -111,14 +113,6 @@ public final class KeyboardShortcuts {
             new KeyCodeCombination(KeyCode.C);
     public static final KeyCodeCombination NEW_COMMENT =
             new KeyCodeCombination(KeyCode.R);
-
-    // TODO decouple manage/show labels/milestones?
-    public static final KeyCodeCombination MANAGE_LABELS =
-            new KeyCodeCombination(KeyCode.L);
-    public static final KeyCodeCombination MANAGE_ASSIGNEES =
-            new KeyCodeCombination(KeyCode.A);
-    public static final KeyCodeCombination MANAGE_MILESTONE =
-            new KeyCodeCombination(KeyCode.M);
 
     //ui.RepositorySelector
     public static final KeyCodeCombination REMOVE_FOCUS =
@@ -182,7 +176,6 @@ public final class KeyboardShortcuts {
         assignedKeys.add(SHOW_DOCS);
         assignedKeys.add(GOTO_MODIFIER);
         assignedKeys.add(NEW_COMMENT);
-        assignedKeys.add(MANAGE_ASSIGNEES);
     }
 
     private static void getKeyboardShortcutsFromHashMap() {

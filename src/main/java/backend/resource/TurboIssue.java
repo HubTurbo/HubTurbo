@@ -69,6 +69,8 @@ public class TurboIssue {
     private Optional<LocalDateTime> labelsLastModifiedAt = Optional.empty();
     private Optional<LocalDateTime> milestoneLastModifiedAt = Optional.empty();
     private Optional<LocalDateTime> stateLastModifiedAt = Optional.empty();
+    private Optional<LocalDateTime> assigneeLastModifiedAt = Optional.empty();
+
 
     @SuppressWarnings("unused")
     private void ______CONSTRUCTORS______() {}
@@ -221,6 +223,7 @@ public class TurboIssue {
     private void reconcile(TurboIssue otherIssue) {
         logger.info(String.format("Reconciling issue %s in %s", this, this.getRepoId()));
         this.reconcileLabels(otherIssue);
+        this.reconcileAssignee(otherIssue);
     }
 
     /**
@@ -237,6 +240,22 @@ public class TurboIssue {
             this.labels = otherIssue.getLabels();
             this.labelsLastModifiedAt = Optional.of(otherIssue.getLabelsLastModifiedAt());
         }
+    }
+
+    /**
+     * See also {@link #reconcile(TurboIssue)}
+     * @param otherIssue
+     */
+    private void reconcileAssignee(TurboIssue otherIssue) {
+        LocalDateTime thisIssueAssigneeModifiedAt = this.getAssigneeLastModifiedAt();
+        LocalDateTime otherIssueAssigneeModifiedAt = otherIssue.getAssigneeLastModifiedAt();
+        if (thisIssueAssigneeModifiedAt.isBefore(otherIssueAssigneeModifiedAt)) {
+            logger.info(String.format("Issue %s's assignee %s is stale, replacing with %s",
+                        this, this.getAssignee(), otherIssue.getAssignee()));
+            this.assignee = otherIssue.getAssignee();
+            this.assigneeLastModifiedAt = Optional.of(otherIssueAssigneeModifiedAt);
+        }
+
     }
 
     /**
@@ -439,12 +458,19 @@ public class TurboIssue {
         return assignee;
     }
 
-    public void setAssignee(String assignee) {
-        this.assignee = Optional.of(assignee);
-    }
-
     public void setAssignee(TurboUser assignee) {
         setAssignee(assignee.getLoginName());
+        this.assigneeLastModifiedAt = Optional.of(LocalDateTime.now());
+    }
+
+    public void setAssignee(String assignee) {
+        this.assignee = Optional.ofNullable(assignee);
+        this.assigneeLastModifiedAt = Optional.of(LocalDateTime.now()); 
+    }
+
+    public void removeAssignee() {
+        this.assignee = Optional.empty();
+        this.assigneeLastModifiedAt = Optional.of(LocalDateTime.now());
     }
 
     public List<String> getLabels() {
@@ -466,6 +492,10 @@ public class TurboIssue {
 
     public LocalDateTime getStateLastModifiedAt() {
         return stateLastModifiedAt.orElse(getUpdatedAt());
+    }
+
+    public LocalDateTime getAssigneeLastModifiedAt() {
+        return this.assigneeLastModifiedAt.orElse(getUpdatedAt());
     }
 
     public void addLabel(String label) {

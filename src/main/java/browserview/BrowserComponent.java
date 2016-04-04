@@ -19,7 +19,6 @@ import util.GitHubURL;
 import util.GithubPageElements;
 import util.PlatformSpecific;
 import util.events.testevents.JumpToNewCommentBoxEvent;
-import util.events.testevents.SendKeysToBrowserEvent;
 
 import java.awt.Rectangle;
 import java.io.*;
@@ -503,24 +502,6 @@ public class BrowserComponent {
             script = GithubPageElements.SCROLL_UP;
         }
         executeJavaScript(script);
-    }
-
-    private void sendKeysToBrowser(String keyCode) {
-        if (isTestChromeDriver) {
-            UI.events.triggerEvent(new SendKeysToBrowserEvent(keyCode));
-        }
-        WebElement body;
-        try {
-            body = driver.findElementByTagName(GithubPageElements.BODY);
-            body.sendKeys(keyCode);
-        } catch (Exception e) {
-            logger.error("No such element");
-        }
-    }
-
-    public void manageAssignees(String keyCode) {
-        sendKeysToBrowser(keyCode.toLowerCase());
-        bringToTop();
     }
 
     public void showIssues() {
