@@ -13,7 +13,6 @@ import util.events.MilestoneCreatedEvent;
 import util.events.testevents.ExecuteScriptEventHandler;
 import util.events.testevents.JumpToNewCommentBoxEventHandler;
 import util.events.testevents.NavigateToPageEventHandler;
-import util.events.testevents.SendKeysToBrowserEventHandler;
 
 import static org.junit.Assert.assertEquals;
 
