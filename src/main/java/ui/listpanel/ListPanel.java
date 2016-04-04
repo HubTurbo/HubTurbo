@@ -335,7 +335,7 @@ public class ListPanel extends FilterPanel {
                     changeLabels();
                 }
             }
-            if (MANAGE_ASSIGNEES.match(event) && ui.getBrowserComponent().isCurrentUrlIssue()) {
+            if (SHOW_ASSIGNEES.match(event)) {
                 changeAssignee();
             }
             if (SHOW_MILESTONES.match(event)) {
