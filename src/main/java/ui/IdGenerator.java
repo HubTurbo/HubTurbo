@@ -67,6 +67,22 @@ public final class IdGenerator {
         return "apiBox";
     }
 
+    public static String getBoardPickerTextFieldId() {
+        return "queryField";
+    }
+
+    public static String getBoardPickerSuggestedBoardListId() {
+        return "boardList";
+    }
+
+    public static String getBoardPickerTextFieldReference() {
+        return '#' + getBoardPickerTextFieldId();
+    }
+
+    public static String getBoardPickerSuggestedBoardListReference() {
+        return '#' + getBoardPickerSuggestedBoardListId();
+    }
+
     public static String getRepositoryPickerTextFieldId() {
         return "repositoryPickerUserInputField";
     }
