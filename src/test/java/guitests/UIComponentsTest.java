@@ -2,6 +2,7 @@ package guitests;
 
 import javafx.scene.input.KeyCode;
 import org.junit.Test;
+
 import ui.UI;
 import ui.components.FilterTextField;
 import util.events.UpdateProgressEvent;
@@ -9,6 +10,7 @@ import util.events.UpdateProgressEvent;
 import static org.junit.Assert.assertEquals;
 
 public class UIComponentsTest extends UITest {
+    
 
     // TODO check that filter text field does indeed do autocomplete correctly, etc
     @Test

@@ -31,6 +31,14 @@ public final class IdGenerator {
         return "labelPickerTextField";
     }
 
+    public static String getMilestonePickerTextFieldId() {
+        return "milestonePickerTextField";
+    }
+
+    public static String getAssigneePickerTextFieldId() {
+        return "assigneePickerTextField";
+    }
+
     public static String getPanelCloseButtonId(int panelIndex) {
         return "panel" + panelIndex + "_closeButton";
     }
@@ -59,6 +67,22 @@ public final class IdGenerator {
         return "apiBox";
     }
 
+    public static String getRepositoryPickerTextFieldId() {
+        return "repositoryPickerUserInputField";
+    }
+
+    public static String getRepositoryPickerSuggestedRepoListId() {
+        return "suggestedRepositoryList";
+    }
+
+    public static String getRepositoryPickerTextFieldReference() {
+        return "#" + getRepositoryPickerTextFieldId();
+    }
+
+    public static String getRepositoryPickerSuggestedRepoListReference() {
+        return "#" + getRepositoryPickerSuggestedRepoListId();
+    }
+
     public static String getPanelCellIdReference(int panelIndex, int issueId) {
         return "#" + getPanelCellId(panelIndex, issueId);
     }
@@ -85,6 +109,14 @@ public final class IdGenerator {
 
     public static String getLabelPickerTextFieldIdReference() {
         return "#" + getLabelPickerTextFieldId();
+    }
+
+    public static String getMilestonePickerTextFieldIdReference() {
+        return "#" + getMilestonePickerTextFieldId();
+    }
+
+    public static String getAssigneePickerFieldIdReference() {
+        return "#" + getAssigneePickerTextFieldId();
     }
 
     public static String getPanelCloseButtonIdReference(int panelIndex) {

@@ -1,12 +1,11 @@
-package unstable;
+package guitests;
 
-import guitests.UITest;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCode;
 import org.junit.Before;
 import org.junit.Test;
-import ui.IdGenerator;
+
 import ui.components.FilterTextField;
 import ui.components.IssueListView;
 import ui.listpanel.ListPanel;
@@ -19,9 +18,11 @@ import static org.junit.Assert.assertEquals;
 
 public class MarkAllIssuesAsReadUnreadTests extends UITest {
 
+    private static final int EVENT_DELAY = 1000;
+
     @Before
-    public void setup() {
-        PlatformEx.runAndWait(stage::requestFocus);
+    public void setupUIComponent() {
+        PlatformEx.runAndWait(getStage()::requestFocus);
 
         FilterTextField filterTextField = getFilterTextFieldAtPanel(0);
         filterTextField.setText("");
@@ -87,11 +88,12 @@ public class MarkAllIssuesAsReadUnreadTests extends UITest {
             awaitCondition(menuItem::isVisible);
         }
 
-        if (isMarkAsRead) {
-            click(ListPanel.MARK_ALL_AS_READ_MENU_ITEM_TEXT);
+        if (isMarkAsRead){
+            clickMenuItem(contextMenu, ListPanel.MARK_ALL_AS_READ_MENU_ITEM_TEXT);
         } else {
-            click(ListPanel.MARK_ALL_AS_UNREAD_MENU_ITEM_TEXT);
+            clickMenuItem(contextMenu, ListPanel.MARK_ALL_AS_UNREAD_MENU_ITEM_TEXT);
         }
+        sleep(EVENT_DELAY);
     }
 
     /**
@@ -100,7 +102,7 @@ public class MarkAllIssuesAsReadUnreadTests extends UITest {
     private void verifyReadStatusOfIssuesBelow(int index, boolean isExpectedStatusRead) {
         for (int i = index; i >= 1; i--) {
             ListPanelCell listPanelCell = getIssueCell(0, index);
-            assertEquals(listPanelCell.getIssue().isCurrentlyRead(), isExpectedStatusRead);
+            assertEquals(isExpectedStatusRead, listPanelCell.getIssue().isCurrentlyRead());
         }
     }
 }

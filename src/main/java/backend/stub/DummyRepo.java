@@ -197,6 +197,14 @@ public class DummyRepo implements Repo {
     }
 
     @Override
+    public Optional<String> setAssignee(String repoId, int issueId, String issueTitle,
+                                        Optional<String> issueAssigneeLoginName) {
+        Issue returnedIssue = getRepoState(repoId).setAssignee(issueId, issueAssigneeLoginName);
+        return Optional.ofNullable(returnedIssue.getAssignee())
+                .map(User::getLogin);
+    }
+
+    @Override
     public boolean isRepositoryValid(String repoId) {
         return true;
     }

@@ -29,8 +29,10 @@ import ui.components.HTStatusBar;
 import ui.components.KeyboardShortcuts;
 import ui.components.StatusUI;
 import ui.components.issuepicker.IssuePicker;
+import ui.components.pickers.AssigneePicker;
 import ui.components.pickers.LabelPicker;
 import ui.components.pickers.MilestonePicker;
+import ui.components.pickers.RepositoryPicker;
 import ui.issuepanel.PanelControl;
 import undo.UndoController;
 import util.*;
@@ -45,8 +47,8 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import static ui.components.KeyboardShortcuts.SWITCH_DEFAULT_REPO;
 import static ui.components.KeyboardShortcuts.SHOW_ISSUE_PICKER;
+import static ui.components.KeyboardShortcuts.SHOW_REPO_PICKER;
 
 public class UI extends Application implements EventDispatcher {
 
@@ -206,6 +208,8 @@ public class UI extends Application implements EventDispatcher {
         new LabelPicker(this, mainStage);
         new MilestonePicker(this, mainStage);
         new IssuePicker(this, mainStage);
+        new RepositoryPicker(this, mainStage, this::primaryRepoChanged);
+        new AssigneePicker(this, mainStage);
     }
 
     protected void registerTestEvents() {
@@ -358,9 +362,6 @@ public class UI extends Application implements EventDispatcher {
     private void setupGlobalKeyboardShortcuts(Scene scene) {
         globalHotkey.init();
         scene.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            if (SWITCH_DEFAULT_REPO.match(event)) {
-                switchDefaultRepo();
-            }
             if (SHOW_ISSUE_PICKER.match(event)) {
                 triggerEvent(new ShowIssuePickerEvent(logic.getModels().getIssues(), true));
             }

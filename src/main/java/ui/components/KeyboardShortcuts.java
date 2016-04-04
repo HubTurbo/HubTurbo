@@ -67,8 +67,6 @@ public final class KeyboardShortcuts {
             new KeyCodeCombination(KeyCode.M, KeyCombination.SHORTCUT_DOWN);
     public static final KeyCodeCombination DEFAULT_SIZE_WINDOW =
             new KeyCodeCombination(KeyCode.D, KeyCombination.SHORTCUT_DOWN);
-    public static final KeyCodeCombination SWITCH_DEFAULT_REPO =
-            new KeyCodeCombination(KeyCode.R, KeyCombination.SHORTCUT_DOWN);
     public static final KeyCodeCombination SHOW_ISSUES =
             new KeyCodeCombination(KeyCode.I);
     public static final KeyCodeCombination SHOW_ISSUE_PICKER =
@@ -94,6 +92,8 @@ public final class KeyboardShortcuts {
             new KeyCodeCombination(KeyCode.L);
     public static final KeyCodeCombination SHOW_MILESTONES =
             new KeyCodeCombination(KeyCode.M);
+    public static final KeyCodeCombination SHOW_ASSIGNEES =
+            new KeyCodeCombination(KeyCode.A);
     public static final KeyCodeCombination SHOW_PULL_REQUESTS =
             new KeyCodeCombination(KeyCode.P);
     public static final KeyCodeCombination SHOW_HELP =
@@ -114,17 +114,11 @@ public final class KeyboardShortcuts {
     public static final KeyCodeCombination NEW_COMMENT =
             new KeyCodeCombination(KeyCode.R);
 
-    // TODO decouple manage/show labels/milestones?
-    public static final KeyCodeCombination MANAGE_LABELS =
-            new KeyCodeCombination(KeyCode.L);
-    public static final KeyCodeCombination MANAGE_ASSIGNEES =
-            new KeyCodeCombination(KeyCode.A);
-    public static final KeyCodeCombination MANAGE_MILESTONE =
-            new KeyCodeCombination(KeyCode.M);
-
     //ui.RepositorySelector
     public static final KeyCodeCombination REMOVE_FOCUS =
             new KeyCodeCombination(KeyCode.ESCAPE);
+    public static final KeyCodeCombination SHOW_REPO_PICKER =
+            new KeyCodeCombination(KeyCode.R, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN);
 
     // ui.MenuControl
     public static final KeyCodeCombination NEW_ISSUE =
@@ -182,7 +176,6 @@ public final class KeyboardShortcuts {
         assignedKeys.add(SHOW_DOCS);
         assignedKeys.add(GOTO_MODIFIER);
         assignedKeys.add(NEW_COMMENT);
-        assignedKeys.add(MANAGE_ASSIGNEES);
     }
 
     private static void getKeyboardShortcutsFromHashMap() {

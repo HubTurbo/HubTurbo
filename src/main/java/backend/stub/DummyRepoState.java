@@ -11,6 +11,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.eclipse.egit.github.core.*;
 
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -467,6 +468,32 @@ public class DummyRepoState {
                 .setMilestoneTitle(milestones.get(milestoneOfIssue).getTitle()));
 
         toSet.removeMilestone();
+    }
+
+    protected final Issue setAssignee(int issueId, Optional<String> newAssigneeLoginName) {
+        ImmutablePair<TurboIssue, IssueMetadata> mutables = produceMutables(issueId);
+        TurboIssue toSet = mutables.getLeft();
+        IssueMetadata metadataOfIssue = mutables.getRight();
+        List<TurboIssueEvent> eventsOfIssue = metadataOfIssue.getEvents();
+
+        if (toSet.getAssignee().isPresent()) {
+            String assigneeOfIssue = toSet.getAssignee().get();
+            eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test-nonself"),
+                    IssueEventType.Unassigned,
+                    new Date()).setAssignedUser(new User().setLogin(assigneeOfIssue)));
+        }
+
+        eventsOfIssue.add(new TurboIssueEvent(new User().setLogin("test-nonself"),
+                IssueEventType.Assigned,
+                new Date()).setAssignedUser(new User().setLogin(newAssigneeLoginName.get())));
+        toSet.setAssignee(newAssigneeLoginName.get());
+        toSet.setUpdatedAt(LocalDateTime.now());
+
+        markUpdatedEvents(toSet, IssueMetadata.intermediate(eventsOfIssue, metadataOfIssue.getComments(), "", ""));
+
+        Issue newIssue = new Issue();
+        newIssue.setAssignee(new User().setLogin(newAssigneeLoginName.get()));
+        return newIssue;
     }
 
     protected TurboIssue commentOnIssue(String author, String commentText, int issueId) {

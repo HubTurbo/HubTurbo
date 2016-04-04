@@ -7,7 +7,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.junit.Test;
-import org.loadui.testfx.utils.FXTestUtils;
+import org.loadui.testfx.GuiTest;
+import org.testfx.api.FxToolkit;
+
 import prefs.PanelInfo;
 import prefs.Preferences;
 import ui.IdGenerator;
@@ -24,15 +26,16 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.concurrent.TimeoutException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 public class UseSessionConfigsTest extends UITest {
     @Override
-    public void launchApp() {
+    public void setup() throws TimeoutException {
         // isTestMode in UI checks for testconfig too so we don't need to specify --test=true here.
-        FXTestUtils.launchApp(TestUI.class, "--testconfig=true");
+        FxToolkit.setupApplication(TestUI.class, "--testconfig=true");
     }
 
     @Test
@@ -50,21 +53,21 @@ public class UseSessionConfigsTest extends UITest {
         type("test");
         pushKeys(KeyCode.TAB);
         type("test");
-        click("Sign in");
-        ComboBox<String> repositorySelector = findOrWaitFor(IdGenerator.getRepositorySelectorIdReference());
+        clickOn("Sign in");
+        ComboBox<String> repositorySelector = findOrWaitFor("#repositorySelector");
         waitForValue(repositorySelector);
         assertEquals("dummy/dummy", repositorySelector.getValue());
 
         pushKeys(KeyboardShortcuts.MAXIMIZE_WINDOW);
 
         // Make a new board
-        click("Boards");
-        click("Save as");
+        clickOn("Boards");
+        clickOn("Save as");
 
         // Somehow the text field cannot be populated by typing on the CI, use setText instead.
         // TODO find out why
-        ((TextField) find(IdGenerator.getBoardNameInputFieldIdReference())).setText("Empty Board");
-        click("OK");
+        ((TextField) GuiTest.find(IdGenerator.getBoardNameInputFieldIdReference())).setText("Empty Board");
+        clickOn("OK");
 
         PlatformEx.runAndWait(() -> UI.events.triggerEvent(new ShowRenamePanelEvent(0)));
         type("Renamed panel");
@@ -95,7 +98,7 @@ public class UseSessionConfigsTest extends UITest {
         pushKeys(KeyCode.ENTER);
 
         Label renameButton1 = filterPanel1.getRenameButton();
-        click(renameButton1);
+        clickOn(renameButton1);
         type("Dummy 2 panel");
         push(KeyCode.ENTER);
         assertEquals("Dummy 2 panel", filterPanel1.getNameText().getText());
@@ -120,16 +123,16 @@ public class UseSessionConfigsTest extends UITest {
 
 
         // Make a new board
-        click("Boards");
-        click("Save as");
+        clickOn("Boards");
+        clickOn("Save as");
 
         // Text field cannot be populated by typing on the CI, use setText instead
-        ((TextField) find(IdGenerator.getBoardNameInputFieldIdReference())).setText("Dummy Board");
-        click("OK");
+        ((TextField) GuiTest.find(IdGenerator.getBoardNameInputFieldIdReference())).setText("Dummy Board");
+        clickOn("OK");
 
         // Then exit program...
-        click("File");
-        click("Quit");
+        clickOn("File");
+        clickOn("Quit");
 
         // ...and check if the test JSON is still there...
         File testConfig = new File(TestController.TEST_DIRECTORY, TestController.TEST_SESSION_CONFIG_FILENAME);

@@ -1,12 +1,20 @@
-package unstable;
+package guitests;
 
-import backend.stub.DummyRepoState;
-import guitests.UITest;
-import javafx.scene.control.ComboBox;
-import javafx.scene.input.KeyCode;
+import static org.junit.Assert.assertEquals;
+import static ui.components.KeyboardShortcuts.CREATE_RIGHT_PANEL;
+import static ui.components.KeyboardShortcuts.DEFAULT_SIZE_WINDOW;
+import static ui.components.KeyboardShortcuts.JUMP_TO_FILTER_BOX;
+import static ui.components.KeyboardShortcuts.JUMP_TO_FIRST_ISSUE;
+import static ui.components.KeyboardShortcuts.JUMP_TO_NTH_ISSUE_KEYS;
+import static ui.components.KeyboardShortcuts.MAXIMIZE_WINDOW;
+import static ui.components.KeyboardShortcuts.MINIMIZE_WINDOW;
+import static ui.components.KeyboardShortcuts.SHOW_REPO_PICKER;
 
 import org.junit.Test;
 
+import backend.stub.DummyRepoState;
+import javafx.scene.control.ComboBox;
+import javafx.scene.input.KeyCode;
 import ui.IdGenerator;
 import ui.UI;
 import ui.components.KeyboardShortcuts;
@@ -16,11 +24,6 @@ import util.events.IssueSelectedEventHandler;
 import util.events.PanelClickedEventHandler;
 import util.events.testevents.UIComponentFocusEvent;
 import util.events.testevents.UIComponentFocusEventHandler;
-
-import static org.junit.Assert.assertEquals;
-import static ui.components.KeyboardShortcuts.*;
-
-import static ui.components.KeyboardShortcuts.SWITCH_DEFAULT_REPO;
 
 public class KeyboardShortcutsTest extends UITest {
 
@@ -38,13 +41,13 @@ public class KeyboardShortcutsTest extends UITest {
         clearPanelIndex();
 
         // maximize
-        assertEquals(false, stage.getWidth() > 500);
+        assertEquals(false, getStage().getWidth() > 500);
         press(MAXIMIZE_WINDOW);
-        assertEquals(true, stage.getWidth() > 500);
+        assertEquals(true, getStage().getWidth() > 500);
 
         // mid-sized window
         press(DEFAULT_SIZE_WINDOW);
-        assertEquals(false, stage.getWidth() > 500);
+        assertEquals(false, getStage().getWidth() > 500);
 
         // jump from panel focus to first issue
         // - This is because on startup focus is on panel and not on filter box
@@ -123,40 +126,16 @@ public class KeyboardShortcutsTest extends UITest {
         assertEquals(false, repoSelectorComboBox.isFocused());
         clearUiComponentFocusEventType();
 
-        // switch default repo tests
-        assertEquals(1, repoSelectorComboBox.getItems().size());
-        // setup - add a new repo
-        clickRepositorySelector();
-        selectAll();
-        type("dummy1/dummy1");
-        push(KeyCode.ENTER);
-        PlatformEx.waitOnFxThread();
-        assertEquals(2, repoSelectorComboBox.getItems().size());
-        assertEquals("dummy1/dummy1", repoSelectorComboBox.getValue());
-        // test shortcut on repo dropdown
-        doubleClick(repoSelectorComboBox);
-        press(SWITCH_DEFAULT_REPO);
-        // wait for issue 11 to appear then click on it
-        // issue 11 is chosen instead of issue 12
-        // as there is a problem with finding issue 12's node due to it being the first card in the panel
-        waitUntilNodeAppears(getIssueCell(1, DummyRepoState.NO_OF_DUMMY_ISSUES - 1));
-        assertEquals("dummy/dummy", repoSelectorComboBox.getValue());
-        // test shortcut when focus is on panel
-        clickIssue(1, DummyRepoState.NO_OF_DUMMY_ISSUES - 1);
-        press(SWITCH_DEFAULT_REPO);
-        PlatformEx.waitOnFxThread();
-        assertEquals("dummy1/dummy1", repoSelectorComboBox.getValue());
-        // test shortcut when focus is on issue list
-        press(JUMP_TO_NTH_ISSUE_KEYS.get(1));
-        press(SWITCH_DEFAULT_REPO);
-        PlatformEx.waitOnFxThread();
-        assertEquals("dummy/dummy", repoSelectorComboBox.getValue());
+        press(SHOW_REPO_PICKER);
+        waitUntilNodeAppears("#repositoryPickerUserInputField");
+        press(KeyCode.ESCAPE);
 
         // mark as read
         ListPanel issuePanel = getPanel(1);
         // mark as read an issue that has another issue below it
         push(KeyCode.HOME);
         // focus should change to the issue below
+        clickOn(IdGenerator.getPanelCellIdReference(1, 11));
         int issueIdBeforeMark = selectedIssueId;
         int issueIdExpected = issueIdBeforeMark - 1;
         push(getKeyCode("MARK_AS_READ"));
@@ -208,7 +187,7 @@ public class KeyboardShortcutsTest extends UITest {
 
         // minimize window
         press(MINIMIZE_WINDOW);
-        assertEquals(true, stage.isIconified());
+        assertEquals(true, getStage().isIconified());
 
     }
 

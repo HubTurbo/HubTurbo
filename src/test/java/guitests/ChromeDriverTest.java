@@ -2,7 +2,8 @@ package guitests;
 
 import javafx.scene.input.KeyCode;
 import org.junit.Test;
-import org.loadui.testfx.utils.FXTestUtils;
+import org.testfx.api.FxToolkit;
+
 import ui.UI;
 import util.GitHubURL;
 import util.events.IssueCreatedEvent;
@@ -12,34 +13,32 @@ import util.events.MilestoneCreatedEvent;
 import util.events.testevents.ExecuteScriptEventHandler;
 import util.events.testevents.JumpToNewCommentBoxEventHandler;
 import util.events.testevents.NavigateToPageEventHandler;
-import util.events.testevents.SendKeysToBrowserEventHandler;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.concurrent.TimeoutException;
+
 public class ChromeDriverTest extends UITest {
 
-    private static final int EVENT_DELAY = 1000;
+    private static final int EVENT_DELAY = 2000;
     private String url;
     private String script;
-    private String keyCode;
 
     private boolean jumpToComment = false; // NOPMD
 
     @Override
-    public void launchApp() {
-        FXTestUtils.launchApp(
-                TestUI.class, "--test=true", "--bypasslogin=true", "--testchromedriver=true");
+    public void setup() throws TimeoutException {
+        FxToolkit.setupApplication(
+            TestUI.class, "--test=true", "--bypasslogin=true", "--testchromedriver=true");
     }
 
     @Test
     public void chromeDriverStubTest() {
         clearUrl();
         clearScript();
-        clearKeyCode();
 
         UI.events.registerEvent((NavigateToPageEventHandler) e -> url = e.url);
         UI.events.registerEvent((ExecuteScriptEventHandler) e -> script = e.script);
-        UI.events.registerEvent((SendKeysToBrowserEventHandler) e -> keyCode = e.keyCode);
         UI.events.registerEvent((JumpToNewCommentBoxEventHandler) e -> jumpToComment = true);
 
         UI.events.triggerEvent(new IssueSelectedEvent("dummy/dummy", 1, 0, false));
@@ -133,26 +132,20 @@ public class ChromeDriverTest extends UITest {
         assertEquals(GitHubURL.KEYBOARD_SHORTCUTS_PAGE, url);
         clearUrl();
 
-        // manage assignee
-        push(KeyCode.A);
-        sleep(EVENT_DELAY);
-        assertEquals("a", keyCode);
-        clearKeyCode();
-
         // jump to comments
         push(KeyCode.R);
         sleep(EVENT_DELAY);
         assertEquals(true, jumpToComment);
         jumpToComment = false;
 
-        click("View");
-        click("Documentation");
+        clickOn("View");
+        clickOn("Documentation");
         sleep(EVENT_DELAY);
         assertEquals(GitHubURL.DOCS_PAGE, url);
         clearUrl();
 
-        click("File");
-        click("Logout");
+        clickOn("File");
+        clickOn("Logout");
     }
 
     public void clearUrl() {
@@ -163,7 +156,4 @@ public class ChromeDriverTest extends UITest {
         script = "";
     }
 
-    public void clearKeyCode() {
-        keyCode = "";
-    }
 }
