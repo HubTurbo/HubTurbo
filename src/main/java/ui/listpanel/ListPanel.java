@@ -77,10 +77,10 @@ public class ListPanel extends FilterPanel {
     private static final String CHANGE_LABELS_MENU_ITEM_TEXT = "Change labels (L)";
     private static final MenuItem changeMilestoneMenuItem = new MenuItem();
     private static final String CHANGE_MILESTONE_MENU_ITEM_TEXT = "Change milestone (M)";
-    private static final MenuItem changeAssigneeMenuItem = new MenuItem();
+    private final MenuItem changeAssigneeMenuItem = new MenuItem();
     private static final String CHANGE_ASSIGNEE_MENU_ITEM_TEXT = "Change Assignee (A)";
 
-    private static final MenuItem closeReopenIssueMenuItem = new MenuItem();
+    private final MenuItem closeReopenIssueMenuItem = new MenuItem();
     private static final String closeIssueMenuItemText = "Close issue (C)";
     private static final String reopenIssueMenuItemText = "Reopen issue (O)";
 
