@@ -14,7 +14,7 @@ import util.PlatformEx;
 
 
 import static org.junit.Assert.assertEquals;
-import static ui.components.KeyboardShortcuts.SWITCH_BOARD;
+import static ui.components.KeyboardShortcuts.SHOW_BOARD_PICKER;
 
 public class BoardPickerTest extends UITest {
 
@@ -48,7 +48,7 @@ public class BoardPickerTest extends UITest {
         ((TextField) GuiTest.find(boardNameInputId)).setText("Dummy Board 2");
         clickOn(boardNameSaveButtonId);
 
-        pushKeys(SWITCH_BOARD);
+        pushKeys(SHOW_BOARD_PICKER);
         PlatformEx.waitOnFxThread();
         suggestedBoardList = findOrWaitFor(IdGenerator.getBoardPickerSuggestedBoardListReference());
         assertEquals(5, suggestedBoardList.getChildren().size());
@@ -60,7 +60,7 @@ public class BoardPickerTest extends UITest {
         PlatformEx.waitOnFxThread();
         assertEquals("Board 1", prefs.getLastOpenBoard().get());
 
-        pushKeys(SWITCH_BOARD);
+        pushKeys(SHOW_BOARD_PICKER);
         PlatformEx.waitOnFxThread();
         suggestedBoardList = findOrWaitFor(IdGenerator.getBoardPickerSuggestedBoardListReference());
         assertEquals(5, suggestedBoardList.getChildren().size());
@@ -72,7 +72,7 @@ public class BoardPickerTest extends UITest {
         PlatformEx.waitOnFxThread();
         assertEquals("Dummy Board 1", prefs.getLastOpenBoard().get());
 
-        pushKeys(SWITCH_BOARD);
+        pushKeys(SHOW_BOARD_PICKER);
         PlatformEx.waitOnFxThread();
         suggestedBoardList = findOrWaitFor(IdGenerator.getBoardPickerSuggestedBoardListReference());
         assertEquals(5, suggestedBoardList.getChildren().size());
@@ -84,7 +84,7 @@ public class BoardPickerTest extends UITest {
         PlatformEx.waitOnFxThread();
         assertEquals("Dummy Board 2", prefs.getLastOpenBoard().get());
 
-        pushKeys(SWITCH_BOARD);
+        pushKeys(SHOW_BOARD_PICKER);
         PlatformEx.waitOnFxThread();
         suggestedBoardList = findOrWaitFor(IdGenerator.getBoardPickerSuggestedBoardListReference());
         assertEquals(5, suggestedBoardList.getChildren().size());
