@@ -37,6 +37,7 @@ class BoardPickerState {
     private void update() {
         if (keyword.isEmpty()) {
             matchAllBoards();
+            return;
         }
 
         updateMatchedBoards();
@@ -66,7 +67,7 @@ class BoardPickerState {
     }
 
     private void updateSuggestion() {
-        if (matchedBoards.isEmpty() || matchedBoards.size() == boards.size() && boards.size() != 1) {
+        if (matchedBoards.isEmpty() || keyword.isEmpty()) {
             suggestion = Optional.empty();
         } else {
             suggestion = matchedBoards.stream().min(String::compareToIgnoreCase);
