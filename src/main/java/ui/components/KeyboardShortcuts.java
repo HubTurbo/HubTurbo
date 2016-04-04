@@ -193,74 +193,18 @@ public final class KeyboardShortcuts {
         downIssue = getKeyCodeCombination("DOWN_ISSUE");
     }
 
-    public static void loadKeyboardShortcuts(Preferences prefs) {
+    public static void loadKeyboardShortcuts() {
         assignedKeys = new HashSet<>();
-        if (prefs.getKeyboardShortcuts().size() == 0) {
-            logger.info("No user specified keyboard shortcuts found, using defaults. ");
-            prefs.setKeyboardShortcuts(getDefaultKeyboardShortcuts());
-        }
-        if (prefs.getKeyboardShortcuts().size() != getDefaultKeyboardShortcuts().size()) {
-            logger.warn("Invalid number of user specified keyboard shortcuts detected. ");
-            if (DialogMessage.showYesNoWarningDialog(
-                    "Warning",
-                    "Invalid number of shortcut keys specified",
-                    "Do you want to reset the shortcut keys to their defaults or quit?",
-                    "Reset to default",
-                    "Quit")) {
-                keyboardShortcuts = getDefaultKeyboardShortcuts();
-            } else {
-                Platform.exit();
-                System.exit(0);
-            }
-        } else {
-            logger.info("Loading user specified keyboard shortcuts. ");
-            keyboardShortcuts = prefs.getKeyboardShortcuts();
-        }
+        keyboardShortcuts = getDefaultKeyboardShortcuts();
         addNonCustomizableShortcutKeys();
         getKeyboardShortcutsFromHashMap();
-        prefs.setKeyboardShortcuts(keyboardShortcuts);
     }
 
     private static KeyCodeCombination getKeyCodeCombination(String keyboardShortcut) {
-        KeyCodeCombination keyCodeCombi =
-                new KeyCodeCombination(KeyCode.getKeyCode(getDefaultKeyboardShortcuts().get(keyboardShortcut)));
-        if (keyboardShortcuts.containsKey(keyboardShortcut)) {
-            KeyCode keyCode = KeyCode.getKeyCode(keyboardShortcuts.get(keyboardShortcut).toUpperCase());
-            if (keyCode != null && !assignedKeys.contains(new KeyCodeCombination(keyCode))) {
-                keyCodeCombi = new KeyCodeCombination(keyCode);
-            } else {
-                logger.warn("Invalid key specified for "
-                        + keyboardShortcut
-                        + " or it has already been used for some other shortcut. ");
-                if (DialogMessage.showYesNoWarningDialog(
-                        "Warning",
-                        "Invalid key specified for " + keyboardShortcut +
-                                " or it has already been used for some other shortcut. ",
-                        "Do you want to use the default key <" +
-                                getDefaultKeyboardShortcuts().get(keyboardShortcut) + "> or quit?",
-                        "Use default key",
-                        "Quit")) {
-                    keyboardShortcuts.put(keyboardShortcut, getDefaultKeyboardShortcuts().get(keyboardShortcut));
-                } else {
-                    Platform.exit();
-                    System.exit(0);
-                }
-            }
-        } else {
-            logger.warn("Could not find user defined keyboard shortcut for " + keyboardShortcut);
-            if (DialogMessage.showYesNoWarningDialog(
-                    "Warning",
-                    "Could not find user defined keyboard shortcut for " + keyboardShortcut,
-                    "Do you want to use the default key <" +
-                            getDefaultKeyboardShortcuts().get(keyboardShortcut) + "> or quit?",
-                    "Use default key",
-                    "Quit")) {
-                keyboardShortcuts.put(keyboardShortcut, getDefaultKeyboardShortcuts().get(keyboardShortcut));
-            } else {
-                Platform.exit();
-                System.exit(0);
-            }
-        }
+        assert keyboardShortcuts.containsKey(keyboardShortcut);
+        KeyCode keyCode = KeyCode.getKeyCode(keyboardShortcuts.get(keyboardShortcut).toUpperCase());
+        KeyCodeCombination keyCodeCombi = new KeyCodeCombination(keyCode);
+
         logger.info("Assigning <" + keyCodeCombi + "> to " + keyboardShortcut);
         assignedKeys.add(keyCodeCombi);
         return keyCodeCombi;
