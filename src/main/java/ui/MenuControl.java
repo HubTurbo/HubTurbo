@@ -89,7 +89,7 @@ public class MenuControl extends MenuBar {
     }
 
     /**
-     * Called upon the Boards > New being clicked
+     * Logs the user action and creates a new board
      */
     private void onBoardNew() {
         logger.info("Menu: Boards > New");
@@ -133,7 +133,7 @@ public class MenuControl extends MenuBar {
     }
 
     /**
-     * Called upon the Boards > Save being clicked
+     * Logs the user action and saves the current board
      */
     private void onBoardSave() {
         logger.info("Menu: Boards > Save");
@@ -141,7 +141,7 @@ public class MenuControl extends MenuBar {
     }
 
     /**
-     * Tries to save current board. If current board is dangling, it calls {@code saveBoardAs()}
+     * Tries to save current board. If current board has not been saved before, it calls {@code saveBoardAs()}
      */
     public final void saveBoard() {
         if (!prefs.getLastOpenBoard().isPresent()) {
@@ -162,7 +162,7 @@ public class MenuControl extends MenuBar {
     }
 
     /**
-     * Called upon the Boards > Save as being clicked
+     * Logs the user action and triggers "Save as" on the current board
      */
     private void onBoardSaveAs() {
         logger.info("Menu: Boards > Save as");
@@ -191,7 +191,7 @@ public class MenuControl extends MenuBar {
     }
 
     /**
-     * Called upon the Boards > Open being clicked
+     * Logs the user action and opens the board that user requested
      */
     private void onBoardOpen(String boardName, List<PanelInfo> panelInfos) {
         logger.info("Menu: Boards > Open > " + boardName);
@@ -216,7 +216,7 @@ public class MenuControl extends MenuBar {
     }
 
     /**
-     * Called upon the Boards > Delete being clicked
+     * Logs the user action and deletes the board that user requested
      */
     private void onBoardDelete(String boardName) {
         logger.info("Menu: Boards > Delete > " + boardName);
@@ -224,7 +224,7 @@ public class MenuControl extends MenuBar {
     }
 
     /**
-     * Delete the board named {@boardName}
+     * Deletes the board named {@boardName}
      *
      * @param boardName name of the board to delete
      */
