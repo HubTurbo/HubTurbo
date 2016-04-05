@@ -21,7 +21,7 @@ public class PanelMenuCreatorTest extends UITest {
 
     @Before
     public void setupUIComponent() {
-        UI ui = TestController.getUI();
+        ui = TestController.getUI();
         panelControl = ui.getPanelControl();
     }
 
