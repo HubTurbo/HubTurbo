@@ -47,6 +47,7 @@ public class MilestonePickerDialog extends Dialog<MilestonePickerDialogResponse>
         initUI();
         setupKeyEvents();
         setInputFieldToDefaultMilestone();
+        Platform.runLater(() -> positionDialog(stage));
     }
 
     /**
@@ -64,6 +65,11 @@ public class MilestonePickerDialog extends Dialog<MilestonePickerDialogResponse>
 
     private void fillInputFieldWithMilestoneName(String milestoneName) {
         inputField.setText(milestoneName);
+    }
+
+    private final void positionDialog(Stage stage) {
+        setX(stage.getX() + stage.getWidth() / 2);
+        setY(stage.getY() + stage.getHeight() / 2 - getHeight() / 2);
     }
 
     private void setupKeyEvents() {
