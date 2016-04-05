@@ -23,8 +23,8 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
     private static final int BIG_LABEL_FONT = 16;
 
     private boolean isSelected = false;
-    private boolean isMatching = false;
     private boolean isExisting = false;
+    private boolean isMatching = true;
 
     public PickerMilestone(TurboMilestone milestone) {
         super(milestone.getRepoId(), milestone.getId(), milestone.getTitle());
@@ -37,15 +37,16 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
 
     public PickerMilestone(PickerMilestone milestone) {
         this((TurboMilestone) milestone);
-        setMatching(milestone.isMatching());
         setSelected(milestone.isSelected());
         setExisting(milestone.isExisting());
+        setMatching(milestone.isMatching());
     }
 
     public Node getNode() {
         Label milestone = createLabel();
         setStatusColour(milestone);
         if (isSelected) setSelectedInUI(milestone);
+        if (!isMatching) setFadedInUI(milestone);
         adjustWidthToFont(milestone);
         return milestone;
     }
@@ -152,20 +153,24 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
                 .findFirst();
     }
 
+    private void setFadedInUI(Label milestone) {
+        milestone.setStyle(milestone.getStyle() + " -fx-opacity: 60%;");
+    }
+
+    public void setMatching(boolean isMatching) {
+        this.isMatching = isMatching;
+    }
+
+    public boolean isMatching() {
+        return isMatching;
+    }
+
     public void setSelected(boolean isSelected) {
         this.isSelected = isSelected;
     }
 
     public boolean isSelected() {
         return this.isSelected;
-    }
-
-    public void setMatching(boolean isFaded) {
-        this.isMatching = isFaded;
-    }
-
-    public boolean isMatching() {
-        return this.isMatching;
     }
 
     public void setExisting(boolean isExisting) {
