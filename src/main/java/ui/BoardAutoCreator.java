@@ -62,21 +62,21 @@ public class BoardAutoCreator {
         Menu autoCreate = new Menu("Auto-create");
         MenuItem sample = new MenuItem(SAMPLE_BOARD);
         sample.setOnAction(e -> {
-            saveBoardAfterUserConfirmationIfNeeded(SAMPLE_BOARD);
+            promptToSaveBoardIfNeeded(SAMPLE_BOARD);
             createSampleBoard(true);
         });
         autoCreate.getItems().add(sample);
 
         MenuItem milestone = new MenuItem(MILESTONES);
         milestone.setOnAction(e -> {
-            saveBoardAfterUserConfirmationIfNeeded(MILESTONES);
+            promptToSaveBoardIfNeeded(MILESTONES);
             createMilestoneBoard();
         });
         autoCreate.getItems().add(milestone);
 
         MenuItem workAllocation = new MenuItem(WORK_ALLOCATION);
         workAllocation.setOnAction(e -> {
-            saveBoardAfterUserConfirmationIfNeeded(WORK_ALLOCATION);
+            promptToSaveBoardIfNeeded(WORK_ALLOCATION);
             createWorkAllocationBoard();
         });
         autoCreate.getItems().add(workAllocation);
@@ -84,7 +84,7 @@ public class BoardAutoCreator {
         return autoCreate;
     }
 
-    private void saveBoardAfterUserConfirmationIfNeeded(String boardName) {
+    private void promptToSaveBoardIfNeeded(String boardName) {
         boolean isOpenBoardDifferentFromSavedBoard = !prefs.getLastOpenBoardPanelInfos().isPresent()
                 || !prefs.getLastOpenBoardPanelInfos().get().equals(panelControl.getCurrentPanelInfos());
 
