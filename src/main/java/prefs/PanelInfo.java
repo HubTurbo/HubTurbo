@@ -2,6 +2,9 @@ package prefs;
 
 import java.util.Objects;
 
+/**
+ * Represents the information about a Panel. Contains two String attributes {@code name} and {@code filter}.
+ */
 public class PanelInfo {
 
     private final String name;
