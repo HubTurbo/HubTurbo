@@ -9,6 +9,7 @@ import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef.HWND;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -70,7 +71,7 @@ public class UI extends Application implements EventDispatcher {
      */
     public static final String REQUIRED_JAVA_VERSION = "1.8.0_60"; // update gettingStarted.md if this is changed
 
-    public static final String WINDOW_TITLE = "HubTurbo %s (%s)";
+    public static final String WINDOW_TITLE = "%s (%s)";
 
     public static final String ARG_UPDATED_TO = "--updated-to";
 
@@ -108,7 +109,6 @@ public class UI extends Application implements EventDispatcher {
     private MenuControl menuBar;
     private BrowserComponent browserComponent;
     private ScreenManager screenManager;
-    private RepositorySelector repoSelector;
     private Label apiBox;
     private ScrollPane panelsScrollPane;
     private NotificationPane notificationPane;
@@ -171,7 +171,6 @@ public class UI extends Application implements EventDispatcher {
     private void disableUI(boolean disable) {
         mainStage.setResizable(!disable);
         menuBar.setDisable(disable);
-        repoSelector.setDisable(disable);
     }
 
     private void showMainWindow(String repoId) {
@@ -180,7 +179,6 @@ public class UI extends Application implements EventDispatcher {
         boolean isAFirstTimeUser = logic.getStoredRepos().isEmpty();
         logic.openPrimaryRepository(repoId);
         logic.setDefaultRepo(repoId);
-        repoSelector.setText(repoId);
         triggerEvent(new PrimaryRepoChangedEvent(repoId));
 
         triggerEvent(new BoardSavedEvent()); // Initializes boards
@@ -254,8 +252,8 @@ public class UI extends Application implements EventDispatcher {
     }
 
     private void initUI(Stage stage) {
-        repoSelector = createRepoSelector();
         apiBox = new Label("-/-");
+        apiBox.setPadding(new Insets(10, 10, 5, 15));
         apiBox.setId(IdGenerator.getApiBoxId());
 
         mainStage = stage;
@@ -322,7 +320,7 @@ public class UI extends Application implements EventDispatcher {
     }
 
     public void onRepoOpened() {
-        Platform.runLater(repoSelector::refreshContents);
+        updateTitle();
     }
 
     public String initCSS() {
@@ -339,7 +337,6 @@ public class UI extends Application implements EventDispatcher {
     }
 
     private void setupMainStage(Scene scene) {
-        updateTitle();
         mainStage.setScene(scene);
         mainStage.show();
         mainStage.setOnCloseRequest(e -> quit());
@@ -391,13 +388,13 @@ public class UI extends Application implements EventDispatcher {
         menuBar = new MenuControl(this, panels, panelsScrollPane, prefs, mainStage);
         menuBar.setUseSystemMenuBar(true);
 
-        HBox repoSelectorBar = new HBox();
-        repoSelectorBar.setAlignment(Pos.CENTER_LEFT);
+        HBox detailsBar = new HBox();
+        detailsBar.setAlignment(Pos.CENTER_LEFT);
         apiBox.getStyleClass().add("text-grey");
         apiBox.setTooltip(new Tooltip("Remaining calls / Minutes to next refresh"));
-        repoSelectorBar.getChildren().addAll(repoSelector, apiBox);
+        detailsBar.getChildren().add(apiBox);
 
-        top.getChildren().addAll(menuBar, repoSelectorBar);
+        top.getChildren().addAll(menuBar, detailsBar);
 
         BorderPane root = new BorderPane();
         root.setTop(top);
@@ -457,38 +454,12 @@ public class UI extends Application implements EventDispatcher {
     public HashMap<String, String> getCommandLineArgs() {
         return TestController.getCommandLineArgs();
     }
-
-    private RepositorySelector createRepoSelector() {
-        RepositorySelector repoSelector = new RepositorySelector(this);
-        repoSelector.setOnValueChange(this::primaryRepoChanged);
-        return repoSelector;
-    }
-
+    
     private void primaryRepoChanged(String repoId) {
         triggerEvent(new PrimaryRepoChangedEvent(repoId));
         logic.setDefaultRepo(repoId);
         logic.openPrimaryRepository(repoId);
         triggerEvent(new UsedReposChangedEvent());
-    }
-
-    public void switchDefaultRepo() {
-        String[] openRepos = repoSelector.getContents().toArray(new String[0]);
-        String currentRepo = logic.getDefaultRepo();
-
-        // Cycle to the next open repository
-        for (int i = 0; i < openRepos.length; i++) {
-            if (openRepos[i].equals(currentRepo)) {
-                if (i == openRepos.length - 1) {
-                    primaryRepoChanged(openRepos[0]);
-                    repoSelector.setText(openRepos[0]);
-                } else {
-                    primaryRepoChanged(openRepos[i + 1]);
-                    repoSelector.setText(openRepos[i + 1]);
-                }
-            }
-        }
-
-        triggerEvent(new UnusedStoredReposChangedEvent());
     }
 
     private void ensureSelectedPanelHasFocus() {
@@ -551,8 +522,8 @@ public class UI extends Application implements EventDispatcher {
 
     public void updateTitle() {
         String openBoard = prefs.getLastOpenBoard().orElse("none");
-        String version = Version.getCurrentVersion().toString();
-        String title = String.format(WINDOW_TITLE, version, openBoard);
+        String defaultRepo = logic.getDefaultRepo();
+        String title = String.format(WINDOW_TITLE, defaultRepo, openBoard);
         mainStage.setTitle(title);
     }
 
