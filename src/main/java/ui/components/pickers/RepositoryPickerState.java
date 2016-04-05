@@ -1,7 +1,5 @@
 package ui.components.pickers;
 
-import org.controlsfx.control.spreadsheet.Picker;
-
 import java.util.*;
 import java.util.stream.IntStream;
 
@@ -133,7 +131,7 @@ public class RepositoryPickerState {
     }
 
     private void clearRepositorySelection() {
-        repositories.stream().forEach(repo -> repo.setSelected(false));
+        suggestedRepositories.stream().forEach(repo -> repo.setSelected(false));
     }
 
     /**

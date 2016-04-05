@@ -1,6 +1,16 @@
 
 # Changelog
 
+# V3.26.0
+
+- Added the repo picker
+- Added the assignee picker
+- Added on-demand autocomplete
+- Fix bugs in milestone picker and parser
+- Fix keyboard shortcut bug on the browser view
+- Added headless testing system
+- Updated documentations
+
 # V3.25.0
 
 - Added the milestone picker
