@@ -26,6 +26,8 @@ import static org.mockito.Mockito.when;
 
 public class MultiModelTest {
 
+    private static final String REPO = "dummy/dummy";
+
     MultiModel multiModel = new MultiModel(mock(Preferences.class));
 
     @BeforeClass
@@ -77,6 +79,16 @@ public class MultiModelTest {
         MultiModel models = new MultiModel(mock(Preferences.class));
         assertEquals(Optional.empty(), models.replaceIssueLabels("nonexistentrepo", 1, new ArrayList<>()));
     }
+    
+     /**
+     * Tests that replaceIssueAssigneeOnServer returns Optional.empty if the model for the
+     * issue given in the argument can't be found
+     */
+    @Test
+    public void replaceIssueAssignee_modelNotFound() {
+        MultiModel models = new MultiModel(mock(Preferences.class));
+        assertEquals(Optional.empty(), models.replaceIssueAssignee("nonexistentrepo", 1, Optional.of("")));
+    }
 
     /**
      * Tests that {@code editIssueState} returns Optional.empty() if the model for the
@@ -92,8 +104,6 @@ public class MultiModelTest {
     @Test
     public void isUserInRepo_queryExistingUser_userFound() {
         MultiModel models = new MultiModel(mock(Preferences.class));
-
-        final String REPO = "dummy/dummy";
 
         TurboUser user1 = new TurboUser(REPO, "alice", "Alice");
         TurboUser user2 = new TurboUser(REPO, "bob", "Fox");
@@ -115,8 +125,6 @@ public class MultiModelTest {
     @Test
     public void isUserInRepo_queryNonExistingUser_userNotFound() {
         MultiModel models = new MultiModel(mock(Preferences.class));
-
-        final String REPO = "dummy/dummy";
 
         TurboUser user1 = new TurboUser(REPO, "alice", "Alice");
         TurboUser user2 = new TurboUser(REPO, "bob", "Fox");
@@ -144,8 +152,8 @@ public class MultiModelTest {
     }
 
     /**
-     * Tests that replaceIssueLabels called the Model with the same id as the argument
-     * repoId and invoke replaceIssueLabels on that Model
+     * Tests that replaceIssueLabelsOnServer called the Model with the same id as the argument
+     * repoId and invoke replaceIssueLabelsOnServer on that Model
      */
     @Test
     public void replaceIssueLabels_successful() {
@@ -209,5 +217,27 @@ public class MultiModelTest {
 
         models.editIssueState(repoId, issueId, false);
         verify(mockedModel).editIssueState(issueId, false);
+    }
+
+    /**
+     * Tests that replaceIssueAssigneeOnServer called the Model with the same id as the argument
+     * repoId and invoke replaceIssueAssigneeOnServer on that Model
+     */
+    @Test
+    public void replaceIssueAssignee_successful() {
+        String repoId = "testowner/testrepo";
+        int issueId = 1;
+        Optional<String> assignee = Optional.of("user1");
+
+        Model mockedModel = mock(Model.class);
+        when(mockedModel.getRepoId()).thenReturn(repoId);
+        when(mockedModel.getIssues()).thenReturn(new ArrayList<>());
+
+        MultiModel models = new MultiModel(mock(Preferences.class));
+        models.queuePendingRepository(repoId);
+        models.addPending(mockedModel);
+
+        models.replaceIssueAssignee(repoId, issueId, assignee);
+        verify(mockedModel).replaceIssueAssignee(issueId, assignee);
     }
 }

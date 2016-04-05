@@ -5,16 +5,17 @@ import static org.junit.Assert.fail;
 import static org.loadui.testfx.Assertions.assertNodeExists;
 
 import java.io.File;
+import java.util.concurrent.TimeoutException;
 
-import javafx.application.Platform;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.junit.Test;
-import org.loadui.testfx.utils.FXTestUtils;
+import org.testfx.api.FxToolkit;
 
+import javafx.application.Platform;
 import javafx.scene.control.ComboBox;
 import javafx.scene.input.KeyCode;
-import javafx.stage.Stage;
 import prefs.Preferences;
+import ui.IdGenerator;
 import ui.TestController;
 import ui.UI;
 import util.PlatformEx;
@@ -24,26 +25,10 @@ public class RepositorySelectorTest extends UITest {
 
     private static String primaryRepo;
 
-    protected static class RepositorySelectorTestUI extends UI {
-        public RepositorySelectorTestUI() {
-            super();
-        }
-
-        @Override
-        public void start(Stage primaryStage) {
-            super.start(primaryStage);
-            STAGE_FUTURE.set(primaryStage);
-        }
-
-        @Override
-        protected void registerTestEvents() {
-            UI.events.registerEvent((PrimaryRepoChangedEventHandler) e -> primaryRepo = e.repoId);
-        }
-    }
-
     @Override
-    public void launchApp() {
-        FXTestUtils.launchApp(RepositorySelectorTestUI.class, "--testconfig=true");
+    public void setup() throws TimeoutException {
+        FxToolkit.setupApplication(TestUI.class, "--testconfig=true");
+        UI.events.registerEvent((PrimaryRepoChangedEventHandler) e -> primaryRepo = e.repoId);
     }
 
     @Override
@@ -56,7 +41,7 @@ public class RepositorySelectorTest extends UITest {
     }
 
     @Test
-    public void repositorySelectorTest() {
+    public void testrepositorySelectorTest() {
         // check if test json is present
         File testConfig = new File(TestController.TEST_DIRECTORY, TestController.TEST_SESSION_CONFIG_FILENAME);
         boolean testConfigExists = testConfig.exists() && testConfig.isFile();
@@ -66,16 +51,16 @@ public class RepositorySelectorTest extends UITest {
 
         // now we check if the login dialog pops up because the "dummy/dummy" json
         // doesn't exist and there are no other valid repo json files
-        assertNodeExists("#repoOwnerField");
+        assertNodeExists(IdGenerator.getLoginDialogOwnerFieldIdReference());
         type("dummy").push(KeyCode.TAB);
         type("dummy").push(KeyCode.ENTER);
-        ComboBox<String> comboBox = find("#repositorySelector");
-        assertEquals(1, comboBox.getItems().size());
+        ComboBox<String> comboBox = getRepositorySelector();
+        waitAndAssertEquals(1, comboBox.getItems()::size);
         assertEquals("dummy/dummy", primaryRepo);
 
         // we check if the "dummy2/dummy2" is added to the repository selector
         // but the primary repo isn't changed
-        Platform.runLater(find("#dummy/dummy_col0_filterTextField")::requestFocus);
+        Platform.runLater(getFilterTextFieldAtPanel(0)::requestFocus);
         PlatformEx.waitOnFxThread();
         type("repo:dummy2/dummy2");
         push(KeyCode.ENTER);
@@ -84,19 +69,19 @@ public class RepositorySelectorTest extends UITest {
 
         // we check if "dummy3/dummy3" is added to the repository selector
         // and that the primary repo is also changed
-        doubleClick(comboBox);
-        doubleClick();
+        doubleClickOn(comboBox);
+        doubleClickOn();
         type("dummy3/dummy3");
         push(KeyCode.ENTER);
-        assertEquals(3, comboBox.getItems().size());
+        waitAndAssertEquals(3, comboBox.getItems()::size);
         assertEquals("dummy3/dummy3", primaryRepo);
 
         // we check if repo's id with white spaces are handled correctly
-        doubleClick(comboBox);
-        doubleClick();
+        doubleClickOn(comboBox);
+        doubleClickOn();
         type(" dummy4 / dummy4 ");
         push(KeyCode.ENTER);
-        assertEquals(4, comboBox.getItems().size());
+        waitAndAssertEquals(4, comboBox.getItems()::size);
         assertEquals("dummy4/dummy4", primaryRepo);
 
         // we check if deleting used repo does not remove it

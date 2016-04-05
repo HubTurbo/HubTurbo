@@ -72,7 +72,7 @@ public final class Parser {
             return token;
         } else {
             throw new ParseException(String.format(
-                    "Expected %s but got %s", type, input.get(position)));
+                    "Expected %s but got %s", type, token));
         }
     }
 

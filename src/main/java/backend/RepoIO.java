@@ -214,6 +214,10 @@ public class RepoIO {
         return repoSource.replaceIssueMilestone(issue, milestone);
     }
 
+    public CompletableFuture<Boolean> replaceIssueAssignee(TurboIssue issue, Optional<String> assigneeLoginName) {
+        return repoSource.replaceIssueAssignee(issue, assigneeLoginName);
+    }
+
     public CompletableFuture<Boolean> editIssueState(TurboIssue issue, boolean isOpen) {
         return repoSource.editIssueState(issue, isOpen);
     }

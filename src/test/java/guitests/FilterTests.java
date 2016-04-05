@@ -8,6 +8,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import org.junit.Test;
+
 import ui.listpanel.ListPanel;
 import util.PlatformEx;
 
@@ -17,10 +18,10 @@ public class FilterTests extends UITest {
 
     @Test
     public void parseExceptionTest() {
-        ListPanel issuePanel = find("#dummy/dummy_col0");
+        ListPanel issuePanel = getPanel(0);
 
         // test parse exception returns Qualifier.EMPTY, i.e. all issues
-        click("#dummy/dummy_col0_filterTextField");
+        clickFilterTextFieldAtPanel(0);
         selectAll();
         type("milestone:");
         push(KeyCode.ENTER);
@@ -31,10 +32,10 @@ public class FilterTests extends UITest {
 
     @Test
     public void filterTextField_semanticException_emptyFilter() {
-        ListPanel issuePanel = find("#dummy/dummy_col0");
+        ListPanel issuePanel = getPanel(0);
 
-        // test semantic exception dummy/dummy_col0_filterTextField");
-        click("#dummy/dummy_col0_filterTextField");
+        // test semantic exception
+        clickFilterTextFieldAtPanel(0);
         selectAll();
         type("id:buggy");
         push(KeyCode.ENTER);
@@ -45,10 +46,10 @@ public class FilterTests extends UITest {
 
     @Test
     public void filterTextField_tallyMetadataUpdateSemanticException_emptyFilter() {
-        ListPanel issuePanel = find("#dummy/dummy_col0");
+        ListPanel issuePanel = getPanel(0);
 
         // test semantic exception dummy/dummy_col0_filterTextField");
-        click("#dummy/dummy_col0_filterTextField");
+        clickFilterTextFieldAtPanel(0);
         selectAll();
         type("id:buggy u:<24");
         push(KeyCode.ENTER);
@@ -59,10 +60,10 @@ public class FilterTests extends UITest {
 
     @Test
     public void filterTextField_multiplePanels_correctPanelFiltered() {
-        ListPanel issuePanel = find("#dummy/dummy_col0");
+        ListPanel issuePanel = getPanel(0);
 
         // filter panel 1
-        click("#dummy/dummy_col0_filterTextField");
+        clickFilterTextFieldAtPanel(0);
         selectAll();
         type("id:4");
         push(KeyCode.ENTER);
@@ -72,17 +73,17 @@ public class FilterTests extends UITest {
         // create new panel 2
         pushKeys(new KeyCodeCombination(KeyCode.P, KeyCombination.SHORTCUT_DOWN));
         PlatformEx.waitOnFxThread();
-        ListPanel issuePanel2 = find("#dummy/dummy_col1");
+        ListPanel issuePanel2 = getPanel(1);
 
         // filter once
-        click("#dummy/dummy_col1_filterTextField");
+        clickFilterTextFieldAtPanel(1);
         type("id:3");
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
         assertEquals(1, issuePanel2.getIssuesCount());
 
         // filter again and check if the correct panel is filtered (and the other panel is untouched)
-        click("#dummy/dummy_col1_filterTextField");
+        clickFilterTextFieldAtPanel(1);
         selectAll();
         push(KeyCode.BACK_SPACE);
         push(KeyCode.ENTER);
@@ -95,7 +96,7 @@ public class FilterTests extends UITest {
 
     @Test
     public void milestoneAliasFilterTest() {
-        ListPanel issuePanel = find("#dummy/dummy_col0");
+        ListPanel issuePanel = getPanel(0);
 
         // test current-1 : equal to first milestone in dummy repo
         checkCurrWithResult("milestone", "current-1", issuePanel, 1);
@@ -110,7 +111,7 @@ public class FilterTests extends UITest {
         checkCurrWithResult("milestone", "current+2", issuePanel, 4);
 
         // test current-2 : has no result
-        click("#dummy/dummy_col0_filterTextField");
+        clickFilterTextFieldAtPanel(0);
         selectAll();
         type("milestone:curr-2");
         push(KeyCode.ENTER);
@@ -118,7 +119,7 @@ public class FilterTests extends UITest {
         assertEquals(0, issuePanel.getIssuesCount());
 
         // test current+3 : has no result
-        click("#dummy/dummy_col0_filterTextField");
+        clickFilterTextFieldAtPanel(0);
         selectAll();
         type("milestone:current+3");
         push(KeyCode.ENTER);
@@ -126,7 +127,7 @@ public class FilterTests extends UITest {
         assertEquals(0, issuePanel.getIssuesCount());
 
         // test wrong alias
-        click("#dummy/dummy_col0_filterTextField");
+        clickFilterTextFieldAtPanel(0);
         selectAll();
         type("milestone:current+s0v8f");
         push(KeyCode.ENTER);
@@ -135,10 +136,11 @@ public class FilterTests extends UITest {
 
     @Test
     public void countFilterTest() {
-        ListPanel issuePanel = find("#dummy/dummy_col0");
+        ListPanel issuePanel = getPanel(0);
+
 
         // Checking 7 issues shown for count:7
-        click("#dummy/dummy_col0_filterTextField");
+        clickFilterTextFieldAtPanel(0);
         selectAll();
         type("count:7");
         push(KeyCode.ENTER);
@@ -146,7 +148,7 @@ public class FilterTests extends UITest {
         assertEquals(7, issuePanel.getIssuesCount());
 
         // Checking 10 issues shown for count:10
-        click("#dummy/dummy_col0_filterTextField");
+        clickFilterTextFieldAtPanel(0);
         selectAll();
         type("count:10");
         push(KeyCode.ENTER);
@@ -154,7 +156,7 @@ public class FilterTests extends UITest {
         assertEquals(10, issuePanel.getIssuesCount());
 
         // Checking 0 issues show for count:0
-        click("#dummy/dummy_col0_filterTextField");
+        clickFilterTextFieldAtPanel(0);
         selectAll();
         type("count:0");
         push(KeyCode.ENTER);
@@ -162,7 +164,7 @@ public class FilterTests extends UITest {
         assertEquals(0, issuePanel.getIssuesCount());
 
         // if the count is greater than the number of issues, all the issues are shown in the list view
-        click("#dummy/dummy_col0_filterTextField");
+        clickFilterTextFieldAtPanel(0);
         selectAll();
         type("count:15");
         push(KeyCode.ENTER);
@@ -170,7 +172,7 @@ public class FilterTests extends UITest {
         assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES, issuePanel.getIssuesCount());
 
         //multiple count qualifiers
-        click("#dummy/dummy_col0_filterTextField");
+        clickFilterTextFieldAtPanel(0);
         selectAll();
         type("count:6 count:9");
         push(KeyCode.ENTER);
@@ -179,7 +181,7 @@ public class FilterTests extends UITest {
 
         // Not-a-number
 
-        click("#dummy/dummy_col0_filterTextField");
+        clickFilterTextFieldAtPanel(0);
         selectAll();
         type("count:abcd");
         push(KeyCode.ENTER);
@@ -188,7 +190,7 @@ public class FilterTests extends UITest {
 
         // Test with sort qualifier as the second qualifier
 
-        click("#dummy/dummy_col0_filterTextField");
+        clickFilterTextFieldAtPanel(0);
         selectAll();
         type("count:8 sort:unmerged");
         push(KeyCode.ENTER);
@@ -198,7 +200,7 @@ public class FilterTests extends UITest {
         assertEquals("Issue 2", issuePanel.getElementsList().get(1).getIssue().getTitle());
 
         // Test with sort qualifier as the first qualifier
-        click("#dummy/dummy_col0_filterTextField");
+        clickFilterTextFieldAtPanel(0);
         selectAll();
         type("sort:unmerged count:8");
         push(KeyCode.ENTER);
@@ -208,7 +210,7 @@ public class FilterTests extends UITest {
         assertEquals("Issue 2", issuePanel.getElementsList().get(1).getIssue().getTitle());
 
         // Checking for negative number
-        click("#dummy/dummy_col0_filterTextField");
+        clickFilterTextFieldAtPanel(0);
         selectAll();
         type("count:-1");
         push(KeyCode.ENTER);
@@ -218,7 +220,7 @@ public class FilterTests extends UITest {
 
     private void checkCurrWithResult(String milestoneAlias, String currString, ListPanel issuePanel,
                                      int milestoneNumber) {
-        click("#dummy/dummy_col0_filterTextField");
+        clickFilterTextFieldAtPanel(0);
         selectAll();
         type(milestoneAlias + ":" + currString);
         push(KeyCode.ENTER);

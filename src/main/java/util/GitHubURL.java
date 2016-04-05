@@ -9,6 +9,10 @@ public final class GitHubURL {
     public static final String FILTERS_PAGE = RELEASE_BLOB_PREFIX + "docs/filters.md";
     public static final String KEYBOARD_SHORTCUTS_PAGE = RELEASE_BLOB_PREFIX + "docs/keyboardShortcuts.md";
 
+    public static final String PR_TAB_SUFFIX_DISCUSSION = "";
+    public static final String PR_TAB_SUFFIX_FILES_CHANGED = "/files";
+    public static final String PR_TAB_SUFFIX_COMMITS = "/commits";
+
     public static String getPathForAllIssues(String repoId) {
         return String.format("https://github.com/%s/issues", repoId);
     }
@@ -45,12 +49,12 @@ public final class GitHubURL {
         return String.format("https://github.com/%s/graphs/contributors", repoId);
     }
 
-    public static boolean isUrlIssue(String url) {
-        return url.matches("https://github.com/([^/]+)/([^/]+)/(issues|pull)/([0-9]+)([/commits,/files]*)");
+    public static boolean isUrlIssueOrPr(String url) {
+        return url.matches("https://github\\.com/([^/]+)/([^/]+)/(issues|pull)/([0-9]+)([/commits,/files]*)");
     }
 
-    public static boolean isPullRequestLoaded(String url) {
-        return url.matches("https://github.com/([^/]+)/([^/]+)/pull/([0-9]+)(/|/commits|/files)?");
+    public static boolean isUrlPullRequest(String url) {
+        return url.matches("https://github\\.com/([^/]+)/([^/]+)/pull/([0-9]+)(/|/commits|/files)?");
     }
 
     /**
@@ -59,9 +63,8 @@ public final class GitHubURL {
      * @param url url to be checked
      */
     public static boolean isUrlIssueOrPrDiscussionPage(String url) {
-        return url.matches("https://github.com/([^/]+)/([^/]+)/(issues|pull)/([0-9]+)$");
+        return url.matches("https://github\\.com/([^/]+)/([^/]+)/(issues|pull)/([0-9]+)$");
     }
 
-    private GitHubURL() {
-    }
+    private GitHubURL() {}
 }

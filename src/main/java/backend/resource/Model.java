@@ -244,6 +244,26 @@ public class Model implements IBaseModel {
         }, () -> logger.error("Issue " + issueId + " not found in model for " + repoId));
     }
 
+    /**
+     * Replaces assignee of an issue specified by {@code issueId} with {@code assigneeLoginName}
+     * @param issueId
+     * @param assigneeLoginName
+     * @return the modified TurboIssue if successful
+     */
+    public synchronized Optional<TurboIssue> replaceIssueAssignee(int issueId, Optional<String> assigneeLoginName) {
+        Optional<TurboIssue> issueLookUpResult = getIssueById(issueId);
+        return Utility.safeFlatMapOptional(issueLookUpResult,
+            (issue) -> {
+                if (!assigneeLoginName.isPresent()) {
+                    issue.removeAssignee();
+                } else {
+                    issue.setAssignee(assigneeLoginName.get());
+                }
+                return Optional.of(new TurboIssue(issue));
+            },
+            () -> logger.error("Issue " + issueId + " not found in model for " + repoId));
+    }
+
     @SuppressWarnings("unused")
     private void ______BOILERPLATE______() {}
 

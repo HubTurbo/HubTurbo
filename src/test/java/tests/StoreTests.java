@@ -7,6 +7,7 @@ import backend.json.JSONStoreStub;
 import backend.resource.Model;
 import backend.stub.DummyRepoState;
 import guitests.UITest;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;

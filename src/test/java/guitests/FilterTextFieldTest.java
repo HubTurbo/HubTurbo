@@ -2,6 +2,7 @@ package guitests;
 
 import static junit.framework.TestCase.assertTrue;
 
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -9,7 +10,8 @@ import org.junit.After;
 import org.junit.Test;
 
 import javafx.scene.input.KeyCode;
-import org.loadui.testfx.utils.FXTestUtils;
+import org.testfx.api.FxToolkit;
+
 import ui.TestController;
 import ui.UI;
 import ui.components.FilterTextField;
@@ -20,30 +22,19 @@ import util.events.testevents.NavigateToPageEventHandler;
 public class FilterTextFieldTest extends UITest {
 
     @Override
-    public void launchApp() {
-        FXTestUtils.launchApp(
-                TestUI.class, "--test=true", "--bypasslogin=true", "--testchromedriver=true");
+    public void setup() throws TimeoutException {
+        FxToolkit.setupApplication(
+            TestUI.class, "--test=true", "--bypasslogin=true", "--testchromedriver=true");
     }
 
     @Test
     public void completion_validPrefixes_match() {
         FilterTextField field = getFirstPanelField();
+
         // Basic completion
         clearField();
         type("cou").push(KeyCode.TAB);
         waitAndAssertEquals("count", field::getText);
-
-        // Completion does not only work for alternating keys typed
-        clearField();
-        type("c");
-        waitAndAssertEquals("losed", field::getSelectedText);
-        type("l");
-        waitAndAssertEquals("osed", field::getSelectedText);
-        type("o");
-        waitAndAssertEquals("sed", field::getSelectedText);
-        type(KeyCode.TAB);
-        waitAndAssertEquals("", field::getSelectedText);
-        waitAndAssertEquals("closed", field::getText);
 
         // Completion with selection
         clearField();
@@ -55,6 +46,27 @@ public class FilterTextFieldTest extends UITest {
         // c[oun]t
         type("lo").push(KeyCode.TAB); // 'c' + 'lo' is a prefix of 'closed'
         waitAndAssertEquals("closedt", field::getText);
+    }
+
+    @Test
+    public void completion_isNavigatingAndEnter_match() {
+        FilterTextField field = getFirstPanelField();
+
+        clearField();
+        type("a");
+        push(KeyCode.DOWN, 4);
+        press(KeyCode.ENTER);
+        waitAndAssertEquals("creator", field::getText);
+    }
+
+    @Test
+    public void completion_escapeOnce_filterRemainsUnchanged() {
+        FilterTextField field = getFirstPanelField();
+
+        clearField();
+        type("a");
+        press(KeyCode.ESCAPE);
+        waitAndAssertEquals("a", field::getText);
     }
 
     @Test
@@ -70,17 +82,9 @@ public class FilterTextFieldTest extends UITest {
         clearField();
         type("assi").push(KeyCode.TAB);
         type(" c").push(KeyCode.BACK_SPACE); // cancel completion
-        push(KeyCode.LEFT, 2);
-        type(" ");
-        waitAndAssertEquals("assignee  c", field::getText);
-
-        // Insertion of spaces after spaces
-        clearField();
-        type("assi").push(KeyCode.TAB);
-        type(" c").push(KeyCode.BACK_SPACE); // cancel completion
         push(KeyCode.LEFT);
         type(" ");
-        waitAndAssertEquals("assignee  c", field::getText);
+        waitAndAssertEquals("assignee  ", field::getText);
 
         // Insertion of spaces with trailing spaces
         clearField();
@@ -161,7 +165,7 @@ public class FilterTextFieldTest extends UITest {
         FilterPanel issuePanel = (FilterPanel) TestController.getUI().getPanelControl().getPanel(0);
         FilterTextField field = issuePanel.getFilterTextField();
         waitUntilNodeAppears(field);
-        click(issuePanel.getFilterTextField());
+        clickOn(issuePanel.getFilterTextField());
         return field;
     }
 

@@ -1,25 +1,29 @@
-package unstable;
+package guitests;
 
 import static ui.components.KeyboardShortcuts.REFRESH;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.junit.Before;
 import org.junit.Test;
 
-import guitests.UITest;
 import ui.UI;
 import util.PlatformEx;
 import util.events.ModelUpdatedEventHandler;
 
 public class MenuControlTest extends UITest {
-    @Test
-    public void refresh_refreshCount_refreshTriggersCorrectEvent() {
-        final AtomicInteger triggered = new AtomicInteger(0);
 
+    private final AtomicInteger triggered = new AtomicInteger(0);
+
+    @Before
+    public void setupUIComponent() {
         PlatformEx.runAndWait(() ->
                 UI.events.registerEvent((ModelUpdatedEventHandler) e -> triggered.incrementAndGet()));
+    }
 
-        press(REFRESH);
-        waitAndAssertEquals(1, triggered::get);
+    @Test
+    public void refresh_refreshCount_refreshTriggersCorrectEvent() {
+        push(REFRESH);
+        waitAndAssertEquals(2, triggered::get);
     }
 }

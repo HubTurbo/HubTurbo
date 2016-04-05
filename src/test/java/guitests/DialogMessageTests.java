@@ -18,7 +18,7 @@ public class DialogMessageTests extends UITest {
         Platform.runLater(() -> DialogMessage.showErrorDialog("Error", "Test Error Dialog"));
         waitUntilNodeAppears(hasText("Test Error Dialog"));
         assertNodeExists(hasText("Test Error Dialog"));
-        click("OK");
+        clickOn("OK");
     }
 
     @Test
@@ -28,14 +28,14 @@ public class DialogMessageTests extends UITest {
         Platform.runLater(yesTask);
         waitUntilNodeAppears(hasText("Warning Header"));
         assertNodeExists(hasText("Warning Header"));
-        click("yEs");
+        clickOn("yEs");
         assertEquals(true, yesTask.get());
         FutureTask<Boolean> noTask = new FutureTask<>(() ->
                 DialogMessage.showYesNoWarningDialog("Warning", "Warning Header", "Warning Message", "yEs", "nO"));
         Platform.runLater(noTask);
         waitUntilNodeAppears(hasText("Warning Message"));
         assertNodeExists(hasText("Warning Message"));
-        click("nO");
+        clickOn("nO");
         assertEquals(false, noTask.get());
     }
 
@@ -44,6 +44,6 @@ public class DialogMessageTests extends UITest {
         Platform.runLater(() -> DialogMessage.showInformationDialog("Information", "Test Information Dialog"));
         waitUntilNodeAppears(hasText("Test Information Dialog"));
         assertNodeExists(hasText("Test Information Dialog"));
-        click("OK");
+        clickOn("OK");
     }
 }

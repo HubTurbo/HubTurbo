@@ -26,6 +26,8 @@ public class BoardAutoCreator {
     private static final String FIRST_SAMPLE_REPO_NAME = "HubTurbo/SampleRepo";
     private static final String SECOND_SAMPLE_REPO_NAME = "HubTurbo/SampleRepo2";
     private static final String TIPS_REPO_NAME = "HubTurbo/TipsRepo";
+    public static final String SAVE_MESSAGE = "You are about to create the '%s' board.%n%n"
+            + "Would you like the save the current board before continuing?";
     public static final String SAMPLE_BOARD_DIALOG = String.format("%s has been created and loaded.", SAMPLE_BOARD);
 
     public static final Map<String, String> getSamplePanelDetails() {
@@ -59,18 +61,41 @@ public class BoardAutoCreator {
     public Menu generateBoardAutoCreateMenu() {
         Menu autoCreate = new Menu("Auto-create");
         MenuItem sample = new MenuItem(SAMPLE_BOARD);
-        sample.setOnAction(e -> createSampleBoard(true));
+        sample.setOnAction(e -> {
+            promptToSaveBoardIfNeeded(SAMPLE_BOARD);
+            createSampleBoard(true);
+        });
         autoCreate.getItems().add(sample);
 
         MenuItem milestone = new MenuItem(MILESTONES);
-        milestone.setOnAction(e -> createMilestoneBoard());
+        milestone.setOnAction(e -> {
+            promptToSaveBoardIfNeeded(MILESTONES);
+            createMilestoneBoard();
+        });
         autoCreate.getItems().add(milestone);
 
         MenuItem workAllocation = new MenuItem(WORK_ALLOCATION);
-        workAllocation.setOnAction(e -> createWorkAllocationBoard());
+        workAllocation.setOnAction(e -> {
+            promptToSaveBoardIfNeeded(WORK_ALLOCATION);
+            createWorkAllocationBoard();
+        });
         autoCreate.getItems().add(workAllocation);
 
         return autoCreate;
+    }
+
+    private void promptToSaveBoardIfNeeded(String boardName) {
+        boolean isOpenBoardDifferentFromSavedBoard = !prefs.getLastOpenBoardPanelInfos().isPresent()
+                || !prefs.getLastOpenBoardPanelInfos().get().equals(panelControl.getCurrentPanelInfos());
+
+        if (isOpenBoardDifferentFromSavedBoard && isSaveBoardDialogResponsePositive(boardName)) {
+            ui.getMenuControl().saveBoard();
+        }
+    }
+
+    private boolean isSaveBoardDialogResponsePositive(String boardName) {
+        return DialogMessage.showYesNoWarningDialog("Confirmation", "Save current board?",
+                 String.format(SAVE_MESSAGE, boardName), "Yes", "No");
     }
 
     private void createMilestoneBoard() {
@@ -182,8 +207,10 @@ public class BoardAutoCreator {
     }
 
     private void triggerBoardSaveEventSequence(String boardName) {
-        prefs.addBoard(boardName, panelControl.getCurrentPanelInfos());
+        List<PanelInfo> currentPanelInfos = panelControl.getCurrentPanelInfos();
+        prefs.addBoard(boardName, currentPanelInfos);
         prefs.setLastOpenBoard(boardName);
+        prefs.setLastOpenBoardPanelInfos(currentPanelInfos);
         TestController.getUI().triggerEvent(new BoardSavedEvent());
         logger.info("Auto-created board, saved as \"" + boardName + "\"");
         TestController.getUI().updateTitle();

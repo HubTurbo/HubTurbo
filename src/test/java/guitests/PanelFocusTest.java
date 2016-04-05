@@ -5,24 +5,27 @@ import static ui.components.KeyboardShortcuts.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.junit.Test;
-import org.loadui.testfx.utils.FXTestUtils;
+import org.loadui.testfx.GuiTest;
+import org.testfx.api.FxToolkit;
 
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import prefs.PanelInfo;
 import prefs.Preferences;
+import ui.IdGenerator;
 import ui.TestController;
 import ui.issuepanel.PanelControl;
 
 public class PanelFocusTest extends UITest {
 
     @Override
-    public void launchApp() {
-        FXTestUtils.launchApp(TestUI.class, "--testconfig=true", "--bypasslogin=true");
+    public void setup() throws TimeoutException {
+        FxToolkit.setupApplication(TestUI.class, "--testconfig=true", "--bypasslogin=true");
     }
 
     @Override
@@ -68,13 +71,13 @@ public class PanelFocusTest extends UITest {
         // More shortcut checks to ensure the focus is always correct
         pushKeys(JUMP_TO_FILTER_BOX);
         awaitCondition(() ->
-            1 == panelControl.getCurrentlySelectedPanel().get());
+            1 == panelControl.getCurrentlySelectedPanel().get(), 10);
         pushKeys(JUMP_TO_FIRST_ISSUE);
         awaitCondition(() ->
-            1 == panelControl.getCurrentlySelectedPanel().get());
+            1 == panelControl.getCurrentlySelectedPanel().get(), 10);
         pushKeys(KeyCode.F);
         awaitCondition(() ->
-            2 == panelControl.getCurrentlySelectedPanel().get());
+            2 == panelControl.getCurrentlySelectedPanel().get(), 10);
     }
 
     private void panelFocus_focusedPanel_focusCorrectOnCreatingPanels(PanelControl panelControl) {
@@ -110,12 +113,12 @@ public class PanelFocusTest extends UITest {
          */
         // Setup:
         // 1. Save a board
-        click("Boards");
+        clickOn("Boards");
         pushKeys(KeyCode.DOWN);
         pushKeys(KeyCode.DOWN);
         pushKeys(KeyCode.ENTER);
-        ((TextField) find("#boardnameinput")).setText("Board 1");
-        click("OK");
+        ((TextField) GuiTest.find(IdGenerator.getBoardNameInputFieldIdReference())).setText("Board 1");
+        clickOn("OK");
         awaitCondition(() -> 1 == panelControl.getNumberOfSavedBoards());
         // 2. Create a new panel so that scroll bar is on the left
         pushKeys(CREATE_RIGHT_PANEL);

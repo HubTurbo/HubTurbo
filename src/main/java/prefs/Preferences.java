@@ -205,6 +205,14 @@ public class Preferences { // NOPMD
         return sessionConfig.getLastOpenBoard();
     }
 
+    public void setLastOpenBoardPanelInfos(List<PanelInfo> panelInfos) {
+        sessionConfig.setLastOpenBoardPanelInfos(panelInfos);
+    }
+
+    public Optional<List<PanelInfo>> getLastOpenBoardPanelInfos() {
+        return sessionConfig.getLastOpenBoardPanelInfos();
+    }
+
     /**
      * Switches the board to the next one. Cycles through the boards one at a time.
      * @return The new board selected
@@ -222,6 +230,11 @@ public class Preferences { // NOPMD
 
     public void clearLastOpenBoard() {
         sessionConfig.clearLastOpenBoard();
+        save();
+    }
+
+    public void clearLastOpenBoardPanelInfos() {
+        sessionConfig.clearLastOpenBoardPanelInfos();
         save();
     }
 

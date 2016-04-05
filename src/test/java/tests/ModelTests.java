@@ -327,7 +327,17 @@ public class ModelTests {
     }
 
     /**
-     * Tests that replaceIssueLabels finds issue with the right id and successfully modify the issue's labels
+     * Tests that replaceIssueAssigneeOnServer returns Optional.empty() if the model for the
+     * issue given in the argument can't be found
+     */
+    @Test
+    public void replaceIssueAssignee_issueNotFound() {
+        Model model = new Model("testrepo");
+        assertEquals(Optional.empty(), model.replaceIssueAssignee(1, Optional.of("")));
+    }
+
+    /**
+     * Tests that replaceIssueLabelsOnServer finds issue with the right id and successfully modify the issue's labels
      */
     @Test
     public void replaceIssueLabels_successful() {
@@ -370,7 +380,7 @@ public class ModelTests {
         TurboIssue issue2 = LogicTests.createClosedIssue();
         List<TurboIssue> issues = Arrays.asList(issue2, issue1);
         Model model = new Model(repoId, issues, new ArrayList<TurboLabel>(),
-                                new ArrayList<TurboMilestone>(), new ArrayList<TurboUser>());
+                new ArrayList<TurboMilestone>(), new ArrayList<TurboUser>());
 
         result = model.editIssueState(issue1.getId(), false);
         assertEquals(issue1.getId(), result.get().getId());
@@ -383,5 +393,27 @@ public class ModelTests {
         result = model.editIssueState(issue2.getId(), true);
         assertEquals(issue2.getId(), result.get().getId());
         assertEquals(true, result.get().isOpen());
+    }
+
+    /**
+     * Tests that replaceIssueAssigneeOnServer finds issue with the right id and successfully modify the
+     * issue's assignee
+     */
+    @Test
+    public void replaceIssueAssignee_successful() {
+        String repoId = "testowner/testrepo";
+        String originalAssignee = "user1";
+        String newAssignee = "user2";
+
+        TurboIssue issue1 = LogicTests.createIssueWithAssignee(1, originalAssignee);
+        TurboIssue issue2 = LogicTests.createIssueWithAssignee(2, originalAssignee);
+        TurboIssue issue3 = LogicTests.createIssueWithAssignee(3, originalAssignee);
+        List<TurboIssue> issues = Arrays.asList(issue3, issue2, issue1);
+
+        Model model = new Model(repoId, issues, new ArrayList<>(),
+                                new ArrayList<>(), new ArrayList<>());
+        Optional<TurboIssue> result = model.replaceIssueAssignee(issue1.getId(), Optional.of(newAssignee));
+        assertEquals(1, result.get().getId());
+        assertEquals(newAssignee, result.get().getAssignee().get());
     }
 }
