@@ -62,21 +62,21 @@ public class BoardAutoCreator {
         Menu autoCreate = new Menu("Auto-create");
         MenuItem sample = new MenuItem(SAMPLE_BOARD);
         sample.setOnAction(e -> {
-            saveBoardAfterUserConfirmation(SAMPLE_BOARD);
+            promptToSaveBoardIfNeeded(SAMPLE_BOARD);
             createSampleBoard(true);
         });
         autoCreate.getItems().add(sample);
 
         MenuItem milestone = new MenuItem(MILESTONES);
         milestone.setOnAction(e -> {
-            saveBoardAfterUserConfirmation(MILESTONES);
+            promptToSaveBoardIfNeeded(MILESTONES);
             createMilestoneBoard();
         });
         autoCreate.getItems().add(milestone);
 
         MenuItem workAllocation = new MenuItem(WORK_ALLOCATION);
         workAllocation.setOnAction(e -> {
-            saveBoardAfterUserConfirmation(WORK_ALLOCATION);
+            promptToSaveBoardIfNeeded(WORK_ALLOCATION);
             createWorkAllocationBoard();
         });
         autoCreate.getItems().add(workAllocation);
@@ -84,8 +84,13 @@ public class BoardAutoCreator {
         return autoCreate;
     }
 
-    private void saveBoardAfterUserConfirmation(String boardName) {
-        if (isSaveBoardDialogResponsePositive(boardName)) ui.getMenuControl().saveBoardAs();
+    private void promptToSaveBoardIfNeeded(String boardName) {
+        boolean isOpenBoardDifferentFromSavedBoard = !prefs.getLastOpenBoardPanelInfos().isPresent()
+                || !prefs.getLastOpenBoardPanelInfos().get().equals(panelControl.getCurrentPanelInfos());
+
+        if (isOpenBoardDifferentFromSavedBoard && isSaveBoardDialogResponsePositive(boardName)) {
+            ui.getMenuControl().saveBoard();
+        }
     }
 
     private boolean isSaveBoardDialogResponsePositive(String boardName) {
@@ -202,8 +207,10 @@ public class BoardAutoCreator {
     }
 
     private void triggerBoardSaveEventSequence(String boardName) {
-        prefs.addBoard(boardName, panelControl.getCurrentPanelInfos());
+        List<PanelInfo> currentPanelInfos = panelControl.getCurrentPanelInfos();
+        prefs.addBoard(boardName, currentPanelInfos);
         prefs.setLastOpenBoard(boardName);
+        prefs.setLastOpenBoardPanelInfos(currentPanelInfos);
         TestController.getUI().triggerEvent(new BoardSavedEvent());
         logger.info("Auto-created board, saved as \"" + boardName + "\"");
         TestController.getUI().updateTitle();

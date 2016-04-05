@@ -47,6 +47,7 @@ public class BoardAutoCreatorTest extends UITest {
         pushKeys(KeyboardShortcuts.CREATE_RIGHT_PANEL);
         pushKeys(KeyboardShortcuts.CREATE_RIGHT_PANEL);
         pushKeys(KeyboardShortcuts.CREATE_RIGHT_PANEL);
+        PlatformEx.waitOnFxThread();
         assertEquals(panelCount + 3, panelControl.getPanelCount());
 
         // create milestones board
@@ -58,6 +59,11 @@ public class BoardAutoCreatorTest extends UITest {
         // save as "New Board"
         clickOn("OK");
 
+        PlatformEx.waitOnFxThread();
+        assertNodeExists(hasText("Milestones board has been created and loaded.\n\n"
+                + "It is saved under the name \"Milestones\"."));
+        clickOn("OK");
+
         assertEquals(2, panelControl.getNumberOfSavedBoards());
         assertEquals(5, panelControl.getPanelCount());
 
@@ -65,6 +71,45 @@ public class BoardAutoCreatorTest extends UITest {
         traverseMenu("Boards", "Open", "New Board");
         PlatformEx.waitOnFxThread();
         assertEquals(panelCount + 3, panelControl.getPanelCount());
+
+        traverseMenu("Boards", "Delete", "Milestones");
+        waitUntilNodeAppears("OK");
+        clickOn("OK");
+        traverseMenu("Boards", "Delete", "New Board");
+        waitUntilNodeAppears("OK");
+        clickOn("OK");
+    }
+
+    @Test
+    public void boardAutoCreator_clickNoInSavePrompt_currentBoardSaved() {
+        int panelCount = panelControl.getPanelCount();
+        assertEquals(0, panelControl.getNumberOfSavedBoards());
+
+        // create 3 new panels
+        pushKeys(KeyboardShortcuts.CREATE_RIGHT_PANEL);
+        pushKeys(KeyboardShortcuts.CREATE_RIGHT_PANEL);
+        pushKeys(KeyboardShortcuts.CREATE_RIGHT_PANEL);
+        PlatformEx.waitOnFxThread();
+        assertEquals(panelCount + 3, panelControl.getPanelCount());
+
+        // create milestones board
+        traverseMenu("Boards", "Auto-create", "Milestones");
+        PlatformEx.waitOnFxThread();
+        waitUntilNodeAppears(String.format(SAVE_MESSAGE, "Milestones"));
+        // do not opt to save current board
+        clickOn("No");
+
+        PlatformEx.waitOnFxThread();
+        assertNodeExists(hasText("Milestones board has been created and loaded.\n\n"
+                + "It is saved under the name \"Milestones\"."));
+        clickOn("OK");
+
+        assertEquals(1, panelControl.getNumberOfSavedBoards());
+        assertEquals(5, panelControl.getPanelCount());
+
+        traverseMenu("Boards", "Delete", "Milestones");
+        waitUntilNodeAppears("OK");
+        clickOn("OK");
     }
 
     @Test
@@ -76,6 +121,8 @@ public class BoardAutoCreatorTest extends UITest {
         PlatformEx.waitOnFxThread();
         waitUntilNodeAppears(String.format(SAVE_MESSAGE, "Milestones"));
         clickOn("No");
+
+        PlatformEx.waitOnFxThread();
         assertNodeExists(hasText("Milestones board has been created and loaded.\n\n"
                 + "It is saved under the name \"Milestones\"."));
         clickOn("OK");
@@ -97,6 +144,10 @@ public class BoardAutoCreatorTest extends UITest {
         assertEquals("Next Milestone", panelInfos.get(2).getPanelName());
         assertEquals("Next Next Milestone", panelInfos.get(3).getPanelName());
         assertEquals("Next Next Next Milestone", panelInfos.get(4).getPanelName());
+
+        traverseMenu("Boards", "Delete", "Milestones");
+        waitUntilNodeAppears("OK");
+        clickOn("OK");
     }
 
     @Test
@@ -108,6 +159,8 @@ public class BoardAutoCreatorTest extends UITest {
         PlatformEx.waitOnFxThread();
         waitUntilNodeAppears(String.format(SAVE_MESSAGE, "Work Allocation"));
         clickOn("No");
+
+        PlatformEx.waitOnFxThread();
         assertNodeExists(hasText("Work Allocation board has been created and loaded.\n\n"
                 + "It is saved under the name \"Work Allocation\"."));
         clickOn("OK");
@@ -129,6 +182,10 @@ public class BoardAutoCreatorTest extends UITest {
         assertEquals("Work allocated to User 11", panelInfos.get(2).getPanelName());
         assertEquals("Work allocated to User 12", panelInfos.get(3).getPanelName());
         assertEquals("Work allocated to User 2", panelInfos.get(4).getPanelName());
+
+        traverseMenu("Boards", "Delete", "Work Allocation");
+        waitUntilNodeAppears("OK");
+        clickOn("OK");
     }
 
     @Test
@@ -141,6 +198,10 @@ public class BoardAutoCreatorTest extends UITest {
         waitUntilNodeAppears(SAMPLE_BOARD_DIALOG);
         clickOn("OK");
         verifyBoard(panelControl, BoardAutoCreator.getSamplePanelDetails());
+
+        traverseMenu("Boards", "Delete", SAMPLE_BOARD);
+        waitUntilNodeAppears("OK");
+        clickOn("OK");
     }
 
     /**

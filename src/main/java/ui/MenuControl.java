@@ -89,19 +89,25 @@ public class MenuControl extends MenuBar {
     }
 
     /**
-     * Creates an empty board. User will be prompted to
-     * confirm the action if there are unclosed panels.
+     * Logs the user action and creates a new board
      */
     private void onBoardNew() {
         logger.info("Menu: Boards > New");
+        newBoard();
+    }
 
+    /**
+     * Creates an empty board. User will be prompted to
+     * confirm the action if there are unclosed panels
+     */
+    public final void newBoard() {
         if (!isNewBoardCreationDialogConfirmed()) {
             logger.info("New board creation cancelled");
             return;
         }
 
         panels.closeAllPanels();
-        onBoardSaveAs();
+        saveBoardAs();
     }
 
     /**
@@ -126,11 +132,20 @@ public class MenuControl extends MenuBar {
                 response.get().getButtonData() == ButtonData.OK_DONE;
     }
 
+    /**
+     * Logs the user action and saves the current board
+     */
     private void onBoardSave() {
         logger.info("Menu: Boards > Save");
+        saveBoard();
+    }
 
+    /**
+     * Tries to save current board. If current board has not been saved before, it calls {@code saveBoardAs()}
+     */
+    public final void saveBoard() {
         if (!prefs.getLastOpenBoard().isPresent()) {
-            onBoardSaveAs();
+            saveBoardAs();
             return;
         }
 
@@ -141,12 +156,13 @@ public class MenuControl extends MenuBar {
         }
 
         prefs.addBoard(prefs.getLastOpenBoard().get(), panelList);
+        prefs.setLastOpenBoardPanelInfos(panelList);
         ui.triggerEvent(new BoardSavedEvent());
         logger.info("Board " + prefs.getLastOpenBoard().get() + " saved");
     }
 
     /**
-     * Called upon the Boards > Save as being clicked
+     * Logs the user action and triggers "Save as" on the current board
      */
     private void onBoardSaveAs() {
         logger.info("Menu: Boards > Save as");
@@ -167,6 +183,7 @@ public class MenuControl extends MenuBar {
             String boardName = response.get().trim();
             prefs.addBoard(boardName, panelList);
             prefs.setLastOpenBoard(boardName);
+            prefs.setLastOpenBoardPanelInfos(panelList);
             ui.triggerEvent(new BoardSavedEvent());
             logger.info("New board " + boardName + " saved");
             ui.updateTitle();
@@ -174,26 +191,44 @@ public class MenuControl extends MenuBar {
     }
 
     /**
-     * Called upon the Boards > Open being clicked
+     * Logs the user action and opens the board that user requested
      */
-    private void onBoardOpen(String boardName, List<PanelInfo> panelInfo) {
+    private void onBoardOpen(String boardName, List<PanelInfo> panelInfos) {
         logger.info("Menu: Boards > Open > " + boardName);
+        openBoard(boardName, panelInfos);
+    }
 
+    /**
+     * Opens the board named {@code boardName}.
+     *
+     * @param boardName name of the board
+     * @param panelInfos list of panel infos of the board
+     */
+    public final void openBoard(String boardName, List<PanelInfo> panelInfos) {
         panels.closeAllPanels();
-        panels.openPanels(panelInfo);
+        panels.openPanels(panelInfos);
         panels.selectFirstPanel();
         prefs.setLastOpenBoard(boardName);
+        prefs.setLastOpenBoardPanelInfos(panelInfos);
         ui.updateTitle();
 
         ui.triggerEvent(new UsedReposChangedEvent());
     }
 
     /**
-     * Called upon the Boards > Delete being clicked
+     * Logs the user action and deletes the board that user requested
      */
     private void onBoardDelete(String boardName) {
         logger.info("Menu: Boards > Delete > " + boardName);
+        deleteBoard(boardName);
+    }
 
+    /**
+     * Deletes the board named {@boardName}
+     *
+     * @param boardName name of the board to delete
+     */
+    public final void deleteBoard(String boardName) {
         Alert dlg = new Alert(AlertType.CONFIRMATION, "");
         dlg.initModality(Modality.APPLICATION_MODAL);
         dlg.setTitle("Confirmation");
@@ -207,6 +242,7 @@ public class MenuControl extends MenuBar {
                     prefs.getLastOpenBoard().get().equals(boardName)) {
 
                 prefs.clearLastOpenBoard();
+                prefs.clearLastOpenBoardPanelInfos();
             }
             ui.triggerEvent(new BoardSavedEvent());
             logger.info(boardName + " was deleted");
