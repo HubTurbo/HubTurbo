@@ -4,7 +4,6 @@ import backend.resource.TurboIssue;
 import backend.resource.TurboMilestone;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
@@ -151,7 +150,8 @@ public class MilestonePickerDialog extends Dialog<MilestonePickerDialogResponse>
         matchingMilestones.getChildren().clear();
         matchingMilestoneList.stream()
                 .sorted()
-                .forEach(milestone -> matchingMilestones.getChildren().add(createDetailedMilestoneBox(milestone)));
+                .forEach(milestone -> matchingMilestones.getChildren().add(
+                        setMouseClickForNode(milestone.getDetailedMilestoneNode(), milestone.getTitle())));
     }
 
     private void addAssignmentIndicator(FlowPane assignedMilestoneStatus) {
@@ -181,52 +181,6 @@ public class MilestonePickerDialog extends Dialog<MilestonePickerDialogResponse>
         Node existingMilestoneNode = setMouseClickForNode(existingMilestone.get().getExistingMilestoneNode(),
                                                           existingMilestone.get().getTitle());
         assignedMilestoneBox.getChildren().add(existingMilestoneNode);
-    }
-
-    private HBox createDetailedMilestoneBox(PickerMilestone milestone) {
-        HBox detailedMilestoneBox = new HBox();
-        detailedMilestoneBox.setPrefHeight(DETAILED_MILESTONE_HEIGHT);
-        detailedMilestoneBox.setSpacing(3);
-        detailedMilestoneBox.setPadding(new Insets(3, 3, 3, 3));
-        detailedMilestoneBox.setStyle("-fx-border-width: 0 0 1 0; -fx-border-style: solid;");
-
-        HBox milestoneNodeBox = createMilestoneNodeBox(milestone);
-        Label separator = new Label("|");
-        HBox milestoneDetailsBox = createMilestoneDetailsBox(milestone);
-
-        detailedMilestoneBox.getChildren().setAll(milestoneNodeBox, separator, milestoneDetailsBox);
-
-        return detailedMilestoneBox;
-    }
-
-    private HBox createMilestoneDetailsBox(PickerMilestone milestone) {
-        HBox milestoneDetailsBox = new HBox();
-        milestoneDetailsBox.setSpacing(3);
-        milestoneDetailsBox.setPrefWidth(250);
-        milestoneDetailsBox.setAlignment(Pos.CENTER_RIGHT);
-
-        if (milestone.getDueDate().isPresent()) {
-            Label dueDate = new Label("Due on: " + milestone.getDueDate().get().toString());
-            dueDate.setPrefWidth(150);
-            milestoneDetailsBox.getChildren().add(dueDate);
-        }
-        int totalIssues = milestone.getOpenIssues() + milestone.getClosedIssues();
-        double progressValue = totalIssues > 0
-                ? (double) milestone.getClosedIssues() / (milestone.getOpenIssues() + milestone.getClosedIssues()) : 0;
-        MilestoneProgressBar progressBar = new MilestoneProgressBar(progressValue);
-        Label progressLabel = new Label(String.format("%3.0f%%", progressValue * 100));
-        progressLabel.setPrefWidth(50);
-        milestoneDetailsBox.getChildren().addAll(progressBar, progressLabel);
-        return milestoneDetailsBox;
-    }
-
-    private HBox createMilestoneNodeBox(PickerMilestone milestone) {
-        HBox milestoneNodeBox = new HBox();
-        milestoneNodeBox.setPrefWidth(129);
-        milestoneNodeBox.setAlignment(Pos.CENTER);
-        Node milestoneNode = setMouseClickForNode(milestone.getNode(), milestone.getTitle());
-        milestoneNodeBox.getChildren().add(milestoneNode);
-        return milestoneNodeBox;
     }
 
     private VBox createMilestoneDialogBox() {
