@@ -22,9 +22,6 @@ import java.util.OptionalInt;
 
 import static javafx.scene.input.KeyCode.*;
 
-/**
- * @author Liu Xinan
- */
 public class BoardPickerDialog extends Dialog<String> {
 
     private static final Logger logger = HTLog.get(BoardPickerDialog.class);

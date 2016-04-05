@@ -4,7 +4,12 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import org.apache.logging.log4j.Logger;
+import org.controlsfx.control.spreadsheet.Picker;
 import ui.UI;
+import util.HTLog;
+
+import java.io.IOException;
 
 /**
  * Represent a candidate board UI element in the candidate list of BoardPickerDialog
@@ -12,6 +17,8 @@ import ui.UI;
  * It contains the board name, and a method to toggle its highlighted state.
  */
 public class PickerBoard extends HBox {
+
+    private static final Logger logger = HTLog.get(PickerBoard.class);
 
     @FXML
     private Label name;
@@ -31,8 +38,8 @@ public class PickerBoard extends HBox {
             loader.setRoot(this);
             loader.setController(this);
             loader.load();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            logger.error("Failure to load FXML. " + e.getMessage());
         }
     }
 
