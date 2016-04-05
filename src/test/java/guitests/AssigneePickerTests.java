@@ -18,8 +18,6 @@ public class AssigneePickerTests extends UITest {
     public void showAssigneePicker_typeQuery_displaysCorrectly() {
         triggerAssigneePicker(getIssueCell(0, 9).getIssue());
         clickAssigneePickerTextField();
-        selectAll();
-        push(KeyCode.BACK_SPACE);
         type("world");
         assertEquals("world", getAssigneePickerTextField().getText());
         exitCleanly();
@@ -29,8 +27,6 @@ public class AssigneePickerTests extends UITest {
     public void showAssigneePicker_noAssignee_assigneeAssigned() {
         TurboIssue issue = getIssueCell(0, 9).getIssue();
         triggerAssigneePicker(issue);
-        selectAll();
-        push(KeyCode.BACK_SPACE);
         type("User");
         push(KeyCode.ENTER);
         assertEquals(true, issue.getAssignee().isPresent());

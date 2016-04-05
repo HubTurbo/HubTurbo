@@ -41,18 +41,7 @@ public class AssigneePickerDialog extends Dialog<AssigneePickerDialog.AssigneePi
         state = new AssigneePickerState(originalUsers);
         initUI();
         setupKeyEvents();
-        fillTextFieldWithExistingAssignee();
         Platform.runLater(() -> positionDialog(stage));
-    }
-
-    private void fillTextFieldWithExistingAssignee() {
-        PickerAssignee.getExistingAssignee(originalUsers)
-                .map(PickerAssignee::getLoginName)
-                .ifPresent(this::fillTextFieldWithUsername);
-    }
-
-    private void fillTextFieldWithUsername(String username) {
-        textField.setText(username);
     }
 
     private void setupKeyEvents() {
