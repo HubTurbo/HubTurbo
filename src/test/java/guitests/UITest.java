@@ -390,7 +390,7 @@ public class UITest extends FxRobot {
     public void clickFilterTextFieldAtPanel(int panelIndex) {
         waitUntilNodeAppears(IdGenerator.getPanelFilterTextFieldIdReference(panelIndex));
         awaitCondition(getFilterTextFieldAtPanel(panelIndex)::isVisible, 10);
-        clickOn(IdGenerator.getPanelFilterTextFieldIdReference(panelIndex));
+        clickOn(getFilterTextFieldAtPanel(panelIndex));
     }
 
     /**
