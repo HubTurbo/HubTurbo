@@ -29,8 +29,10 @@ import ui.components.HTStatusBar;
 import ui.components.KeyboardShortcuts;
 import ui.components.StatusUI;
 import ui.components.issuepicker.IssuePicker;
+import ui.components.pickers.AssigneePicker;
 import ui.components.pickers.LabelPicker;
 import ui.components.pickers.MilestonePicker;
+import ui.components.pickers.RepositoryPicker;
 import ui.issuepanel.PanelControl;
 import undo.UndoController;
 import util.*;
@@ -45,13 +47,13 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import static ui.components.KeyboardShortcuts.SWITCH_DEFAULT_REPO;
 import static ui.components.KeyboardShortcuts.SHOW_ISSUE_PICKER;
+import static ui.components.KeyboardShortcuts.SHOW_REPO_PICKER;
 
 public class UI extends Application implements EventDispatcher {
 
     public static final int VERSION_MAJOR = 3;
-    public static final int VERSION_MINOR = 24;
+    public static final int VERSION_MINOR = 25;
     public static final int VERSION_PATCH = 0;
 
     private static final Logger logger = LogManager.getLogger(UI.class.getName());
@@ -61,9 +63,11 @@ public class UI extends Application implements EventDispatcher {
     private static final int REFRESH_PERIOD = 60;
 
     /**
-     * Minimum Java Version Required by HT
+     * Minimum Java Version Required by HT.
+     *
+     * Due to usage of ControlsFX 8.40.10, HubTurbo requires minimum Java version of 1.8.0_60.
      */
-    public static final String REQUIRED_JAVA_VERSION = "1.8.0_60";
+    public static final String REQUIRED_JAVA_VERSION = "1.8.0_60"; // update gettingStarted.md if this is changed
 
     public static final String WINDOW_TITLE = "HubTurbo %s (%s)";
 
@@ -204,6 +208,8 @@ public class UI extends Application implements EventDispatcher {
         new LabelPicker(this, mainStage);
         new MilestonePicker(this, mainStage);
         new IssuePicker(this, mainStage);
+        new RepositoryPicker(this, mainStage, this::primaryRepoChanged);
+        new AssigneePicker(this, mainStage);
     }
 
     protected void registerTestEvents() {
@@ -246,7 +252,7 @@ public class UI extends Application implements EventDispatcher {
     private void initUI(Stage stage) {
         repoSelector = createRepoSelector();
         apiBox = new Label("-/-");
-        apiBox.setId("apiBox");
+        apiBox.setId(IdGenerator.getApiBoxId());
 
         mainStage = stage;
         stage.setMaximized(false);
@@ -356,9 +362,6 @@ public class UI extends Application implements EventDispatcher {
     private void setupGlobalKeyboardShortcuts(Scene scene) {
         globalHotkey.init();
         scene.addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            if (SWITCH_DEFAULT_REPO.match(event)) {
-                switchDefaultRepo();
-            }
             if (SHOW_ISSUE_PICKER.match(event)) {
                 triggerEvent(new ShowIssuePickerEvent(logic.getModels().getIssues(), true));
             }

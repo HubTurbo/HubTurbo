@@ -135,6 +135,12 @@ public class FilterParserTests {
     }
 
     @Test
+    public void parse_unexpectedTokenAtEOF_exceptionThrown() {
+        thrown.expect(ParseException.class);
+        Parser.parse("sort:a,");
+    }
+
+    @Test
     public void parse_disjunction_validAST() {
         assertEquals(Parser.parse("id:b OR id:d"),
                      new Disjunction(new Qualifier(ID, "b"), new Qualifier(ID, "d")));

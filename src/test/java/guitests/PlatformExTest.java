@@ -5,17 +5,11 @@ import static org.junit.Assert.assertEquals;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Test;
-import org.loadui.testfx.utils.FXTestUtils;
 
 import javafx.application.Platform;
 import util.PlatformEx;
 
 public class PlatformExTest extends UITest {
-
-    @Override
-    public void launchApp() {
-        FXTestUtils.launchApp(TestUI.class);
-    }
 
     /**
      * This method is needed to sequence concurrent tests. Order matters for these

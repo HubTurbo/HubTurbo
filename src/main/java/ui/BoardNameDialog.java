@@ -71,7 +71,7 @@ public final class BoardNameDialog extends Dialog<String> {
                 event.consume();
             }
         });
-        submitButton.setId("boardsavebutton");
+        submitButton.setId(IdGenerator.getBoardNameSaveButtonId());
 
         setResultConverter(submit -> {
             if (submit == submitButtonType) {
@@ -103,7 +103,7 @@ public final class BoardNameDialog extends Dialog<String> {
         Platform.runLater(() -> {
             nameField.requestFocus();
         });
-        nameField.setId("boardnameinput");
+        nameField.setId(IdGenerator.getBoardNameInputFieldId());
 
         nameArea.getChildren().addAll(prompt, nameField);
         grid.add(nameArea, 0, 0);

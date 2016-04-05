@@ -1,10 +1,7 @@
 package ui.listpanel;
 
 import static ui.components.KeyboardShortcuts.*;
-import static util.GithubPageElements.DISCUSSION_TAB;
-import static util.GithubPageElements.COMMITS_TAB;
-import static util.GithubPageElements.FILES_TAB;
-
+import util.GithubPageElements.PrTab;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,8 +23,8 @@ import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.Logger;
 
-import ui.GUIController;
 import ui.GuiElement;
+import ui.IdGenerator;
 import ui.UI;
 import ui.components.IssueListView;
 import ui.components.KeyboardShortcuts;
@@ -48,7 +45,6 @@ public class ListPanel extends FilterPanel {
     private static final Logger logger = HTLog.get(ListPanel.class);
 
     private final UI ui;
-    private final GUIController guiController;
     private int issuesCount = 0;
     private int closedIssuesCount = 0;
     private int openIssuesCount = 0;
@@ -79,19 +75,18 @@ public class ListPanel extends FilterPanel {
     private static final Boolean READ = true;
     private final MenuItem changeLabelsMenuItem = new MenuItem();
     private static final String CHANGE_LABELS_MENU_ITEM_TEXT = "Change labels (L)";
-
     private static final MenuItem changeMilestoneMenuItem = new MenuItem();
     private static final String CHANGE_MILESTONE_MENU_ITEM_TEXT = "Change milestone (M)";
+    private final MenuItem changeAssigneeMenuItem = new MenuItem();
+    private static final String CHANGE_ASSIGNEE_MENU_ITEM_TEXT = "Change Assignee (A)";
 
-    private static final MenuItem closeReopenIssueMenuItem = new MenuItem();
+    private final MenuItem closeReopenIssueMenuItem = new MenuItem();
     private static final String closeIssueMenuItemText = "Close issue (C)";
     private static final String reopenIssueMenuItemText = "Reopen issue (O)";
 
-    public ListPanel(UI ui, GUIController guiController, Stage mainStage,
-                     PanelControl parentPanelControl, int panelIndex) {
-        super(ui, guiController, parentPanelControl, panelIndex);
+    public ListPanel(UI ui, Stage mainStage, PanelControl parentPanelControl, int panelIndex) {
+        super(ui, parentPanelControl, panelIndex);
         this.ui = ui;
-        this.guiController = guiController;
         this.mainStage = mainStage;
 
         listView = new IssueListView();
@@ -191,7 +186,7 @@ public class ListPanel extends FilterPanel {
         closedIssuesCount = getClosedIssuesCount();
         openIssuesCount = issuesCount - closedIssuesCount;
         listView.restoreSelection();
-        this.setId(guiController.getDefaultRepo() + "_col" + panelIndex);
+        this.setId(IdGenerator.getPanelId(panelIndex));
         updateFooter();
 
 
@@ -312,39 +307,25 @@ public class ListPanel extends FilterPanel {
             }
             if (NEW_COMMENT.match(event)) {
                 if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
-                    ui.getBrowserComponent().switchToTab(DISCUSSION_TAB);
-                } else {
-                    if (!ui.getBrowserComponent().isCurrentUrlIssue()) {
-                        openPageOfCurrentlySelectedIssue();
-                    } else if (!ui.getBrowserComponent().isCurrentUrlDiscussion()) {
-                        ui.getBrowserComponent().switchToTab(DISCUSSION_TAB);
+                    // goto PR discussion tab
+                    ui.getBrowserComponent().openPrTab(getCurrentlySelectedIssue(), PrTab.DISCUSSION);
+                } else { // focus new comment textbox
+                    if (!ui.getBrowserComponent().isCurrentUrlDiscussion()) {
+                        openIssuePageMainTab(getCurrentlySelectedIssue());
                     }
-
                     ui.getBrowserComponent().waitUntilDiscussionPageLoaded();
-                    ui.getBrowserComponent().jumpToComment();
+                    ui.getBrowserComponent().jumpToNewCommentBox();
                 }
 
             }
             if (PR_FILES_CHANGED.match(event)
                     && KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
-
-                if (!ui.getBrowserComponent().isCurrentUrlIssue()) {
-                    openPageOfCurrentlySelectedIssue();
-                    ui.getBrowserComponent().waitUntilDiscussionPageLoaded();
-                }
-
-                ui.getBrowserComponent().switchToTab(FILES_TAB);
+                ui.getBrowserComponent().openPrTab(getCurrentlySelectedIssue(), PrTab.FILES);
                 event.consume();
             }
             if (PR_COMMITS.match(event)
                     && KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
-
-                if (!ui.getBrowserComponent().isCurrentUrlIssue()) {
-                    openPageOfCurrentlySelectedIssue();
-                    ui.getBrowserComponent().waitUntilDiscussionPageLoaded();
-                }
-
-                ui.getBrowserComponent().switchToTab(COMMITS_TAB);
+                ui.getBrowserComponent().openPrTab(getCurrentlySelectedIssue(), PrTab.COMMITS);
                 event.consume();
             }
             if (SHOW_LABELS.match(event)) {
@@ -354,9 +335,8 @@ public class ListPanel extends FilterPanel {
                     changeLabels();
                 }
             }
-            if (MANAGE_ASSIGNEES.match(event) && ui.getBrowserComponent().isCurrentUrlIssue()) {
-                ui.getBrowserComponent().switchToTab(DISCUSSION_TAB);
-                ui.getBrowserComponent().manageAssignees(event.getCode().toString());
+            if (SHOW_ASSIGNEES.match(event)) {
+                changeAssignee();
             }
             if (SHOW_MILESTONES.match(event)) {
                 if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
@@ -394,7 +374,7 @@ public class ListPanel extends FilterPanel {
         TurboIssue issue = listView.getSelectedItem().get().getIssue();
         Optional<Integer> relatedIssueNumber = listView.getSelectedItem().get().getIssue().isPullRequest()
                 ? GithubPageElements.extractIssueNumber(listView.getSelectedItem().get().getIssue().getDescription())
-                : ui.getBrowserComponent().getPRNumberFromIssue();
+                : ui.getBrowserComponent().getPrNumberFromIssue();
         if (!relatedIssueNumber.isPresent()) return;
         ui.triggerEvent(
                 new IssueSelectedEvent(issue.getRepoId(), relatedIssueNumber.get(), panelIndex, issue.isPullRequest())
@@ -427,9 +407,15 @@ public class ListPanel extends FilterPanel {
             changeLabels();
         });
 
+
         changeMilestoneMenuItem.setText(CHANGE_MILESTONE_MENU_ITEM_TEXT);
         changeMilestoneMenuItem.setOnAction(e -> {
             getSelectedElement().ifPresent(this::changeMilestone);
+        });
+
+        changeAssigneeMenuItem.setText(CHANGE_ASSIGNEE_MENU_ITEM_TEXT);
+        changeAssigneeMenuItem.setOnAction(e -> {
+            changeAssignee();
         });
 
         markAllBelowAsReadMenuItem.setText(MARK_ALL_AS_READ_MENU_ITEM_TEXT);
@@ -446,7 +432,9 @@ public class ListPanel extends FilterPanel {
                                       markAllBelowAsReadMenuItem, markAllBelowAsUnreadMenuItem,
                                       changeLabelsMenuItem,
                                       changeMilestoneMenuItem,
+                                      changeAssigneeMenuItem,
                                       closeReopenIssueMenuItem);
+
         contextMenu.setOnShowing(e -> updateContextMenu(contextMenu));
         listView.setContextMenu(contextMenu);
 
@@ -458,12 +446,23 @@ public class ListPanel extends FilterPanel {
         updateCloseReopenIssueMenuItem();
         updateChangeLabelsMenuItem();
         updateChangeMilestoneMenuItem();
-
+        updateChangeAssigneeMenuItem();
         return contextMenu;
     }
 
     public ContextMenu getContextMenu() {
         return contextMenu;
+    }
+
+    private MenuItem updateChangeAssigneeMenuItem() {
+        Optional<GuiElement> item = listView.getSelectedItem();
+        if (item.isPresent()) {
+            changeAssigneeMenuItem.setDisable(false);
+        } else {
+            changeAssigneeMenuItem.setDisable(true);
+        }
+
+        return changeAssigneeMenuItem;
     }
 
     private MenuItem updateChangeLabelsMenuItem() {
@@ -607,8 +606,15 @@ public class ListPanel extends FilterPanel {
         }
     }
 
+
     private void changeMilestone(GuiElement issueGuiElement) {
         ui.triggerEvent(new ShowMilestonePickerEvent(issueGuiElement.getIssue()));
+    }
+
+    private void changeAssignee() {
+        if (getSelectedElement().isPresent()) {
+            ui.triggerEvent(new ShowAssigneePickerEvent(getSelectedElement().get().getIssue()));
+        }
     }
 
     @Override
@@ -675,8 +681,16 @@ public class ListPanel extends FilterPanel {
         return allReposInFilterExpr.isEmpty();
     }
 
-    private void openPageOfCurrentlySelectedIssue() {
-        TurboIssue issue = getSelectedElement().get().getIssue();
-        ui.getBrowserComponent().showIssue(issue.getRepoId(), issue.getId(), issue.isPullRequest(), false);
+    private TurboIssue getCurrentlySelectedIssue() {
+        return getSelectedElement().get().getIssue();
+    }
+
+    private void openIssuePageMainTab(TurboIssue issue) {
+        ui.getBrowserComponent().showIssueMainTab(issue.getRepoId(), issue.getId(), issue.isPullRequest(), false);
+    }
+
+    @Override
+    public void close() {
+        // To be implemented if action needed to be taken after panel is deselected
     }
 }

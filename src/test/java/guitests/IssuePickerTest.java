@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
+import org.loadui.testfx.GuiTest;
 
 import backend.resource.TurboIssue;
 import javafx.application.Platform;
@@ -20,14 +21,14 @@ public class IssuePickerTest extends UITest {
     @Test
     public void showIssuePicker_typeQuery_displaysCorrectly() {
         triggerIssuePicker(new ArrayList<>());
-        TextField issuePickerTextField = find(QUERY_FIELD_ID);
-        click(issuePickerTextField);
+        TextField issuePickerTextField = GuiTest.find(QUERY_FIELD_ID);
+        clickOn(issuePickerTextField);
         type("world");
         assertEquals("world", issuePickerTextField.getText());
     }
 
     private void triggerIssuePicker(List<TurboIssue> allIssues) {
-        Platform.runLater(stage::hide);
+        Platform.runLater(getStage()::hide);
         UI.events.triggerEvent(new ShowIssuePickerEvent(allIssues, false));
         waitUntilNodeAppears(QUERY_FIELD_ID);
     }

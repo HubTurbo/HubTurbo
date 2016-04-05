@@ -17,8 +17,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import ui.GUIController;
+import ui.IdGenerator;
 import ui.UI;
 import ui.issuepanel.FilterPanel;
+import util.events.PanelClickedEvent;
 import util.events.ShowRenamePanelEvent;
 
 /**
@@ -38,7 +40,6 @@ public class PanelMenuBar extends HBox {
     private HBox nameBox;
     private Label renameButton;
     private final FilterPanel panel;
-    private final GUIController guiController;
     private Label closeButton;
     private final UI ui;
     private String panelName = DEFAULT_PANEL_NAME;
@@ -49,9 +50,8 @@ public class PanelMenuBar extends HBox {
     public static final int NAME_AREA_WIDTH = PANEL_WIDTH - 65;
     public static final int TOOLTIP_WRAP_WIDTH = 220; //prefWidth for longer tooltip
 
-    public PanelMenuBar(FilterPanel panel, GUIController guiController, UI ui) {
+    public PanelMenuBar(FilterPanel panel, UI ui) {
         this.ui = ui;
-        this.guiController = guiController;
         this.panel = panel;
         this.setSpacing(2);
         this.setMinWidth(PANEL_WIDTH);
@@ -74,7 +74,7 @@ public class PanelMenuBar extends HBox {
         HBox nameArea = new HBox();
 
         nameText = new Text(panelName);
-        nameText.setId(guiController.getDefaultRepo() + "_col" + panel.panelIndex + "_nameText");
+        nameText.setId(IdGenerator.getPanelNameAreaId(panel.panelIndex));
         nameText.setWrappingWidth(NAME_DISPLAY_WIDTH);
 
         nameBox = new HBox();
@@ -102,6 +102,7 @@ public class PanelMenuBar extends HBox {
 
     private void activateInplaceRename() {
         ui.triggerEvent(new ShowRenamePanelEvent(panel.panelIndex));
+        clickThisPanel();
     }
 
     private HBox createRenameButton() {
@@ -109,7 +110,7 @@ public class PanelMenuBar extends HBox {
         renameButton = new Label(OCTICON_RENAME_PANEL);
 
         renameButton.getStyleClass().addAll("octicon", "label-button");
-        renameButton.setId(guiController.getDefaultRepo() + "_col" + panel.panelIndex + "_renameButton");
+        renameButton.setId(IdGenerator.getPanelRenameButtonId(panel.panelIndex));
         renameButton.setOnMouseClicked(e -> {
             e.consume();
             activateInplaceRename();
@@ -123,7 +124,7 @@ public class PanelMenuBar extends HBox {
     private HBox createCloseButton() {
         HBox closeArea = new HBox();
         closeButton = new Label(OCTICON_CLOSE_PANEL);
-        closeButton.setId(guiController.getDefaultRepo() + "_col" + panel.panelIndex + "_closeButton");
+        closeButton.setId(IdGenerator.getPanelCloseButtonId(panel.panelIndex));
         closeButton.getStyleClass().addAll("octicon", "label-button");
         closeButton.setOnMouseClicked((e) -> {
             e.consume();
@@ -141,7 +142,7 @@ public class PanelMenuBar extends HBox {
 
         Label buttonType = new Label(octString);
         buttonType.getStyleClass().addAll("octicon", "label-button");
-        buttonType.setId(guiController.getDefaultRepo() + "_col" + panel.panelIndex + "_" + cssName);
+        buttonType.setId(IdGenerator.getOcticonButtonId(panel.panelIndex, cssName));
         buttonArea.getChildren().add(buttonType);
 
         return buttonArea;
@@ -153,7 +154,7 @@ public class PanelMenuBar extends HBox {
      */
     public void initRenameableTextFieldAndEvents() {
         renameableTextField = new TextField();
-        renameableTextField.setId(guiController.getDefaultRepo() + "_col" + panel.panelIndex + "_renameTextField");
+        renameableTextField.setId(IdGenerator.getPanelRenameTextFieldId(panel.panelIndex));
         Platform.runLater(() -> {
             renameableTextField.requestFocus();
             renameableTextField.selectAll();
@@ -193,6 +194,14 @@ public class PanelMenuBar extends HBox {
     }
 
     /**
+     * Clears selection on the rest of the panels to avoid multiple
+     * panels being selected at the same time.
+     */
+    private void clickThisPanel() {
+        ui.triggerEvent(new PanelClickedEvent(panel.panelIndex));
+    }
+
+    /**
      * Augments components of PanelMenuBar when the renaming of the panel happens.
      * The confirm button and the undo button are added to the panel.
      */
@@ -217,6 +226,7 @@ public class PanelMenuBar extends HBox {
         menuBarNameArea.getChildren().add(nameBox);
         this.getChildren().addAll(menuBarRenameButton, menuBarCloseButton);
         panel.requestFocus();
+        clickThisPanel();
     }
 
     private void panelNameValidator() {

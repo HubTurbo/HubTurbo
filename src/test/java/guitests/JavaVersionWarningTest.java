@@ -44,7 +44,7 @@ public class JavaVersionWarningTest extends UITest {
         String message = String.format(UI.WARNING_MSG_OUTDATED_JAVA_VERSION, required.toString(), runtime.toString());
 
         waitUntilNodeAppears(hasText(message));
-        click("OK");
+        clickOn("OK");
     }
 
     @Test
@@ -76,6 +76,6 @@ public class JavaVersionWarningTest extends UITest {
         String message = String.format(UI.ERROR_MSG_JAVA_RUNTIME_VERSION_PARSING, javaRuntimeVersionString);
 
         waitUntilNodeAppears(hasText(message));
-        click("OK");
+        clickOn("OK");
     }
 }

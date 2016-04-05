@@ -3,9 +3,12 @@ package guitests;
 import backend.RepoIO;
 import javafx.scene.control.ComboBox;
 import org.junit.Test;
-import org.loadui.testfx.utils.FXTestUtils;
+import org.loadui.testfx.GuiTest;
+import org.testfx.api.FxToolkit;
+
 import prefs.Preferences;
 import tests.TestUtils;
+import ui.IdGenerator;
 import ui.TestController;
 import ui.UI;
 import ui.components.StatusUIStub;
@@ -13,14 +16,15 @@ import util.events.EventDispatcherStub;
 
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
 
 import static org.junit.Assert.assertEquals;
 
 public class WrongLastViewedTest extends UITest {
 
     @Override
-    public void launchApp() {
-        FXTestUtils.launchApp(TestUI.class, "--testconfig=true");
+    public void setup() throws TimeoutException {
+        FxToolkit.setupApplication(TestUI.class, "--testconfig=true");
     }
 
     @Override
@@ -45,7 +49,6 @@ public class WrongLastViewedTest extends UITest {
 
     @Test
     public void wrongLastViewedTest() throws InterruptedException {
-        ComboBox<String> repositorySelector = find("#repositorySelector");
-        assertEquals("test2/test2", repositorySelector.getValue());
+        assertEquals("test2/test2", getRepositorySelector().getValue());
     }
 }

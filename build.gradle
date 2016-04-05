@@ -28,7 +28,7 @@ allprojects {
     apply plugin: 'java'
 
     // TODO: add group here (e.g. group = 'sg.edu.nus.comp.hubturbo')
-    version = '3.24.0'
+    version = '3.25.0'
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 
@@ -71,11 +71,15 @@ allprojects {
         compile "org.ocpsoft.prettytime:prettytime:$prettytimeVersion"
         compile "org.seleniumhq.selenium:selenium-java:$seleniumJavaVersion"
         compile "org.seleniumhq.selenium:selenium-server:$seleniumServerVersion"
-
         testCompile "junit:junit:$junitVersion"
-        testCompile "org.loadui:testFx:$testFxVersion"
+		testCompile "org.testfx:testfx-core:4.0.+"
+    	testCompile "org.testfx:testfx-junit:4.0.+"
+		testCompile "org.testfx:testfx-legacy:4.0.+", {
+        	exclude group: "junit", module: "junit"
+    	}
         testCompile "org.mockito:mockito-core:$mockitoVersion"
         testCompile group: "org.mock-server", name: "mockserver-netty", version: "$mockServerVersion"
+ 		testCompile 'org.testfx:openjfx-monocle:1.8.0_20'
         compile fileTree(dir: 'lib', include: '*.jar')
     }
 
@@ -84,6 +88,7 @@ allprojects {
         forkEvery = 1
         if (System.env.'CI') {
             exclude 'unstable'
+			jvmArgs '-Dheadless=true'
         }
     }
 

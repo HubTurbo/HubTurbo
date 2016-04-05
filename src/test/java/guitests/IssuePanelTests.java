@@ -1,7 +1,7 @@
-package unstable;
+package guitests;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertFalse;
 import static ui.components.KeyboardShortcuts.JUMP_TO_FIRST_ISSUE;
 
 import github.IssueEventType;
@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import guitests.UITest;
 import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
@@ -25,7 +24,6 @@ import org.eclipse.egit.github.core.User;
 import org.junit.Test;
 
 import org.loadui.testfx.GuiTest;
-import org.loadui.testfx.exceptions.NoNodesFoundException;
 import tests.TurboIssueEventTests;
 import ui.GuiElement;
 import ui.UI;
@@ -46,8 +44,8 @@ public class IssuePanelTests extends UITest {
     public void keepSelectionTest() {
         // checks to see if ListPanel keeps the same issue selected even after
         // the list is updated
-        ListPanel issuePanel = find("#dummy/dummy_col0");
-        click("#dummy/dummy_col0_filterTextField");
+        ListPanel issuePanel = getPanel(0);
+        clickFilterTextFieldAtPanel(0);
         selectAll();
         type("sort:date");
         push(KeyCode.ENTER);
@@ -67,34 +65,33 @@ public class IssuePanelTests extends UITest {
 
     @Test
     public void guiElementsTest() {
-        click("#dummy/dummy_col0_filterTextField");
+        sleep(EVENT_DELAY);
+        clickFilterTextFieldAtPanel(0);
         selectAll();
         type("id:8");
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
         // Issue #8 was assigned label 11, but it was removed
-        try {
-            GuiTest.exists("Label 11");
-            fail();
-        } catch (NoNodesFoundException e) { /* Successful, we should not be able to see label 11 */ }
 
+
+        assertFalse(existsQuiet("Label 11"));
         type(" updated:5");
         push(KeyCode.ENTER);
         // After we load the metadata, label 11 should appear.
         waitUntilNodeAppears("Label 11");
         // Ensure that the "Label 11" text found represents the label from backend
-        assertEquals(true, find("Label 11").getStyle().contains("-fx-background-color: #ffa500"));
+        assertEquals(true, GuiTest.find("Label 11").getStyle().contains("-fx-background-color: #ffa500"));
 
         // Next we check for a label that was deleted from the repository, but should still be displayed under
         // metadata (label update events).
-        click("#dummy/dummy_col0_filterTextField");
+        clickFilterTextFieldAtPanel(0);
         selectAll();
         type("id:9 updated:5");
         PlatformEx.waitOnFxThread();
         push(KeyCode.ENTER);
         waitUntilNodeAppears("Deleted");
         // We should see the "Deleted" label with the proper color despite the label having been deleted.
-        assertEquals(true, find("Deleted").getStyle().contains("-fx-background-color: #84b6eb"));
+        assertEquals(true, GuiTest.find("Deleted").getStyle().contains("-fx-background-color: #84b6eb"));
     }
 
     @Test
@@ -171,7 +168,7 @@ public class IssuePanelTests extends UITest {
 
     @Test
     public void showAuthorAssignee_assignedPullRequest_authorAssigneeShown() {
-        click("#dummy/dummy_col0_filterTextField");
+        clickFilterTextFieldAtPanel(0);
         selectAll();
         type("id:11");
         push(KeyCode.ENTER);
@@ -184,16 +181,13 @@ public class IssuePanelTests extends UITest {
 
     @Test
     public void showAuthorAssignee_assignedIssue_onlyAssigneeShown() {
-        click("#dummy/dummy_col0_filterTextField");
+        clickFilterTextFieldAtPanel(0);
         selectAll();
         type("id:12");
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
         // author should not show since it is an issue
-        try {
-            GuiTest.exists("User 12");
-            fail();
-        } catch (NoNodesFoundException e) { /* Successful since it should not show */ }
+        assertFalse(existsQuiet("User 12"));
         // assignee should still show
         assertEquals(true, GuiTest.exists("User 2"));
     }

@@ -4,6 +4,7 @@ import backend.RepoIO;
 import backend.control.RepoOpControl;
 import backend.github.GitHubModelUpdatesData;
 import backend.github.GitHubRepoTask;
+import backend.interfaces.Repo;
 import backend.resource.Model;
 import backend.resource.MultiModel;
 import backend.resource.TurboIssue;
@@ -178,6 +179,21 @@ public class RepoOpControlTest {
                 .thenReturn(Optional.of(returnedIssue));
         RepoOpControl repoOpControl = new RepoOpControl(mock(RepoIO.class), models);
         TurboIssue result = repoOpControl.editIssueStateLocally(returnedIssue, false).join().get();
+        assertEquals(returnedIssue, result);
+    }
+
+    /**
+     * Tests that replaceIssueAssigneeLocally calls replaceIssueAssignee method from models and
+     * return corresponding result
+     */
+    @Test
+    public void replaceIssueAssigneeLocally() throws ExecutionException, InterruptedException {
+        MultiModel models = mock(MultiModel.class);
+        TurboIssue returnedIssue = new TurboIssue("testrepo/testrepo", 1, "Issue title");
+        when(models.replaceIssueAssignee("testrepo/testrepo", 1, Optional.of("")))
+                .thenReturn(Optional.of(returnedIssue));
+        RepoOpControl repoOpControl = new RepoOpControl(mock(RepoIO.class), models);
+        TurboIssue result = repoOpControl.replaceIssueAssigneeLocally(returnedIssue, Optional.of("")).join().get();
         assertEquals(returnedIssue, result);
     }
 

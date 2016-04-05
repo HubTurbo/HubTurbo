@@ -81,6 +81,9 @@ Operators may be written in any of the following forms:
 As in C-like languages, NOT is prefix, AND and OR are infix and left-associative, and precedence goes: NOT > AND > OR.
 Note that operators are case sensitive: `AND` is a valid operator, but `and` is not.
 
+HubTurbo also supports `;` as a shorter form of OR that can be used to express a disjunction of several qualifiers of the same type.
+For example, `(repo:a OR repo:b OR repo:c) AND has:d` can be written as `repo:a;b;c has:d`.
+
 <!-- To be enabled later
 
 ## Application
@@ -121,12 +124,14 @@ This will not work for ambiguous expressions (containing OR or NOT operators) an
 - Number ranges are written using a relational operator (.e.g `>5`, `<=10`).
 - Repo ids are written as `owner/name`
 - Sorting keys are written as a comma-separated list of possibly-negated keys. For example, `repo, ~updated, -comments`. See `sort` for more information.
+- Qualified issue ids are written as `repo_id#number` or `repo_id#number_range`.
 
 ### id
 
-*Expects a number or number range*
+*Expects a string in form of qualified issue id, number, or number range*
 
 Matches the issue with the given id number, or issues with ids in the given range.
+Will look for issues in the primary repository if the issue id is unqualified.
 
 ### keyword
 

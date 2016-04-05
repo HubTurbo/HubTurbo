@@ -1,17 +1,16 @@
-package unstable;
+package guitests;
 
 import static org.junit.Assert.assertEquals;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeoutException;
 
 import backend.stub.DummyRepoState;
 import org.junit.Test;
-import org.loadui.testfx.utils.FXTestUtils;
+import org.testfx.api.FxToolkit;
 
-import guitests.UITest;
 import ui.UI;
-import ui.listpanel.ListPanel;
 import util.PlatformEx;
 import util.events.testevents.UILogicRefreshEvent;
 import util.events.testevents.UpdateDummyRepoEvent;
@@ -21,8 +20,8 @@ public class ModelUpdateUITest extends UITest {
     private static final int EVENT_DELAY = 1500;
 
     @Override
-    public void launchApp() {
-        FXTestUtils.launchApp(TestUI.class, "--test=true", "--testjson=true", "--bypasslogin=true");
+    public void setup() throws TimeoutException {
+        FxToolkit.setupApplication(UITest.TestUI.class, "--test=true", "--testjson=true", "--bypasslogin=true");
     }
 
     @Test
@@ -30,7 +29,7 @@ public class ModelUpdateUITest extends UITest {
             throws InterruptedException, ExecutionException {
         resetRepo();
         addIssue();
-        FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssuesCount);
+        FutureTask<Integer> countIssues = new FutureTask<>(getPanel(0)::getIssuesCount);
         PlatformEx.runAndWait(countIssues);
         assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES + 1, countIssues.get().intValue());
     }
@@ -42,7 +41,7 @@ public class ModelUpdateUITest extends UITest {
         addIssue();
         addIssue();
         addIssue();
-        FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssuesCount);
+        FutureTask<Integer> countIssues = new FutureTask<>(getPanel(0)::getIssuesCount);
         PlatformEx.runAndWait(countIssues);
         assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES + 3, countIssues.get().intValue());
     }
@@ -52,7 +51,7 @@ public class ModelUpdateUITest extends UITest {
             throws InterruptedException, ExecutionException {
         addIssue();
         resetRepo();
-        FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssuesCount);
+        FutureTask<Integer> countIssues = new FutureTask<>(getPanel(0)::getIssuesCount);
         PlatformEx.runAndWait(countIssues);
         assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES, countIssues.get().intValue());
     }
@@ -64,7 +63,7 @@ public class ModelUpdateUITest extends UITest {
         addIssue();
         addIssue();
         deleteIssue(1);
-        FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssuesCount);
+        FutureTask<Integer> countIssues = new FutureTask<>(getPanel(0)::getIssuesCount);
         PlatformEx.runAndWait(countIssues);
         assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES + 1, countIssues.get().intValue());
     }
@@ -78,7 +77,7 @@ public class ModelUpdateUITest extends UITest {
         addIssue();
         deleteIssue(1);
         deleteIssue(2);
-        FutureTask<Integer> countIssues = new FutureTask<>(((ListPanel) find("#dummy/dummy_col0"))::getIssuesCount);
+        FutureTask<Integer> countIssues = new FutureTask<>(getPanel(0)::getIssuesCount);
         PlatformEx.runAndWait(countIssues);
         assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES + 1, countIssues.get().intValue());
     }

@@ -1,9 +1,10 @@
-package unstable;
+package guitests;
 
 import org.junit.Test;
+import org.loadui.testfx.GuiTest;
 
-import guitests.UITest;
 import javafx.scene.input.KeyCode;
+import ui.IdGenerator;
 import ui.UI;
 import ui.components.FilterTextField;
 import util.events.testevents.UpdateDummyRepoEvent;
@@ -23,11 +24,11 @@ public class MetadataUpdateTest extends UITest {
     }
 
     private void ensureMetadataDownloadIsTriggered() {
-        awaitCondition(() -> existsQuiet("Getting metadata for dummy/dummy..."));
+        awaitCondition(() -> existsQuiet("Getting metadata for dummy/dummy..."), 10);
     }
 
     private void ensureMetadataIsReceived() {
-        awaitCondition(() -> existsQuiet("Received metadata from dummy/dummy!"));
+        awaitCondition(() -> existsQuiet("Received metadata from dummy/dummy!"), 10);
     }
 
     private void updated24() {
@@ -35,10 +36,8 @@ public class MetadataUpdateTest extends UITest {
     }
 
     private void updated24(String qualifier) {
-        FilterTextField field = find("#dummy/dummy_col0_filterTextField");
-
         // Select everything in the field
-        click(field);
+        clickFilterTextFieldAtPanel(0);
         selectAll();
 
         type(String.format("%s:24", qualifier));

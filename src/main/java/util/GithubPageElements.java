@@ -11,10 +11,10 @@ public final class GithubPageElements {
     public static final String LOGIN_FIELD = "login";
     public static final String PASSWORD_FIELD = "password";
 
-    // PR tab names
-    public static final String DISCUSSION_TAB = "discussion";
-    public static final String COMMITS_TAB = "commits";
-    public static final String FILES_TAB = "files";
+    // PR tab types
+    public enum PrTab {
+        DISCUSSION, COMMITS, FILES
+    }
 
     //Javascript
     public static final String SCROLL_TO_TOP = "window.scrollTo(0, 0)";

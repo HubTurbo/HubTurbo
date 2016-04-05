@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.*;
 
-
 /**
  * A means of repo-level synchronisation for select RepoIO operations. Only one instance of this class
  * is available at any time availabel through {@code getRepoOpControl}. A new instance can be created with
@@ -111,6 +110,22 @@ public final class RepoOpControl {
         init(issue.getRepoId());
         CompletableFuture<Optional<TurboIssue>> result = new CompletableFuture<>();
         enqueue(new ReplaceIssueMilestoneLocallyOp(models, result, issue, milestone));
+        return result;
+    }
+
+    public CompletableFuture<Boolean> replaceIssueAssigneeOnServer(TurboIssue issue,
+                                                                   Optional<String> assigneeLoginName) {
+        init(issue.getRepoId());
+        CompletableFuture<Boolean> result = new CompletableFuture<>();
+        enqueue(new ReplaceIssueAssigneeOnServerOp(repoIO, result, issue, assigneeLoginName));
+        return result;
+    }
+
+    public CompletableFuture<Optional<TurboIssue>> replaceIssueAssigneeLocally(TurboIssue issue,
+                                                                               Optional<String> assigneeLoginName) {
+        init(issue.getRepoId());
+        CompletableFuture<Optional<TurboIssue>> result = new CompletableFuture<>();
+        enqueue(new ReplaceIssueAssigneeLocallyOp(models, issue, assigneeLoginName, result));
         return result;
     }
 
