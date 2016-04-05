@@ -85,10 +85,12 @@ public class BoardAutoCreator {
     }
 
     private void saveBoardAfterUserConfirmationIfNeeded(String boardName) {
-        boolean isNeeded = !prefs.getLastOpenBoardPanelInfos().isPresent()
-                        || !prefs.getLastOpenBoardPanelInfos().get().equals(panelControl.getCurrentPanelInfos());
+        boolean isOpenBoardDifferentFromSavedBoard = !prefs.getLastOpenBoardPanelInfos().isPresent()
+                || !prefs.getLastOpenBoardPanelInfos().get().equals(panelControl.getCurrentPanelInfos());
 
-        if (isNeeded && isSaveBoardDialogResponsePositive(boardName)) ui.getMenuControl().saveBoard();
+        if (isOpenBoardDifferentFromSavedBoard && isSaveBoardDialogResponsePositive(boardName)) {
+            ui.getMenuControl().saveBoard();
+        }
     }
 
     private boolean isSaveBoardDialogResponsePositive(String boardName) {
