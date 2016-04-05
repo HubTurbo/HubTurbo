@@ -12,7 +12,6 @@ import java.util.Map;
  * This class handles the keyboard shortcuts used by the different UI components
  */
 public final class KeyboardShortcuts {
-    // ui.listpanel.ListPanel
     public static final KeyCodeCombination MARK_AS_READ =
             new KeyCodeCombination(KeyCode.E);
     public static final KeyCodeCombination MARK_AS_UNREAD =
@@ -32,19 +31,16 @@ public final class KeyboardShortcuts {
     public static final KeyCodeCombination SCROLL_DOWN =
             new KeyCodeCombination(KeyCode.K);
 
-    //ui.issuepanel.PanelControl
     public static final KeyCodeCombination LEFT_PANEL =
             new KeyCodeCombination(KeyCode.D);
     public static final KeyCodeCombination RIGHT_PANEL =
             new KeyCodeCombination(KeyCode.F);
 
-    // ui.components.NavigableListView
     public static final KeyCodeCombination UP_ISSUE =
             new KeyCodeCombination(KeyCode.T);
     public static final KeyCodeCombination DOWN_ISSUE =
             new KeyCodeCombination(KeyCode.V);
 
-    // ui.listpanel.ListPanel
     public static final KeyCodeCombination JUMP_TO_FIRST_ISSUE =
             new KeyCodeCombination(KeyCode.ENTER, KeyCombination.SHORTCUT_DOWN);
     public static final KeyCodeCombination JUMP_TO_FILTER_BOX =
@@ -102,13 +98,11 @@ public final class KeyboardShortcuts {
     public static final KeyCodeCombination NEW_COMMENT =
             new KeyCodeCombination(KeyCode.R);
 
-    //ui.RepositorySelector
     public static final KeyCodeCombination REMOVE_FOCUS =
             new KeyCodeCombination(KeyCode.ESCAPE);
     public static final KeyCodeCombination SHOW_REPO_PICKER =
             new KeyCodeCombination(KeyCode.R, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN);
 
-    // ui.MenuControl
     public static final KeyCodeCombination NEW_ISSUE =
             new KeyCodeCombination(KeyCode.I, KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN);
     public static final KeyCodeCombination NEW_LABEL =
