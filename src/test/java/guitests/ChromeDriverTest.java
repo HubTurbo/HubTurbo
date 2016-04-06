@@ -69,7 +69,6 @@ public class ChromeDriverTest extends UITest {
         responses.clear();
         action.run();
         awaitCondition(() -> responses.contains(expected));
-        responses.clear();
     }
     
     private void actAndAwaitNavToPage(String expectedUrl, Runnable action) {
