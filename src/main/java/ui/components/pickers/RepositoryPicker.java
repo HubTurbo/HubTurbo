@@ -28,10 +28,13 @@ public class RepositoryPicker {
         new RepositoryPickerDialog(storedRepos, this::pickRepository, (repoId) -> ui.logic.isRepositoryValid(repoId));
     }
 
-    private void pickRepository(String repoId) {
+    private void pickRepository(Optional<String> repoId) {
         String defaultRepo = ui.logic.getDefaultRepo();
-        if (repoId != null && !defaultRepo.equals(repoId)) {
-            onValueChangeCallback.accept(repoId);
+        if (!repoId.isPresent()) {
+            return;
+        }
+        if (!defaultRepo.equals(repoId.get())) {
+            onValueChangeCallback.accept(repoId.get());
         }
     }
 

@@ -110,7 +110,7 @@ public class RepositoryPickerState {
 
     /**
      * Updates List<PickerRepository> suggestedRepositories so that it contains PickerRepositories that match
-     * the user input.
+     * the user input. It is guaranteed that the suggestedRepositories will be sorted.
      */
     private void updateSuggestedRepositories(String query) {
         suggestedRepositories.clear();
@@ -119,14 +119,14 @@ public class RepositoryPickerState {
                 suggestedRepositories.add(repo);
             }
         });
-        if (suggestedRepositories.size() > 0) {
+        if (!suggestedRepositories.isEmpty()) {
             suggestedRepositories.get(0).setSelected(true);
         }
     }
 
     /**
-     * Finds whether there is any PickerRepository in repositoryList
-     * which has exactly same id as query, the matching is case-insensitive.
+     * Finds whether there is any PickerRepository in repositoryList which has exactly same id as query, the matching
+     * is case-insensitive.
      */
     private Optional<PickerRepository> getPickerRepositoryById(List<PickerRepository> repositoryList, String repoId) {
         return repositoryList.stream()
@@ -139,8 +139,8 @@ public class RepositoryPickerState {
     }
 
     /**
-     * Returns a list of PickerRepository which matches the current user input.
-     * The first entry suggestedRepository is always the user input.
+     * Returns a sorted list of PickerRepository which matches the current user input as specified by the last call
+     * to processUserQuery.
      */
     public List<PickerRepository> getSuggestedRepositories() {
         return new ArrayList<>(suggestedRepositories);

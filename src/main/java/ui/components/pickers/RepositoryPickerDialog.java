@@ -9,19 +9,19 @@ import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import ui.IdGenerator;
 import util.DialogMessage;
+import util.Futures;
 import util.Utility;
 
-import java.security.cert.PKIXRevocationChecker;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.function.Function;
+
+import static util.Futures.withResult;
 
 /**
  * Serves as a presenter that also helps the user by suggesting repositories stored in the disk
@@ -36,17 +36,16 @@ public class RepositoryPickerDialog {
     private static final Insets DEFAULT_PADDING = new Insets(10);
     private static final Insets DEFAULT_LABEL_MARGIN = new Insets(2);
 
-    private final Consumer<String> onCloseCallback;
+    private final Consumer<Optional<String>> onCloseCallback;
     private final Function<String, CompletableFuture<Boolean>> repoValidator;
+    private final Stage stage = new Stage();
 
-    private Stage stage = new Stage();
-    private VBox mainLayout;
     private VBox suggestedRepositoryList;
     private HBox buttons;
     private TextField userInputTextField;
     private RepositoryPickerState state;
 
-    public RepositoryPickerDialog(Set<String> storedRepos, Consumer<String> onCloseCallback,
+    public RepositoryPickerDialog(Set<String> storedRepos, Consumer<Optional<String>> onCloseCallback,
                                   Function<String, CompletableFuture<Boolean>> repoValidator) {
         this.onCloseCallback = onCloseCallback;
         this.repoValidator = repoValidator;
@@ -82,7 +81,7 @@ public class RepositoryPickerDialog {
     }
 
     private void createMainLayout() {
-        mainLayout = new VBox(SPACING_BETWEEN_NODES);
+        VBox mainLayout = new VBox(SPACING_BETWEEN_NODES);
         mainLayout.setPadding(DEFAULT_PADDING);
 
         createButtons();
@@ -99,7 +98,10 @@ public class RepositoryPickerDialog {
     private void registerEventHandlers() {
         stage.getScene().setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.ESCAPE) {
-                onCancel();
+                quitRepositoryPicker();
+                e.consume();
+            } else if (e.getCode() == KeyCode.ENTER) {
+                confirmSelectedRepository();
                 e.consume();
             }
         });
@@ -164,30 +166,44 @@ public class RepositoryPickerDialog {
 
     /**
      * Prompts the user for a repository id then return it only if it is a valid github repo. This method also informs
-     * the user whether the repository that the user is trying to add is valid or not.
+     * the user if the repository that the user is trying to add is not valid.
      */
-    private Optional<String> addRepository() {
+    private CompletableFuture<Boolean> addRepository() {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setHeaderText("Add a new repository");
+        dialog.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
+            String repositoryId = Utility.removeAllWhitespace(newValue);
+            if (!repositoryId.equals(newValue)) {
+                dialog.getEditor().setText(repositoryId);
+                return;
+            }
+        });
         Optional<String> userInput = dialog.showAndWait();
         if (!userInput.isPresent()) {
-            return Optional.empty();
+            return CompletableFuture.completedFuture(false);
         }
 
         String repoId = userInput.get();
-        boolean isValidRepoId = false;
-        try {
-            isValidRepoId = repoValidator.apply(repoId).get();
-        } catch (InterruptedException | ExecutionException e) {
-            DialogMessage.showErrorDialog("Error checking the validity of " + repoId + ".", "Please try again.");
-        }
+        return repoValidator.apply(repoId)
+                .thenCompose(valid -> {
+                    if (!valid) {
+                        Platform.runLater(() -> DialogMessage.showErrorDialog("Cannot add to repository list",
+                                repoId + " is not a valid GitHub repository."));
+                        return Futures.unit(false);
+                    }
 
-        if (!isValidRepoId) {
-            DialogMessage.showErrorDialog("Cannot add to repository list", repoId + " is not a valid GitHub repository.");
-            return Optional.empty();
-        }
+                    Platform.runLater(() -> addRepositoryToState(repoId));
+                    return CompletableFuture.completedFuture(true);
+                }).exceptionally(e -> {
+                    Platform.runLater(() -> DialogMessage.showErrorDialog("Error checking the validity of " + repoId,
+                                                                          "Please try again."));
+                    return withResult(false).apply(e);
+                });
+    }
 
-        return Optional.of(repoId);
+    private void addRepositoryToState(String repoId) {
+        state.addRepository(repoId);
+        updateUserQuery(userInputTextField.getText());
     }
 
     private void createButtons() {
@@ -199,40 +215,24 @@ public class RepositoryPickerDialog {
         buttons.getChildren().addAll(addRepository, cancel, confirm);
 
         confirm.setDefaultButton(true);
-        confirm.setOnAction((event) -> {
-            onConfirm();
-        });
-
-        cancel.setOnAction((event) -> {
-            onCancel();
-        });
-
-        addRepository.setOnAction((event) -> {
-            Optional<String> addedRepo = addRepository();
-            if (!addedRepo.isPresent()) {
-                return;
-            }
-
-            state.addRepository(addedRepo.get());
-            updateUserQuery(userInputTextField.getText());
-        });
+        confirm.setOnAction((event) -> confirmSelectedRepository());
+        cancel.setOnAction((event) -> quitRepositoryPicker());
+        addRepository.setOnAction((event) -> addRepository());
     }
 
-    private void onConfirm() {
+    private void confirmSelectedRepository() {
         Optional<String> selectedRepositoryId = state.getSelectedRepositoryId();
         if (!selectedRepositoryId.isPresent()) {
-            onCloseCallback.accept(null);
-            stage.close();
+            quitRepositoryPicker();
             return;
         }
 
         String result = Utility.isWellFormedRepoId(selectedRepositoryId.get()) ? selectedRepositoryId.get() : null;
-        onCloseCallback.accept(result);
-        stage.close();
+        onCloseCallback.accept(Optional.ofNullable(result));
+        quitRepositoryPicker();
     }
 
-    private void onCancel() {
-        onCloseCallback.accept(null);
+    private void quitRepositoryPicker() {
         stage.close();
     }
 
