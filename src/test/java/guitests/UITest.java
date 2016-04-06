@@ -1,6 +1,7 @@
 package guitests;
 
 import static com.google.common.io.Files.getFileExtension;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -388,9 +389,9 @@ public class UITest extends FxRobot {
      * @param panelIndex
      */
     public void clickFilterTextFieldAtPanel(int panelIndex) {
-        waitUntilNodeAppears(IdGenerator.getPanelFilterTextFieldIdReference(panelIndex));
-        awaitCondition(getFilterTextFieldAtPanel(panelIndex)::isVisible, 10);
-        clickOn(getFilterTextFieldAtPanel(panelIndex));
+        TextField field = getFilterTextFieldAtPanel(panelIndex);
+        assertNotNull(field);
+        clickOn(field);
     }
 
     /**

@@ -1,21 +1,24 @@
-package guitests;
+package unstable;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static ui.components.pickers.PickerRepository.COMMON_REPO_LABEL_STYLE;
 import static ui.components.pickers.PickerRepository.SELECTED_REPO_LABEL_STYLE;
 
 import java.io.File;
 import java.util.concurrent.TimeoutException;
 
-import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.junit.Test;
 import org.testfx.api.FxToolkit;
 
+import guitests.UITest;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.VBox;
 import prefs.Preferences;
 import ui.IdGenerator;
 import ui.TestController;
