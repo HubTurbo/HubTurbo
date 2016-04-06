@@ -17,7 +17,6 @@ import util.events.MilestoneCreatedEvent;
 import util.events.testevents.*;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import java.util.concurrent.TimeoutException;
@@ -42,7 +41,7 @@ public class ChromeDriverTest extends UITest {
         UI.events.registerEvent(navToPageHandler);
         UI.events.registerEvent(execScriptHandler);
         UI.events.registerEvent(jumpCommentHandler);
-        PlatformEx.runAndWait(()->TestController.getUI().getPanelControl().getPanel(0).requestFocus());
+        PlatformEx.runLaterAndWait(()->TestController.getUI().getPanelControl().getPanel(0).requestFocus());
     }
 
     @After
@@ -57,157 +56,109 @@ public class ChromeDriverTest extends UITest {
         FxToolkit.setupApplication(
             TestUI.class, "--test=true", "--bypasslogin=true", "--testchromedriver=true");
     }
-    
-    /**
-     * Performs the specified action and waits for a specific response to occur.
-     *
-     * @param expected expected response to the action.
-     * @param action the action to take to trigger the desired response.
-     * @param responses aggregator of responses to the action.
-     */
-    private <T> void actAndAwaitResponse(T expected, Runnable action, Collection<T> responses) {
-        responses.clear();
-        action.run();
-        awaitCondition(() -> responses.contains(expected));
-    }
-    
-    private void actAndAwaitNavToPage(String expectedUrl, Runnable action) {
-        actAndAwaitResponse(expectedUrl, action, urlsNavigated);
-    }
 
     @Test
     public void navigateToPage_selectIssue() {
-        actAndAwaitNavToPage(
-            GitHubURL.getPathForIssue("dummy/dummy", 1),
-            () -> UI.events.triggerEvent(new IssueSelectedEvent("dummy/dummy", 1, 0, false))
-        );
+        UI.events.triggerEvent(new IssueSelectedEvent("dummy/dummy", 1, 0, false));
+        awaitCondition(() -> urlsNavigated.contains(GitHubURL.getPathForIssue("dummy/dummy", 1)));
     }
 
     @Test
     public void navigateToPage_createIssue() {
-        actAndAwaitNavToPage(
-            GitHubURL.getPathForNewIssue("dummy/dummy"),
-            () -> UI.events.triggerEvent(new IssueCreatedEvent())
-        );
+        UI.events.triggerEvent(new IssueCreatedEvent());
+        awaitCondition(() -> urlsNavigated.contains(GitHubURL.getPathForNewIssue("dummy/dummy")));
     }
 
     @Test
-    public void navigateToPage_createLabel() {
-        actAndAwaitNavToPage(
-            GitHubURL.getPathForNewLabel("dummy/dummy"),
-            () -> UI.events.triggerEvent(new LabelCreatedEvent())
-        );
-        actAndAwaitNavToPage(
-            GitHubURL.getPathForNewLabel("dummy/dummy"),
-            () -> push(KeyCode.G).push(KeyCode.L)
-        );
+    public void navigateToPage_newLabelKey_createLabel() {
+        push(KeyCode.G).push(KeyCode.L);
+        awaitCondition(() -> urlsNavigated.contains(GitHubURL.getPathForNewLabel("dummy/dummy")));
+    }
+    
+    @Test
+    public void navigateToPage_triggerEvent_createLabel() {
+        UI.events.triggerEvent(new LabelCreatedEvent());
+        awaitCondition(() -> urlsNavigated.contains(GitHubURL.getPathForNewLabel("dummy/dummy")));
     }
 
     @Test
     public void navigateToPage_createMilestone() {
-        actAndAwaitNavToPage(
-            GitHubURL.getPathForNewMilestone("dummy/dummy"),
-            () -> UI.events.triggerEvent(new MilestoneCreatedEvent())
-        );
+        UI.events.triggerEvent(new MilestoneCreatedEvent());
+        awaitCondition(() -> urlsNavigated.contains(GitHubURL.getPathForNewMilestone("dummy/dummy")));
     }
 
     @Test
-    public void navigateToPage_showDocs() {
-        actAndAwaitNavToPage(
-            GitHubURL.DOCS_PAGE,
-            () -> push(KeyCode.F1)
-        );
-        actAndAwaitNavToPage(
-            GitHubURL.DOCS_PAGE,
-            () -> {
-                push(KeyCode.G);
-                push(KeyCode.H);
-            }
-        );
-        actAndAwaitNavToPage(
-            GitHubURL.DOCS_PAGE,
-            () -> {
-                clickOn("View");
-                clickOn("Documentation");
-            }
-        );
+    public void navigateToPage_showDocsKey_showDocs() {
+        push(KeyCode.F1);
+        awaitCondition(() -> urlsNavigated.contains(GitHubURL.DOCS_PAGE));
+    }
+
+    @Test
+    public void navigateToPage_helpKey_showDocs() {
+        push(KeyCode.G).push(KeyCode.H);
+        awaitCondition(() -> urlsNavigated.contains(GitHubURL.DOCS_PAGE));
+    }
+
+    @Test
+    public void navigateToPage_dropdown_showDocs() {
+        clickOn("View");
+        clickOn("Documentation");
+        awaitCondition(() -> urlsNavigated.contains(GitHubURL.DOCS_PAGE));
     }
 
     @Test
     public void navigateToPage_issues() {
         // go to issues page
-        actAndAwaitNavToPage(
-            GitHubURL.getPathForAllIssues("dummy/dummy"),
-            () -> push(KeyCode.G).push(KeyCode.I)
-        );
+        push(KeyCode.G).push(KeyCode.I);
+        awaitCondition(() -> urlsNavigated.contains(GitHubURL.getPathForAllIssues("dummy/dummy")));
     }
 
     @Test
     public void navigateToPage_milestones() {
-        actAndAwaitNavToPage(
-            GitHubURL.getPathForMilestones("dummy/dummy"),
-            () -> push(KeyCode.G).push(KeyCode.M)
-        );
+        push(KeyCode.G).push(KeyCode.M);
+        awaitCondition(() -> urlsNavigated.contains(GitHubURL.getPathForMilestones("dummy/dummy")));
     }
 
     @Test
     public void navigateToPage_pullRequests() {
-        actAndAwaitNavToPage(
-            GitHubURL.getPathForPullRequests("dummy/dummy"),
-            () -> push(KeyCode.G).push(KeyCode.P)
-        );
+        push(KeyCode.G).push(KeyCode.P);
+        awaitCondition(() -> urlsNavigated.contains(GitHubURL.getPathForPullRequests("dummy/dummy")));
     }
 
     @Test
     public void navigateToPage_developers() {
-        actAndAwaitNavToPage(
-            GitHubURL.getPathForContributors("dummy/dummy"),
-            () -> push(KeyCode.G).push(KeyCode.D)
-        );
+        push(KeyCode.G).push(KeyCode.D);
+        awaitCondition(() -> urlsNavigated.contains(GitHubURL.getPathForContributors("dummy/dummy")));
     }
 
     @Test
     public void navigateToPage_keyboardShortcuts() {
-        actAndAwaitNavToPage(
-            GitHubURL.KEYBOARD_SHORTCUTS_PAGE,
-            () -> push(KeyCode.G).push(KeyCode.K)
-        );
+        push(KeyCode.G).push(KeyCode.K);
+        awaitCondition(() -> urlsNavigated.contains(GitHubURL.KEYBOARD_SHORTCUTS_PAGE));
     }
 
-    private void actAndAwaitExecScript(String expectedScript, Runnable action) {
-        actAndAwaitResponse(expectedScript, action, scriptsExecuted);
-    }
-    
     @Test
     public void executeScripts_scrollToTop() {
-        actAndAwaitExecScript(
-            "window.scrollTo(0, 0)",
-            () -> push(KeyCode.I)
-        );
+        push(KeyCode.I);
+        awaitCondition(() -> scriptsExecuted.contains("window.scrollTo(0, 0)"));
     }
 
     @Test
     public void executeScripts_scrollToBottom() {
-        actAndAwaitExecScript(
-            "window.scrollTo(0, document.body.scrollHeight)",
-            () -> push(KeyCode.N)
-        );
+        push(KeyCode.N);
+        awaitCondition(() -> scriptsExecuted.contains("window.scrollTo(0, document.body.scrollHeight)"));
     }
 
     @Test
     public void executeScripts_scrollUp() {
-        actAndAwaitExecScript(
-            "window.scrollBy(0, -100)",
-            () -> push(KeyCode.J)
-        );
+        push(KeyCode.J);
+        awaitCondition(() -> scriptsExecuted.contains("window.scrollBy(0, -100)"));
     }
 
     @Test
     public void executeScripts_scrollDown() {
-        actAndAwaitExecScript(
-            "window.scrollBy(0, 100)",
-            () -> push(KeyCode.K)
-        );
+        push(KeyCode.K);
+        awaitCondition(() -> scriptsExecuted.contains("window.scrollBy(0, 100)"));
     }
 
     @Test
@@ -216,5 +167,4 @@ public class ChromeDriverTest extends UITest {
         push(KeyCode.R, 1);
         awaitCondition(() -> hasJumpedToComment);
     }
-
 }
