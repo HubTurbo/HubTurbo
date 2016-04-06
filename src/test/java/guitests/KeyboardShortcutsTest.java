@@ -1,14 +1,7 @@
 package guitests;
 
 import static org.junit.Assert.assertEquals;
-import static ui.components.KeyboardShortcuts.CREATE_RIGHT_PANEL;
-import static ui.components.KeyboardShortcuts.DEFAULT_SIZE_WINDOW;
-import static ui.components.KeyboardShortcuts.JUMP_TO_FILTER_BOX;
-import static ui.components.KeyboardShortcuts.JUMP_TO_FIRST_ISSUE;
-import static ui.components.KeyboardShortcuts.JUMP_TO_NTH_ISSUE_KEYS;
-import static ui.components.KeyboardShortcuts.MAXIMIZE_WINDOW;
-import static ui.components.KeyboardShortcuts.MINIMIZE_WINDOW;
-import static ui.components.KeyboardShortcuts.SHOW_REPO_PICKER;
+import static ui.components.KeyboardShortcuts.*;
 
 import org.junit.Test;
 
@@ -17,7 +10,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.input.KeyCode;
 import ui.IdGenerator;
 import ui.UI;
-import ui.components.KeyboardShortcuts;
 import ui.listpanel.ListPanel;
 import util.PlatformEx;
 import util.events.IssueSelectedEventHandler;
@@ -82,39 +74,39 @@ public class KeyboardShortcutsTest extends UITest {
         }
 
         // jump to last issue
-        push(KeyCode.END);
+        push(LAST_ISSUE);
         assertEquals(1, selectedIssueId);
         clearSelectedIssueId();
 
         // jump to first issue
-        push(KeyCode.HOME);
+        push(FIRST_ISSUE);
         sleep(1000);
         assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES, selectedIssueId);
         clearSelectedIssueId();
 
-        push(getKeyCode("DOWN_ISSUE"));
+        push(DOWN_ISSUE);
         assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES - 1, selectedIssueId);
         clearSelectedIssueId();
-        push(getKeyCode("DOWN_ISSUE"));
+        push(DOWN_ISSUE);
         assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES - 2, selectedIssueId);
         clearSelectedIssueId();
-        push(getKeyCode("UP_ISSUE"));
+        push(UP_ISSUE);
         assertEquals(DummyRepoState.NO_OF_DUMMY_ISSUES - 1, selectedIssueId);
         clearSelectedIssueId();
 
         press(CREATE_RIGHT_PANEL);
         press(JUMP_TO_FIRST_ISSUE);
 
-        push(getKeyCode("RIGHT_PANEL"));
+        push(RIGHT_PANEL);
         assertEquals(0, panelIndex);
         clearPanelIndex();
-        push(getKeyCode("LEFT_PANEL"));
+        push(LEFT_PANEL);
         assertEquals(1, panelIndex);
         clearPanelIndex();
-        push(getKeyCode("RIGHT_PANEL"));
+        push(RIGHT_PANEL);
         assertEquals(0, panelIndex);
         clearPanelIndex();
-        push(getKeyCode("LEFT_PANEL"));
+        push(LEFT_PANEL);
         assertEquals(1, panelIndex);
         clearPanelIndex();
 
@@ -133,34 +125,34 @@ public class KeyboardShortcutsTest extends UITest {
         // mark as read
         ListPanel issuePanel = getPanel(1);
         // mark as read an issue that has another issue below it
-        push(KeyCode.HOME);
+        push(FIRST_ISSUE);
         // focus should change to the issue below
         clickOn(IdGenerator.getPanelCellIdReference(1, 11));
         int issueIdBeforeMark = selectedIssueId;
         int issueIdExpected = issueIdBeforeMark - 1;
-        push(getKeyCode("MARK_AS_READ"));
+        push(MARK_AS_READ);
         PlatformEx.waitOnFxThread();
         assertEquals(issueIdExpected, selectedIssueId);
-        push(getKeyCode("UP_ISSUE")); // required since focus has changed to next issue
+        push(UP_ISSUE); // required since focus has changed to next issue
         assertEquals(true, issuePanel.getSelectedElement().isPresent());
         assertEquals(true, issuePanel.getSelectedElement().get().getIssue().isCurrentlyRead());
 
         // mark as read an issue at the bottom
-        push(KeyCode.END);
-        push(getKeyCode("MARK_AS_READ"));
+        push(LAST_ISSUE);
+        push(MARK_AS_READ);
         // focus should remain at bottom issue
         assertEquals(1, selectedIssueId);
         assertEquals(true, issuePanel.getSelectedElement().isPresent());
         assertEquals(true, issuePanel.getSelectedElement().get().getIssue().isCurrentlyRead());
 
         // mark as unread
-        push(getKeyCode("MARK_AS_UNREAD"));
+        push(MARK_AS_UNREAD);
         assertEquals(true, issuePanel.getSelectedElement().isPresent());
         assertEquals(false, issuePanel.getSelectedElement().get().getIssue().isCurrentlyRead());
         clearSelectedIssueId();
 
         // close issue
-        push(getKeyCode("CLOSE_ISSUE"));
+        push(CLOSE_ISSUE);
         push(KeyCode.ENTER);
         waitUntilNodeAppears("Undo");
         assertEquals(true, issuePanel.getSelectedElement().isPresent());
@@ -168,7 +160,7 @@ public class KeyboardShortcutsTest extends UITest {
         clearSelectedIssueId();
 
         // reopen issue
-        push(getKeyCode("REOPEN_ISSUE"));
+        push(REOPEN_ISSUE);
         push(KeyCode.ENTER);
         waitUntilNodeAppears("Undo");
         assertEquals(true, issuePanel.getSelectedElement().isPresent());
@@ -181,7 +173,7 @@ public class KeyboardShortcutsTest extends UITest {
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
         press(JUMP_TO_FIRST_ISSUE);
-        push(getKeyCode("MARK_AS_READ"));
+        push(MARK_AS_READ);
         // focus should remain at the only issue shown
         assertEquals(5, selectedIssueId);
 
@@ -189,10 +181,6 @@ public class KeyboardShortcutsTest extends UITest {
         press(MINIMIZE_WINDOW);
         assertEquals(true, getStage().isIconified());
 
-    }
-
-    public KeyCode getKeyCode(String shortcut) {
-        return KeyCode.getKeyCode(KeyboardShortcuts.getDefaultKeyboardShortcuts().get(shortcut));
     }
 
     public void clearSelectedIssueId() {
