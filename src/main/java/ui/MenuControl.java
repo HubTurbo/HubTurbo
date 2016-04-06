@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 import prefs.PanelInfo;
 import prefs.Preferences;
 import ui.issuepanel.PanelControl;
+import util.DialogMessage;
 import util.Utility;
 import util.events.*;
 
@@ -103,9 +104,12 @@ public class MenuControl extends MenuBar {
      * Prompts a dialog to ask the user whether or not to save the current board.
      */
     public final void promptToSaveCurrentBoard() {
-        ConfirmChangesDialog dlg = new ConfirmChangesDialog(mainStage);
-        Optional<ButtonType> response = dlg.showAndWait();
-        if (response.get() != ButtonType.YES) {
+        boolean shouldSave = DialogMessage.showYesNoConfirmationDialog("Save Changes?",
+                "There are unsaved changes to your current board.",
+                "If you choose not to save, all unsaved changes will be discarded.\n\nDo you want to save them?",
+                "Yes", "No");
+
+        if (!shouldSave) {
             logger.info("User abandoned unsaved changes.");
             return;
         }

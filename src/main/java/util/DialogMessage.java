@@ -34,6 +34,23 @@ public final class DialogMessage {
         return result.get().equals(yesButton);
     }
 
+    public static boolean showYesNoConfirmationDialog(String title, String header, String message,
+                                                 String yesButtonLabel, String noButtonLabel) {
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(message);
+
+        ButtonType yesButton = new ButtonType(yesButtonLabel);
+        ButtonType noButton = new ButtonType(noButtonLabel);
+        alert.getButtonTypes().setAll(yesButton, noButton);
+
+        Optional<ButtonType> result = alert.showAndWait();
+
+        return result.get().equals(yesButton);
+    }
+
     public static void showInformationDialog(String header, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setHeaderText(header);
