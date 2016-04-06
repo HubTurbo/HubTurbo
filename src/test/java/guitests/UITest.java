@@ -330,22 +330,6 @@ public class UITest extends FxRobot {
     }
 
     /**
-     * Clicks the repository selector's ComboBox
-     */
-    public void clickRepositorySelector() {
-        waitUntilNodeAppears(IdGenerator.getRepositorySelectorIdReference());
-        clickOn(IdGenerator.getRepositorySelectorIdReference());
-    }
-
-    /**
-     * Gets the repository selector's ComboBox
-     */
-    public ComboBox getRepositorySelector() {
-        waitUntilNodeAppears(IdGenerator.getRepositorySelectorIdReference());
-        return GuiTest.find(IdGenerator.getRepositorySelectorIdReference());
-    }
-
-    /**
      * Clicks the label picker's TextField
      */
     public void clickLabelPickerTextField() {

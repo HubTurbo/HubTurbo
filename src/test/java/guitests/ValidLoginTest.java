@@ -10,6 +10,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import ui.IdGenerator;
+import ui.TestController;
 
 public class ValidLoginTest extends UITest {
 
@@ -28,7 +29,7 @@ public class ValidLoginTest extends UITest {
         type("test").push(KeyCode.TAB);
         type("test");
         clickOn("Sign in");
-        ComboBox<String> repositorySelector = findOrWaitFor(IdGenerator.getRepositorySelectorIdReference());
-        awaitCondition(() -> "test/test".equals(repositorySelector.getValue()), 10);
+        String title = TestController.getUI().getTitle();
+        awaitCondition(() -> "test/test (none)".equals(title), 10);
     }
 }

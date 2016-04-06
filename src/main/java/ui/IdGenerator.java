@@ -15,10 +15,6 @@ public final class IdGenerator {
         return "panel" + panelIndex + "_renameTextField";
     }
 
-    public static String getRepositorySelectorId() {
-        return "repositorySelector";
-    }
-
     public static String getPanelNameAreaId(int panelIndex) {
         return "panel" + panelIndex + "_nameText";
     }
@@ -93,10 +89,6 @@ public final class IdGenerator {
 
     public static String getPanelRenameTextFieldIdReference(int panelIndex) {
         return "#" + getPanelRenameTextFieldId(panelIndex);
-    }
-
-    public static String getRepositorySelectorIdReference() {
-        return "#" + getRepositorySelectorId();
     }
 
     public static String getPanelNameAreaIdReference(int panelIndex) {
