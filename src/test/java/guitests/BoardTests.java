@@ -263,6 +263,8 @@ public class BoardTests extends UITest {
         assertEquals(1, panelControl.getPanelCount());
 
         traverseMenu("Boards", "New");
+        waitUntilNodeAppears("No");
+        clickOn("No");
         press(KeyCode.ESCAPE);
         assertEquals(0, panelControl.getNumberOfSavedBoards());
         assertEquals(1, panelControl.getPanelCount());
@@ -275,15 +277,15 @@ public class BoardTests extends UITest {
         PanelControl panelControl = ui.getPanelControl();
 
         traverseMenu("Boards", "New");
-        waitUntilNodeAppears(hasText("OK"));
-        clickOn("OK");
+        waitUntilNodeAppears(hasText("No"));
+        clickOn("No");
 
         waitUntilNodeAppears(boardNameInputId);
         ((TextField) GuiTest.find(boardNameInputId)).setText("empty");
         waitUntilNodeAppears(hasText("OK"));
         clickOn("OK");
 
-        waitAndAssertEquals(0, panelControl::getPanelCount);
+        waitAndAssertEquals(1, panelControl::getPanelCount);
         waitAndAssertEquals(ui.getTitle(), () -> getUiTitleWithOpenBoard("empty"));
     }
 }
