@@ -176,35 +176,6 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
                 .findAny();
     }
 
-    /**
-     * Gets the default milestone from the sortedMilestoneList
-     * If there is an existing milestone, default milestone is the existing milestone
-     * Else it is the first open milestone that is not overdue
-     * Precondition: sortedMilestoneList needs to be sorted in its natural order
-     *
-     * @param sortedMilestoneList
-     * @return Optional of default milestone
-     */
-    public static Optional<PickerMilestone> getDefaultMilestone(List<PickerMilestone> sortedMilestoneList) {
-        return PickerMilestone.getExistingMilestone(sortedMilestoneList)
-                .map(Optional::of)
-                .orElse(PickerMilestone.getNextOpenMilestone(sortedMilestoneList));
-
-    }
-
-    /**
-     * Gets the the first PickerMilestone that is open and not overdue from the sortedMilestoneList
-     * Precondition: sortedMilestoneList needs to be sorted in its natural order
-     *
-     * @param sortedMilestoneList
-     * @return Optional of first PickerMilestone that is open and not overdue
-     */
-    private static Optional<PickerMilestone> getNextOpenMilestone(List<PickerMilestone> sortedMilestoneList) {
-        return sortedMilestoneList.stream()
-                .filter(milestone -> !milestone.isOverdue() && milestone.isOpen())
-                .findFirst();
-    }
-
     private void setFadedInUI(Label milestone) {
         milestone.setStyle(milestone.getStyle() + " -fx-opacity: 60%;");
     }

@@ -17,8 +17,7 @@ public class PickerMilestoneTest {
     private static final String REPO_ID = "test/testrepo";
 
     private static List<PickerMilestone> listWithNoExistingAndSelected, listWithNoDefaultMilestone,
-            listWithExisting, listWithSelected, listWithNextMilestone, listWithMilestonesWithNoDueDates,
-            listWithMilesonesWithSameDueDates;
+            listWithExisting, listWithSelected, listWithNextMilestone, listWithMilestonesWithNoDueDates;
     private static PickerMilestone noDueDateMilestone1, noDueDateMilestone2, openMilestone1, openMilestone2,
             closedMilestone, existingMilestone, selectedMilestone;
 
@@ -66,8 +65,6 @@ public class PickerMilestoneTest {
         listWithMilestonesWithNoDueDates = new ArrayList<>();
         listWithMilestonesWithNoDueDates.add(noDueDateMilestone1);
         listWithMilestonesWithNoDueDates.add(noDueDateMilestone2);
-
-        listWithMilesonesWithSameDueDates = listWithNoExistingAndSelected;
     }
 
     @Test
@@ -88,32 +85,5 @@ public class PickerMilestoneTest {
     @Test
     public void getSelectedMilestone_haveSelectedMilestone_returnSelectedMilestone() {
         assertEquals(Optional.of(selectedMilestone), PickerMilestone.getSelectedMilestone(listWithSelected));
-    }
-
-    @Test
-    public void getDefaultMilestone_noDefaultMilestone_returnEmpty() {
-        assertEquals(Optional.empty(), PickerMilestone.getDefaultMilestone(listWithNoDefaultMilestone));
-    }
-
-    @Test
-    public void getDefaultMilestone_haveExistingMilestone_returnExistingMilestone() {
-        assertEquals(Optional.of(existingMilestone), PickerMilestone.getDefaultMilestone(listWithExisting));
-    }
-
-    @Test
-    public void getDefaultMilestone_haveNoExistingButHaveNextMilestone_returnNextMilestone() {
-        assertEquals(Optional.of(openMilestone1), PickerMilestone.getDefaultMilestone(listWithNextMilestone));
-    }
-
-    @Test
-    public void getDefaultMilestone_haveMilestonesWithNoDueDates_returnMilestoneWithLexicographicallySmallerName() {
-        assertEquals(Optional.of(noDueDateMilestone1),
-                PickerMilestone.getDefaultMilestone(listWithMilestonesWithNoDueDates));
-    }
-
-    @Test
-    public void getDefaultMilestone_haveMilestonesWithSameDueDates_returnMilestoneWithLexicographicallySmallerName() {
-        assertEquals(Optional.of(openMilestone1),
-                PickerMilestone.getDefaultMilestone(listWithMilesonesWithSameDueDates));
     }
 }

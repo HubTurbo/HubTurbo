@@ -105,13 +105,15 @@ public class MilestonePickerState {
      */
     private void populateBestMatchingMilestones(String querySentence) {
         bestMatchingMilestones.clear();
-        addMatchingMilestones(bestMatchingMilestones, getRemainingBestMatchesToLimit(), allMilestones);
+        addMatchingMilestones(bestMatchingMilestones, getRemainingBestMatchesToLimit(),
+                                                      getSelectableMilestones(allMilestones));
         if (isMilestonesSizeBelowLimit(bestMatchingMilestones, BEST_MATCHING_LIMIT)) {
             addPartiallyMatchingMilestones(bestMatchingMilestones, getRemainingBestMatchesToLimit(), querySentence,
-                                            allMilestones);
+                                           getSelectableMilestones(allMilestones));
         }
         if (isMilestonesSizeBelowLimit(bestMatchingMilestones, BEST_MATCHING_LIMIT)) {
-            addLikelyUnmatchedMilestones(bestMatchingMilestones, getRemainingBestMatchesToLimit(), allMilestones);
+            addLikelyUnmatchedMilestones(bestMatchingMilestones, getRemainingBestMatchesToLimit(),
+                                         getSelectableMilestones(allMilestones));
         }
     }
 
@@ -271,6 +273,12 @@ public class MilestonePickerState {
         return milestones.stream()
                 .filter(milestone -> milestone.getTitle().equals(query))
                 .findFirst();
+    }
+
+    private List<PickerMilestone> getSelectableMilestones(List<PickerMilestone> milestones) {
+        return milestones.stream()
+                .filter(milestone -> !milestone.isExisting())
+                .collect(Collectors.toList());
     }
 
     private boolean isMatchingQuery(PickerMilestone milestone, String query) {
