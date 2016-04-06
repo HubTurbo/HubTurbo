@@ -6,8 +6,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.testfx.api.FxToolkit;
 
+import ui.TestController;
 import ui.UI;
 import util.GitHubURL;
+import util.PlatformEx;
 import util.events.IssueCreatedEvent;
 import util.events.IssueSelectedEvent;
 import util.events.LabelCreatedEvent;
@@ -32,7 +34,7 @@ public class ChromeDriverTest extends UITest {
     private final JumpToNewCommentBoxEventHandler jumpCommentHandler = e -> hasJumpedToComment = true;
 
     @Before
-    public void cleanAndRegisterHandlers() {
+    public void prepare() {
         urlsNavigated.clear();
         scriptsExecuted.clear();
         keysSentToBrowser.clear();
@@ -40,11 +42,11 @@ public class ChromeDriverTest extends UITest {
         UI.events.registerEvent(navToPageHandler);
         UI.events.registerEvent(execScriptHandler);
         UI.events.registerEvent(jumpCommentHandler);
-        clickIssue(0, 9);
+        PlatformEx.runAndWait(()->TestController.getUI().getPanelControl().getPanel(0).requestFocus());
     }
 
     @After
-    public void unregisterHandlers() {
+    public void tearDown() {
         UI.events.unregisterEvent(navToPageHandler);
         UI.events.unregisterEvent(execScriptHandler);
         UI.events.unregisterEvent(jumpCommentHandler);
@@ -55,6 +57,7 @@ public class ChromeDriverTest extends UITest {
         FxToolkit.setupApplication(
             TestUI.class, "--test=true", "--bypasslogin=true", "--testchromedriver=true");
     }
+    
     /**
      * Performs the specified action and waits for a specific response to occur.
      *
@@ -68,123 +71,143 @@ public class ChromeDriverTest extends UITest {
         awaitCondition(() -> responses.contains(expected));
         responses.clear();
     }
+    
+    private void actAndAwaitNavToPage(String expectedUrl, Runnable action) {
+        actAndAwaitResponse(expectedUrl, action, urlsNavigated);
+    }
 
     @Test
-    public void navigateToPage() {
-        actAndAwaitResponse(
+    public void navigateToPage_selectIssue() {
+        actAndAwaitNavToPage(
             GitHubURL.getPathForIssue("dummy/dummy", 1),
-            () -> UI.events.triggerEvent(new IssueSelectedEvent("dummy/dummy", 1, 0, false)),
-            urlsNavigated
-        );
-        actAndAwaitResponse(
-            GitHubURL.getPathForNewIssue("dummy/dummy"),
-            () -> UI.events.triggerEvent(new IssueCreatedEvent()),
-            urlsNavigated
-        );
-        actAndAwaitResponse(
-            GitHubURL.getPathForNewLabel("dummy/dummy"),
-            () -> UI.events.triggerEvent(new LabelCreatedEvent()),
-            urlsNavigated
-        );
-        actAndAwaitResponse(
-            GitHubURL.getPathForNewMilestone("dummy/dummy"),
-            () -> UI.events.triggerEvent(new MilestoneCreatedEvent()),
-            urlsNavigated
-        );
-
-        // show docs
-        actAndAwaitResponse(
-            GitHubURL.DOCS_PAGE,
-            () -> push(KeyCode.F1),
-            urlsNavigated
-        );
-        actAndAwaitResponse(
-            GitHubURL.DOCS_PAGE,
-            () -> {
-                push(KeyCode.G);
-                push(KeyCode.H);
-            },
-            urlsNavigated
-        );
-        actAndAwaitResponse(
-            GitHubURL.DOCS_PAGE,
-            () -> {
-                clickOn("View");
-                clickOn("Documentation");
-            },
-            urlsNavigated
-        );
-        // go to labels page
-        actAndAwaitResponse(
-            GitHubURL.getPathForNewLabel("dummy/dummy"),
-            () -> push(KeyCode.G).push(KeyCode.L),
-            urlsNavigated
-        );
-
-        // go to issues page
-        actAndAwaitResponse(
-            GitHubURL.getPathForAllIssues("dummy/dummy"),
-            () -> push(KeyCode.G).push(KeyCode.I),
-            urlsNavigated
-        );
-
-        // go to milestones page
-        actAndAwaitResponse(
-            GitHubURL.getPathForMilestones("dummy/dummy"),
-            () -> push(KeyCode.G).push(KeyCode.M),
-            urlsNavigated
-        );
-
-        // go to pull requests page
-        actAndAwaitResponse(
-            GitHubURL.getPathForPullRequests("dummy/dummy"),
-            () -> push(KeyCode.G).push(KeyCode.P),
-            urlsNavigated
-        );
-
-        // go to developers page
-        actAndAwaitResponse(
-            GitHubURL.getPathForContributors("dummy/dummy"),
-            () -> push(KeyCode.G).push(KeyCode.D),
-            urlsNavigated
-        );
-
-        // go to keyboard shortcuts page
-        actAndAwaitResponse(
-            GitHubURL.KEYBOARD_SHORTCUTS_PAGE,
-            () -> push(KeyCode.G).push(KeyCode.K),
-            urlsNavigated
+            () -> UI.events.triggerEvent(new IssueSelectedEvent("dummy/dummy", 1, 0, false))
         );
     }
 
     @Test
-    public void executeScripts() {
-        // scroll to top
-        actAndAwaitResponse(
+    public void navigateToPage_createIssue() {
+        actAndAwaitNavToPage(
+            GitHubURL.getPathForNewIssue("dummy/dummy"),
+            () -> UI.events.triggerEvent(new IssueCreatedEvent())
+        );
+    }
+
+    @Test
+    public void navigateToPage_createLabel() {
+        actAndAwaitNavToPage(
+            GitHubURL.getPathForNewLabel("dummy/dummy"),
+            () -> UI.events.triggerEvent(new LabelCreatedEvent())
+        );
+        actAndAwaitNavToPage(
+            GitHubURL.getPathForNewLabel("dummy/dummy"),
+            () -> push(KeyCode.G).push(KeyCode.L)
+        );
+    }
+
+    @Test
+    public void navigateToPage_createMilestone() {
+        actAndAwaitNavToPage(
+            GitHubURL.getPathForNewMilestone("dummy/dummy"),
+            () -> UI.events.triggerEvent(new MilestoneCreatedEvent())
+        );
+    }
+
+    @Test
+    public void navigateToPage_showDocs() {
+        actAndAwaitNavToPage(
+            GitHubURL.DOCS_PAGE,
+            () -> push(KeyCode.F1)
+        );
+        actAndAwaitNavToPage(
+            GitHubURL.DOCS_PAGE,
+            () -> {
+                push(KeyCode.G);
+                push(KeyCode.H);
+            }
+        );
+        actAndAwaitNavToPage(
+            GitHubURL.DOCS_PAGE,
+            () -> {
+                clickOn("View");
+                clickOn("Documentation");
+            }
+        );
+    }
+
+    @Test
+    public void navigateToPage_issues() {
+        // go to issues page
+        actAndAwaitNavToPage(
+            GitHubURL.getPathForAllIssues("dummy/dummy"),
+            () -> push(KeyCode.G).push(KeyCode.I)
+        );
+    }
+
+    @Test
+    public void navigateToPage_milestones() {
+        actAndAwaitNavToPage(
+            GitHubURL.getPathForMilestones("dummy/dummy"),
+            () -> push(KeyCode.G).push(KeyCode.M)
+        );
+    }
+
+    @Test
+    public void navigateToPage_pullRequests() {
+        actAndAwaitNavToPage(
+            GitHubURL.getPathForPullRequests("dummy/dummy"),
+            () -> push(KeyCode.G).push(KeyCode.P)
+        );
+    }
+
+    @Test
+    public void navigateToPage_developers() {
+        actAndAwaitNavToPage(
+            GitHubURL.getPathForContributors("dummy/dummy"),
+            () -> push(KeyCode.G).push(KeyCode.D)
+        );
+    }
+
+    @Test
+    public void navigateToPage_keyboardShortcuts() {
+        actAndAwaitNavToPage(
+            GitHubURL.KEYBOARD_SHORTCUTS_PAGE,
+            () -> push(KeyCode.G).push(KeyCode.K)
+        );
+    }
+
+    private void actAndAwaitExecScript(String expectedScript, Runnable action) {
+        actAndAwaitResponse(expectedScript, action, scriptsExecuted);
+    }
+    
+    @Test
+    public void executeScripts_scrollToTop() {
+        actAndAwaitExecScript(
             "window.scrollTo(0, 0)",
-            () -> push(KeyCode.I),
-            scriptsExecuted)
-        ;
+            () -> push(KeyCode.I)
+        );
+    }
 
-        // scroll to bottom
-        actAndAwaitResponse(
+    @Test
+    public void executeScripts_scrollToBottom() {
+        actAndAwaitExecScript(
             "window.scrollTo(0, document.body.scrollHeight)",
-            () -> push(KeyCode.N),
-            scriptsExecuted
+            () -> push(KeyCode.N)
         );
+    }
 
-        // scroll up
-        actAndAwaitResponse(
+    @Test
+    public void executeScripts_scrollUp() {
+        actAndAwaitExecScript(
             "window.scrollBy(0, -100)",
-            () -> push(KeyCode.J),
-            scriptsExecuted
+            () -> push(KeyCode.J)
         );
+    }
 
-        // scroll down
-        actAndAwaitResponse(
+    @Test
+    public void executeScripts_scrollDown() {
+        actAndAwaitExecScript(
             "window.scrollBy(0, 100)",
-            () -> push(KeyCode.K),
-            scriptsExecuted
+            () -> push(KeyCode.K)
         );
     }
 
