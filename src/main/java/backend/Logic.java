@@ -76,7 +76,7 @@ public class Logic {
         openPrimaryRepository(e.repoId);
     }
 
-    private CompletableFuture<Boolean> isRepositoryValid(String repoId) {
+    public CompletableFuture<Boolean> isRepositoryValid(String repoId) {
         return repoIO.isRepositoryValid(repoId);
     }
 

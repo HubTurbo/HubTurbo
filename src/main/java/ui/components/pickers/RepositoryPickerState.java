@@ -43,6 +43,21 @@ public class RepositoryPickerState {
     }
 
     /**
+     * Adds a new repository with the given repoId to the list of repositories. If it already exists in the list,
+     * it will be ignored. This method also invalidates suggestedRepositoryList by clearing it as the current
+     * suggestedRepositories might become invalid.
+     */
+    public void addRepository(String repoId) {
+        if (getPickerRepositoryById(repositories, repoId).isPresent()) {
+            return;
+        }
+
+        repositories.add(new PickerRepository(repoId));
+        Collections.sort(repositories);
+        suggestedRepositories.clear();
+    }
+
+    /**
      * Selects a repository right after the current selected repository in the sorted
      * suggested repository list. If the current selected repository is the last one,
      * it will then select the first suggested repository instead.
