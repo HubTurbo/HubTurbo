@@ -887,11 +887,15 @@ public class Qualifier implements FilterExpression {
 
     private boolean authorSatisfies(IModel model, TurboIssue issue) {
         if (!content.isPresent()) return false;
-        TurboUser author = model.getAuthorOfIssue(issue).get();
+        Optional<TurboUser> author = model.getAuthorOfIssue(issue);
 
         String content = this.content.get().toLowerCase();
-        String login = author.getLoginName() == null ? "" : author.getLoginName().toLowerCase();
-        String name = author.getRealName() == null ? "" : author.getRealName().toLowerCase();
+        String login = issue.getCreator();
+        String name = ""; // default value, since TurboIssue does not keep track of creator's real name
+
+        if (author.isPresent()) {
+            name = author.get().getRealName() == null ? "" : author.get().getRealName();
+        }
 
         return login.contains(content) || name.contains(content);
     }

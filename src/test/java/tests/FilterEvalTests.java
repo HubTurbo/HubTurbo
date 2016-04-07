@@ -477,14 +477,17 @@ public class FilterEvalTests {
     @Test
     public void satisfiesAuthor_validInputs() {
         TurboIssue issue = new TurboIssue(REPO, 1, "", "bob", null, false);
-        IModel model = TestUtils.modelWith(issue, new TurboUser("test/test", "bob"));
+        IModel model = TestUtils.modelWith(issue, new TurboUser("test/test", "bob", "alice"));
 
         assertTrue(Qualifier.process(model, Parser.parse("author:BOB"), issue));
         assertTrue(Qualifier.process(model, Parser.parse("author:bob"), issue));
         assertTrue(Qualifier.process(model, Parser.parse("author:o"), issue));
+        assertTrue(Qualifier.process(model, Parser.parse("author:a"), issue));
+        assertTrue(Qualifier.process(model, Parser.parse("author:aLICE"), issue));
 
         // test: qualifier alias
         assertTrue(Qualifier.process(model, Parser.parse("au:bob"), issue));
+        assertTrue(Qualifier.process(model, Parser.parse("au:CE"), issue));
     }
 
     @Test
@@ -494,7 +497,7 @@ public class FilterEvalTests {
         // assignee
         TurboUser user = new TurboUser(REPO, "bob", "alice");
 
-        TurboIssue issue = new TurboIssue(REPO, 1, "");
+        TurboIssue issue = new TurboIssue(REPO, 1, "", "bob", LocalDateTime.now(), true);
         issue.setAssignee(user);
 
         IModel model = TestUtils.modelWith(issue, user);
@@ -513,9 +516,9 @@ public class FilterEvalTests {
 
         assertTrue(Qualifier.process(model, Parser.parse("involves:BOB"), issue));
         assertTrue(Qualifier.process(model, Parser.parse("involves:bob"), issue));
-        assertFalse(Qualifier.process(model, Parser.parse("involves:alice"), issue));
+        assertTrue(Qualifier.process(model, Parser.parse("involves:alice"), issue));
         assertTrue(Qualifier.process(model, Parser.parse("involves:o"), issue));
-        assertFalse(Qualifier.process(model, Parser.parse("involves:lic"), issue));
+        assertFalse(Qualifier.process(model, Parser.parse("involves:alicee"), issue));
     }
 
     @Test
