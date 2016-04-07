@@ -1,4 +1,4 @@
-package ui.components.issuepicker;
+package ui;
 
 import java.util.Optional;
 
@@ -20,7 +20,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
-import ui.GuiElement;
 
 /**
  * Represents an individual issue card not linked to any panel

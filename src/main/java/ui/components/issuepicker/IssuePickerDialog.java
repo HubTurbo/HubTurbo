@@ -23,6 +23,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import ui.GuiElement;
+import ui.IssueCard;
 import ui.UI;
 import util.HTLog;
 
