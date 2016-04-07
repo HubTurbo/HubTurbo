@@ -89,11 +89,11 @@ public class MenuControl extends MenuBar {
     }
 
     /**
-     * Checks whether the current open board is dirty, i.e. has unsaved changes.
+     * Checks whether the current board is dirty, i.e. has unsaved changes.
      *
-     * @return true if current open board is dirty, false otherwise
+     * @return true if current board is dirty, false otherwise
      */
-    public final boolean isCurrentOpenBoardDirty() {
+    public final boolean isCurrentBoardDirty() {
         if (!prefs.getLastOpenBoardPanelInfos().isPresent()) {
             return true;
         }
@@ -105,8 +105,8 @@ public class MenuControl extends MenuBar {
      */
     public final void promptToSaveCurrentBoard() {
         boolean shouldSave = DialogMessage.showYesNoConfirmationDialog("Save Changes?",
-                "There are unsaved changes to your current board.",
-                "If you choose not to save, all unsaved changes will be discarded.\n\nDo you want to save them?",
+                "All unsaved changes will be discarded.",
+                "Do you want to save them?",
                 "Yes", "No");
 
         if (!shouldSave) {
@@ -119,10 +119,10 @@ public class MenuControl extends MenuBar {
     }
 
     /**
-     * Prompts a {@code BoardNameDialog} to ask the user for a new board name
+     * Prompts a {@link BoardNameDialog} to ask the user for a new board name
      * @return the user's response
      */
-    public final Optional<String> promptForNewBoardName() {
+    public final Optional<String> promptForBoardName() {
         BoardNameDialog dlg = new BoardNameDialog(prefs, mainStage);
         Optional<String> response = dlg.showAndWait();
 
@@ -135,7 +135,7 @@ public class MenuControl extends MenuBar {
     private void onBoardNew() {
         logger.info("Menu: Boards > New");
 
-        if (isCurrentOpenBoardDirty()) {
+        if (isCurrentBoardDirty()) {
             promptToSaveCurrentBoard();
         }
 
@@ -146,7 +146,7 @@ public class MenuControl extends MenuBar {
      * Creates a new board with a single empty panel. User will be prompted for the new board name.
      */
     public final void newBoard() {
-        Optional<String> response = promptForNewBoardName();
+        Optional<String> response = promptForBoardName();
 
         response.ifPresent(boardName -> {
             List<PanelInfo> panelList = new ArrayList<>();
@@ -198,7 +198,7 @@ public class MenuControl extends MenuBar {
      * Prompts for board name and save the current board as per the name
      */
     public final void saveBoardAs() {
-        Optional<String> response = promptForNewBoardName();
+        Optional<String> response = promptForBoardName();
 
         response.ifPresent(boardName -> {
             createAndOpenNewBoard(boardName, panels.getCurrentPanelInfos());
