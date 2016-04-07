@@ -59,6 +59,10 @@ In general, ensure as far as possible that tests are deterministic. Keep tests s
 
 To test for events, you can create new events for the test in [`util.events.testevents`](../src/main/java/util/events/testevents), ensure that you also create the corresponding event handler. You can then test for event triggering using [`UI.events.registerEvent((EventHandler))`](../src/main/java/ui/UI.java).
 
+## Headless Testing
+
+Headless testing 
+
 ## CI Quirks
 
 HubTurbo runs GUI tests on Travis as well. As its testing environment may differ from your development environment, tests which pass on your end may fail on Travis. Do troubleshoot with the following points, and feel free to add on to the list if you encounter problems.
