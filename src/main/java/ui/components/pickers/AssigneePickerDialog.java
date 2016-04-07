@@ -145,7 +145,7 @@ public class AssigneePickerDialog extends Dialog<AssigneePickerDialog.AssigneePi
 
     private void updateNewlyAddedAssignee(List<PickerAssignee> users, FlowPane assignedUserPane) {
         users.stream()
-                .filter(PickerAssignee::isSelected)
+                .filter(user -> !user.isExisting() && user.isSelected())
                 .forEach(user -> assignedUserPane.getChildren().add(
                         setMouseClickForNode(user.getNewlyAssignedAssigneeNode(),
                                 user.getLoginName())
