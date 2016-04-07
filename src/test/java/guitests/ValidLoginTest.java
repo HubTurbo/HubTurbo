@@ -29,7 +29,6 @@ public class ValidLoginTest extends UITest {
         type("test").push(KeyCode.TAB);
         type("test");
         clickOn("Sign in");
-        String title = TestController.getUI().getTitle();
-        awaitCondition(() -> "test/test (none)".equals(title), 10);
+        awaitCondition(() -> "test/test (none)".equals(TestController.getUI().getTitle()), 10);
     }
 }
