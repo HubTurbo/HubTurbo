@@ -28,13 +28,17 @@ public class PanelMenuCreatorTest extends UITest {
     @Test
     public void autoCreatePanels_createCustomPanelsFromMenu_panelsCreatedWithAppropriatePanelNameAndFilter()
             throws NoSuchFieldException, IllegalAccessException {
-        Field panelMenuCreatorField = MenuControl.class.getDeclaredField("panelMenuCreator");
-        panelMenuCreatorField.setAccessible(true);
-        PanelMenuCreator value = (PanelMenuCreator) panelMenuCreatorField.get(ui.getMenuControl());
+        PanelMenuCreator value = (PanelMenuCreator) getPanelMenuCreatorField().get(ui.getMenuControl());
         for (Map.Entry<String, String> entry :
-                value.generateCustomizedPanelDetails(ui.prefs.getLastLoginUsername()).entrySet()) {
+                value.generatePanelDetails(ui.prefs.getLastLoginUsername()).entrySet()) {
             customizedPanelMenuItemTest(entry.getKey(), entry.getValue());
         }
+    }
+
+    private Field getPanelMenuCreatorField() throws NoSuchFieldException, IllegalAccessException {
+        Field panelMenuCreatorField = MenuControl.class.getDeclaredField("panelMenuCreator");
+        panelMenuCreatorField.setAccessible(true);
+        return panelMenuCreatorField;
     }
 
     @Test

@@ -11,7 +11,6 @@ import javafx.scene.control.ScrollPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ui.issuepanel.PanelControl;
-import prefs.Preferences;
 
 import java.util.*;
 
@@ -21,17 +20,17 @@ import static ui.components.KeyboardShortcuts.CREATE_RIGHT_PANEL;
 
 public class PanelMenuCreator {
 
-    private final Preferences prefs;
+    private final String lastLoginUsername;
 
     private static final Logger logger = LogManager.getLogger(MenuControl.class.getName());
 
     private final PanelControl panelControl;
     private final ScrollPane panelsScrollPane;
 
-    public PanelMenuCreator(PanelControl panelControl, ScrollPane panelsScrollPane, Preferences prefs) {
+    public PanelMenuCreator(PanelControl panelControl, ScrollPane panelsScrollPane, String lastLoginUsername) {
         this.panelsScrollPane = panelsScrollPane;
         this.panelControl = panelControl;
-        this.prefs = prefs;
+        this.lastLoginUsername = lastLoginUsername;
     }
 
     public Menu generatePanelMenu() {
@@ -43,8 +42,8 @@ public class PanelMenuCreator {
         items.add(createRightPanelMenuItem());
         items.add(closePanelMenuItem());
         for (Map.Entry<String, String> entry :
-                generateCustomizedPanelDetails(prefs.getLastLoginUsername()).entrySet()) {
-            autoCreateItems.add(createCustomizedPanelMenuItem(entry.getKey(), entry.getValue()));
+                generatePanelDetails(lastLoginUsername).entrySet()) {
+            autoCreateItems.add(createPanelMenuItem(entry.getKey(), entry.getValue()));
         }
         autoCreatePanelMenu.getItems().addAll(autoCreateItems);
         panelMenu.getItems().addAll(items);
@@ -58,15 +57,15 @@ public class PanelMenuCreator {
      * Uses the username as a parameter to construct the filter names.
      * @param lastLoginUsername
      */
-    public static Map<String, String> generateCustomizedPanelDetails(String lastLoginUsername){
-        Map<String, String> customPanelMap = new LinkedHashMap<>();
-        customPanelMap.put("Open issues and PR's",
-                String.format("is:open ((is:issue assignee:%s) OR (is:pr author:%s))", lastLoginUsername,
+    public static Map<String, String> generatePanelDetails(String lastLoginUsername){
+        Map<String, String> customPanel = new LinkedHashMap<>();
+        customPanel.put("Open issues and PR's",
+                String.format("is:open ((is:issue assignee:%1$s) OR (is:pr author:%2$s))", lastLoginUsername,
                         lastLoginUsername));
-        customPanelMap.put("Current Milestone", "milestone:curr sort:status");
-        customPanelMap.put("Recently Updated issues",
+        customPanel.put("Current Milestone", "milestone:curr sort:status");
+        customPanel.put("Recently Updated issues",
                 String.format("assignee:%s updated:<48", lastLoginUsername));
-        return Collections.unmodifiableMap(customPanelMap);
+        return Collections.unmodifiableMap(customPanel);
     }
 
     public MenuItem createLeftPanelMenuItem() {
@@ -119,7 +118,7 @@ public class PanelMenuCreator {
         return closePanel;
     }
 
-    public MenuItem createCustomizedPanelMenuItem(String panelName, String panelFilter) {
+    public MenuItem createPanelMenuItem(String panelName, String panelFilter) {
         MenuItem customizedPanel = new MenuItem(panelName);
         customizedPanel.setOnAction(e -> {
             logger.info("Menu: Panels > Auto-create > " + panelName + "panel");
