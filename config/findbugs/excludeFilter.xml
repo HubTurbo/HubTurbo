@@ -60,24 +60,6 @@
     </Match>
 
     <Match>
-        <Class name="ui.components.KeyboardShortcuts" />
-        <Bug pattern="MS_CANNOT_BE_FINAL" />
-        <Or>
-            <Field name="closeIssue" />
-            <Field name="reopenIssue" />
-            <Field name="downIssue" />
-            <Field name="leftPanel" />
-            <Field name="markAsRead" />
-            <Field name="markAsUnread" />
-            <Field name="rightPanel" />
-            <Field name="scrollDown" />
-            <Field name="scrollToBottom" />
-            <Field name="scrollToTop" />
-            <Field name="scrollUp" />
-            <Field name="upIssue" />
-        </Or>
-    </Match>
-    <Match>
         <Class name="tests.PreferencesTests" />
         <Bug pattern="RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT" />
         <Or>

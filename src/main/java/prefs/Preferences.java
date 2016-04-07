@@ -205,6 +205,14 @@ public class Preferences { // NOPMD
         return sessionConfig.getLastOpenBoard();
     }
 
+    public void setLastOpenBoardPanelInfos(List<PanelInfo> panelInfos) {
+        sessionConfig.setLastOpenBoardPanelInfos(panelInfos);
+    }
+
+    public Optional<List<PanelInfo>> getLastOpenBoardPanelInfos() {
+        return sessionConfig.getLastOpenBoardPanelInfos();
+    }
+
     /**
      * Switches the board to the next one. Cycles through the boards one at a time.
      * @return The new board selected
@@ -222,6 +230,11 @@ public class Preferences { // NOPMD
 
     public void clearLastOpenBoard() {
         sessionConfig.clearLastOpenBoard();
+        save();
+    }
+
+    public void clearLastOpenBoardPanelInfos() {
+        sessionConfig.clearLastOpenBoardPanelInfos();
         save();
     }
 
@@ -279,14 +292,5 @@ public class Preferences { // NOPMD
      */
     public Optional<LocalDateTime> getMarkedReadAt(String repoId, int issue) {
         return sessionConfig.getMarkedReadAt(repoId, issue);
-    }
-
-    public Map<String, String> getKeyboardShortcuts() {
-        return sessionConfig.getKeyboardShortcuts();
-    }
-
-    public void setKeyboardShortcuts(Map<String, String> keyboardShortcuts) {
-        sessionConfig.setKeyboardShortcuts(keyboardShortcuts);
-        save();
     }
 }

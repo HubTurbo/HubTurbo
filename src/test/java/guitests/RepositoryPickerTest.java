@@ -123,6 +123,21 @@ public class RepositoryPickerTest extends UITest {
         assertSelectedPickerRepositoryNode("dummmy", suggestedRepositoryList.getChildren().get(0));
         push(KeyCode.ESCAPE);
 
+        // we check that the new repo created from user input is not selected anymore upon click
+        traverseMenu("Repos", "Show Repository Picker");
+        PlatformEx.waitOnFxThread();
+        userInputField = findOrWaitFor(IdGenerator.getRepositoryPickerTextFieldReference());
+        doubleClickOn(userInputField);
+        type("d");
+        suggestedRepositoryList = findOrWaitFor(IdGenerator.getRepositoryPickerSuggestedRepoListReference());
+        assertEquals(4, suggestedRepositoryList.getChildren().size());
+        clickOn("dummy2/dummy2");
+        assertEquals(4, suggestedRepositoryList.getChildren().size());
+        assertTrue(userInputField.isDisabled());
+        push(KeyCode.ENTER);
+        PlatformEx.waitOnFxThread();
+        assertEquals("dummy2/dummy2", primaryRepo);
+
         // we check if repo's id with white spaces are handled correctly
         traverseMenu("Repos", "Show Repository Picker");
         PlatformEx.waitOnFxThread();
