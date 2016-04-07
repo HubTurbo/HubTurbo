@@ -1,7 +1,6 @@
 package guitests;
 
 import static com.google.common.io.Files.getFileExtension;
-import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -68,6 +67,7 @@ public class UITest extends FxRobot {
     protected static final SettableFuture<Stage> STAGE_FUTURE = SettableFuture.create();
     private static final Logger logger = LogManager.getLogger(UITest.class.getName());
     private static final Map<Character, KeyCode> specialCharsMap = getSpecialCharsMap();
+    private static final int EVENT_DELAY = 2000;
 
     /**
      * Sets TestFX properties to run in headless mode with
@@ -389,8 +389,8 @@ public class UITest extends FxRobot {
      * @param panelIndex
      */
     public void clickFilterTextFieldAtPanel(int panelIndex) {
+        sleep(EVENT_DELAY);
         TextField field = getFilterTextFieldAtPanel(panelIndex);
-        assertNotNull(field);
         clickOn(field);
     }
 

@@ -33,6 +33,7 @@ public class UIEventTests extends UITest {
         UI.events.registerEvent((IssueCreatedEventHandler) e -> UIEventTests.increaseEventTestCount());
         resetEventTestCount();
         traverseMenu("New", "Issue");
+        push(KeyCode.ENTER);
         assertEquals(1, eventTestCount);
         resetEventTestCount();
         press(NEW_ISSUE);
@@ -44,6 +45,7 @@ public class UIEventTests extends UITest {
         UI.events.registerEvent((LabelCreatedEventHandler) e -> UIEventTests.increaseEventTestCount());
         resetEventTestCount();
         traverseMenu("New", "Label");
+        push(KeyCode.ENTER);
         assertEquals(1, eventTestCount);
         resetEventTestCount();
         press(NEW_LABEL);
@@ -55,6 +57,7 @@ public class UIEventTests extends UITest {
         UI.events.registerEvent((MilestoneCreatedEventHandler) e -> UIEventTests.increaseEventTestCount());
         resetEventTestCount();
         traverseMenu("New", "Milestone");
+        push(KeyCode.ENTER);
         assertEquals(1, eventTestCount);
         resetEventTestCount();
         press(NEW_MILESTONE);
