@@ -40,6 +40,25 @@ public class DialogMessageTests extends UITest {
     }
 
     @Test
+    public void showYesNoConfirmationDialogTest() throws ExecutionException, InterruptedException {
+        FutureTask<Boolean> yesTask = new FutureTask<>(() ->
+                DialogMessage.showYesNoConfirmationDialog("Confirm", "Confirm Header", "Confirm Message", "yEs", "nO"));
+        Platform.runLater(yesTask);
+        waitUntilNodeAppears(hasText("Confirm Header"));
+        assertNodeExists(hasText("Confirm Header"));
+        clickOn("yEs");
+        assertEquals(true, yesTask.get());
+
+        FutureTask<Boolean> noTask = new FutureTask<>(() ->
+                DialogMessage.showYesNoWarningDialog("Confirm", "Confirm Header", "Confirm Message", "yEs", "nO"));
+        Platform.runLater(noTask);
+        waitUntilNodeAppears(hasText("Confirm Message"));
+        assertNodeExists(hasText("Confirm Message"));
+        clickOn("nO");
+        assertEquals(false, noTask.get());
+    }
+
+    @Test
     public void showInformationDialogTest() {
         Platform.runLater(() -> DialogMessage.showInformationDialog("Information", "Test Information Dialog"));
         waitUntilNodeAppears(hasText("Test Information Dialog"));
