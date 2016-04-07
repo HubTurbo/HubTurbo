@@ -8,6 +8,9 @@ import util.events.ShowBoardPickerEventHandler;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Represents a picker for user to search and switch to another board.
+ */
 public class BoardPicker {
 
     private final UI ui;
@@ -26,12 +29,9 @@ public class BoardPicker {
     }
 
     private void showBoardPicker(List<String> boards) {
-        // create new BoardPickerDialog
         BoardPickerDialog boardPickerDialog = new BoardPickerDialog(boards, stage);
-        // show BoardPickerDialog and wait for result
         Optional<String> result = boardPickerDialog.showAndWait();
-        stage.show(); // ensures stage is showing after board picker is closed (mostly for tests)
-        // if result is present (user did not cancel) then replace issue labels with result
+        stage.show();
 
         result.ifPresent(res -> ui.getMenuControl().switchBoard(res));
     }

@@ -12,9 +12,7 @@ import util.HTLog;
 import java.io.IOException;
 
 /**
- * Represent a candidate board UI element in the candidate list of BoardPickerDialog
- *
- * It contains the board name, and a method to toggle its highlighted state.
+ * Represents a candidate board UI element in the candidate list of BoardPickerDialog
  */
 public class PickerBoard extends HBox {
 

@@ -22,6 +22,9 @@ import java.util.OptionalInt;
 
 import static javafx.scene.input.KeyCode.*;
 
+/**
+ * Represents the dialog for {@link BoardPicker}
+ */
 public class BoardPickerDialog extends Dialog<String> {
 
     private static final Logger logger = HTLog.get(BoardPickerDialog.class);
@@ -106,14 +109,22 @@ public class BoardPickerDialog extends Dialog<String> {
                 .sorted(String::compareToIgnoreCase)
                 .map(PickerBoard::new)
                 .forEach(pickerBoard -> {
-                    suggestion.ifPresent(suggestion -> {
-                        pickerBoard.setHighlighted(suggestion.equals(pickerBoard.getBoardName()));
-                    });
-                    pickerBoard.setOnMouseClicked(e -> handleBoardClick(pickerBoard));
-                    boardList.getChildren().add(pickerBoard);
+                    processItem(pickerBoard);
+                    addItemToList(pickerBoard);
                 });
 
         updateConfirmButton();
+    }
+
+    private void processItem(PickerBoard pickerBoard) {
+        suggestion.ifPresent(suggestion -> {
+            pickerBoard.setHighlighted(suggestion.equals(pickerBoard.getBoardName()));
+        });
+        pickerBoard.setOnMouseClicked(e -> handleBoardClick(pickerBoard));
+    }
+
+    private void addItemToList(PickerBoard pickerBoard) {
+        boardList.getChildren().add(pickerBoard);
     }
 
     private void updateConfirmButton() {

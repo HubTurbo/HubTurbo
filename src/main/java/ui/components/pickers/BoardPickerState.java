@@ -4,26 +4,26 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * @author Liu Xinan
+ * Represents the state of a BoardPicker. It is determined by the set of boards and the user input.
  */
 class BoardPickerState {
 
     private Set<String> boards;
     private List<String> matchedBoards;
     private Optional<String> suggestion;
-    private String keyword;
+    private String userInput;
 
     BoardPickerState(Set<String> boards, String userInput) {
         this(boards, new ArrayList<>(), userInput.trim(), Optional.empty());
         update();
     }
 
-    private BoardPickerState(Set<String> boards, List<String> matchedBoards, String keyword,
+    private BoardPickerState(Set<String> boards, List<String> matchedBoards, String userInput,
                              Optional<String> suggestion) {
         this.boards = boards;
         this.matchedBoards = matchedBoards;
         this.suggestion = suggestion;
-        this.keyword = keyword;
+        this.userInput = userInput;
     }
 
     List<String> getMatchedBoards() {
@@ -35,7 +35,7 @@ class BoardPickerState {
     }
 
     private void update() {
-        if (keyword.isEmpty()) {
+        if (userInput.isEmpty()) {
             matchAllBoards();
             return;
         }
@@ -49,15 +49,15 @@ class BoardPickerState {
     }
 
     private void updateMatchedBoards() {
-        String[] prefixes = keyword.split("\\s+");
+        String[] keywords = userInput.split("\\s+");
         matchedBoards = boards.stream()
                     .filter(board -> {
                         String[] parts = board.trim().toLowerCase().split("\\s+");
-                        if (prefixes.length > parts.length) {
+                        if (keywords.length > parts.length) {
                             return false;
                         }
-                        for (String prefix : prefixes) {
-                            if (!board.matches(String.format("(?i:.*\\b%s.*)", prefix))) {
+                        for (String keyword : keywords) {
+                            if (!board.matches(String.format("(?i:.*\\b%s.*)", keyword))) {
                                 return false;
                             }
                         }
@@ -67,7 +67,7 @@ class BoardPickerState {
     }
 
     private void updateSuggestion() {
-        if (matchedBoards.isEmpty() || keyword.isEmpty()) {
+        if (matchedBoards.isEmpty() || userInput.isEmpty()) {
             suggestion = Optional.empty();
         } else {
             suggestion = matchedBoards.stream().min(String::compareToIgnoreCase);

@@ -27,6 +27,7 @@ public class BoardPickerTest extends UITest {
 
         VBox suggestedBoardList;
 
+        // Create some boards
         traverseMenu("Boards", "Save as");
         waitUntilNodeAppears(boardNameInputId);
         ((TextField) GuiTest.find(boardNameInputId)).setText("Board 1");
@@ -48,6 +49,7 @@ public class BoardPickerTest extends UITest {
         ((TextField) GuiTest.find(boardNameInputId)).setText("Dummy Board 2");
         clickOn(boardNameSaveButtonId);
 
+        // Should be able to match an exact word
         pushKeys(SHOW_BOARD_PICKER);
         PlatformEx.waitOnFxThread();
         suggestedBoardList = findOrWaitFor(IdGenerator.getBoardPickerSuggestedBoardListReference());
@@ -60,6 +62,7 @@ public class BoardPickerTest extends UITest {
         PlatformEx.waitOnFxThread();
         assertEquals("Board 1", prefs.getLastOpenBoard().get());
 
+        // Should be able to match single-letter prefixes
         pushKeys(SHOW_BOARD_PICKER);
         PlatformEx.waitOnFxThread();
         suggestedBoardList = findOrWaitFor(IdGenerator.getBoardPickerSuggestedBoardListReference());
@@ -72,6 +75,7 @@ public class BoardPickerTest extends UITest {
         PlatformEx.waitOnFxThread();
         assertEquals("Dummy Board 1", prefs.getLastOpenBoard().get());
 
+        // Should be able to match multiple-letter prefixes
         pushKeys(SHOW_BOARD_PICKER);
         PlatformEx.waitOnFxThread();
         suggestedBoardList = findOrWaitFor(IdGenerator.getBoardPickerSuggestedBoardListReference());
@@ -84,6 +88,7 @@ public class BoardPickerTest extends UITest {
         PlatformEx.waitOnFxThread();
         assertEquals("Dummy Board 2", prefs.getLastOpenBoard().get());
 
+        // Should be able to match a fully exact match
         pushKeys(SHOW_BOARD_PICKER);
         PlatformEx.waitOnFxThread();
         suggestedBoardList = findOrWaitFor(IdGenerator.getBoardPickerSuggestedBoardListReference());
