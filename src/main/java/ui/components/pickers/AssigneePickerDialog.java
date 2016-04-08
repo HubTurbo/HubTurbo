@@ -42,6 +42,7 @@ public class AssigneePickerDialog extends Dialog<AssigneePickerDialog.AssigneePi
         initUI();
         setupKeyEvents();
         fillTextFieldWithExistingAssignee();
+        Platform.runLater(() -> positionDialog(stage));
     }
 
     private void fillTextFieldWithExistingAssignee() {
@@ -58,6 +59,11 @@ public class AssigneePickerDialog extends Dialog<AssigneePickerDialog.AssigneePi
         textField.textProperty().addListener((observable, oldValue, newValue) -> {
             handleUpdatedInput(newValue);
         });
+    }
+
+    private final void positionDialog(Stage stage) {
+        setX(stage.getX() + stage.getWidth() / 2);
+        setY(stage.getY() + stage.getHeight() / 2 - getHeight() / 2);
     }
 
     private void handleUpdatedInput(String userInput) {
