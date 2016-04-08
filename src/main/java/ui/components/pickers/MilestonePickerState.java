@@ -105,15 +105,16 @@ public class MilestonePickerState {
      */
     private void populateBestMatchingMilestones(String querySentence) {
         bestMatchingMilestones.clear();
-        addMatchingMilestones(bestMatchingMilestones, getRemainingBestMatchesToLimit(),
-                                                      getSelectableMilestones(allMilestones));
+        List<PickerMilestone> selectableMilestones = getSelectableMilestones(allMilestones);
+
+        addMatchingMilestones(bestMatchingMilestones, getRemainingBestMatchesToLimit(), selectableMilestones);
         if (isMilestonesSizeBelowLimit(bestMatchingMilestones, BEST_MATCHING_LIMIT)) {
             addPartiallyMatchingMilestones(bestMatchingMilestones, getRemainingBestMatchesToLimit(), querySentence,
-                                           getSelectableMilestones(allMilestones));
+                                           selectableMilestones);
         }
         if (isMilestonesSizeBelowLimit(bestMatchingMilestones, BEST_MATCHING_LIMIT)) {
             addLikelyUnmatchedMilestones(bestMatchingMilestones, getRemainingBestMatchesToLimit(),
-                                         getSelectableMilestones(allMilestones));
+                                         selectableMilestones);
         }
     }
 
@@ -275,6 +276,12 @@ public class MilestonePickerState {
                 .findFirst();
     }
 
+    /**
+     * Returns the list of milestones that the user is allowed to select.
+     * A milestone is allowed for selection if it is not an existing milestone.
+     *
+     * @param milestones
+     */
     private List<PickerMilestone> getSelectableMilestones(List<PickerMilestone> milestones) {
         return milestones.stream()
                 .filter(milestone -> !milestone.isExisting())
