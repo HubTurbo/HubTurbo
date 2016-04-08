@@ -48,7 +48,7 @@ public class WrongLastViewedTest extends UITest {
     }
 
     @Test
-    public void wrongLastViewedTest() throws InterruptedException {
+    public void wrongLastViewedTest() {
         String title = TestController.getUI().getTitle();
         assertEquals("test2/test2 (none)", title);
     }

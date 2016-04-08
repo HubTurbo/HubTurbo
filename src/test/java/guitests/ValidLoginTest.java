@@ -20,7 +20,7 @@ public class ValidLoginTest extends UITest {
     }
 
     @Test
-    public void validLoginTest() throws InterruptedException {
+    public void validLoginTest() {
         TextField repoOwnerField = GuiTest.find(IdGenerator.getLoginDialogOwnerFieldIdReference());
         clickOn(repoOwnerField);
         selectAll();
