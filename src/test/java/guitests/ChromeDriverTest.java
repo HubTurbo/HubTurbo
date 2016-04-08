@@ -25,7 +25,6 @@ public class ChromeDriverTest extends UITest {
 
     private final List<String> urlsNavigated = new ArrayList<>();
     private final List<String> scriptsExecuted = new ArrayList<>();
-    private final List<String> keysSentToBrowser = new ArrayList<>();
     private boolean hasJumpedToComment = false;
 
     private final NavigateToPageEventHandler navToPageHandler = e -> urlsNavigated.add(e.url);
@@ -36,7 +35,6 @@ public class ChromeDriverTest extends UITest {
     public void prepare() {
         urlsNavigated.clear();
         scriptsExecuted.clear();
-        keysSentToBrowser.clear();
         hasJumpedToComment = false;
         UI.events.registerEvent(navToPageHandler);
         UI.events.registerEvent(execScriptHandler);
