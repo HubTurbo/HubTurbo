@@ -12,6 +12,7 @@ import javafx.scene.text.Font;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * This class handles the statuses and appearance of the milestones in MilestonePickerDialog
@@ -174,6 +175,18 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
         return milestoneList.stream()
                 .filter(PickerMilestone::isSelected)
                 .findAny();
+    }
+
+    /**
+     * Returns milestones that the user is allowed to select.
+     * A milestone is allowed for selection if it is not an existing milestone.
+     *
+     * @param milestones
+     */
+    public static List<PickerMilestone> getSelectableMilestones(List<PickerMilestone> milestones) {
+        return milestones.stream()
+                .filter(milestone -> !milestone.isExisting())
+                .collect(Collectors.toList());
     }
 
     private void setFadedInUI(Label milestone) {

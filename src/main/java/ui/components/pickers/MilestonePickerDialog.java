@@ -51,7 +51,7 @@ public class MilestonePickerDialog extends Dialog<MilestonePickerDialogResponse>
     }
 
     /**
-     * Fills the input field of milestone picker dialog with best suggested milestone's name
+     * Fills the input field of milestone picker dialog with suggested milestone's name
      */
     private void setInputFieldToSuggestedMilestone() {
         Optional<PickerMilestone> suggestedMilestone = state.getBestMatchingMilestones().stream()

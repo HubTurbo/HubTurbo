@@ -16,8 +16,8 @@ public class PickerMilestoneTest {
 
     private static final String REPO_ID = "test/testrepo";
 
-    private static List<PickerMilestone> listWithNoExistingAndSelected, listWithNoDefaultMilestone,
-            listWithExisting, listWithSelected, listWithNextMilestone, listWithMilestonesWithNoDueDates;
+    private static List<PickerMilestone> listWithNoExistingAndSelected, listWithExisting, listWithSelected,
+            listWithMilestonesWithNoDueDates;
     private static PickerMilestone noDueDateMilestone1, noDueDateMilestone2, openMilestone1, openMilestone2,
             closedMilestone, existingMilestone, selectedMilestone;
 
@@ -46,10 +46,6 @@ public class PickerMilestoneTest {
         listWithNoExistingAndSelected.add(openMilestone1);
         listWithNoExistingAndSelected.add(openMilestone2);
 
-        listWithNoDefaultMilestone = new ArrayList<>();
-        listWithNoDefaultMilestone.add(closedMilestone);
-        listWithNoDefaultMilestone.add(closedMilestone);
-
         listWithExisting = new ArrayList<>();
         listWithExisting.add(existingMilestone);
         listWithExisting.add(openMilestone1);
@@ -57,10 +53,6 @@ public class PickerMilestoneTest {
         listWithSelected = new ArrayList<>();
         listWithSelected.add(selectedMilestone);
         listWithSelected.add(openMilestone1);
-
-        listWithNextMilestone = new ArrayList<>();
-        listWithNextMilestone.add(openMilestone1);
-        listWithNextMilestone.add(closedMilestone);
 
         listWithMilestonesWithNoDueDates = new ArrayList<>();
         listWithMilestonesWithNoDueDates.add(noDueDateMilestone1);
@@ -85,5 +77,12 @@ public class PickerMilestoneTest {
     @Test
     public void getSelectedMilestone_haveSelectedMilestone_returnSelectedMilestone() {
         assertEquals(Optional.of(selectedMilestone), PickerMilestone.getSelectedMilestone(listWithSelected));
+    }
+
+    @Test
+    public void getSelectableMilestones_haveExistingMilestone_doesNotReturnExistingMilestone() {
+        List<PickerMilestone> selectableMilestones = PickerMilestone.getSelectableMilestones(listWithExisting);
+        assertEquals(listWithExisting.size() - 1, selectableMilestones.size());
+        assertEquals(openMilestone1, selectableMilestones.get(0));
     }
 }

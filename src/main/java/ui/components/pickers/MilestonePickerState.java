@@ -97,7 +97,7 @@ public class MilestonePickerState {
 
     /**
      * Populates bestMatchingMilestones with milestones from allMilestones that best match
-     * {@code querySentence}.
+     * {@code querySentence} and are not already assigned.
      *
      * The added milestones are references to the actual elements in allMilestones, and thus should not be
      * unnecessarily mutated.
@@ -105,7 +105,7 @@ public class MilestonePickerState {
      */
     private void populateBestMatchingMilestones(String querySentence) {
         bestMatchingMilestones.clear();
-        List<PickerMilestone> selectableMilestones = getSelectableMilestones(allMilestones);
+        List<PickerMilestone> selectableMilestones = PickerMilestone.getSelectableMilestones(allMilestones);
 
         addMatchingMilestones(bestMatchingMilestones, getRemainingBestMatchesToLimit(), selectableMilestones);
         if (isMilestonesSizeBelowLimit(bestMatchingMilestones, BEST_MATCHING_LIMIT)) {
@@ -274,18 +274,6 @@ public class MilestonePickerState {
         return milestones.stream()
                 .filter(milestone -> milestone.getTitle().equals(query))
                 .findFirst();
-    }
-
-    /**
-     * Returns the list of milestones that the user is allowed to select.
-     * A milestone is allowed for selection if it is not an existing milestone.
-     *
-     * @param milestones
-     */
-    private List<PickerMilestone> getSelectableMilestones(List<PickerMilestone> milestones) {
-        return milestones.stream()
-                .filter(milestone -> !milestone.isExisting())
-                .collect(Collectors.toList());
     }
 
     private boolean isMatchingQuery(PickerMilestone milestone, String query) {
