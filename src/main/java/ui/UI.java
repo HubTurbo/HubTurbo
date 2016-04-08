@@ -35,6 +35,7 @@ import ui.components.pickers.MilestonePicker;
 import ui.components.pickers.RepositoryPicker;
 import ui.issuepanel.PanelControl;
 import undo.UndoController;
+import updater.UpdateManager;
 import util.*;
 import util.events.*;
 import util.events.Event;
@@ -97,6 +98,7 @@ public class UI extends Application implements EventDispatcher {
     public GUIController guiController;
     private NotificationController notificationController;
     public UndoController undoController;
+    public UpdateManager updateManager;
 
 
     // Main UI elements
@@ -217,7 +219,7 @@ public class UI extends Application implements EventDispatcher {
     }
 
     private void initPreApplicationState() {
-        logger.info(Utility.version(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH));
+        logger.info(Version.getCurrentVersion().toString());
         UI.events = this;
 
         Thread.currentThread().setUncaughtExceptionHandler((thread, throwable) ->
@@ -235,6 +237,9 @@ public class UI extends Application implements EventDispatcher {
 
         uiManager = new UIManager(this);
         status = new HTStatusBar(this);
+
+        updateManager = TestController.createUpdateManager();
+        updateManager.run();
     }
 
     private void initApplicationState() {
@@ -310,6 +315,7 @@ public class UI extends Application implements EventDispatcher {
             panels.saveSession();
         }
         if (!TestController.isTestMode() || TestController.isCloseOnQuit()) {
+            updateManager.onAppQuit();
             Platform.exit();
             System.exit(0);
         }
@@ -545,7 +551,7 @@ public class UI extends Application implements EventDispatcher {
 
     public void updateTitle() {
         String openBoard = prefs.getLastOpenBoard().orElse("none");
-        String version = Utility.version(VERSION_MAJOR, VERSION_MINOR, VERSION_PATCH);
+        String version = Version.getCurrentVersion().toString();
         String title = String.format(WINDOW_TITLE, version, openBoard);
         mainStage.setTitle(title);
     }
@@ -603,5 +609,9 @@ public class UI extends Application implements EventDispatcher {
     private void showJavaRuntimeVersionNotCompatible(String javaRuntimeVersionString) {
         String message = String.format(ERROR_MSG_JAVA_RUNTIME_VERSION_PARSING, javaRuntimeVersionString);
         DialogMessage.showInformationDialog("Java version unknown", message);
+    }
+    
+    public void showUpdateProgressWindow() {
+        updateManager.showUpdateProgressWindow();
     }
 }

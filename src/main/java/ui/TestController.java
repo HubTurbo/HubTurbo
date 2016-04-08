@@ -7,6 +7,8 @@ import backend.json.JSONStoreStub;
 import backend.stub.DummySource;
 import javafx.application.Application;
 import prefs.Preferences;
+import updater.UpdateManager;
+import updater.UpdateManagerStub;
 
 import java.util.HashMap;
 import java.util.Optional;
@@ -158,5 +160,18 @@ public final class TestController {
     public static RepoIO createTestingRepoIO(Optional<JSONStore> jsonStoreToBeUsed) {
         return new RepoIO(Optional.of(new DummySource()), jsonStoreToBeUsed,
                           Optional.of(RepoStore.TEST_DIRECTORY));
+    }
+
+    /**
+     * Creates update manager if not in test mode, its stub otherwise.
+     * @return update manager to be used
+     */
+    public static UpdateManager createUpdateManager() {
+        if (isTestMode()) {
+            return new UpdateManagerStub();
+        } else {
+            UpdateProgressWindow updateProgressWindow = new UpdateProgressWindow();
+            return new UpdateManager(ui, updateProgressWindow);
+        }
     }
 }

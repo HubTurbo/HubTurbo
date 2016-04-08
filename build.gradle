@@ -194,6 +194,23 @@ tasks.coveralls {
     onlyIf { System.env.'CI' }
 }
 
+task compileJarUpdater(type: Jar) {
+    manifest{
+        attributes 'Implementation-Title': 'Jar Updater',
+                'Implementation-Version': '1.0',
+                'Main-Class': 'updater.JarUpdater'
+    }
+    archiveName = 'jarUpdater'
+    destinationDir = file('src/main/resources/updater')
+
+    with jar
+
+    from sourceSets.main.output
+    include('updater/JarUpdater.class')
+    include('updater/JarUpdaterFileHandler.class')
+    include('util/DialogMessage.class')
+}
+
 task wrapper(type: Wrapper) {
     gradleVersion = '2.4'
 }

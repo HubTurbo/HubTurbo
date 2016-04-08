@@ -14,7 +14,10 @@
     </Match>
 
     <Match>
-        <Class name="ui.UI"/>
+        <Or>
+            <Class name="ui.UI"/>
+            <Class name="updater.JarUpdater"/>
+        </Or>
         <Method name="quit" />
         <Bug pattern="DM_EXIT" />
     </Match>
