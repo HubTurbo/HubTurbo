@@ -6,13 +6,13 @@ jdk:
 env:
     - TERM=dumb _JAVA_OPTIONS="-Dheadless=true"
 
-# before_cache:
-#    - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+before_cache:
+    - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
 
-#cache:
-#  directories:
-#    - $HOME/.gradle/caches/
-#    - $HOME/.gradle/wrapper/
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
 
 script:
     - "./gradlew clean check -i"

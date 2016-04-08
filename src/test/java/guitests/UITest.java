@@ -20,7 +20,6 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-import javafx.scene.layout.FlowPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hamcrest.Matcher;
@@ -40,7 +39,6 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.ComboBoxBase;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
@@ -50,6 +48,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.FlowPane;
 import javafx.stage.Stage;
 import ui.IdGenerator;
 import ui.MenuControl;
@@ -75,7 +74,6 @@ public class UITest extends FxRobot {
      * as suggested by TestFX documentation
      */
     static {
-        System.setProperty("headless", "true");
         if (Boolean.getBoolean("headless")) {
             System.setProperty("java.awt.robot", "true");
             System.setProperty("testfx.robot", "glass");
@@ -389,6 +387,7 @@ public class UITest extends FxRobot {
      * @param panelIndex
      */
     public void clickFilterTextFieldAtPanel(int panelIndex) {
+        // Wait for a node to be associated with a scene to prevent NullPointerException
         sleep(EVENT_DELAY);
         TextField field = getFilterTextFieldAtPanel(panelIndex);
         clickOn(field);
