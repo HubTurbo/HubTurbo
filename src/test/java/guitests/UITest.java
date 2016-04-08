@@ -20,6 +20,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import javafx.scene.layout.FlowPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hamcrest.Matcher;
@@ -365,8 +366,8 @@ public class UITest extends FxRobot {
      * Clicks the assignee picker's TextField
      */
     public void clickAssigneePickerTextField() {
-        waitUntilNodeAppears(IdGenerator.getAssigneePickerFieldIdReference());
-        clickOn(IdGenerator.getAssigneePickerFieldIdReference());
+        waitUntilNodeAppears(IdGenerator.getAssigneePickerTextFieldIdReference());
+        clickOn(IdGenerator.getAssigneePickerTextFieldIdReference());
     }
 
     /**
@@ -387,7 +388,14 @@ public class UITest extends FxRobot {
      * Gets the assignee picker's TextField
      */
     public TextField getAssigneePickerTextField() {
-        return GuiTest.find(IdGenerator.getAssigneePickerFieldIdReference());
+        return GuiTest.find(IdGenerator.getAssigneePickerTextFieldIdReference());
+    }
+
+    /**
+     * Gets the assignee picker's AssignedUserPane
+     */
+    public FlowPane getAssigneePickerAssignedUserPane() {
+        return GuiTest.find(IdGenerator.getAssigneePickerAssignedUserPaneIdReference());
     }
 
     /**

@@ -12,6 +12,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import ui.IdGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -178,6 +179,7 @@ public class AssigneePickerDialog extends Dialog<AssigneePickerDialog.AssigneePi
         assignedUserPane.setHgap(3);
         assignedUserPane.setVgap(5);
         assignedUserPane.setStyle("-fx-border-radius: 3;");
+        assignedUserPane.setId(IdGenerator.getAssigneePickerAssignedUserPaneId());
         return assignedUserPane;
     }
 
