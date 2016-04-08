@@ -16,8 +16,6 @@ public class CollaboratorServiceEx extends CollaboratorService {
 
     private static final Logger logger = HTLog.get(PullRequestServiceEx.class);
 
-    private final UserService userService = new UserService();
-
     public CollaboratorServiceEx(GitHubClient client) {
         super(client);
     }
@@ -34,17 +32,18 @@ public class CollaboratorServiceEx extends CollaboratorService {
      */
     @Override
     public List<User> getCollaborators(IRepositoryIdProvider repository) throws IOException {
-        return getUsersCompleteData(super.getCollaborators(repository));
+        return getCompleteUserData(super.getCollaborators(repository));
     }
 
     /**
      * Gets the complete data for every user since most of GitHub APIs do not return users' complete data
      */
-    public List<User> getUsersCompleteData(List<User> users) {
+    public static List<User> getCompleteUserData(List<User> users) {
+        UserService service = new UserService();
         return users.stream()
                 .map(user -> {
                     try {
-                        return userService.getUser(user.getLogin());
+                        return service.getUser(user.getLogin());
                     } catch (IOException e) {
                         logger.warn("Unable to get full details for user " + user.getLogin());
                         return user;
