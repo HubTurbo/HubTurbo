@@ -119,18 +119,16 @@ public class MenuControl extends MenuBar {
     }
 
     /**
-     * Prompts a {@link BoardNameDialog} to ask the user for a new board name
+     * Prompts a {@link BoardNameDialog} to ask the user for a board name
      * @return the user's response
      */
     public final Optional<String> promptForBoardName() {
         BoardNameDialog dlg = new BoardNameDialog(prefs, mainStage);
-        Optional<String> response = dlg.showAndWait();
-
-        return response;
+        return dlg.showAndWait();
     }
 
     /**
-     * Logs the user action and creates a new board
+     * Creates a new board, prompt the user to save the current board if the current board is dirty.
      */
     private void onBoardNew() {
         logger.info("Menu: Boards > New");
@@ -157,7 +155,7 @@ public class MenuControl extends MenuBar {
     }
 
     /**
-     * Logs the user action and saves the current board
+     * Saves the current board
      */
     private void onBoardSave() {
         logger.info("Menu: Boards > Save");
@@ -187,7 +185,7 @@ public class MenuControl extends MenuBar {
     }
 
     /**
-     * Logs the user action and triggers "Save as" on the current board
+     * Triggers "Save as" on the current board
      */
     private void onBoardSaveAs() {
         logger.info("Menu: Boards > Save as");
@@ -195,7 +193,7 @@ public class MenuControl extends MenuBar {
     }
 
     /**
-     * Prompts for board name and save the current board as per the name
+     * Prompts for board name and saves the current board as per the name
      */
     public final void saveBoardAs() {
         Optional<String> response = promptForBoardName();
@@ -217,7 +215,7 @@ public class MenuControl extends MenuBar {
     }
 
     /**
-     * Logs the user action and opens the board that user requested
+     * Opens the board that user requested
      */
     private void onBoardOpen(String boardName, List<PanelInfo> panelInfos) {
         logger.info("Menu: Boards > Open > " + boardName);
@@ -244,7 +242,7 @@ public class MenuControl extends MenuBar {
     }
 
     /**
-     * Logs the user action and deletes the board that user requested
+     * Deletes the board that user requested
      */
     private void onBoardDelete(String boardName) {
         logger.info("Menu: Boards > Delete > " + boardName);

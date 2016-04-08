@@ -40,7 +40,7 @@ public class DialogMessageTests extends UITest {
     }
 
     @Test
-    public void showYesNoConfirmationDialogTest() throws ExecutionException, InterruptedException {
+    public void showYesNoConfirmationDialog_tryYesAndNo_getCorrectValue() throws ExecutionException, InterruptedException {
         FutureTask<Boolean> yesTask = new FutureTask<>(() ->
                 DialogMessage.showYesNoConfirmationDialog("Confirm", "Confirm Header", "Confirm Message", "yEs", "nO"));
         Platform.runLater(yesTask);
