@@ -13,11 +13,12 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.input.KeyCode;
 import ui.components.FilterTextField;
 import ui.listpanel.ListPanel;
+import ui.listpanel.ListPanelCell;
+import util.PlatformEx;
 
 public class ContextMenuTests extends UITest {
 
     private static final int EVENT_DELAY = 1000;
-    private static final int DIALOG_DELAY = 1500;
 
     private ListPanel issuePanel;
 
@@ -59,18 +60,17 @@ public class ContextMenuTests extends UITest {
      */
     @Test
     public void testMarkAsReadUnread() {
+        ListPanel listPanel = getPanel(0);
+
         clickIssue(0, 9);
-        rightClickIssue(0, 9);
-        sleep(EVENT_DELAY);
-        clickMenuItem("Mark as read (E)");
-        sleep(EVENT_DELAY);
+        traverseContextMenu(listPanel.getContextMenu(), "Mark as read (E)");
+        PlatformEx.waitOnFxThread(); // wait for traverseContextMenu's action to be carried out
+        PlatformEx.waitOnFxThread(); // wait for panel refresh caused by mark as read
         assertTrue(getIssueCell(0, 9).getIssue().isCurrentlyRead());
 
         clickIssue(0, 9);
-        rightClickIssue(0, 9);
-        sleep(EVENT_DELAY);
-        clickMenuItem("Mark as unread (U)");
-        sleep(EVENT_DELAY);
+        traverseContextMenu(listPanel.getContextMenu(), "Mark as unread (U)");
+        PlatformEx.waitOnFxThread();
         assertFalse(getIssueCell(0, 9).getIssue().isCurrentlyRead());
     }
 
@@ -79,13 +79,14 @@ public class ContextMenuTests extends UITest {
      */
     @Test
     public void testChangeLabels() {
-        clickIssue(0, 9);
-        rightClickIssue(0, 9);
-        sleep(EVENT_DELAY);
-        clickMenuItem("Change labels (L)");
-        sleep(DIALOG_DELAY);
+        ListPanel listPanel = getPanel(0);
 
-        assertNotNull(getLabelPickerTextField());
+        clickIssue(0, 9);
+
+        traverseContextMenu(listPanel.getContextMenu(), "Change labels (L)");
+        PlatformEx.waitOnFxThread();
+
+        assertNotNull(findOrWaitFor("#labelPickerTextField"));
 
         push(KeyCode.ESCAPE);
         sleep(EVENT_DELAY);
@@ -96,12 +97,13 @@ public class ContextMenuTests extends UITest {
      */
     @Test
     public void contextMenu_selectChangeMilestoneMenu_successful() {
-        rightClickIssue(0, 9);
-        sleep(EVENT_DELAY);
-        clickMenuItem("Change milestone (M)");
-        sleep(DIALOG_DELAY);
+        ListPanel listPanel = getPanel(0);
 
-        assertNotNull(getMilestonePickerTextField());
+        clickIssue(0, 9);
+        traverseContextMenu(listPanel.getContextMenu(), "Change milestone (M)");
+        PlatformEx.waitOnFxThread();
+
+        assertNotNull(findOrWaitFor("#milestonePickerTextField"));
 
         push(KeyCode.ESCAPE);
         sleep(EVENT_DELAY);
@@ -112,10 +114,11 @@ public class ContextMenuTests extends UITest {
      */
     @Test
     public void testCloseReopenIssue() {
-        rightClickIssue(0, 9);
-        sleep(EVENT_DELAY);
-        clickMenuItem("Close issue (C)");
-        sleep(EVENT_DELAY);
+        ListPanel listPanel = getPanel(0);
+
+        clickIssue(0, 9);
+        traverseContextMenu(listPanel.getContextMenu(), "Close issue (C)");
+        PlatformEx.waitOnFxThread();
         waitUntilNodeAppears("OK");
         clickOn("OK");
         sleep(EVENT_DELAY);
@@ -123,25 +126,15 @@ public class ContextMenuTests extends UITest {
         clickOn("Undo");
         sleep(EVENT_DELAY);
 
-        rightClickIssue(0, 6);
-        sleep(EVENT_DELAY);
-        clickMenuItem("Reopen issue (O)");
-        sleep(EVENT_DELAY);
+        clickIssue(0, 6);
+        traverseContextMenu(listPanel.getContextMenu(), "Reopen issue (O)");
+        PlatformEx.waitOnFxThread();
         waitUntilNodeAppears("OK");
         clickOn("OK");
         sleep(EVENT_DELAY);
         waitUntilNodeAppears("Undo");
         clickOn("Undo");
         sleep(EVENT_DELAY);
-    }
-
-    /**
-     * Clicks on menu item with target text
-     * @param menu
-     * @param target
-     */
-    private void clickMenuItem(String target) {
-        clickMenuItem(issuePanel.getContextMenu(), target);
     }
 
     /**

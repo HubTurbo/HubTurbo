@@ -47,22 +47,22 @@ public class PanelMenuCreatorTest extends UITest {
 
     @Test
     public void createPanelTest() {
-        traverseMenu("Panels", "Create");
+        traverseHubTurboMenu("Panels", "Create");
 
         waitAndAssertEquals(2, panelControl::getPanelCount);
         assertEquals(Optional.of(1), panelControl.getCurrentlySelectedPanel());
 
-        traverseMenu("Panels", "Create (Left)");
+        traverseHubTurboMenu("Panels", "Create (Left)");
         waitAndAssertEquals(3, panelControl::getPanelCount);
         assertEquals(Optional.of(0), panelControl.getCurrentlySelectedPanel());
 
-        traverseMenu("Panels", "Close");
-        traverseMenu("Panels", "Close");
+        traverseHubTurboMenu("Panels", "Close");
+        traverseHubTurboMenu("Panels", "Close");
     }
 
     private void customizedPanelMenuItemTest(String panelName, String panelFilter) {
         PlatformEx.waitOnFxThread();
-        traverseMenu("Panels", "Auto-create", panelName);
+        traverseHubTurboMenu("Panels", "Auto-create", panelName);
 
         waitAndAssertEquals(2, panelControl::getPanelCount);
         assertEquals(Optional.of(1), panelControl.getCurrentlySelectedPanel());
@@ -70,7 +70,7 @@ public class PanelMenuCreatorTest extends UITest {
         PanelInfo panelInfo = panelControl.getCurrentPanelInfos().get(1);
         waitAndAssertEquals(panelFilter, panelInfo::getPanelFilter);
         assertEquals(panelName, panelInfo.getPanelName());
-        traverseMenu("Panels", "Close");
+        traverseHubTurboMenu("Panels", "Close");
     }
 
 }
