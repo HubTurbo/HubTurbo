@@ -398,9 +398,8 @@ public class TurboIssue {
      * @return number of matches to a list of query
      */
     private int getNumberOfMatchingQuery(List<String> queries) {
-        return (int) queries.stream()
-            .filter(query -> Utility.containsIgnoreCase(getMatchableText(), query))
-            .count();
+        return Math.toIntExact(
+            queries.stream().filter(query -> Utility.containsIgnoreCase(getMatchableText(), query)).count());
     }
 
     /**

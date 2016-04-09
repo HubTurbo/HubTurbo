@@ -7,6 +7,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.eclipse.egit.github.core.Comment;
+
+import backend.resource.TurboIssue;
+import backend.resource.TurboMilestone;
+import backend.resource.TurboUser;
+import filter.expression.FilterExpression;
+import filter.expression.Qualifier;
+import github.TurboIssueEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -16,18 +24,9 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-
-import org.eclipse.egit.github.core.Comment;
-
 import ui.GuiElement;
 import ui.issuepanel.FilterPanel;
 import util.Utility;
-import backend.resource.TurboIssue;
-import backend.resource.TurboMilestone;
-import backend.resource.TurboUser;
-import filter.expression.FilterExpression;
-import filter.expression.Qualifier;
-import github.TurboIssueEvent;
 
 public class ListPanelCard extends VBox {
 
@@ -104,7 +103,7 @@ public class ListPanelCard extends VBox {
                 .filter(event -> {
                     LocalDateTime eventTime = Utility.longToLocalDateTime
                             (event.getDate().getTime());
-                    int hours = Utility.safeLongToInt(eventTime.until(now, ChronoUnit.HOURS));
+                    int hours = Math.toIntExact(eventTime.until(now, ChronoUnit.HOURS));
                     return hours < withinHours;
                 })
                 .collect(Collectors.toList());
@@ -112,7 +111,7 @@ public class ListPanelCard extends VBox {
         List<Comment> commentsWithinDuration = issue.getMetadata().getComments().stream()
                 .filter(comment -> {
                     LocalDateTime created = Utility.longToLocalDateTime(comment.getCreatedAt().getTime());
-                    int hours = Utility.safeLongToInt(created.until(now, ChronoUnit.HOURS));
+                    int hours = Math.toIntExact(created.until(now, ChronoUnit.HOURS));
                     return hours < withinHours;
                 })
                 .collect(Collectors.toList());
