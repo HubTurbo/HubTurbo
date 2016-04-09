@@ -28,7 +28,7 @@ public class ReplaceIssueMilestoneTask extends GitHubRepoTask<Boolean> {
         try {
             result = repo.setMilestone(repoId, issueId, issueTitle, issueMilestone);
         } catch (IOException e) {
-            response.completeExceptionally(e);
+            response.complete(false);
             return;
         }
 
