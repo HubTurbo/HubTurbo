@@ -1,14 +1,6 @@
 package backend.resource;
 
-import backend.IssueMetadata;
-import backend.resource.serialization.SerializableIssue;
-import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.Issue;
-import org.eclipse.egit.github.core.Label;
-import org.eclipse.egit.github.core.PullRequest;
-import prefs.Preferences;
-import util.HTLog;
-import util.Utility;
+import static util.Utility.replaceNull;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -17,7 +9,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static util.Utility.replaceNull;
+import org.apache.logging.log4j.Logger;
+import org.eclipse.egit.github.core.Issue;
+import org.eclipse.egit.github.core.Label;
+import org.eclipse.egit.github.core.PullRequest;
+
+import backend.IssueMetadata;
+import backend.resource.serialization.SerializableIssue;
+import prefs.Preferences;
+import util.HTLog;
+import util.Utility;
 
 /**
  * The guidelines in this class apply to all TurboResources.
@@ -370,7 +371,7 @@ public class TurboIssue {
 
     /**
      * Matching is done by matching all words separated by space in query
-     *
+     * Matched issues are sorted in descending order starting with issue with most number of matches with query
      * @param issues
      * @param query
      * @return list of issues that contains the query
@@ -378,7 +379,8 @@ public class TurboIssue {
     public static List<TurboIssue> getMatchedIssues(List<TurboIssue> issues, String query) {
         List<String> queries = Arrays.asList(query.split("\\s"));
         return issues.stream()
-                .filter(i -> Utility.containsIgnoreCase(i.getTitle() + " " + i.getId(), queries))
+                .filter(i -> Utility.containsIgnoreCase(i.getMatchableText(), queries))
+                .sorted((i1, i2) -> i2.getNumberOfMatchingQuery(queries) - i1.getNumberOfMatchingQuery(queries))
                 .collect(Collectors.toList());
     }
 
@@ -389,6 +391,23 @@ public class TurboIssue {
      */
     public static Optional<TurboIssue> getFirstMatchingIssue(List<TurboIssue> issues, String query) {
         return getMatchedIssues(issues, query).stream().findFirst();
+    }
+
+    /**
+     * @param queries
+     * @return number of matches to a list of query
+     */
+    private int getNumberOfMatchingQuery(List<String> queries) {
+        return (int) queries.stream()
+            .filter(query -> Utility.containsIgnoreCase(getMatchableText(), query))
+            .count();
+    }
+
+    /**
+     * @return string that can be matched by any query
+     */
+    private String getMatchableText() {
+        return getTitle() + " " + getId();
     }
 
     @SuppressWarnings("unused")
@@ -466,7 +485,7 @@ public class TurboIssue {
 
     public void setAssignee(String assignee) {
         this.assignee = Optional.ofNullable(assignee);
-        this.assigneeLastModifiedAt = Optional.of(LocalDateTime.now()); 
+        this.assigneeLastModifiedAt = Optional.of(LocalDateTime.now());
     }
 
     public void removeAssignee() {
