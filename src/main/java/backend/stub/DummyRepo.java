@@ -180,7 +180,7 @@ public class DummyRepo implements Repo {
     }
 
     @Override
-    public List<Label> setLabels(String repoId, int issueId, List<String> labels) {
+    public List<Label> setLabels(String repoId, int issueId, List<String> labels) throws IOException {
         return getRepoState(repoId).setLabels(issueId, labels);
     }
 

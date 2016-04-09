@@ -9,9 +9,11 @@ import github.IssueEventType;
 import github.TurboIssueEvent;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.*;
+import util.HTLog;
 
-
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -39,6 +41,8 @@ public class DummyRepoState {
     // We keep track of issues that user has not gotten metadata from.
     private final HashSet<Integer> updatedEvents = new HashSet<>();
     private final HashSet<Integer> updatedComments = new HashSet<>();
+
+    private static final Logger logger = HTLog.get(DummyRepoState.class);
 
     public DummyRepoState(String repoId) {
         this.dummyRepoId = repoId;
@@ -83,6 +87,7 @@ public class DummyRepoState {
         labels.put("p.high", new TurboLabel(dummyRepoId, "p.high"));
         labels.put("type.story", new TurboLabel(dummyRepoId, "type.story"));
         labels.put("type.research", new TurboLabel(dummyRepoId, "type.research"));
+        labels.put("exception", new TurboLabel(dummyRepoId, "exception")); // Label that causes an exception when set
 
         // set milestones for testing milestone alias
         milestones.get(1).setDueDate(Optional.of(LocalDate.now().minusMonths(3)));
@@ -154,17 +159,21 @@ public class DummyRepoState {
         updatedEvents.add(10);
 
         // Then set label 3 and 11 for issue 8, and immediately remove label 11
-        String[] oldLabels = { "Label 3", "Label 11" };
-        String[] newLabels = { "Label 3" };
-        setLabels(8, Arrays.asList(oldLabels));
-        setLabels(8, Arrays.asList(newLabels));
-        // Then put a temporary (colourful) label into the repo
-        labels.put("Deleted", new TurboLabel(dummyRepoId, "84b6eb", "Deleted"));
-        String[] issue9Labels = { "Label 1" };
-        String[] deletedLabels = { "Label 1", "Deleted" };
-        setLabels(9, Arrays.asList(deletedLabels)); // add and unset it immediately on issue 9
-        setLabels(9, Arrays.asList(issue9Labels));
-        labels.remove("Deleted"); // Then remove this label. The labeling events should still display the color.
+        try {
+            String[] oldLabels = {"Label 3", "Label 11"};
+            String[] newLabels = {"Label 3"};
+            setLabels(8, Arrays.asList(oldLabels));
+            setLabels(8, Arrays.asList(newLabels));
+            // Then put a temporary (colourful) label into the repo
+            labels.put("Deleted", new TurboLabel(dummyRepoId, "84b6eb", "Deleted"));
+            String[] issue9Labels = {"Label 1"};
+            String[] deletedLabels = {"Label 1", "Deleted"};
+            setLabels(9, Arrays.asList(deletedLabels)); // add and unset it immediately on issue 9
+            setLabels(9, Arrays.asList(issue9Labels));
+            labels.remove("Deleted"); // Then remove this label. The labeling events should still display the color.
+        } catch (IOException e) {
+            logger.error("Should not set exception label to any issue here");
+        }
     }
 
     protected ImmutableTriple<List<TurboIssue>, String, Date> getUpdatedIssues(String eTag, Date lastCheckTime) {
@@ -387,7 +396,10 @@ public class DummyRepoState {
         return users.remove(idString);
     }
 
-    protected final List<Label> setLabels(int issueId, List<String> newLabels) {
+    protected final List<Label> setLabels(int issueId, List<String> newLabels) throws IOException {
+        if (newLabels.contains("exception")) {
+            throw new IOException("Exception label was set");
+        }
         // Get copies of issue itself and its metadata
         ImmutablePair<TurboIssue, IssueMetadata> mutables = produceMutables(issueId);
         TurboIssue toSet = mutables.getLeft();

@@ -2,7 +2,6 @@ package backend.github;
 
 import backend.interfaces.Repo;
 import backend.interfaces.TaskRunner;
-import org.eclipse.egit.github.core.Issue;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -28,7 +27,7 @@ public class ReplaceIssueMilestoneTask extends GitHubRepoTask<Boolean> {
         try {
             result = repo.setMilestone(repoId, issueId, issueTitle, issueMilestone);
         } catch (IOException e) {
-            response.complete(false);
+            response.completeExceptionally(e);
             return;
         }
 
