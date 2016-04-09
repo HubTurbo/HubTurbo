@@ -323,6 +323,10 @@ public class MenuControl extends MenuBar {
         }
     }
 
+    public void switchBoard(String name) {
+        onBoardOpen(name, prefs.getBoardPanels(name));
+    }
+
     private MenuItem createDocumentationMenuItem() {
         MenuItem documentationMenuItem = new MenuItem("Documentation");
         documentationMenuItem.setOnAction((e) -> {

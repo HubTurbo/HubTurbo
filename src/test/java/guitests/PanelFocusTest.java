@@ -20,6 +20,7 @@ import prefs.Preferences;
 import ui.IdGenerator;
 import ui.TestController;
 import ui.issuepanel.PanelControl;
+import util.PlatformEx;
 
 public class PanelFocusTest extends UITest {
 
@@ -113,10 +114,8 @@ public class PanelFocusTest extends UITest {
          */
         // Setup:
         // 1. Save a board
-        clickOn("Boards");
-        pushKeys(KeyCode.DOWN);
-        pushKeys(KeyCode.DOWN);
-        pushKeys(KeyCode.ENTER);
+        traverseMenu("Boards", "Save as");
+        PlatformEx.waitOnFxThread();
         ((TextField) GuiTest.find(IdGenerator.getBoardNameInputFieldIdReference())).setText("Board 1");
         clickOn("OK");
         awaitCondition(() -> 1 == panelControl.getNumberOfSavedBoards());

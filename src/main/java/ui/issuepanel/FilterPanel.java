@@ -1,11 +1,5 @@
 package ui.issuepanel;
 
-import static ui.components.KeyboardShortcuts.DEFAULT_SIZE_WINDOW;
-import static ui.components.KeyboardShortcuts.JUMP_TO_FILTER_BOX;
-import static ui.components.KeyboardShortcuts.MAXIMIZE_WINDOW;
-import static ui.components.KeyboardShortcuts.MINIMIZE_WINDOW;
-import static ui.components.KeyboardShortcuts.SWITCH_BOARD;
-
 import javafx.application.Platform;
 import ui.*;
 import ui.components.PanelMenuBar;
@@ -27,6 +21,8 @@ import util.events.testevents.UIComponentFocusEvent;
 import prefs.PanelInfo;
 
 import java.util.List;
+
+import static ui.components.KeyboardShortcuts.*;
 
 /**
  * A FilterPanel is an AbstractPanel meant for containing issues and an accompanying filter text field,
@@ -75,6 +71,8 @@ public abstract class FilterPanel extends AbstractPanel {
                 ui.setDefaultWidth();
             } else if (SWITCH_BOARD.match(event)) {
                 ui.getMenuControl().switchBoard();
+            } else if (SHOW_BOARD_PICKER.match(event)) {
+                ui.triggerEvent(new ShowBoardPickerEvent(UI.prefs.getAllBoardNames()));
             } else if (JUMP_TO_FILTER_BOX.match(event)) {
                 setFocusToFilterBox();
             }
