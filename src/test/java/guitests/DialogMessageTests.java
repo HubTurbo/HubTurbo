@@ -40,21 +40,24 @@ public class DialogMessageTests extends UITest {
     }
 
     @Test
-    public void showYesNoConfirmationDialog_tryYesAndNo_getCorrectValue() throws ExecutionException, InterruptedException {
+    public void showYesNoConfirmationDialog_tryYesAndNo_getCorrectValue()
+            throws ExecutionException, InterruptedException {
+
         FutureTask<Boolean> yesTask = new FutureTask<>(() ->
-                DialogMessage.showYesNoConfirmationDialog("Confirm", "Confirm Header", "Confirm Message", "yEs", "nO"));
+                DialogMessage.showYesNoConfirmationDialog("Confirm", "Confirm Header", "Confirm Message", "yes", "no"));
         Platform.runLater(yesTask);
         waitUntilNodeAppears(hasText("Confirm Header"));
         assertNodeExists(hasText("Confirm Header"));
-        clickOn("yEs");
+        clickOn("yes");
         assertEquals(true, yesTask.get());
 
         FutureTask<Boolean> noTask = new FutureTask<>(() ->
-                DialogMessage.showYesNoWarningDialog("Confirm", "Confirm Header", "Confirm Message", "yEs", "nO"));
+                DialogMessage.showYesNoWarningDialog("Confirm", "Confirm Header", "Confirm Message",
+                                                     "Non-Standard-Yes", "Non-Standard-No"));
         Platform.runLater(noTask);
         waitUntilNodeAppears(hasText("Confirm Message"));
         assertNodeExists(hasText("Confirm Message"));
-        clickOn("nO");
+        clickOn("Non-Standard-No");
         assertEquals(false, noTask.get());
     }
 
