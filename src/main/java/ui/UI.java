@@ -209,7 +209,7 @@ public class UI extends Application implements EventDispatcher {
         new LabelPicker(this, mainStage);
         new MilestonePicker(this, mainStage);
         new IssuePicker(this, mainStage);
-        new RepositoryPicker(this, mainStage, this::primaryRepoChanged);
+        new RepositoryPicker(this, this::primaryRepoChanged);
         new AssigneePicker(this, mainStage);
         new BoardPicker(this, mainStage);
     }

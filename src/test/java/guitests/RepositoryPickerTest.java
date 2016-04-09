@@ -1,26 +1,25 @@
 package guitests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
+import static ui.components.pickers.PickerRepository.COMMON_REPO_LABEL_STYLE;
+import static ui.components.pickers.PickerRepository.SELECTED_REPO_LABEL_STYLE;
 
 import java.io.File;
 import java.util.concurrent.TimeoutException;
 
+import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.junit.Test;
 import org.testfx.api.FxToolkit;
 
-import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.VBox;
 import prefs.Preferences;
 import ui.IdGenerator;
 import ui.TestController;
 import ui.UI;
-import ui.components.pickers.PickerRepository;
 import ui.listpanel.ListPanel;
 import util.PlatformEx;
 import util.events.testevents.PrimaryRepoChangedEventHandler;
@@ -86,11 +85,14 @@ public class RepositoryPickerTest extends UITest {
         traverseMenu("Repos", "Show Repository Picker");
         PlatformEx.waitOnFxThread();
         userInputField = findOrWaitFor(IdGenerator.getRepositoryPickerTextFieldReference());
+        clickOn("Add repository");
+        type("dummy3/dummy3");
+        push(KeyCode.ENTER);
+        PlatformEx.waitOnFxThread();
         doubleClickOn(userInputField);
         doubleClickOn();
         type("dummy3/dummy3");
         push(KeyCode.ENTER);
-        PlatformEx.waitOnFxThread();
         traverseMenu("Repos", "Show Repository Picker");
         PlatformEx.waitOnFxThread();
         suggestedRepositoryList = findOrWaitFor(IdGenerator.getRepositoryPickerSuggestedRepoListReference());
@@ -105,22 +107,19 @@ public class RepositoryPickerTest extends UITest {
         userInputField = findOrWaitFor(IdGenerator.getRepositoryPickerTextFieldReference());
         clickOn(userInputField);
         type("dummy");
-        assertEquals(4, suggestedRepositoryList.getChildren().size());
-        assertSelectedPickerRepositoryNode("dummy", suggestedRepositoryList.getChildren().get(0));
+        assertEquals(3, suggestedRepositoryList.getChildren().size());
+        assertSelectedPickerRepositoryNode("dummy/dummy", suggestedRepositoryList.getChildren().get(0));
         push(KeyCode.DOWN);
-        assertSelectedPickerRepositoryNode("dummy/dummy", suggestedRepositoryList.getChildren().get(1));
+        assertSelectedPickerRepositoryNode("dummy2/dummy2", suggestedRepositoryList.getChildren().get(1));
         push(KeyCode.DOWN);
-        assertSelectedPickerRepositoryNode("dummy2/dummy2", suggestedRepositoryList.getChildren().get(2));
+        assertSelectedPickerRepositoryNode("dummy3/dummy3", suggestedRepositoryList.getChildren().get(2));
         push(KeyCode.DOWN);
-        assertSelectedPickerRepositoryNode("dummy3/dummy3", suggestedRepositoryList.getChildren().get(3));
-        push(KeyCode.DOWN);
-        assertSelectedPickerRepositoryNode("dummy", suggestedRepositoryList.getChildren().get(0));
+        assertSelectedPickerRepositoryNode("dummy/dummy", suggestedRepositoryList.getChildren().get(0));
         push(KeyCode.UP);
-        assertSelectedPickerRepositoryNode("dummy3/dummy3", suggestedRepositoryList.getChildren().get(3));
+        assertSelectedPickerRepositoryNode("dummy3/dummy3", suggestedRepositoryList.getChildren().get(2));
         doubleClickOn(userInputField);
         type("dummmy");
-        assertEquals(1, suggestedRepositoryList.getChildren().size());
-        assertSelectedPickerRepositoryNode("dummmy", suggestedRepositoryList.getChildren().get(0));
+        assertEquals(0, suggestedRepositoryList.getChildren().size());
         push(KeyCode.ESCAPE);
 
         // we check that the new repo created from user input is not selected anymore upon click
@@ -130,9 +129,9 @@ public class RepositoryPickerTest extends UITest {
         doubleClickOn(userInputField);
         type("d");
         suggestedRepositoryList = findOrWaitFor(IdGenerator.getRepositoryPickerSuggestedRepoListReference());
-        assertEquals(4, suggestedRepositoryList.getChildren().size());
+        assertEquals(3, suggestedRepositoryList.getChildren().size());
         clickOn("dummy2/dummy2");
-        assertEquals(4, suggestedRepositoryList.getChildren().size());
+        assertEquals(3, suggestedRepositoryList.getChildren().size());
         assertTrue(userInputField.isDisabled());
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
@@ -141,6 +140,10 @@ public class RepositoryPickerTest extends UITest {
         // we check if repo's id with white spaces are handled correctly
         traverseMenu("Repos", "Show Repository Picker");
         PlatformEx.waitOnFxThread();
+        waitUntilNodeAppears("Add repository");
+        clickOn("Add repository");
+        type(" dummy4 / dummy4 ");
+        push(KeyCode.ENTER);
         userInputField = findOrWaitFor(IdGenerator.getRepositoryPickerTextFieldReference());
         doubleClickOn(userInputField);
         doubleClickOn();
@@ -201,6 +204,6 @@ public class RepositoryPickerTest extends UITest {
     private void assertSelectedPickerRepositoryNode(String repoId, Node node) {
         assertTrue(node instanceof Label);
         assertEquals(repoId, ((Label) node).getText());
-        assertEquals(PickerRepository.SELECTED_REPO_LABEL_STYLE, node.getStyle());
+        assertEquals(COMMON_REPO_LABEL_STYLE + SELECTED_REPO_LABEL_STYLE, node.getStyle());
     }
 }
