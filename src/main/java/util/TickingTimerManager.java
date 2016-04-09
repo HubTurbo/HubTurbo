@@ -35,6 +35,18 @@ public class TickingTimerManager {
 
     /**
      * Computes the TickerTimer period that are used for refreshing the issues periodically.
+     * The refresh rate is computed based on the three input argument and constant APIQUOTA_BUFFER.
+     * APIQUOTA_BUFFER is the amount that is reserved for manual refresh and creation of label, issue and milestone.
+     * This amount is then deducted from the actual apiQuota to ensure the algorithm reserve this amount.
+     * The calculation has 2 steps.
+     * The first step, the offset amount(apiQuota - APIQUOTA_BUFFER) is divided by the amount
+     * of api used during the last refresh. This amount corresponds to the estimated no of refresh allowed to use till
+     * the next apiQuota renewal.
+     * Second, the refresh rate is calculated by dividing the remainingTime by the estimated no of refresh allowed.
+     *
+     * For some case where the refresh rate is equal to the remainingTime till next apiQuota renewal. BUFFER_TIME
+     * is added to ensure that the next refresh happens after the apiQuota renewal.
+     *
      * @param apiQuota         : The remaining allowed api request until the next api request allowance renewal.
      * @param remainingTime    : The remaining time left until the next api request allowance renewal.
      * @param lastApiCallsUsed : The amount of api used in the last api pull.
@@ -45,7 +57,8 @@ public class TickingTimerManager {
 
         long refreshTimeInMin;
 
-        if (isDuringAppInitOrRemainingTimeIsZero(apiQuota, remainingTime, lastApiCallsUsed)) {
+        boolean isDuringAppInit = apiQuota != 0 && lastApiCallsUsed == 0;
+        if (isDuringAppInit || remainingTime == 0) {
             refreshTimeInMin = Utility.secsToMins(DEFAULT_REFRESH_PERIOD_IN_SEC);
             return refreshTimeInMin;
         }
@@ -53,9 +66,7 @@ public class TickingTimerManager {
         if (isQuotaInsufficient(apiQuota, lastApiCallsUsed)) {
             refreshTimeInMin = remainingTime + BUFFER_TIME;
             return refreshTimeInMin;
-        }
-
-        if (isQuotaSufficient(apiQuota, lastApiCallsUsed)) {
+        } else {
             double noOfRefreshAllowed = computeNoOfRefreshAllowed(apiQuota, lastApiCallsUsed);
             refreshTimeInMin = (long) Math.ceil(remainingTime / noOfRefreshAllowed);
 
@@ -64,8 +75,6 @@ public class TickingTimerManager {
             }
             return refreshTimeInMin;
         }
-
-        return Utility.secsToMins(DEFAULT_REFRESH_PERIOD_IN_SEC);
     }
 
     private double computeNoOfRefreshAllowed(int apiQuota, int lastApiCallsUsed) {
@@ -80,16 +89,12 @@ public class TickingTimerManager {
         timer.changePeriodInSecs((int) Utility.minsToSecs(period));
     }
 
-    private boolean isQuotaSufficient(int apiQuota, int lastApiCallsUsed) {
-        return apiQuota - APIQUOTA_BUFFER >= lastApiCallsUsed;
-    }
-
     private boolean isQuotaInsufficient(int apiQuota, int lastApiCallsUsed) {
-        return apiQuota == 0 && lastApiCallsUsed == 0 || apiQuota <= APIQUOTA_BUFFER
-                || apiQuota - APIQUOTA_BUFFER > 0 && apiQuota - APIQUOTA_BUFFER < lastApiCallsUsed;
-    }
+        boolean outOfQuota = apiQuota == 0 && lastApiCallsUsed == 0;
+        boolean apiQuotaBelowBufferAllowance = apiQuota <= APIQUOTA_BUFFER;
+        boolean offsetQuotaLessThanLastApiCallsUsed = apiQuota - APIQUOTA_BUFFER > 0
+                                                      && apiQuota - APIQUOTA_BUFFER < lastApiCallsUsed;
 
-    private boolean isDuringAppInitOrRemainingTimeIsZero(int apiQuota, long remainingTime, int lastApiCallsUsed) {
-        return apiQuota != 0 && lastApiCallsUsed == 0 || remainingTime == 0;
+        return outOfQuota || apiQuotaBelowBufferAllowance || offsetQuotaLessThanLastApiCallsUsed;
     }
 }
