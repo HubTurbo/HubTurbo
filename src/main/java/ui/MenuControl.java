@@ -105,7 +105,7 @@ public class MenuControl extends MenuBar {
      *
      * @return true if user choose to save, false otherwise
      */
-    public final boolean promptToSaveCurrentBoard() {
+    public final boolean isUserAgreeableToSavingBorad() {
         return DialogMessage.showYesNoConfirmationDialog("Save Changes?",
                 "All unsaved changes will be discarded.",
                 "Do you want to save them?",
@@ -128,13 +128,7 @@ public class MenuControl extends MenuBar {
     private void onBoardNew() {
         logger.info("Menu: Boards > New");
 
-        boolean shouldSave = false;
-
-        if (isCurrentBoardDirty()) {
-            shouldSave = promptToSaveCurrentBoard();
-        }
-
-        if (shouldSave) {
+        if (isCurrentBoardDirty() && isUserAgreeableToSavingBorad()) {
             saveBoard();
 
             logger.info("Changes to the current board saved.");
