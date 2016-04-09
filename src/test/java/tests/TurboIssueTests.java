@@ -1,18 +1,26 @@
 package tests;
 
-import backend.resource.TurboIssue;
-import backend.resource.TurboLabel;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.Label;
 import org.eclipse.egit.github.core.PullRequest;
 import org.eclipse.egit.github.core.User;
 import org.junit.Test;
+
+import backend.resource.TurboIssue;
+import backend.resource.TurboLabel;
 import util.Utility;
-
-import java.time.LocalDateTime;
-import java.util.*;
-
-import static org.junit.Assert.*;
 
 public class TurboIssueTests {
 
@@ -195,5 +203,21 @@ public class TurboIssueTests {
         List<TurboIssue> updatedList = TurboIssue.reconcile(Arrays.asList(originalIssue),
                                                             Arrays.asList(updatedIssue));
         assertEquals(originalLabels, updatedList.get(0).getLabels());
+    }
+
+    /**
+     * Checks that matched issues are sorted according to number of query match
+     */
+    @Test
+    public void getMatchedIssues_issuesWithDifferentMatches() {
+        TurboIssue issue1 = new TurboIssue("dummy/dummy", 1, "matches some");
+        TurboIssue issue2 = new TurboIssue("dummy/dummy", 2, "matches every query");
+        TurboIssue issue3 = new TurboIssue("dummy/dummy", 3, "matches");
+
+        List<TurboIssue> matchedIssues = TurboIssue.getMatchedIssues(
+            Arrays.asList(issue1, issue2, issue3), "matches every some query");
+
+        assertEquals(Arrays.asList(issue2, issue1, issue3), matchedIssues);
+
     }
 }
