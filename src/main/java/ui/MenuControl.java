@@ -102,24 +102,19 @@ public class MenuControl extends MenuBar {
 
     /**
      * Prompts a dialog to ask the user whether or not to save the current board.
+     *
+     * @return true if user choose to save, false otherwise
      */
-    public final void promptToSaveCurrentBoard() {
-        boolean shouldSave = DialogMessage.showYesNoConfirmationDialog("Save Changes?",
+    public final boolean promptToSaveCurrentBoard() {
+        return DialogMessage.showYesNoConfirmationDialog("Save Changes?",
                 "All unsaved changes will be discarded.",
                 "Do you want to save them?",
                 "Yes", "No");
-
-        if (!shouldSave) {
-            logger.info("User abandoned unsaved changes.");
-            return;
-        }
-
-        saveBoard();
-        logger.info("Changes to the current board saved.");
     }
 
     /**
      * Prompts a {@link BoardNameDialog} to ask the user for a board name
+     *
      * @return the user's response
      */
     public final Optional<String> promptForBoardName() {
@@ -133,8 +128,18 @@ public class MenuControl extends MenuBar {
     private void onBoardNew() {
         logger.info("Menu: Boards > New");
 
+        boolean shouldSave = false;
+
         if (isCurrentBoardDirty()) {
-            promptToSaveCurrentBoard();
+            shouldSave = promptToSaveCurrentBoard();
+        }
+
+        if (shouldSave) {
+            saveBoard();
+
+            logger.info("Changes to the current board saved.");
+        } else {
+            logger.info("User abandoned unsaved changes.");
         }
 
         newBoard();
