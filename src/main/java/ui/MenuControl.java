@@ -218,6 +218,15 @@ public class MenuControl extends MenuBar {
      */
     private void onBoardOpen(String boardName, List<PanelInfo> panelInfos) {
         logger.info("Menu: Boards > Open > " + boardName);
+
+        if (isCurrentBoardDirty() && isUserAgreeableToSavingBorad()) {
+            saveBoard();
+
+            logger.info("Changes to the current board saved.");
+        } else {
+            logger.info("User abandoned unsaved changes.");
+        }
+
         openBoard(boardName, panelInfos);
     }
 
@@ -317,9 +326,9 @@ public class MenuControl extends MenuBar {
     }
 
     public void switchBoard() {
-        Optional<String> name = prefs.switchBoard();
+        Optional<String> name = prefs.getNextBoardName();
         if (name.isPresent()) {
-            onBoardOpen(name.get(), prefs.getBoardPanels(name.get()));
+            switchBoard(name.get());
         }
     }
 

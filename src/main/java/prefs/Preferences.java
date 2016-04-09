@@ -214,18 +214,23 @@ public class Preferences { // NOPMD
     }
 
     /**
-     * Switches the board to the next one. Cycles through the boards one at a time.
-     * @return The new board selected
+     * Finds the next board in the list of boards. Circles through the boards one at a time.
+     * If {@code lastOpenBoard} exists, it will look for the board next to it.
+     * Otherwise it will just return the first board on the list.
+     *
+     * @return name of the next board
      */
-    public Optional<String> switchBoard() {
-        if (getLastOpenBoard().isPresent() && getAllBoards().size() > 1) {
-            List<String> boardNames = getAllBoardNames();
-            int lastBoard = boardNames.indexOf(getLastOpenBoard().get());
-            int index = (lastBoard + 1) % boardNames.size();
-            
-            setLastOpenBoard(boardNames.get(index));
+    public Optional<String> getNextBoardName() {
+        List<String> boardNames = getAllBoardNames();
+
+        if (boardNames.isEmpty()) {
+            return Optional.empty();
         }
-        return getLastOpenBoard();
+
+        int currentIndex = getLastOpenBoard().isPresent() ? boardNames.indexOf(getLastOpenBoard().get()) : -1;
+        int nextIndex = (currentIndex + 1) % boardNames.size();
+
+        return Optional.of(boardNames.get(nextIndex));
     }
 
     public void clearLastOpenBoard() {
