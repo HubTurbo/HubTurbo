@@ -89,7 +89,7 @@ public class ListPanel extends FilterPanel {
     private static final String CHANGE_ASSIGNEE_MENU_ITEM_TEXT = "Change Assignee (A)";
 
     private final MenuItem closeReopenIssueMenuItem = new MenuItem();
-    private static final String closeIssueMenuItemText = "Close issue (C)";
+    private static final String closeIssueMenuItemText = "Close issue (X)";
     private static final String reopenIssueMenuItemText = "Reopen issue (O)";
 
     public ListPanel(UI ui, Stage mainStage, PanelControl parentPanelControl, int panelIndex) {
