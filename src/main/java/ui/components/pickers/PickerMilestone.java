@@ -12,6 +12,7 @@ import javafx.scene.text.Font;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * This class handles the statuses and appearance of the milestones in MilestonePickerDialog
@@ -177,32 +178,15 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
     }
 
     /**
-     * Gets the default milestone from the sortedMilestoneList
-     * If there is an existing milestone, default milestone is the existing milestone
-     * Else it is the first open milestone that is not overdue
-     * Precondition: sortedMilestoneList needs to be sorted in its natural order
+     * Returns milestones that the user is allowed to select.
+     * A milestone is allowed for selection if it is not an existing milestone.
      *
-     * @param sortedMilestoneList
-     * @return Optional of default milestone
+     * @param milestones
      */
-    public static Optional<PickerMilestone> getDefaultMilestone(List<PickerMilestone> sortedMilestoneList) {
-        return PickerMilestone.getExistingMilestone(sortedMilestoneList)
-                .map(Optional::of)
-                .orElse(PickerMilestone.getNextOpenMilestone(sortedMilestoneList));
-
-    }
-
-    /**
-     * Gets the the first PickerMilestone that is open and not overdue from the sortedMilestoneList
-     * Precondition: sortedMilestoneList needs to be sorted in its natural order
-     *
-     * @param sortedMilestoneList
-     * @return Optional of first PickerMilestone that is open and not overdue
-     */
-    private static Optional<PickerMilestone> getNextOpenMilestone(List<PickerMilestone> sortedMilestoneList) {
-        return sortedMilestoneList.stream()
-                .filter(milestone -> !milestone.isOverdue() && milestone.isOpen())
-                .findFirst();
+    public static List<PickerMilestone> getSelectableMilestones(List<PickerMilestone> milestones) {
+        return milestones.stream()
+                .filter(milestone -> !milestone.isExisting())
+                .collect(Collectors.toList());
     }
 
     private void setFadedInUI(Label milestone) {

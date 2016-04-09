@@ -97,7 +97,7 @@ public class MilestonePickerState {
 
     /**
      * Populates bestMatchingMilestones with milestones from allMilestones that best match
-     * {@code querySentence}.
+     * {@code querySentence} and are not already assigned.
      *
      * The added milestones are references to the actual elements in allMilestones, and thus should not be
      * unnecessarily mutated.
@@ -105,13 +105,16 @@ public class MilestonePickerState {
      */
     private void populateBestMatchingMilestones(String querySentence) {
         bestMatchingMilestones.clear();
-        addMatchingMilestones(bestMatchingMilestones, getRemainingBestMatchesToLimit(), allMilestones);
+        List<PickerMilestone> selectableMilestones = PickerMilestone.getSelectableMilestones(allMilestones);
+
+        addMatchingMilestones(bestMatchingMilestones, getRemainingBestMatchesToLimit(), selectableMilestones);
         if (isMilestonesSizeBelowLimit(bestMatchingMilestones, BEST_MATCHING_LIMIT)) {
             addPartiallyMatchingMilestones(bestMatchingMilestones, getRemainingBestMatchesToLimit(), querySentence,
-                                            allMilestones);
+                                           selectableMilestones);
         }
         if (isMilestonesSizeBelowLimit(bestMatchingMilestones, BEST_MATCHING_LIMIT)) {
-            addLikelyUnmatchedMilestones(bestMatchingMilestones, getRemainingBestMatchesToLimit(), allMilestones);
+            addLikelyUnmatchedMilestones(bestMatchingMilestones, getRemainingBestMatchesToLimit(),
+                                         selectableMilestones);
         }
     }
 

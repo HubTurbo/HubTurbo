@@ -46,16 +46,17 @@ public class MilestonePickerDialog extends Dialog<MilestonePickerDialogResponse>
         state = new MilestonePickerState(originalMilestones);
         initUI();
         setupKeyEvents();
-        setInputFieldToDefaultMilestone();
+        setInputFieldToSuggestedMilestone();
         Platform.runLater(() -> positionDialog(stage));
     }
 
     /**
-     * Fills the input field of milestone picker dialog with default milestone's title
+     * Fills the input field of milestone picker dialog with suggested milestone's name
      */
-    private void setInputFieldToDefaultMilestone() {
-        Optional<PickerMilestone> defaultMilestone = PickerMilestone.getDefaultMilestone(originalMilestones);
-        defaultMilestone.map(PickerMilestone::getTitle).ifPresent(this::fillInputFieldWithMilestoneName);
+    private void setInputFieldToSuggestedMilestone() {
+        Optional<PickerMilestone> suggestedMilestone = state.getBestMatchingMilestones().stream()
+                                                        .findFirst();
+        suggestedMilestone.map(PickerMilestone::getTitle).ifPresent(this::fillInputFieldWithMilestoneName);
     }
 
     private boolean areFromSameRepo(TurboIssue issue, List<TurboMilestone> milestones) {
