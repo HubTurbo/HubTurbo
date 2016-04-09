@@ -90,11 +90,11 @@ public class TickingTimerManager {
     }
 
     private boolean isQuotaInsufficient(int apiQuota, int lastApiCallsUsed) {
-        boolean outOfQuota = apiQuota == 0 && lastApiCallsUsed == 0;
-        boolean apiQuotaBelowBufferAllowance = apiQuota <= APIQUOTA_BUFFER;
-        boolean offsetQuotaLessThanLastApiCallsUsed = apiQuota - APIQUOTA_BUFFER > 0
+        boolean isOutOfQuota = apiQuota == 0 && lastApiCallsUsed == 0;
+        boolean isBelowApiQuotaBufferAllowance = apiQuota <= APIQUOTA_BUFFER;
+        boolean isOffsetQuotaLessThanLastApiCallsUsed = apiQuota - APIQUOTA_BUFFER > 0
                                                       && apiQuota - APIQUOTA_BUFFER < lastApiCallsUsed;
 
-        return outOfQuota || apiQuotaBelowBufferAllowance || offsetQuotaLessThanLastApiCallsUsed;
+        return isOutOfQuota || isBelowApiQuotaBufferAllowance || isOffsetQuotaLessThanLastApiCallsUsed;
     }
 }
