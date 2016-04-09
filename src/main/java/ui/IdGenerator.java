@@ -39,6 +39,10 @@ public final class IdGenerator {
         return "assigneePickerTextField";
     }
 
+    public static String getAssigneePickerAssignedUserPaneId() {
+        return "assigneePickerAssignedUserPane";
+    }
+
     public static String getPanelCloseButtonId(int panelIndex) {
         return "panel" + panelIndex + "_closeButton";
     }
@@ -115,8 +119,12 @@ public final class IdGenerator {
         return "#" + getMilestonePickerTextFieldId();
     }
 
-    public static String getAssigneePickerFieldIdReference() {
+    public static String getAssigneePickerTextFieldIdReference() {
         return "#" + getAssigneePickerTextFieldId();
+    }
+
+    public static String getAssigneePickerAssignedUserPaneIdReference() {
+        return "#" + getAssigneePickerAssignedUserPaneId();
     }
 
     public static String getPanelCloseButtonIdReference(int panelIndex) {
