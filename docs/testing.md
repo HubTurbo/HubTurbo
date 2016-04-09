@@ -59,9 +59,19 @@ In general, ensure as far as possible that tests are deterministic. Keep tests s
 
 To test for events, you can create new events for the test in [`util.events.testevents`](../src/main/java/util/events/testevents), ensure that you also create the corresponding event handler. You can then test for event triggering using [`UI.events.registerEvent((EventHandler))`](../src/main/java/ui/UI.java).
 
-## Headless Testing
+## Headless Mode
 
-Headless testing 
+Unlike running in GUI tests in headful mode (GUI components are spawned and cursor moves by itself), in headless mode, you will not see any GUI components being initialized on your screen (for Mac users, the focus may constantly shifts to HubTurbo icon). To run in headless mode:
+
+### Mac & Linux
+```sh
+CI=true && ./gradlew clean test -i
+```
+
+### Windows
+```sh
+set CI=true && ./gradlew clean test -i
+```
 
 ## CI Quirks
 
