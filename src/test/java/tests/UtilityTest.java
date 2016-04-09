@@ -9,7 +9,6 @@ import static util.Utility.localDateTimeToDate;
 import static util.Utility.localDateTimeToLong;
 import static util.Utility.parseHTTPLastModifiedDate;
 import static util.Utility.replaceNull;
-import static util.Utility.safeLongToInt;
 import static util.Utility.snakeCaseToCamelCase;
 import static util.Utility.stripQuotes;
 import org.junit.Test;
@@ -28,23 +27,6 @@ import java.util.Set;
 import java.util.TimeZone;
 
 public class UtilityTest {
-
-    @Test
-    public void safeLongToIntTest() {
-        long a = Integer.MAX_VALUE + 30L;
-        try {
-            safeLongToInt(a);
-            fail();
-        } catch (IllegalArgumentException ignored) {
-        }
-
-        a = Integer.MIN_VALUE - 30L;
-        try {
-            safeLongToInt(a);
-            fail();
-        } catch (IllegalArgumentException ignored) {
-        }
-    }
 
     @Test
     public void stripQuotesTest() {

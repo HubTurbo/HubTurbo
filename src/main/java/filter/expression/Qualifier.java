@@ -3,7 +3,14 @@ package filter.expression;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -11,10 +18,15 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import backend.resource.*;
-import filter.*;
-import util.Utility;
 import backend.interfaces.IModel;
+import backend.resource.TurboIssue;
+import backend.resource.TurboLabel;
+import backend.resource.TurboMilestone;
+import backend.resource.TurboUser;
+import filter.MetaQualifierInfo;
+import filter.ParseException;
+import filter.QualifierApplicationException;
+import filter.SemanticException;
 
 public class Qualifier implements FilterExpression {
 
@@ -782,7 +794,7 @@ public class Qualifier implements FilterExpression {
         }
 
         LocalDateTime dateOfUpdate = issue.getUpdatedAt();
-        int hoursSinceUpdate = Utility.safeLongToInt(dateOfUpdate.until(getCurrentTime(), ChronoUnit.HOURS));
+        int hoursSinceUpdate = Math.toIntExact(dateOfUpdate.until(getCurrentTime(), ChronoUnit.HOURS));
         return updatedRange.encloses(hoursSinceUpdate);
     }
 
