@@ -858,6 +858,8 @@ public class FilterEvalTests {
         TurboUser user3 = new TurboUser(REPO, "fox", "Charlie");
         TurboIssue issue1 = new TurboIssue(REPO, 1, "title", "alice", LocalDateTime.now(), false);
         TurboIssue issue2 = new TurboIssue(REPO, 1, "title", "bob", LocalDateTime.now(), false);
+        TurboIssue issue3 = new TurboIssue(REPO + "_invalid", 1, "title", "beta", LocalDateTime.now(), false);
+        TurboIssue issue4 = new TurboIssue(REPO, 1, "title", "fox", LocalDateTime.now(), false);
         issue1.setAssignee(user3);
         IModel model = TestUtils.singletonModel(createModelFromUsers(REPO, user1, user2, user3));
         assertTrue(Qualifier.process(model, Parser.parse("assignee:ox"), issue1));
@@ -865,6 +867,8 @@ public class FilterEvalTests {
         assertFalse(Qualifier.process(model, Parser.parse("assignee:charlie"), issue2));
         assertTrue(Qualifier.process(model, Parser.parse("author:bob"), issue2));
         assertTrue(Qualifier.process(model, Parser.parse("author:bob"), issue2));
+        assertFalse(Qualifier.process(model, Parser.parse("author:betA"), issue3));
+        assertTrue(Qualifier.process(model, Parser.parse("author:ch"), issue4));
     }
 
 
