@@ -53,13 +53,6 @@ public class PanelsTest extends UITest {
         clickOn(panel0.getCloseButton());
         waitUntilNodeDisappears(panel0);
 
-        // Switch default repo
-        clickRepositorySelector();
-        selectAll();
-        type("dummy2/dummy2");
-        push(KeyCode.ENTER);
-        press(CREATE_RIGHT_PANEL);
-
         // Ensure that new panels are associated with the current default repo
         awaitCondition(() -> existsQuiet(IdGenerator.getPanelIdReference(2)));
     }

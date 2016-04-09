@@ -46,9 +46,8 @@ public class SavedLoginTest extends UITest {
     }
 
     @Test
-    public void savedLogin_lastSavedLoginCredentials_shouldAllowLoginWithoutPrompting()
-            throws InterruptedException {
-        ComboBox<String> repositorySelector = getRepositorySelector();
-        assertEquals("test/test", repositorySelector.getValue());
+    public void savedLogin_lastSavedLoginCredentials_shouldAllowLoginWithoutPrompting() {
+        String title = TestController.getUI().getTitle();
+        assertEquals("test/test (none)", title);
     }
 }
