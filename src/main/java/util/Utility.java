@@ -1,14 +1,10 @@
 package util;
 
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonParser;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.RepositoryId;
-import ui.UI;
-import util.events.ShowErrorDialogEvent;
-
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -19,12 +15,26 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TimeZone;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.eclipse.egit.github.core.RepositoryId;
+
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParser;
+
+import ui.UI;
+import util.events.ShowErrorDialogEvent;
 
 public final class Utility {
 
@@ -178,13 +188,6 @@ public final class Utility {
         return obj == null ? replacement : obj;
     }
 
-    public static int safeLongToInt(long l) {
-        if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE) {
-            throw new IllegalArgumentException(l + " cannot be cast to int without changing its value.");
-        }
-        return (int) l;
-    }
-
     public static Date parseHTTPLastModifiedDate(String dateString) {
         assert dateString != null;
         try {
@@ -253,7 +256,7 @@ public final class Utility {
      * @return
      */
     public static boolean containsIgnoreCase(String source, List<String> queries) {
-        return queries.stream().allMatch(query -> Utility.containsIgnoreCase(source, query));
+        return queries.stream().anyMatch(query -> Utility.containsIgnoreCase(source, query));
     }
 
     public static boolean startsWithIgnoreCase(String source, String query) {
