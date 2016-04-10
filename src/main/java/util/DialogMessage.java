@@ -1,6 +1,7 @@
 package util;
 
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 
 import java.util.Optional;
@@ -25,8 +26,8 @@ public final class DialogMessage {
         alert.setHeaderText(header);
         alert.setContentText(message);
 
-        ButtonType yesButton = new ButtonType(yesButtonLabel);
-        ButtonType noButton = new ButtonType(noButtonLabel);
+        ButtonType yesButton = new ButtonType(yesButtonLabel, ButtonBar.ButtonData.YES);
+        ButtonType noButton = new ButtonType(noButtonLabel, ButtonBar.ButtonData.NO);
         alert.getButtonTypes().setAll(yesButton, noButton);
 
         Optional<ButtonType> result = alert.showAndWait();
@@ -42,8 +43,8 @@ public final class DialogMessage {
         alert.setHeaderText(header);
         alert.setContentText(message);
 
-        ButtonType yesButton = new ButtonType(yesButtonLabel);
-        ButtonType noButton = new ButtonType(noButtonLabel);
+        ButtonType yesButton = new ButtonType(yesButtonLabel, ButtonBar.ButtonData.YES);
+        ButtonType noButton = new ButtonType(noButtonLabel, ButtonBar.ButtonData.NO);
         alert.getButtonTypes().setAll(yesButton, noButton);
 
         Optional<ButtonType> result = alert.showAndWait();
