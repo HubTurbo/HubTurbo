@@ -133,7 +133,13 @@ allprojects {
     assemble.dependsOn shadowJar
 }
 
-test.dependsOn generateUnstableTestResources
+test {
+    dependsOn generateUnstableTestResources
+
+    testLogging {
+        exceptionFormat = 'full'
+    }
+}
 
 task checkstyleHtml << {
     ant.xslt(in: checkstyleMain.reports.xml.destination,
@@ -212,5 +218,5 @@ task compileJarUpdater(type: Jar) {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.4'
+    gradleVersion = '2.12'
 }
