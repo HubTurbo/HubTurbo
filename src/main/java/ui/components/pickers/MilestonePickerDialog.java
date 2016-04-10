@@ -77,6 +77,22 @@ public class MilestonePickerDialog extends Dialog<MilestonePickerDialogResponse>
         inputField.textProperty().addListener((observable, oldValue, newValue) -> {
             handleUpdatedInput(newValue);
         });
+        inputField.setOnKeyPressed(e -> {
+            switch (e.getCode()) {
+            case DOWN:
+                state.selectNextBestMatchingMilestone();
+                refreshUI(state);
+                e.consume();
+                break;
+            case UP:
+                state.selectPreviousBestMatchingMilestone();
+                refreshUI(state);
+                e.consume();
+                break;
+            default:
+                break;
+            }
+        });
     }
 
     private void handleUpdatedInput(String userInput) {
@@ -178,7 +194,6 @@ public class MilestonePickerDialog extends Dialog<MilestonePickerDialogResponse>
     private void populateMatchingMilestones(List<PickerMilestone> matchingMilestoneList, VBox matchingMilestones) {
         matchingMilestones.getChildren().clear();
         matchingMilestoneList.stream()
-                .sorted()
                 .forEach(milestone -> matchingMilestones.getChildren().add(
                         setMouseClickForNode(milestone.getDetailedMilestoneNode(), milestone.getTitle())));
     }
