@@ -9,9 +9,9 @@ import prefs.PanelInfo;
 import ui.*;
 import ui.issuepanel.PanelControl;
 import util.PlatformEx;
+import java.util.Map.Entry;
 
 import java.lang.reflect.Field;
-import java.util.Map;
 import java.util.Optional;
 
 public class PanelMenuCreatorTest extends UITest {
@@ -29,7 +29,7 @@ public class PanelMenuCreatorTest extends UITest {
     public void autoCreatePanels_createCustomPanelsFromMenu_panelsCreatedWithAppropriatePanelNameAndFilter()
             throws NoSuchFieldException, IllegalAccessException {
         PanelMenuCreator value = (PanelMenuCreator) getPanelMenuCreatorField().get(ui.getMenuControl());
-        for (Map.Entry<String, String> entry :
+        for (Entry<String, String> entry :
                 value.generatePanelDetails(ui.prefs.getLastLoginUsername()).entrySet()) {
             customizedPanelMenuItemTest(entry.getKey(), entry.getValue());
         }
