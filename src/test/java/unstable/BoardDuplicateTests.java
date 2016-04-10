@@ -1,16 +1,17 @@
-package guitests;
+package unstable;
+
+import static org.loadui.testfx.controls.Commons.hasText;
+
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import guitests.UITest;
 import prefs.Preferences;
 import ui.TestController;
 import ui.UI;
 import ui.issuepanel.PanelControl;
-
-import java.util.List;
-
-import static org.loadui.testfx.controls.Commons.hasText;
 
 public class BoardDuplicateTests extends UITest {
     PanelControl panelControl;

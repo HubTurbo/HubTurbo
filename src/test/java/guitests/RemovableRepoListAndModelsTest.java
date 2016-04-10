@@ -1,32 +1,31 @@
 package guitests;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.loadui.testfx.Assertions.assertNodeExists;
+import static ui.components.KeyboardShortcuts.CREATE_RIGHT_PANEL;
+
+import java.io.File;
+import java.util.Optional;
+import java.util.concurrent.TimeoutException;
+
+import org.junit.Test;
+import org.testfx.api.FxToolkit;
+
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.KeyCode;
-import org.junit.Test;
-import org.loadui.testfx.GuiTest;
-import org.testfx.api.FxToolkit;
-
 import prefs.Preferences;
 import ui.IdGenerator;
 import ui.TestController;
 import ui.UI;
 import util.PlatformEx;
 
-import java.io.File;
-import java.util.Optional;
-import java.util.concurrent.TimeoutException;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-import static org.loadui.testfx.Assertions.assertNodeExists;
-import static ui.components.KeyboardShortcuts.CREATE_RIGHT_PANEL;
-
 public class RemovableRepoListAndModelsTest extends UITest {
 
-    private static final int EVENT_DELAY = 2000;
+    private static final int EVENT_DELAY = 50;
 
     @Override
     public void setup() throws TimeoutException {
@@ -88,7 +87,7 @@ public class RemovableRepoListAndModelsTest extends UITest {
         assertNodeExists(IdGenerator.getLoginDialogOwnerFieldIdReference());
         type("dummy").push(KeyCode.TAB);
         type("dummy").push(KeyCode.ENTER);
-        sleep(EVENT_DELAY);
+        awaitCondition(() -> ui.getCurrentlyUsedRepos() != null, EVENT_DELAY);
         waitAndAssertEquals(noOfUsedRepo, ui.getCurrentlyUsedRepos()::size);
         waitAndAssertEquals(noOfUsedRepo, ui.logic.getOpenRepositories()::size);
         waitAndAssertEquals(totalRepoInSystem + 1, removeRepoMenu.getItems()::size);

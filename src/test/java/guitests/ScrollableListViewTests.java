@@ -1,15 +1,14 @@
 package guitests;
 
-import javafx.scene.input.KeyCode;
-import org.junit.Test;
-import org.loadui.testfx.GuiTest;
+import static org.junit.Assert.assertEquals;
 
+import org.junit.Test;
+
+import javafx.scene.input.KeyCode;
 import ui.UI;
 import ui.listpanel.ListPanel;
 import util.events.testevents.UILogicRefreshEvent;
 import util.events.testevents.UpdateDummyRepoEvent;
-
-import static org.junit.Assert.assertEquals;
 
 public class ScrollableListViewTests extends UITest {
 

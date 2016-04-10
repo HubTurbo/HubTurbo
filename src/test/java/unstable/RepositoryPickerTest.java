@@ -1,21 +1,24 @@
-package guitests;
+package unstable;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static ui.components.pickers.PickerRepository.COMMON_REPO_LABEL_STYLE;
 import static ui.components.pickers.PickerRepository.SELECTED_REPO_LABEL_STYLE;
 
 import java.io.File;
 import java.util.concurrent.TimeoutException;
 
-import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.VBox;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.junit.Test;
 import org.testfx.api.FxToolkit;
 
+import guitests.UITest;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.VBox;
 import prefs.Preferences;
 import ui.IdGenerator;
 import ui.TestController;
@@ -44,7 +47,7 @@ public class RepositoryPickerTest extends UITest {
     }
 
     @Test
-    public void testrepositoryPickerTest() {
+    public void repositoryPickerTest() {
         // check if test json is present
         File testConfig = new File(TestController.TEST_DIRECTORY, TestController.TEST_SESSION_CONFIG_FILENAME);
         boolean testConfigExists = testConfig.exists() && testConfig.isFile();
@@ -62,6 +65,7 @@ public class RepositoryPickerTest extends UITest {
         type("dummy").push(KeyCode.ENTER);
         traverseHubTurboMenu("Repos", "Show Repository Picker");
         PlatformEx.waitOnFxThread();
+        waitUntilNodeAppears(IdGenerator.getRepositoryPickerTextFieldReference());
         suggestedRepositoryList = findOrWaitFor(IdGenerator.getRepositoryPickerSuggestedRepoListReference());
         assertEquals(1, suggestedRepositoryList.getChildren().size());
         assertEquals("dummy/dummy", primaryRepo);
@@ -153,7 +157,7 @@ public class RepositoryPickerTest extends UITest {
         traverseHubTurboMenu("Repos", "Show Repository Picker");
         PlatformEx.waitOnFxThread();
         suggestedRepositoryList = findOrWaitFor(IdGenerator.getRepositoryPickerSuggestedRepoListReference());
-        assertEquals(4, suggestedRepositoryList.getChildren().size());
+        waitAndAssertEquals(4, suggestedRepositoryList.getChildren()::size);
         assertEquals("dummy4/dummy4", primaryRepo);
         push(KeyCode.ESCAPE);
 

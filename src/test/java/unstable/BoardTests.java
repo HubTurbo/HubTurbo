@@ -1,4 +1,4 @@
-package guitests;
+package unstable;
 
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.loadui.testfx.GuiTest;
 
+import guitests.UITest;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import prefs.Preferences;

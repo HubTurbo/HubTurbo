@@ -8,10 +8,9 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.After;
 import org.junit.Test;
-
-import javafx.scene.input.KeyCode;
 import org.testfx.api.FxToolkit;
 
+import javafx.scene.input.KeyCode;
 import ui.TestController;
 import ui.UI;
 import ui.components.FilterTextField;
@@ -165,7 +164,7 @@ public class FilterTextFieldTest extends UITest {
         FilterPanel issuePanel = (FilterPanel) TestController.getUI().getPanelControl().getPanel(0);
         FilterTextField field = issuePanel.getFilterTextField();
         waitUntilNodeAppears(field);
-        clickOn(issuePanel.getFilterTextField());
+        clickFilterTextFieldAtPanel(0);
         return field;
     }
 

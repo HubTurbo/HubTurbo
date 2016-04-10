@@ -1,18 +1,20 @@
 package guitests;
 
-import javafx.scene.input.KeyCode;
+import static org.junit.Assert.assertEquals;
+import static ui.components.KeyboardShortcuts.NEW_ISSUE;
+import static ui.components.KeyboardShortcuts.NEW_LABEL;
+import static ui.components.KeyboardShortcuts.NEW_MILESTONE;
 
 import org.junit.Test;
-import org.loadui.testfx.GuiTest;
 
+import javafx.scene.input.KeyCode;
 import ui.UI;
 import ui.components.KeyboardShortcuts;
-import util.events.*;
-import util.events.testevents.PrimaryRepoChangedEvent;
-import util.events.testevents.PrimaryRepoChangedEventHandler;
-
-import static org.junit.Assert.assertEquals;
-import static ui.components.KeyboardShortcuts.*;
+import util.events.IssueCreatedEventHandler;
+import util.events.LabelCreatedEventHandler;
+import util.events.MilestoneCreatedEventHandler;
+import util.events.PanelClickedEventHandler;
+import util.events.ShowIssuePickerEventHandler;
 
 public class UIEventTests extends UITest {
 
@@ -30,8 +32,8 @@ public class UIEventTests extends UITest {
     public void createIssueTest() {
         UI.events.registerEvent((IssueCreatedEventHandler) e -> UIEventTests.increaseEventTestCount());
         resetEventTestCount();
-        clickOn("New");
-        clickOn("Issue");
+        traverseHubTurboMenu("New", "Issue");
+        push(KeyCode.ENTER);
         assertEquals(1, eventTestCount);
         resetEventTestCount();
         press(NEW_ISSUE);
@@ -42,8 +44,8 @@ public class UIEventTests extends UITest {
     public void createLabelTest() {
         UI.events.registerEvent((LabelCreatedEventHandler) e -> UIEventTests.increaseEventTestCount());
         resetEventTestCount();
-        clickOn("New");
-        clickOn("Label");
+        traverseHubTurboMenu("New", "Label");
+        push(KeyCode.ENTER);
         assertEquals(1, eventTestCount);
         resetEventTestCount();
         press(NEW_LABEL);
@@ -54,8 +56,8 @@ public class UIEventTests extends UITest {
     public void createMilestoneTest() {
         UI.events.registerEvent((MilestoneCreatedEventHandler) e -> UIEventTests.increaseEventTestCount());
         resetEventTestCount();
-        clickOn("New");
-        clickOn("Milestone");
+        traverseHubTurboMenu("New", "Milestone");
+        push(KeyCode.ENTER);
         assertEquals(1, eventTestCount);
         resetEventTestCount();
         press(NEW_MILESTONE);
