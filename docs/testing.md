@@ -111,3 +111,21 @@ If you receive a 404 for a valid request path and parameters, a possible cause i
 This typically happens when we only get the headers from multiple requests i.e. HEAD requests, which take very short time, while the body is still building up.
 This error should not happen if we request for the body (GET, POST etc.) as the request will block until the body is available.
 As a result, this situation can be avoided by omitting body data in expectations that only concern headers or making a full request.
+
+**FAQ**
+
+1. Why does my test randomly returns `AssertionError` ?
+
+ This may indicate that some UI routines leading up to the assertion are not executed i.e `clickOn("Ok")` is not triggered. You can always use `doubleClickOn` to ensure that a click is registered provided it does not affect your test.
+ 
+ There is also a possibility that the value is not updated when assertion is made. Therefore, you can try using `waitAndAssertEquals` to prevent this issue.
+
+2. Why do I get `NullPointerException` with FxRobot's methods like `clickOn` or `rightClickOn` ?
+
+ This is indicative of not waiting for a particular UI element to appear. Remember to use `waitUntil ...` methods before  interacting with the UI. This may happen if you are doing multiple UI interactions consecutively such as trying to press multiple hotkeys. In this case, it is advisable to make sure all intermediate UI actions are being executed. 
+ 
+3. How can I improve stability of my tests ?
+
+ Sometimes the UI action such as `press`, `push` or `clickOn` can be a little bit unstable. If possible, always try to use utility methods in `UITest.java` because they are designed to be more fail-proof rather than writing you own. Instead of calling multiple `clickOn` to access a menu item, you should use `traverseHubTurboMenu`.
+ 
+ Another tip is to avoid writing very long test method. Testing specific UI interaction make debugging a lot easier and depending on less UI actions to succeed consecutively.
