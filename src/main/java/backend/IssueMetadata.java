@@ -1,15 +1,15 @@
 package backend;
 
-import github.TurboIssueEvent;
-import org.eclipse.egit.github.core.Comment;
-
-import util.Utility;
-
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import org.eclipse.egit.github.core.Comment;
+
+import github.TurboIssueEvent;
+import util.Utility;
 
 public final class IssueMetadata {
 
@@ -151,9 +151,9 @@ public final class IssueMetadata {
     }
 
     private static int countCommentsBySelf(List<Comment> comments, String user) {
-        return Utility.safeLongToInt(comments.stream()
-                                             .filter(c -> isCommentBySelf(c, user))
-                                             .count());
+        return Math.toIntExact(comments.stream()
+                               .filter(c -> isCommentBySelf(c, user))
+                               .count());
     }
 
     private static boolean isEventBySelf(TurboIssueEvent event, String user) {

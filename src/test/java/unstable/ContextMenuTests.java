@@ -1,4 +1,4 @@
-package guitests;
+package unstable;
 
 import javafx.application.Platform;
 import javafx.scene.control.ContextMenu;
@@ -9,6 +9,7 @@ import javafx.scene.input.KeyCode;
 import org.junit.Before;
 import org.junit.Test;
 
+import guitests.UITest;
 import ui.IdGenerator;
 import ui.components.FilterTextField;
 import ui.listpanel.ListPanel;
@@ -32,9 +33,8 @@ public class ContextMenuTests extends UITest {
 
         FilterTextField filterTextField = getFilterTextFieldAtPanel(0);
         filterTextField.setText("");
-        Platform.runLater(filterTextField::requestFocus);
+        PlatformEx.runAndWait(filterTextField::requestFocus);
 
-        clickOn(filterTextField);
         push(KeyCode.ENTER);
         sleep(EVENT_DELAY);
         issuePanel = getPanel(0);

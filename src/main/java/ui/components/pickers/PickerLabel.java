@@ -1,10 +1,10 @@
 package ui.components.pickers;
 
-import backend.resource.TurboLabel;
-
 import com.sun.javafx.tk.FontLoader;
 import com.sun.javafx.tk.Toolkit;
 
+import backend.resource.TurboLabel;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
@@ -17,11 +17,12 @@ import javafx.scene.control.Tooltip;
  */
 public class PickerLabel extends TurboLabel {
 
+    private final boolean canDisplayFullName;
+
     private boolean isSelected;
     private boolean isHighlighted;
     private boolean isRemoved;
     private boolean isFaded;
-    private final boolean canDisplayFullName;
 
     public PickerLabel(TurboLabel label, boolean canDisplayFullName) {
         super(label.getRepoId(), label.getColour(), label.getFullName());
@@ -36,22 +37,36 @@ public class PickerLabel extends TurboLabel {
     public Node getNode() {
         // actual name for labels at the top, add tick for selected labels
         Label label = new Label((canDisplayFullName ? getFullName() : getShortName()));
-        label.getStyleClass().add("labels");
-        if (isRemoved) label.getStyleClass().add("labels-removed"); // add strikethrough
-        String style = getStyle() + (isHighlighted ? " -fx-border-color: black;" : ""); // add highlight border
-        style += (isFaded ? " -fx-opacity: 40%;" : ""); // change opacity if needed
-        label.setStyle(style);
+        setLabelStyle(label);
         label.setText(label.getText() + (!canDisplayFullName && isSelected ? " ✓" : ""));
 
         FontLoader fontLoader = Toolkit.getToolkit().getFontLoader();
-        double width = (double) fontLoader.computeStringWidth(label.getText(), label.getFont());
+        double width = fontLoader.computeStringWidth(label.getText(), label.getFont());
         label.setPrefWidth(width + 30);
 
         if (isInGroup()) {
             Tooltip groupTooltip = new Tooltip(getGroupName());
             label.setTooltip(groupTooltip);
         }
+
+        setupEvents(label);
         return label;
+    }
+
+    private void setLabelStyle(Label label) {
+        label.getStyleClass().add("labels");
+        // add strikethrough
+        if (isRemoved) label.getStyleClass().add("labels-removed");
+        // add highlight border
+        String style = getStyle() + (isHighlighted ? " -fx-border-color: black; -fx-border-width: 2px;" : "");
+        // change opacity if needed
+        style += (isFaded ? " -fx-opacity: 40%;" : "");
+        label.setStyle(style);
+    }
+
+    private void setupEvents(Node node) {
+        node.setOnMouseEntered(e -> node.getScene().setCursor(Cursor.HAND));
+        node.setOnMouseExited(e -> node.getScene().setCursor(Cursor.DEFAULT));
     }
 
     public boolean isSelected() {

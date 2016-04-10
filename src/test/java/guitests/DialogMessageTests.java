@@ -1,15 +1,16 @@
 package guitests;
 
-import javafx.application.Platform;
-import org.junit.Test;
-import util.DialogMessage;
+import static org.junit.Assert.assertEquals;
+import static org.loadui.testfx.Assertions.assertNodeExists;
+import static org.loadui.testfx.controls.Commons.hasText;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
-import static org.junit.Assert.assertEquals;
-import static org.loadui.testfx.Assertions.assertNodeExists;
-import static org.loadui.testfx.controls.Commons.hasText;
+import org.junit.Test;
+
+import javafx.application.Platform;
+import util.DialogMessage;
 
 public class DialogMessageTests extends UITest {
 
@@ -35,6 +36,7 @@ public class DialogMessageTests extends UITest {
         Platform.runLater(noTask);
         waitUntilNodeAppears(hasText("Warning Message"));
         assertNodeExists(hasText("Warning Message"));
+        waitUntilNodeAppears("nO");
         clickOn("nO");
         assertEquals(false, noTask.get());
     }
