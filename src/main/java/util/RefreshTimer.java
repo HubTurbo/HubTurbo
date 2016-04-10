@@ -4,8 +4,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
- * This class manages the TickingTimer instance used for refreshing. It contains methods to gain information and
- * manipulation of the refresh rate.
+ * This class is a subclass of TickingTimer. It contains logic to facilitate dynamic period of the timer.
  */
 public class RefreshTimer extends TickingTimer{
 
