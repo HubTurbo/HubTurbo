@@ -1,9 +1,8 @@
-package ui.components.issuepicker;
+package ui;
 
 import java.util.Optional;
 
 import backend.resource.TurboIssue;
-import backend.resource.TurboLabel;
 import backend.resource.TurboMilestone;
 import backend.resource.TurboUser;
 import javafx.beans.binding.Bindings;
@@ -13,44 +12,37 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
-import ui.GuiElement;
 
 /**
  * Represents an individual issue card not linked to any panel
  */
 public class IssueCard extends VBox {
 
+    private static final String OCTICON_COMMENT = "\uf02b";
     private static final String OCTICON_PULL_REQUEST = "\uf009";
     private static final int CARD_WIDTH = 350;
-    private static final String OCTICON_COMMENT = "\uf02b";
     private static final String OCTICON_ARROW_RIGHT = "\uf03e";
-    private static final Background FOCUSED_BACKGROUND = new Background(
-            new BackgroundFill(Color.CORNFLOWERBLUE, CornerRadii.EMPTY, Insets.EMPTY));
-    private static final Background DEFAULT_BACKGROUND = new Background(
-            new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY));
 
-    private final GuiElement guiElement;
-    private final FlowPane issueDetails = new FlowPane();
-    private final HBox authorAssigneeBox = new HBox();
+    protected final GuiElement guiElement;
+    protected final FlowPane issueDetails;
+    private final boolean isIssueWithNewComments;
 
-    public IssueCard(GuiElement guiElement, boolean isFocus) {
+    public IssueCard(GuiElement guiElement, boolean isFocus, boolean isIssueWithNewComments) {
         this.guiElement = guiElement;
+        this.issueDetails = createDetailsPane();
+        this.isIssueWithNewComments = isIssueWithNewComments;
         this.setFocused(isFocus);
         setup();
     }
 
     private void setup() {
-        setupMainIssueCard();
         TurboIssue issue = guiElement.getIssue();
-        Text issueTitle = new Text("#" + issue.getId() + " " + issue.getTitle());
-        issueTitle.setWrappingWidth(CARD_WIDTH);
+        Label issueTitle = new Label("#" + issue.getId() + " " + issue.getTitle());
+        issueTitle.setMaxWidth(CARD_WIDTH);
+        issueTitle.setWrapText(true);
         issueTitle.getStyleClass().add("issue-panel-name");
 
         if (issue.isCurrentlyRead()) {
@@ -61,32 +53,34 @@ public class IssueCard extends VBox {
             issueTitle.getStyleClass().add("issue-panel-closed");
         }
 
-        setupIssueDetailsBox();
-        setupAuthorAssigneeBox();
         updateDetails();
 
-        setPadding(new Insets(3, 0, 3, 0));
+        setPadding(new Insets(0, 0, 0, 0));
         setSpacing(1);
 
-        getChildren().addAll(issueTitle, issueDetails, authorAssigneeBox);
+        getChildren().addAll(issueTitle, issueDetails);
     }
 
-    private void setupMainIssueCard() {
-        this.backgroundProperty().bind(Bindings.when(this.focusedProperty())
-                                               .then(FOCUSED_BACKGROUND).otherwise(DEFAULT_BACKGROUND));
+    /**
+     * Sets background color when the card is focused or not
+     * @param focusedBackground
+     * @param defaultBackground
+     * @return issue card
+     */
+    public IssueCard setBackgroundProperty(Background focusedBackground, Background defaultBackground) {
+        this.backgroundProperty().bind(
+            Bindings.when(this.focusedProperty()).then(focusedBackground).otherwise(defaultBackground));
         this.setStyle("-fx-border-color:black; -fx-border-style:hidden hidden solid hidden; ");
+        return this;
     }
 
-    private void setupIssueDetailsBox() {
-        issueDetails.setMaxWidth(CARD_WIDTH);
-        issueDetails.setPrefWrapLength(CARD_WIDTH);
-        issueDetails.setHgap(3);
-        issueDetails.setVgap(3);
-    }
-
-    private void setupAuthorAssigneeBox() {
-        authorAssigneeBox.setPrefWidth(CARD_WIDTH);
-        authorAssigneeBox.setPadding(new Insets(0, 0, 1, 0));
+    private FlowPane createDetailsPane() {
+        FlowPane detailsPane = new FlowPane();
+        detailsPane.setMaxWidth(CARD_WIDTH);
+        detailsPane.setPrefWrapLength(CARD_WIDTH);
+        detailsPane.setHgap(3);
+        detailsPane.setVgap(3);
+        return detailsPane;
     }
 
     private void updateDetails() {
@@ -95,34 +89,28 @@ public class IssueCard extends VBox {
 
         addPullRequestIcon(issue);
         addCommentIcon(issue);
-        addLabels();
         addMilestoneIcon(issue);
 
         createAuthorBox(issue);
         createAssigneeBox(issue);
-    }
-
-    private void addLabels() {
-        for (TurboLabel label : guiElement.getLabels()) {
-            issueDetails.getChildren().add(label.getNode());
-        }
+        guiElement.getLabels().forEach(label -> issueDetails.getChildren().add(label.getNode()));
     }
 
     private void createAssigneeBox(TurboIssue issue) {
         if (issue.getAssignee().isPresent()) {
             HBox assigneeBox = createDisplayUserBox(guiElement.getAssignee(), issue.getAssignee().get());
-            authorAssigneeBox.getChildren().add(assigneeBox);
+            issueDetails.getChildren().add(assigneeBox);
         }
     }
 
     private void createAuthorBox(TurboIssue issue) {
         if (issue.isPullRequest()) {
             HBox authorBox = createDisplayUserBox(guiElement.getAuthor(), issue.getCreator());
-            authorAssigneeBox.getChildren().add(authorBox);
+            issueDetails.getChildren().add(authorBox);
             if (issue.getAssignee().isPresent()) {
                 Label rightArrow = new Label(OCTICON_ARROW_RIGHT);
                 rightArrow.getStyleClass().addAll("octicon", "pull-request-assign-icon");
-                authorAssigneeBox.getChildren().add(rightArrow);
+                issueDetails.getChildren().add(rightArrow);
             }
         }
     }
@@ -139,6 +127,11 @@ public class IssueCard extends VBox {
             Label commentIcon = new Label(OCTICON_COMMENT);
             commentIcon.getStyleClass().addAll("octicon", "comments-label-button");
             Label commentCount = new Label(Integer.toString(issue.getCommentCount()));
+
+            if (isIssueWithNewComments) {
+                commentIcon.getStyleClass().add("has-comments");
+                commentCount.getStyleClass().add("has-comments");
+            }
 
             issueDetails.getChildren().add(commentIcon);
             issueDetails.getChildren().add(commentCount);

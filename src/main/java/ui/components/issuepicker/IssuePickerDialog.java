@@ -18,11 +18,16 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import ui.GuiElement;
+import ui.IssueCard;
 import ui.UI;
 import util.HTLog;
 
@@ -30,6 +35,11 @@ import util.HTLog;
  * Serves as a presenter that synchronizes changes in issues with dialog view
  */
 public class IssuePickerDialog extends Dialog<String> {
+
+    private static final Background BACKGROUND_FOCUSED = new Background(
+            new BackgroundFill(Color.CORNFLOWERBLUE, CornerRadii.EMPTY, Insets.EMPTY));
+    private static final Background BACKGROUND_DEFAULT = new Background(
+            new BackgroundFill(Color.WHITE, CornerRadii.EMPTY, Insets.EMPTY));
 
     private static final int ELEMENT_MAX_WIDTH = 400;
     private static final Insets GROUP_PAD = new Insets(0, 0, 10, 10);
@@ -120,13 +130,20 @@ public class IssuePickerDialog extends Dialog<String> {
     private Node processIssue(TurboIssue issue, Optional<TurboIssue> selectedIssue) {
         GuiElement element = new GuiElement(issue, models.getLabelsOfIssue(issue), models.getMilestoneOfIssue(issue),
                                             models.getAssigneeOfIssue(issue), models.getAuthorOfIssue(issue));
-        IssueCard card = new IssueCard(element, isSuggestedIssue(issue, selectedIssue));
+        IssueCard card = createIssueCard(issue, selectedIssue, element);
         card.setOnMouseClicked(e -> handleIssueClick(issue, card));
         return card;
     }
 
+    private IssueCard createIssueCard(TurboIssue issue, Optional<TurboIssue> selectedIssue, GuiElement element) {
+        IssueCard card = new IssueCard(element, isSuggestedIssue(issue, selectedIssue), false).setBackgroundProperty(
+                                       BACKGROUND_FOCUSED, BACKGROUND_DEFAULT);
+        card.setPadding(new Insets(3, 0, 3, 0));
+        return card;
+    }
 
-    // Event handling 
+
+    // Event handling
 
     /**
      * Updates state of the issue picker based on the entire query
