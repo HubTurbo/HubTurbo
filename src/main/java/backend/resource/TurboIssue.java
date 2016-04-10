@@ -380,7 +380,7 @@ public class TurboIssue {
         List<String> queries = Arrays.asList(query.split("\\s"));
         return issues.stream()
                 .filter(i -> Utility.containsIgnoreCase(i.getMatchableText(), queries))
-                .sorted((i1, i2) -> i2.getNumberOfMatchingQuery(queries) - i1.getNumberOfMatchingQuery(queries))
+                .sorted((i1, i2) -> i2.getMatchingQueryCount(queries) - i1.getMatchingQueryCount(queries))
                 .collect(Collectors.toList());
     }
 
@@ -395,15 +395,15 @@ public class TurboIssue {
 
     /**
      * @param queries
-     * @return number of matches to a list of query
+     * @return number of queries that match this issue
      */
-    private int getNumberOfMatchingQuery(List<String> queries) {
+    private int getMatchingQueryCount(List<String> queries) {
         return Math.toIntExact(
             queries.stream().filter(query -> Utility.containsIgnoreCase(getMatchableText(), query)).count());
     }
 
     /**
-     * @return string that can be matched by any query
+     * @return string representation of issues that will be matched against queries
      */
     private String getMatchableText() {
         return getTitle() + " " + getId();
