@@ -2,9 +2,7 @@ package backend.control.operations;
 
 import backend.RepoIO;
 import backend.resource.TurboIssue;
-import org.eclipse.egit.github.core.Issue;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -33,6 +31,7 @@ public class ReplaceIssueMilestoneOnServerOp implements RepoOp<Boolean> {
     @Override
     public CompletableFuture<Boolean> perform() {
         return repoIO.replaceIssueMilestone(issue, milestone)
-                .thenApply(chain(result));
+                .thenApply(chain(result))
+                .exceptionally(result::completeExceptionally);
     }
 }

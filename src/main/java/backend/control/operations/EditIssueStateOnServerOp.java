@@ -39,6 +39,7 @@ public class EditIssueStateOnServerOp implements RepoOp<Boolean> {
         String state = isOpen ? "\"Open\"" : "\"Closed\"";
         logger.info("Editing state of " + issue + " to " + state + " on GitHub");
         return repoIO.editIssueState(issue, isOpen)
-                .thenApply(chain(result));
+                .thenApply(chain(result))
+                .exceptionally(result::completeExceptionally);
     }
 }

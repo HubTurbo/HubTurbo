@@ -160,12 +160,13 @@ If the PR was from a contributor, merge it only after it is approved.
 
 - `./gradlew clean shadowJar`
 - The JAR will be in `build/libs`
-- Name it in the format: `resource-vMAJOR.MINOR.PATCH.jar`
+- Name it in the format: `HubTurbo.jar`
 - Upload it to [Releases](https://github.com/HubTurbo/HubTurbo/releases/new) under the tag you just created
 
 #### Enable automatic updates
 
-- Update [HubTurbo.xml](https://github.com/HubTurbo/AutoUpdater/blob/master/HubTurbo.xml)
+- Update [HubTurboUpdate.json](https://raw.githubusercontent.com/HubTurbo/HubTurbo/master/HubTurboUpdate.json)
+  - If the release is a different major, create a new JSON object containing `version` and `applicationFileLocation`. This is to allow updating data store when there is an update in major version.
 - Commit in the `VMAJOR.MINOR.PATCH` format
 
 ### Prepare next release candidate
@@ -192,4 +193,4 @@ If the PR was from a contributor, merge it only after it is approved.
 ### Housekeeping
 
 - Delete old [releases](https://github.com/HubTurbo/HubTurbo/releases) so only the last 5 minor versions remain.
-- **Warning**: do not delete the version that [HubTurbo.xml](https://github.com/HubTurbo/AutoUpdater/blob/master/HubTurbo.xml) relies on! The latest public release may have been some time back
+- **Warning**: do not delete the version that [HubTurboUpdate.json](https://raw.githubusercontent.com/HubTurbo/HubTurbo/master/HubTurboUpdate.json) relies on! The latest public release may have been some time back

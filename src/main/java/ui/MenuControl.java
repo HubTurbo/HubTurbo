@@ -11,13 +11,11 @@ import org.apache.logging.log4j.Logger;
 import prefs.PanelInfo;
 import prefs.Preferences;
 import ui.issuepanel.PanelControl;
+import util.DialogMessage;
 import util.Utility;
 import util.events.*;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static ui.components.KeyboardShortcuts.*;
@@ -63,7 +61,9 @@ public class MenuControl extends MenuBar {
                 createRefreshMenuItem(),
                 createDocumentationMenuItem());
 
-        getMenus().addAll(file, newMenu, panels, boards, repos, view);
+        Menu update = createUpdateMenu();
+
+        getMenus().addAll(file, newMenu, panels, boards, repos, view, update);
     }
 
     private Menu createFileMenu() {
@@ -89,51 +89,72 @@ public class MenuControl extends MenuBar {
     }
 
     /**
-     * Logs the user action and creates a new board
+     * Checks whether the current board is dirty, i.e. has unsaved changes.
+     *
+     * @return true if current board is dirty, false otherwise
+     */
+    public final boolean isCurrentBoardDirty() {
+        if (!prefs.getLastOpenBoardPanelInfos().isPresent()) {
+            return true;
+        }
+        return !panels.getCurrentPanelInfos().equals(prefs.getLastOpenBoardPanelInfos().get());
+    }
+
+    /**
+     * Prompts a dialog to ask the user whether or not to save the current board.
+     *
+     * @return true if user choose to save, false otherwise
+     */
+    public final boolean isUserAgreeableToSavingBorad() {
+        return DialogMessage.showYesNoConfirmationDialog("Save Changes?",
+                "All unsaved changes will be discarded.",
+                "Do you want to save them?",
+                "Yes", "No");
+    }
+
+    /**
+     * Prompts a {@link BoardNameDialog} to ask the user for a board name
+     *
+     * @return the user's response
+     */
+    public final Optional<String> promptForBoardName() {
+        BoardNameDialog dlg = new BoardNameDialog(prefs, mainStage);
+        return dlg.showAndWait();
+    }
+
+    /**
+     * Creates a new board, prompt the user to save the current board if the current board is dirty.
      */
     private void onBoardNew() {
         logger.info("Menu: Boards > New");
+
+        if (isCurrentBoardDirty() && isUserAgreeableToSavingBorad()) {
+            saveBoard();
+
+            logger.info("Changes to the current board saved.");
+        } else {
+            logger.info("User abandoned unsaved changes.");
+        }
+
         newBoard();
     }
 
     /**
-     * Creates an empty board. User will be prompted to
-     * confirm the action if there are unclosed panels
+     * Creates a new board with a single empty panel. User will be prompted for the new board name.
      */
     public final void newBoard() {
-        if (!isNewBoardCreationDialogConfirmed()) {
-            logger.info("New board creation cancelled");
-            return;
-        }
+        Optional<String> response = promptForBoardName();
 
-        panels.closeAllPanels();
-        saveBoardAs();
+        response.ifPresent(boardName -> {
+            List<PanelInfo> panelList = new ArrayList<>();
+            panelList.add(new PanelInfo("Panel", ""));
+
+            createAndOpenNewBoard(boardName, panelList);
+        });
     }
 
     /**
-     * Returns a boolean indicating whether we can proceed with
-     * the new board creation. If there are no panels open, it
-     * returns true; else a dialog is shown for the user to confirm.
-     */
-    private boolean isNewBoardCreationDialogConfirmed() {
-        List<PanelInfo> panelList = panels.getCurrentPanelInfos();
-        if (panelList.isEmpty()) {
-            return true;
-        }
-
-        Alert dlg = new Alert(AlertType.CONFIRMATION, "");
-        dlg.initModality(Modality.APPLICATION_MODAL);
-        dlg.setTitle("Confirmation");
-        dlg.getDialogPane().setHeaderText("Create a new board");
-        dlg.getDialogPane().setContentText("Are you sure you want to create a new board?"
-                                           + " All unsaved changes to the current board will be lost.");
-        Optional<ButtonType> response = dlg.showAndWait();
-        return response.isPresent() &&
-                response.get().getButtonData() == ButtonData.OK_DONE;
-    }
-
-    /**
-     * Logs the user action and saves the current board
+     * Saves the current board
      */
     private void onBoardSave() {
         logger.info("Menu: Boards > Save");
@@ -141,7 +162,8 @@ public class MenuControl extends MenuBar {
     }
 
     /**
-     * Tries to save current board. If current board has not been saved before, it calls {@code saveBoardAs()}
+     * Tries to save current board. If current board has not been saved before,
+     * it calls {@link MenuControl#saveBoardAs()}
      */
     public final void saveBoard() {
         if (!prefs.getLastOpenBoard().isPresent()) {
@@ -162,7 +184,7 @@ public class MenuControl extends MenuBar {
     }
 
     /**
-     * Logs the user action and triggers "Save as" on the current board
+     * Triggers "Save as" on the current board
      */
     private void onBoardSaveAs() {
         logger.info("Menu: Boards > Save as");
@@ -170,28 +192,29 @@ public class MenuControl extends MenuBar {
     }
 
     /**
-     * Prompts a BoardNameDialog and saves the current board based on its response
+     * Prompts for board name and saves the current board as per the name
      */
     public final void saveBoardAs() {
-        List<PanelInfo> panelList = panels.getCurrentPanelInfos();
-        BoardNameDialog dlg = new BoardNameDialog(prefs, mainStage);
-        Optional<String> response = dlg.showAndWait();
-        ui.showMainStage();
-        panels.selectFirstPanel();
+        Optional<String> response = promptForBoardName();
 
-        if (response.isPresent()) {
-            String boardName = response.get().trim();
-            prefs.addBoard(boardName, panelList);
-            prefs.setLastOpenBoard(boardName);
-            prefs.setLastOpenBoardPanelInfos(panelList);
-            ui.triggerEvent(new BoardSavedEvent());
-            logger.info("New board " + boardName + " saved");
-            ui.updateTitle();
-        }
+        response.ifPresent(boardName -> {
+            createAndOpenNewBoard(boardName, panels.getCurrentPanelInfos());
+        });
     }
 
     /**
-     * Logs the user action and opens the board that user requested
+     * Opens a new board with the given board name and panel infos, then saves the board.
+     *
+     * @param boardName
+     * @param panelList
+     */
+    public final void createAndOpenNewBoard(String boardName, List<PanelInfo> panelList) {
+        openBoard(boardName, panelList);
+        saveBoard();
+    }
+
+    /**
+     * Opens the board that user requested
      */
     private void onBoardOpen(String boardName, List<PanelInfo> panelInfos) {
         logger.info("Menu: Boards > Open > " + boardName);
@@ -213,10 +236,12 @@ public class MenuControl extends MenuBar {
         ui.updateTitle();
 
         ui.triggerEvent(new UsedReposChangedEvent());
+
+        logger.info("Board " + boardName + " opened");
     }
 
     /**
-     * Logs the user action and deletes the board that user requested
+     * Deletes the board that user requested
      */
     private void onBoardDelete(String boardName) {
         logger.info("Menu: Boards > Delete > " + boardName);
@@ -296,6 +321,10 @@ public class MenuControl extends MenuBar {
         if (name.isPresent()) {
             onBoardOpen(name.get(), prefs.getBoardPanels(name.get()));
         }
+    }
+
+    public void switchBoard(String name) {
+        onBoardOpen(name, prefs.getBoardPanels(name));
     }
 
     private MenuItem createDocumentationMenuItem() {
@@ -391,5 +420,19 @@ public class MenuControl extends MenuBar {
 
     private void onRepoRemove(String repoId) {
         ui.logic.removeStoredRepository(repoId).thenRun(() -> ui.triggerEvent(new UnusedStoredReposChangedEvent()));
+    }
+
+    private Menu createUpdateMenu() {
+        Menu update = new Menu("Update");
+
+        MenuItem checkProgress = new MenuItem("Check progress...");
+
+        checkProgress.setOnAction(e -> {
+            ui.showUpdateProgressWindow();
+        });
+
+        update.getItems().addAll(checkProgress);
+
+        return update;
     }
 }

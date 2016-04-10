@@ -13,7 +13,7 @@ public class RepositoryPickerStateTests {
     @Test
     public void constructor_constructRepoPickerState_oneRepoSelected() {
         RepositoryPickerState state = createRepoPickerStateFromRepoIds("atom/atom", "HubTurbo/HubTurbo");
-        assertEquals("atom/atom", state.getSelectedRepositoryId());
+        assertEquals(Optional.of("atom/atom"), state.getSelectedRepositoryId());
     }
 
     @Test
@@ -37,17 +37,16 @@ public class RepositoryPickerStateTests {
     }
 
     @Test
-    public void processUserQuery_queryIsNotEmpty_queryAddedToSuggestedRepos() {
-        RepositoryPickerState state = createRepoPickerStateFromRepoIds("atom/atom", "atom/tree-view", "org/repoId");
+    public void processUserQuery_queryIsNotEmpty_matchingRepoAddedToSuggestedList() {
+        Set<String> existingRepositories = new HashSet<>(Arrays.asList("atom/atom", "atom/tree-view", "org/repoId"));
+        RepositoryPickerState state = new RepositoryPickerState(existingRepositories);
         state.processUserQuery("atom");
-        PickerRepository userQueryRepo = new PickerRepository("atom");
         PickerRepository repoA = new PickerRepository("atom/atom");
         PickerRepository repoB = new PickerRepository("atom/tree-view");
-        List<PickerRepository> expected = Arrays.asList(userQueryRepo, repoA, repoB);
+        List<PickerRepository> expected = Arrays.asList(repoA, repoB);
         assertEquals(expected, state.getSuggestedRepositories());
         state.processUserQuery("z");
-        userQueryRepo = new PickerRepository("z");
-        expected = Arrays.asList(userQueryRepo);
+        expected = new ArrayList<>();
         assertEquals(expected, state.getSuggestedRepositories());
     }
 
@@ -55,11 +54,11 @@ public class RepositoryPickerStateTests {
     public void selectNextSuggestedRepository_currentSelectedNotAtTheEnd_nextRepositoryInSuggestedIsSelected() {
         RepositoryPickerState state = createRepoPickerStateFromRepoIds("atom/atom", "HubTurbo/HubTurbo", "org/repoId");
         state.processUserQuery("");
-        assertEquals("atom/atom", state.getSelectedRepositoryId());
+        assertEquals(Optional.of("atom/atom"), state.getSelectedRepositoryId());
         state.selectNextSuggestedRepository();
-        assertEquals("HubTurbo/HubTurbo", state.getSelectedRepositoryId());
+        assertEquals(Optional.of("HubTurbo/HubTurbo"), state.getSelectedRepositoryId());
         state.selectNextSuggestedRepository();
-        assertEquals("org/repoId", state.getSelectedRepositoryId());
+        assertEquals(Optional.of("org/repoId"), state.getSelectedRepositoryId());
     }
 
     @Test
@@ -67,11 +66,11 @@ public class RepositoryPickerStateTests {
         RepositoryPickerState state = createRepoPickerStateFromRepoIds("atom/atom", "HubTurbo/HubTurbo", "org/repoId");
         state.processUserQuery("");
         state.setSelectedRepositoryInSuggestedList("org/repoId");
-        assertEquals("org/repoId", state.getSelectedRepositoryId());
+        assertEquals(Optional.of("org/repoId"), state.getSelectedRepositoryId());
         state.selectPreviousSuggestedRepository();
-        assertEquals("HubTurbo/HubTurbo", state.getSelectedRepositoryId());
+        assertEquals(Optional.of("HubTurbo/HubTurbo"), state.getSelectedRepositoryId());
         state.selectPreviousSuggestedRepository();
-        assertEquals("atom/atom", state.getSelectedRepositoryId());
+        assertEquals(Optional.of("atom/atom"), state.getSelectedRepositoryId());
     }
 
     @Test
@@ -80,7 +79,7 @@ public class RepositoryPickerStateTests {
         state.processUserQuery("");
         state.setSelectedRepositoryInSuggestedList("org/repoId");
         state.selectNextSuggestedRepository();
-        assertEquals("atom/atom", state.getSelectedRepositoryId());
+        assertEquals(Optional.of("atom/atom"), state.getSelectedRepositoryId());
     }
 
     @Test
@@ -89,7 +88,7 @@ public class RepositoryPickerStateTests {
         state.processUserQuery("");
         state.setSelectedRepositoryInSuggestedList("atom/atom");
         state.selectPreviousSuggestedRepository();
-        assertEquals("org/repoId", state.getSelectedRepositoryId());
+        assertEquals(Optional.of("org/repoId"), state.getSelectedRepositoryId());
     }
 
     @Test
@@ -106,18 +105,44 @@ public class RepositoryPickerStateTests {
     @Test
     public void setSelectedRepository_suggestedRepositoryDoesNotContainUserInput_correctRepoSelected() {
         RepositoryPickerState state = createRepoPickerStateFromRepoIds("atom/atom", "HubTurbo/HubTurbo", "org/repoId");
-        assertEquals("atom/atom", state.getSelectedRepositoryId());
+        assertEquals(Optional.of("atom/atom"), state.getSelectedRepositoryId());
         state.setSelectedRepositoryInSuggestedList("org/repoId");
-        assertEquals("org/repoId", state.getSelectedRepositoryId());
+        assertEquals(Optional.of("org/repoId"), state.getSelectedRepositoryId());
     }
 
     @Test
     public void setSelectedRepository_suggestedRepositoryContainsUserInput_correctRepoSelected() {
         RepositoryPickerState state = createRepoPickerStateFromRepoIds("atom/atom", "atom/tree-view", "org/repoId");
         state.processUserQuery("a");
-        verifySelectedRepository(state, "a");
+        verifySelectedRepository(state, "atom/atom");
         state.setSelectedRepositoryInSuggestedList("atom/tree-view");
         verifySelectedRepository(state, "atom/tree-view");
+    }
+
+    @Test
+    public void addRepository_suggestedRepositoriesCleared() {
+        RepositoryPickerState state = createRepoPickerStateFromRepoIds("atom/atom", "atom/tree-view", "org/repoId");
+        state.processUserQuery("a");
+        PickerRepository repoA = new PickerRepository("atom/atom");
+        PickerRepository repoB = new PickerRepository("atom/tree-view");
+        List<PickerRepository> expected = Arrays.asList(repoA, repoB);
+        assertEquals(expected, state.getSuggestedRepositories());
+        state.addRepository("atom/status-bar");
+        assertEquals(0, state.getSuggestedRepositories().size());
+    }
+
+    @Test
+    public void addRepository_processInputAfterAdding_newRepoAddedToSuggestedRepositories() {
+        RepositoryPickerState state = createRepoPickerStateFromRepoIds("atom/atom", "atom/tree-view", "org/repoId");
+        state.processUserQuery("a");
+        PickerRepository repoA = new PickerRepository("atom/atom");
+        PickerRepository repoB = new PickerRepository("atom/tree-view");
+        PickerRepository repoD = new PickerRepository("atom/status-bar");
+        state.addRepository("atom/status-bar");
+        assertEquals(0, state.getSuggestedRepositories().size());
+        state.processUserQuery("a");
+        List<PickerRepository> expected = Arrays.asList(repoA, repoD, repoB);
+        assertEquals(expected, state.getSuggestedRepositories());
     }
 
     private RepositoryPickerState createRepoPickerStateFromRepoIds(String... repoId) {

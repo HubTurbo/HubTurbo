@@ -57,6 +57,8 @@ public final class KeyboardShortcuts {
             new KeyCodeCombination(KeyCode.I, KeyCombination.SHORTCUT_DOWN);
     public static final KeyCodeCombination SWITCH_BOARD =
             new KeyCodeCombination(KeyCode.B, KeyCombination.SHORTCUT_DOWN);
+    public static final KeyCodeCombination SHOW_BOARD_PICKER =
+            new KeyCodeCombination(KeyCode.B, KeyCombination.SHORTCUT_DOWN, KeyCombination.SHIFT_DOWN);
     public static final KeyCodeCombination UNDO_LABEL_CHANGES =
             new KeyCodeCombination(KeyCode.Z, KeyCombination.SHORTCUT_DOWN);
 

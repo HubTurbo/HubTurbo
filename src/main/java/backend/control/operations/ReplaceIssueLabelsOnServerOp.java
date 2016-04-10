@@ -35,6 +35,7 @@ public class ReplaceIssueLabelsOnServerOp implements RepoOp<Boolean> {
     @Override
     public CompletableFuture<Boolean> perform() {
         return repoIO.replaceIssueLabels(issue, labels)
-                .thenApply(chain(result));
+                .thenApply(chain(result))
+                .exceptionally(result::completeExceptionally);
     }
 }

@@ -18,7 +18,6 @@ import ui.TestController;
 import ui.UI;
 import ui.issuepanel.PanelControl;
 import util.PlatformEx;
-import util.Utility;
 
 public class BoardTests extends UITest {
 
@@ -53,13 +52,13 @@ public class BoardTests extends UITest {
         press(CREATE_LEFT_PANEL);
         waitAndAssertEquals(2, panelControl::getPanelCount);
 
-        traverseMenu("Panels", "Create");
+        traverseHubTurboMenu("Panels", "Create");
         waitAndAssertEquals(3, panelControl::getPanelCount);
-        traverseMenu("Panels", "Create (Left)");
+        traverseHubTurboMenu("Panels", "Create (Left)");
         waitAndAssertEquals(4, panelControl::getPanelCount);
-        traverseMenu("Panels", "Close");
+        traverseHubTurboMenu("Panels", "Close");
         waitAndAssertEquals(3, panelControl::getPanelCount);
-        traverseMenu("Panels", "Close");
+        traverseHubTurboMenu("Panels", "Close");
         waitAndAssertEquals(2, panelControl::getPanelCount);
     }
 
@@ -73,7 +72,7 @@ public class BoardTests extends UITest {
         assertEquals(ui.getTitle(), getUiTitleWithOpenBoard("none"));
 
         // Saving when no board is open should prompt the user to save a new board
-        traverseMenu("Boards", "Save");
+        traverseHubTurboMenu("Boards", "Save");
         type("Board 1");
         push(KeyCode.ESCAPE);
     }
@@ -82,7 +81,7 @@ public class BoardTests extends UITest {
     public void boards_saveDialog_willNotSaveOnCancellation() {
         PanelControl panelControl = TestController.getUI().getPanelControl();
 
-        traverseMenu("Boards", "Save");
+        traverseHubTurboMenu("Boards", "Save");
         type("Board 1");
         push(KeyCode.ESCAPE);
 
@@ -110,7 +109,7 @@ public class BoardTests extends UITest {
     }
 
     private void saveBoardWithName(String name) {
-        traverseMenu("Boards", "Save as");
+        traverseHubTurboMenu("Boards", "Save as");
         waitUntilNodeAppears(boardNameInputId);
         ((TextField) GuiTest.find(boardNameInputId)).setText(name);
         clickOn("OK");
@@ -159,7 +158,7 @@ public class BoardTests extends UITest {
     }
 
     private void tryBoardName(String name) {
-        traverseMenu("Boards", "Save as");
+        traverseHubTurboMenu("Boards", "Save as");
         waitUntilNodeAppears(boardNameInputId);
         ((TextField) GuiTest.find(boardNameInputId)).setText(name);
         assertTrue(GuiTest.find(boardNameSaveButtonId).isDisabled());
@@ -182,7 +181,7 @@ public class BoardTests extends UITest {
         waitAndAssertEquals(2, panelControl::getPanelCount);
         assertEquals(ui.getTitle(), getUiTitleWithOpenBoard("Board 2"));
 
-        traverseMenu("Boards", "Open", "Board 1");
+        traverseHubTurboMenu("Boards", "Open", "Board 1");
 
         // We've switched to Board 1
         waitAndAssertEquals(1, panelControl::getPanelCount);
@@ -198,13 +197,13 @@ public class BoardTests extends UITest {
         pushKeys(CREATE_RIGHT_PANEL);
         awaitCondition(() -> 2 == panelControl.getPanelCount());
 
-        traverseMenu("Boards", "Open", "Board 1");
+        traverseHubTurboMenu("Boards", "Open", "Board 1");
 
         // Without having saved, we lose the extra panel
         waitAndAssertEquals(1, panelControl::getPanelCount);
 
         pushKeys(CREATE_RIGHT_PANEL);
-        traverseMenu("Boards", "Save");
+        traverseHubTurboMenu("Boards", "Save");
 
         // After saving, the panel is there
         waitAndAssertEquals(2, panelControl::getPanelCount);
@@ -218,7 +217,7 @@ public class BoardTests extends UITest {
 
         saveBoardWithName("Board 1");
 
-        traverseMenu("Boards", "Delete", "Board 1");
+        traverseHubTurboMenu("Boards", "Delete", "Board 1");
         waitUntilNodeAppears(hasText("OK"));
         clickOn("OK");
 
@@ -242,7 +241,7 @@ public class BoardTests extends UITest {
         assertFalse(UI.prefs.getLastOpenBoard().isPresent());
 
         // Saving will prompt the user to save as a new board
-        traverseMenu("Boards", "Save");
+        traverseHubTurboMenu("Boards", "Save");
         waitUntilNodeAppears(boardNameInputId);
         ((TextField) GuiTest.find(boardNameInputId)).setText("Board 1");
         clickOn("OK");
@@ -252,8 +251,7 @@ public class BoardTests extends UITest {
     }
 
     private static String getUiTitleWithOpenBoard(String boardName) {
-        String version = Utility.version(UI.VERSION_MAJOR, UI.VERSION_MINOR, UI.VERSION_PATCH);
-        return String.format(UI.WINDOW_TITLE, version, boardName);
+        return String.format(UI.WINDOW_TITLE, "dummy/dummy", boardName);
     }
 
     @Test
@@ -264,8 +262,15 @@ public class BoardTests extends UITest {
         assertEquals(0, panelControl.getNumberOfSavedBoards());
         assertEquals(1, panelControl.getPanelCount());
 
-        traverseMenu("Boards", "New");
-        press(KeyCode.ESCAPE);
+        traverseHubTurboMenu("Boards", "New");
+
+        // Abort saving changes to current board
+        waitUntilNodeAppears("No");
+        clickOn("No");
+
+        // Cancel new board action
+        waitUntilNodeAppears("Cancel");
+        clickOn("Cancel");
         assertEquals(0, panelControl.getNumberOfSavedBoards());
         assertEquals(1, panelControl.getPanelCount());
     }
@@ -276,16 +281,18 @@ public class BoardTests extends UITest {
         UI ui = TestController.getUI();
         PanelControl panelControl = ui.getPanelControl();
 
-        traverseMenu("Boards", "New");
-        waitUntilNodeAppears(hasText("OK"));
-        clickOn("OK");
+        traverseHubTurboMenu("Boards", "New");
+
+        // Abort saving changes to current board
+        waitUntilNodeAppears("No");
+        clickOn("No");
 
         waitUntilNodeAppears(boardNameInputId);
         ((TextField) GuiTest.find(boardNameInputId)).setText("empty");
-        waitUntilNodeAppears(hasText("OK"));
+        waitUntilNodeAppears("OK");
         clickOn("OK");
 
-        waitAndAssertEquals(0, panelControl::getPanelCount);
+        waitAndAssertEquals(1, panelControl::getPanelCount);
         waitAndAssertEquals(ui.getTitle(), () -> getUiTitleWithOpenBoard("empty"));
     }
 }

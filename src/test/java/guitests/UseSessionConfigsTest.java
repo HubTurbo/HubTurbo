@@ -54,9 +54,6 @@ public class UseSessionConfigsTest extends UITest {
         pushKeys(KeyCode.TAB);
         type("test");
         clickOn("Sign in");
-        ComboBox<String> repositorySelector = findOrWaitFor("#repositorySelector");
-        waitForValue(repositorySelector);
-        assertEquals("dummy/dummy", repositorySelector.getValue());
 
         pushKeys(KeyboardShortcuts.MAXIMIZE_WINDOW);
 

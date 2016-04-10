@@ -9,29 +9,19 @@ import static util.Utility.formatDateISO8601;
 import static util.Utility.localDateTimeToDate;
 import static util.Utility.localDateTimeToLong;
 import static util.Utility.parseHTTPLastModifiedDate;
-import static util.Utility.parseVersionNumber;
 import static util.Utility.replaceNull;
 import static util.Utility.safeLongToInt;
 import static util.Utility.snakeCaseToCamelCase;
 import static util.Utility.stripQuotes;
+import org.junit.Test;
+import util.Utility;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import org.junit.Test;
-
-import util.Utility;
-
 public class UtilityTest {
-
-    @Test
-    public void parseVersionNumberTest() {
-        assertEquals(1, parseVersionNumber("1.2.3a").get()[0]);
-        assertEquals(2, parseVersionNumber("1.2.3a").get()[1]);
-        assertEquals(3, parseVersionNumber("1.2.3a").get()[2]);
-    }
 
     @Test
     public void safeLongToIntTest() {
@@ -185,5 +175,20 @@ public class UtilityTest {
     @Test
     public void containsIgnoreCaseMultipleWords_allMatchingQueries() {
         assertTrue(Utility.containsIgnoreCase("this is me", Arrays.asList("is", "me")));
+    }
+
+    @Test
+    public void removeFirstWord_emptyString() {
+        assertTrue(Utility.removeFirstWord("").isEmpty());
+    }
+
+    @Test
+    public void removeFirstWord_oneWord() {
+        assertTrue(Utility.removeFirstWord("Hello").isEmpty());
+    }
+
+    @Test
+    public void removeFirstWord_moreThanOneWord() {
+        assertEquals("my name is Bond ", Utility.removeFirstWord("Hello, my name is Bond "));
     }
 }
