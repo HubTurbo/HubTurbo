@@ -7,6 +7,7 @@ import ui.issuepanel.FilterPanel;
 import ui.issuepanel.PanelControl;
 import ui.issuepanel.UIBrowserBridge;
 import util.DialogMessage;
+import util.RefreshTimer;
 import util.Utility;
 import util.events.*;
 import util.events.testevents.PrimaryRepoChangedEvent;
@@ -125,15 +126,17 @@ public class GUIController {
      * @param e The current api rate limits for calculation of the refresh rate.
      */
     private void updateSyncRefreshRate(UpdateRateLimitsEvent e) {
-        lastNumberOfApiCallsUsed = computePreviousRemainingApiRequests(e);
-        refreshTimeInMins = ui.timerManager.computeTickerTimerPeriod(e.remainingRequests,
-                Utility.minutesFromNow(e.nextRefreshInMillisecs), lastNumberOfApiCallsUsed);
-        ui.timerManager.changeTickingTimerPeriod((int) refreshTimeInMins);
+        lastNumberOfApiCallsUsed = computePreviousRemainingApiRequests(e.remainingRequests);
+        refreshTimeInMins = RefreshTimer.computeRefreshTimerPeriod(e.remainingRequests,
+                                                                     Utility.minutesFromNow(e.nextRefreshInMillisecs),
+                                                                     lastNumberOfApiCallsUsed, RefreshTimer.BUFFER_TIME,
+                                                                     RefreshTimer.DEFAULT_REFRESH_PERIOD_IN_MIN);
+        ui.refreshTimer.changeRefreshPeriod((int) refreshTimeInMins);
     }
 
-    private int computePreviousRemainingApiRequests(UpdateRateLimitsEvent e) {
-        int difference = previousRemainingApiRequests - e.remainingRequests;
-        previousRemainingApiRequests = e.remainingRequests;
+    private int computePreviousRemainingApiRequests(int remainingRequests) {
+        int difference = previousRemainingApiRequests - remainingRequests;
+        previousRemainingApiRequests = remainingRequests;
 
         if (difference >= 0) {
             return difference;

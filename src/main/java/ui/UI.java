@@ -27,7 +27,6 @@ import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.NotificationPane;
 import prefs.Preferences;
 import ui.components.HTStatusBar;
-import ui.components.KeyboardShortcuts;
 import ui.components.StatusUI;
 import ui.components.issuepicker.IssuePicker;
 import ui.components.pickers.AssigneePicker;
@@ -100,7 +99,7 @@ public class UI extends Application implements EventDispatcher {
 
     public UpdateManager updateManager;
 
-    public TickingTimerManager timerManager;
+    public RefreshTimer refreshTimer;
 
     // Main UI elements
 
@@ -249,11 +248,9 @@ public class UI extends Application implements EventDispatcher {
 
         // TODO clear cache if necessary
         
-        TickingTimer refreshTimer = new TickingTimer("Refresh Timer", TickingTimerManager.DEFAULT_REFRESH_PERIOD_IN_SEC,
-            status::updateTimeToRefresh, logic::refresh, TimeUnit.SECONDS);
-
-        timerManager = new TickingTimerManager(refreshTimer);
-        timerManager.startTimer();
+        refreshTimer = new RefreshTimer("Refresh Timer", RefreshTimer.DEFAULT_REFRESH_PERIOD_IN_MIN * 60,
+                                        status::updateTimeToRefresh, logic::refresh, TimeUnit.SECONDS);
+        refreshTimer.start();
 
         undoController = new UndoController(notificationController);
     }
@@ -360,7 +357,7 @@ public class UI extends Application implements EventDispatcher {
                     if (shouldRefresh) {
                         logger.info("Browser view has changed; refreshing");
                         logic.refresh();
-                        timerManager.restartTimer();
+                        refreshTimer.restart();
                     }
                 }
             });
