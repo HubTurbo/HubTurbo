@@ -248,7 +248,8 @@ public class UI extends Application implements EventDispatcher {
 
         // TODO clear cache if necessary
         
-        refreshTimer = new RefreshTimer("Refresh Timer", RefreshTimer.DEFAULT_REFRESH_PERIOD_IN_MIN * 60,
+        refreshTimer = new RefreshTimer("Refresh Timer",
+                                        (int) Utility.minsToSecs(RefreshTimer.DEFAULT_REFRESH_PERIOD_IN_MIN),
                                         status::updateTimeToRefresh, logic::refresh, TimeUnit.SECONDS);
         refreshTimer.start();
 

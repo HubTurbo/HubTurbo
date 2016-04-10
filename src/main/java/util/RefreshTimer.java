@@ -57,7 +57,7 @@ public class RefreshTimer extends TickingTimer{
     public static long computeRefreshTimerPeriod(int apiQuota, long remainingTimeInMin, int lastApiCallsUsed,
                                                  int bufferTimeInMin, int defaultRefreshPeriodInMin) {
 
-         assert apiQuota >= 0 && remainingTimeInMin >= 0 && lastApiCallsUsed >= 0 && bufferTimeInMin >= 0
+        assert apiQuota >= 0 && remainingTimeInMin >= 0 && lastApiCallsUsed >= 0 && bufferTimeInMin >= 0
                 && defaultRefreshPeriodInMin > 0;
 
         long refreshTimeInMin;
@@ -99,7 +99,7 @@ public class RefreshTimer extends TickingTimer{
         boolean isOutOfQuota = apiQuota == 0 && lastApiCallsUsed == 0;
         boolean isBelowApiQuotaBufferAllowance = apiQuota <= APIQUOTA_BUFFER;
         boolean isOffsetQuotaLessThanLastApiCallsUsed = apiQuota - APIQUOTA_BUFFER > 0
-                                                      && apiQuota - APIQUOTA_BUFFER < lastApiCallsUsed;
+                                                        && apiQuota - APIQUOTA_BUFFER < lastApiCallsUsed;
 
         return isOutOfQuota || isBelowApiQuotaBufferAllowance || isOffsetQuotaLessThanLastApiCallsUsed;
     }

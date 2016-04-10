@@ -33,8 +33,7 @@ public class RefreshTimerTest {
         long result = RefreshTimer.computeRefreshTimerPeriod(199, 35, 25, 2, 1);
         assertEquals(result, 37);
 
-        result = RefreshTimer.computeRefreshTimerPeriod(1,
-                35, 25, 2, 60);
+        result = RefreshTimer.computeRefreshTimerPeriod(1, 35, 25, 2, 60);
         assertEquals(result, 37);
     }
 
