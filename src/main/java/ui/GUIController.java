@@ -39,7 +39,7 @@ public class GUIController {
 
     private String defaultRepoId;
 
-    long refreshTimeInMins = 1;
+    private long refreshTimeInMin = 1;
 
     public GUIController(UI ui, PanelControl panelControl, Label apiBox) {
         this.ui = ui;
@@ -127,11 +127,11 @@ public class GUIController {
      */
     private void updateSyncRefreshRate(UpdateRateLimitsEvent e) {
         lastNumberOfApiCallsUsed = computePreviousRemainingApiRequests(e.remainingRequests);
-        refreshTimeInMins = RefreshTimer.computeRefreshTimerPeriod(e.remainingRequests,
+        refreshTimeInMin = RefreshTimer.computeRefreshTimerPeriod(e.remainingRequests,
                                                                      Utility.minutesFromNow(e.nextRefreshInMillisecs),
                                                                      lastNumberOfApiCallsUsed, RefreshTimer.BUFFER_TIME,
                                                                      RefreshTimer.DEFAULT_REFRESH_PERIOD_IN_MIN);
-        ui.refreshTimer.changeRefreshPeriod((int) refreshTimeInMins);
+        ui.refreshTimer.changeRefreshPeriod((int) refreshTimeInMin);
     }
 
     private int computePreviousRemainingApiRequests(int remainingRequests) {
@@ -152,7 +152,7 @@ public class GUIController {
      */
     private void updateAPIBox(int remainingRequests, long nextRefreshInMillisecs) {
         Platform.runLater(() -> apiBox.setText(String.format("%s/%s[x%d]", remainingRequests,
-                Utility.minutesFromNow(nextRefreshInMillisecs), (int) Math.ceil(refreshTimeInMins))));
+                Utility.minutesFromNow(nextRefreshInMillisecs), (int) Math.ceil(refreshTimeInMin))));
     }
 
     private void showErrorDialog(ShowErrorDialogEvent e) {
