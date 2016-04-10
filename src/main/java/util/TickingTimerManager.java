@@ -36,8 +36,8 @@ public class TickingTimerManager {
     /**
      * Computes the TickerTimer period that are used for refreshing the issues periodically.
      * The refresh rate is computed based on the three input argument and constant APIQUOTA_BUFFER.
-     * APIQUOTA_BUFFER is the amount that is reserved for manual refresh and creation of label, issue and milestone.
-     * This amount is then deducted from the actual apiQuota to ensure the algorithm reserve this amount.
+     * APIQUOTA_BUFFER is the amount that is reserved for manual operations performed by the user.
+     * This amount is then deducted from the actual apiQuota to ensure the algorithm reserves this amount.
      * The calculation has 2 steps.
      * The first step, the offset amount(apiQuota - APIQUOTA_BUFFER) is divided by the amount
      * of api used during the last refresh. This amount corresponds to the estimated no of refresh allowed to use till
@@ -66,15 +66,16 @@ public class TickingTimerManager {
         if (isQuotaInsufficient(apiQuota, lastApiCallsUsed)) {
             refreshTimeInMin = remainingTime + BUFFER_TIME;
             return refreshTimeInMin;
-        } else {
-            double noOfRefreshAllowed = computeNoOfRefreshAllowed(apiQuota, lastApiCallsUsed);
-            refreshTimeInMin = (long) Math.ceil(remainingTime / noOfRefreshAllowed);
-
-            if (noOfRefreshAllowed == NO_OF_REFRESH_THAT_REQUIRES_MORE_TIME) {
-                refreshTimeInMin = refreshTimeInMin + BUFFER_TIME;
-            }
-            return refreshTimeInMin;
         }
+
+        double noOfRefreshAllowed = computeNoOfRefreshAllowed(apiQuota, lastApiCallsUsed);
+        refreshTimeInMin = (long) Math.ceil(remainingTime / noOfRefreshAllowed);
+
+        if (noOfRefreshAllowed == NO_OF_REFRESH_THAT_REQUIRES_MORE_TIME) {
+            refreshTimeInMin = refreshTimeInMin + BUFFER_TIME;
+        }
+        return refreshTimeInMin;
+
     }
 
     private double computeNoOfRefreshAllowed(int apiQuota, int lastApiCallsUsed) {
@@ -83,10 +84,10 @@ public class TickingTimerManager {
 
     /**
      * Changes the timer refresh period.
-     * @param period
+     * @param periodInMin The period of the TickingTimer in minute.
      */
-    public void changeTickingTimerPeriodInMins(int period) {
-        timer.changePeriodInSecs((int) Utility.minsToSecs(period));
+    public void changeTickingTimerPeriod(int periodInMin) {
+        timer.changePeriod((int) Utility.minsToSecs(periodInMin));
     }
 
     private boolean isQuotaInsufficient(int apiQuota, int lastApiCallsUsed) {

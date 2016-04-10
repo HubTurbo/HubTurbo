@@ -128,7 +128,7 @@ public class GUIController {
         lastNumberOfApiCallsUsed = computePreviousRemainingApiRequests(e);
         refreshTimeInMins = ui.timerManager.computeTickerTimerPeriod(e.remainingRequests,
                 Utility.minutesFromNow(e.nextRefreshInMillisecs), lastNumberOfApiCallsUsed);
-        ui.timerManager.changeTickingTimerPeriodInMins((int) refreshTimeInMins);
+        ui.timerManager.changeTickingTimerPeriod((int) refreshTimeInMins);
     }
 
     private int computePreviousRemainingApiRequests(UpdateRateLimitsEvent e) {
