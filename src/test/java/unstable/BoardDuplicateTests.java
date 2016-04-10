@@ -63,6 +63,11 @@ public class BoardDuplicateTests extends UITest {
         clickOn("No");
         clickOn("Cancel");
         traverseHubTurboMenu("Boards", "Open", "New Board");
+
+        // Abort saving changes
+        waitUntilNodeAppears("No");
+        clickOn("No");
+
         waitAndAssertEquals(2, panelControl::getPanelCount);
     }
 }
