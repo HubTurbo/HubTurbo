@@ -142,8 +142,8 @@ public class BoardPickerDialog extends Dialog<String> {
     }
 
     private void handleBoardClick(PickerBoard board) {
+        queryField.setText(board.getBoardName());
         suggestion = Optional.of(board.getBoardName());
-        queryField.setText(suggestion.get());
-        updateConfirmButton();
+        populateBoards(state);
     }
 }
