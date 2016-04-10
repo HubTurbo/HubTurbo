@@ -6,43 +6,39 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 import prefs.PanelInfo;
-import ui.TestController;
-import ui.UI;
+import ui.*;
 import ui.issuepanel.PanelControl;
 import util.PlatformEx;
+import java.util.Map.Entry;
 
+import java.lang.reflect.Field;
 import java.util.Optional;
-
-import static ui.PanelMenuCreator.ASSIGNEE_FILTER_NAME;
-import static ui.PanelMenuCreator.ASSIGNEE_PANEL_NAME;
-import static ui.PanelMenuCreator.MILESTONE_FILTER_NAME;
-import static ui.PanelMenuCreator.MILESTONE_PANEL_NAME;
-import static ui.PanelMenuCreator.UPDATED_FILTER_NAME;
-import static ui.PanelMenuCreator.UPDATED_PANEL_NAME;
 
 public class PanelMenuCreatorTest extends UITest {
 
     private PanelControl panelControl;
+    private UI ui;
 
     @Before
     public void setupUIComponent() {
-        UI ui = TestController.getUI();
+        ui = TestController.getUI();
         panelControl = ui.getPanelControl();
     }
 
     @Test
-    public void assigneePanelMenuItemTest() {
-        customizedPanelMenuItemTest(ASSIGNEE_PANEL_NAME, ASSIGNEE_FILTER_NAME);
+    public void autoCreatePanels_createCustomPanelsFromMenu_panelsCreatedWithAppropriatePanelNameAndFilter()
+            throws NoSuchFieldException, IllegalAccessException {
+        PanelMenuCreator value = (PanelMenuCreator) getPanelMenuCreatorField().get(ui.getMenuControl());
+        for (Entry<String, String> entry :
+                value.generatePanelDetails(ui.prefs.getLastLoginUsername()).entrySet()) {
+            customizedPanelMenuItemTest(entry.getKey(), entry.getValue());
+        }
     }
 
-    @Test
-    public void milestonePanelMenuItemTest() {
-        customizedPanelMenuItemTest(MILESTONE_PANEL_NAME, MILESTONE_FILTER_NAME);
-    }
-
-    @Test
-    public void recentlyUpdatedPanelMenuItemTest() {
-        customizedPanelMenuItemTest(UPDATED_PANEL_NAME, UPDATED_FILTER_NAME);
+    private Field getPanelMenuCreatorField() throws NoSuchFieldException, IllegalAccessException {
+        Field panelMenuCreatorField = MenuControl.class.getDeclaredField("panelMenuCreator");
+        panelMenuCreatorField.setAccessible(true);
+        return panelMenuCreatorField;
     }
 
     @Test
@@ -72,5 +68,4 @@ public class PanelMenuCreatorTest extends UITest {
         assertEquals(panelName, panelInfo.getPanelName());
         traverseHubTurboMenu("Panels", "Close");
     }
-
 }

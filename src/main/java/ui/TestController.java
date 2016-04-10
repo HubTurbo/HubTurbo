@@ -129,7 +129,9 @@ public final class TestController {
      * from it if it already exists.
      */
     public static Preferences loadTestPreferences() {
-        return Preferences.load(TEST_DIRECTORY, TEST_SESSION_CONFIG_FILENAME, TEST_USER_CONFIG_FILENAME);
+        Preferences prefs = Preferences.load(TEST_DIRECTORY, TEST_SESSION_CONFIG_FILENAME, TEST_USER_CONFIG_FILENAME);
+        prefs.setLastLoginCredentials("test", "test");
+        return prefs;
     }
 
     /**

@@ -37,7 +37,7 @@ public class MenuControl extends MenuBar {
         this.ui = ui;
         this.mainStage = mainStage;
         this.boardAutoCreator = new BoardAutoCreator(ui, panels, prefs);
-        this.panelMenuCreator = new PanelMenuCreator(panels, panelsScrollPane);
+        this.panelMenuCreator = new PanelMenuCreator(panels, panelsScrollPane, prefs.getLastLoginUsername());
 
         createMenuItems();
     }
