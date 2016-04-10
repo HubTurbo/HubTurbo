@@ -1,4 +1,4 @@
-package guitests;
+package unstable;
 
 import javafx.application.Platform;
 import javafx.scene.control.ContextMenu;
@@ -9,6 +9,7 @@ import javafx.scene.input.KeyCode;
 import org.junit.Before;
 import org.junit.Test;
 
+import guitests.UITest;
 import ui.IdGenerator;
 import ui.components.FilterTextField;
 import ui.listpanel.ListPanel;
