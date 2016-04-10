@@ -28,10 +28,10 @@ public class PanelMenuCreator {
     private final PanelControl panelControl;
     private final ScrollPane panelsScrollPane;
 
-    public PanelMenuCreator(PanelControl panelControl, ScrollPane panelsScrollPane, String lastLoginUsername) {
+    public PanelMenuCreator(PanelControl panelControl, ScrollPane panelsScrollPane, String currentUsername) {
         this.panelsScrollPane = panelsScrollPane;
         this.panelControl = panelControl;
-        this.currentUsername = lastLoginUsername;
+        this.currentUsername = currentUsername;
     }
 
     public Menu generatePanelMenu() {
