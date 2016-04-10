@@ -1,8 +1,6 @@
 package unstable;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 import static ui.components.pickers.PickerRepository.COMMON_REPO_LABEL_STYLE;
 import static ui.components.pickers.PickerRepository.SELECTED_REPO_LABEL_STYLE;
 
@@ -51,9 +49,7 @@ public class RepositoryPickerTest extends UITest {
         // check if test json is present
         File testConfig = new File(TestController.TEST_DIRECTORY, TestController.TEST_SESSION_CONFIG_FILENAME);
         boolean testConfigExists = testConfig.exists() && testConfig.isFile();
-        if (!testConfigExists) {
-            fail();
-        }
+        assertTrue(testConfigExists);
 
         ListPanel listPanel;
         VBox suggestedRepositoryList;
@@ -89,13 +85,10 @@ public class RepositoryPickerTest extends UITest {
         traverseHubTurboMenu("Repos", "Show Repository Picker");
         PlatformEx.waitOnFxThread();
         userInputField = findOrWaitFor(IdGenerator.getRepositoryPickerTextFieldReference());
-        clickOn("Add repository");
         type("dummy3/dummy3");
+        clickOn("Add repository");
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
-        doubleClickOn(userInputField);
-        doubleClickOn();
-        type("dummy3/dummy3");
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
         traverseHubTurboMenu("Repos", "Show Repository Picker");
@@ -204,6 +197,46 @@ public class RepositoryPickerTest extends UITest {
         // Last viewed repository
         RepositoryId lastViewedRepository = testPref.getLastViewedRepository().get();
         assertEquals("dummy4/dummy4", lastViewedRepository.generateId());
+    }
+
+    @Test
+    public void addRepository_repoPickerTextFieldNotEmpty_inputCopiedToAndSelectedInRepoDialog() {
+        File testConfig = new File(TestController.TEST_DIRECTORY, TestController.TEST_SESSION_CONFIG_FILENAME);
+        boolean testConfigExists = testConfig.exists() && testConfig.isFile();
+        assertTrue(testConfigExists);
+
+        // now we check if the login dialog pops up because the "dummy/dummy" json
+        // doesn't exist and there are no other valid repo json files
+        type("dummy").push(KeyCode.TAB);
+        type("dummy").push(KeyCode.ENTER);
+
+        traverseHubTurboMenu("Repos", "Show Repository Picker");
+        PlatformEx.waitOnFxThread();
+        waitUntilNodeAppears("Confirm");
+        PlatformEx.waitOnFxThread();
+        type("atom/atom");
+        clickOn("Add repository");
+        waitUntilNodeAppears("OK");
+        // try prepending text to test whether the text is selected
+        push(KeyCode.LEFT);
+        type("abcd-").press(KeyCode.ENTER);
+        waitUntilNodeAppears("abcd-atom/atom");
+        push(KeyCode.ESCAPE);
+
+        traverseHubTurboMenu("Repos", "Show Repository Picker");
+        PlatformEx.waitOnFxThread();
+        waitUntilNodeAppears("Confirm");
+        PlatformEx.waitOnFxThread();
+        type("atom/atom");
+        clickOn("Add repository");
+        waitUntilNodeAppears("OK");
+        // immediate typing should erase the whole string in addRepo dialog
+        type("abcd-").press(KeyCode.ENTER);
+        waitUntilNodeAppears("abcd-");
+        push(KeyCode.ESCAPE);
+
+        traverseHubTurboMenu("File", "Quit");
+        push(KeyCode.ENTER);
     }
 
     private void assertSelectedPickerRepositoryNode(String repoId, Node node) {
