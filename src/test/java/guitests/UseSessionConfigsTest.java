@@ -128,8 +128,9 @@ public class UseSessionConfigsTest extends UITest {
         clickOn("OK");
 
         // Then exit program...
-        clickOn("File");
+        clickOn("App");
         clickOn("Quit");
+
 
         // ...and check if the test JSON is still there...
         File testConfig = new File(TestController.TEST_DIRECTORY, TestController.TEST_SESSION_CONFIG_FILENAME);
