@@ -74,6 +74,7 @@ public class UITest extends FxRobot {
      * as suggested by TestFX documentation
      */
     static {
+        System.setProperty("headless", "true");
         if (Boolean.getBoolean("headless")) {
             System.setProperty("java.awt.robot", "true");
             System.setProperty("testfx.robot", "glass");

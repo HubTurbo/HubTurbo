@@ -1,4 +1,4 @@
-package guitests;
+package unstable;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -12,6 +12,7 @@ import java.util.concurrent.TimeoutException;
 import org.junit.Test;
 import org.testfx.api.FxToolkit;
 
+import guitests.UITest;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Menu;
