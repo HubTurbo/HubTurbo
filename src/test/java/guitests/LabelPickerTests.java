@@ -1,7 +1,10 @@
 package guitests;
 
 import backend.resource.TurboIssue;
+import backend.resource.TurboLabel;
 import javafx.application.Platform;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.FlowPane;
 import org.junit.Test;
@@ -11,6 +14,7 @@ import ui.UI;
 import util.events.ShowLabelPickerEvent;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.loadui.testfx.Assertions.assertNodeExists;
 import static org.loadui.testfx.controls.Commons.hasText;
