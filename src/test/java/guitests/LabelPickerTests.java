@@ -53,6 +53,23 @@ public class LabelPickerTests extends UITest {
         exitCleanly();
     }
 
+    @Test
+    public void showLabeLPicker_clickSuggestedLabel_labelDisplayedCorrectly() {
+        TurboIssue issue = new TurboIssue("dummy/dummy", 1, "");
+        triggerLabelPicker(issue);
+        waitUntilNodeAppears(ASSIGNED_LABELS_PANE_ID);
+        clickOn(IdGenerator.getLabelPickerTextFieldIdReference());
+        type("hig");
+        clickOn("high");
+        FlowPane assignedLabels = GuiTest.find(ASSIGNED_LABELS_PANE_ID);
+        Node secondLabel = assignedLabels.getChildren().get(1);
+        assertTrue(secondLabel instanceof Label);
+        assertEquals("p.high", ((Label) secondLabel).getText());
+        // it's not removed
+        assertFalse(secondLabel.getStyleClass().contains("labels-removed"));
+        exitCleanly();
+    }
+
     private void exitCleanly() {
         push(KeyCode.ESCAPE);
         waitUntilNodeDisappears(IdGenerator.getLabelPickerTextFieldIdReference());
