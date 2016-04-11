@@ -364,7 +364,7 @@ public class Qualifier implements FilterExpression {
         case LABEL:
             return labelsSatisfy(model, issue);
         case AUTHOR:
-            return authorSatisfies(issue);
+            return authorSatisfies(model, issue);
         case ASSIGNEE:
             return assigneeSatisfies(model, issue);
         case INVOLVES:
@@ -885,15 +885,19 @@ public class Qualifier implements FilterExpression {
         return login.contains(content) || name.contains(content);
     }
 
-    private boolean authorSatisfies(TurboIssue issue) {
+    private boolean authorSatisfies(IModel model, TurboIssue issue) {
         if (!content.isPresent()) return false;
+        Optional<TurboUser> author = model.getAuthorOfIssue(issue);
 
-        String creator = issue.getCreator();
-        return creator.toLowerCase().contains(content.get().toLowerCase());
+        String content = this.content.get().toLowerCase();
+        String login = issue.getCreator().toLowerCase();
+        String name = author.map(TurboUser::getRealName).orElse("").toLowerCase();
+
+        return login.contains(content) || name.contains(content);
     }
 
     private boolean involvesSatisfies(IModel model, TurboIssue issue) {
-        return authorSatisfies(issue) || assigneeSatisfies(model, issue);
+        return authorSatisfies(model, issue) || assigneeSatisfies(model, issue);
     }
 
     public static boolean labelMatches(String input, String candidate) {
