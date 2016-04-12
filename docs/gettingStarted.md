@@ -109,9 +109,4 @@ To aid in tracking the progress of you project, you can generate a Milestones Bo
 
 <img src="images/gettingStarted/createMilestonesBoard.png" width="500">
 
-Please visit this [link](boards.md) to learn more about other useful boards you can auto-create in HubTurbo. 
-
-
-
-
- 
+Please visit this [link](boards.md) to learn more about other useful boards you can auto-create in HubTurbo.
