@@ -116,9 +116,8 @@ public class IssuePickerDialog extends Dialog<String> {
     private void populateSelectedIssues(Optional<TurboIssue> selectedIssue) {
         selectedIssues.getChildren().clear();
         FlowPane selectedIssueCards = getSelectedIssuesPane(selectedIssue);
-        if (!selectedIssueCards.getChildren().isEmpty()) {
-            selectedIssues.getChildren().addAll(createRepoTitle(models.getDefaultRepo()), selectedIssueCards);
-        }
+        selectedIssue.ifPresent(issue ->
+            selectedIssues.getChildren().addAll(createRepoTitle(issue.getRepoId()), selectedIssueCards));
     }
 
     private void populateSuggestedIssues(List<TurboIssue> matchedIssues, Optional<TurboIssue> selectedIssue) {
