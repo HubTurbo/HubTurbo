@@ -178,6 +178,8 @@ public class RepositoryPickerDialog {
                 return;
             }
         });
+        dialog.getEditor().setText(userInputTextField.getText());
+        dialog.getEditor().selectAll();
         Optional<String> userInput = dialog.showAndWait();
         if (!userInput.isPresent()) {
             return CompletableFuture.completedFuture(false);
