@@ -123,7 +123,7 @@ public class BoardTests extends UITest {
 
         saveBoardWithName("Board 1");
 
-        // Nothing happens
+        // Remain at the same board
         press(SWITCH_BOARD);
         assertTrue(prefs.getLastOpenBoard().isPresent());
         assertEquals("Board 1", prefs.getLastOpenBoard().get());
@@ -200,6 +200,10 @@ public class BoardTests extends UITest {
 
         traverseHubTurboMenu("Boards", "Open", "Board 1");
 
+        // Abort saving changes to current board
+        waitUntilNodeAppears("No");
+        clickOn("No");
+
         // Without having saved, we lose the extra panel
         waitAndAssertEquals(1, panelControl::getPanelCount);
 
@@ -229,26 +233,65 @@ public class BoardTests extends UITest {
     }
 
     @Test
-    public void boards_panelCount_nothingHappensWhenNoBoardIsOpen() {
+    public void boards_panelCount_switchToFirstBoardWhenNoBoardIsOpen() {
+        saveBoardWithName("Board 1");
+        saveBoardWithName("Board 2");
+        saveBoardWithName("Board 3");
 
-        boards_panelCount_boardsCanBeDeletedSuccessfully();
-
-        UI ui = TestController.getUI();
-        PanelControl panelControl = ui.getPanelControl();
+        traverseHubTurboMenu("Boards", "Delete", "Board 3");
+        waitUntilNodeAppears(hasText("OK"));
+        clickOn("OK");
 
         // Switching board has no effect
         assertFalse(UI.prefs.getLastOpenBoard().isPresent());
         pushKeys(SWITCH_BOARD);
-        assertFalse(UI.prefs.getLastOpenBoard().isPresent());
 
-        // Saving will prompt the user to save as a new board
+        // Abort saving changes to current board
+        waitUntilNodeAppears("No");
+        clickOn("No");
+
+        assertTrue(UI.prefs.getLastOpenBoard().isPresent());
+        assertEquals("Board 2", UI.prefs.getLastOpenBoard().get());
+    }
+
+    @Test
+    public void boards_panelCount_promptToSaveWhenCurrentBoardIsDirty() {
+        UI ui = TestController.getUI();
+        PanelControl panelControl = ui.getPanelControl();
+
+        saveBoardWithName("Board 1");
+        saveBoardWithName("Board 2");
+        pushKeys(CREATE_RIGHT_PANEL);
+        awaitCondition(() -> 2 == panelControl.getPanelCount());
+
+        pushKeys(SWITCH_BOARD);
+
+        // Confirm saving changes to current board
+        waitUntilNodeAppears("Yes");
+        clickOn("Yes");
+
+        traverseHubTurboMenu("Boards", "Open", "Board 2");
+        waitAndAssertEquals(2, panelControl::getPanelCount);
+    }
+
+    @Test
+    public void boards_panelCount_askForBoardNameWhenCurrentBoardHasNeverBeenSaved() {
+        UI ui = TestController.getUI();
+        PanelControl panelControl = ui.getPanelControl();
+
+        pushKeys(CREATE_RIGHT_PANEL);
+        pushKeys(CREATE_RIGHT_PANEL);
+        awaitCondition(() -> 3 == panelControl.getPanelCount());
+
         traverseHubTurboMenu("Boards", "Save");
         waitUntilNodeAppears(boardNameInputId);
         ((TextField) GuiTest.find(boardNameInputId)).setText("Board 1");
         clickOn("OK");
 
-        assertEquals(1, panelControl.getNumberOfSavedBoards());
-        assertEquals(ui.getTitle(), getUiTitleWithOpenBoard("Board 1"));
+        assertEquals("Board 1", UI.prefs.getLastOpenBoard().get());
+
+        traverseHubTurboMenu("Boards", "Open", "Board 1");
+        waitAndAssertEquals(3, panelControl::getPanelCount);
     }
 
     private static String getUiTitleWithOpenBoard(String boardName) {

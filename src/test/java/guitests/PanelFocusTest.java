@@ -126,6 +126,10 @@ public class PanelFocusTest extends UITest {
         // 3. Open board
         pushKeys(SWITCH_BOARD);
 
+        // Abort saving changes to current board
+        waitUntilNodeAppears("No");
+        clickOn("No");
+
         // Check that first panel is on focus
         awaitCondition(() -> 0 == panelControl.getCurrentlySelectedPanel().get());
         // Check that first panel is shown by checking scrollbar position
