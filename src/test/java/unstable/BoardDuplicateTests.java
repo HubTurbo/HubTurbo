@@ -1,16 +1,17 @@
-package guitests;
+package unstable;
+
+import static org.loadui.testfx.controls.Commons.hasText;
+
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 
+import guitests.UITest;
 import prefs.Preferences;
 import ui.TestController;
 import ui.UI;
 import ui.issuepanel.PanelControl;
-
-import java.util.List;
-
-import static org.loadui.testfx.controls.Commons.hasText;
 
 public class BoardDuplicateTests extends UITest {
     PanelControl panelControl;
@@ -29,7 +30,7 @@ public class BoardDuplicateTests extends UITest {
     @Test
     public void duplicateNameTest() {
         // Save the current board
-        traverseMenu("Boards", "Save as");
+        traverseHubTurboMenu("Boards", "Save as");
         waitUntilNodeAppears(hasText("OK"));
         // Use the default 'New Board' as board name
         // Workaround since we are unable to get text field into focus on Travis
@@ -38,8 +39,8 @@ public class BoardDuplicateTests extends UITest {
 
         // Create a new panel, then save with the same name
         // Expected: Dialog shown to confirm duplicate name
-        traverseMenu("Panels", "Create");
-        traverseMenu("Boards", "Save as");
+        traverseHubTurboMenu("Panels", "Create");
+        traverseHubTurboMenu("Boards", "Save as");
         waitUntilNodeAppears(hasText("OK"));
         // Sometimes not trigger if only click once
         doubleClickOn("OK");
@@ -48,20 +49,25 @@ public class BoardDuplicateTests extends UITest {
         // Overwrite previous board, then open the board again
         // Expected: the board should contain 2 panels
         clickOn("Yes");
-        traverseMenu("Boards", "Open", "New Board");
+        traverseHubTurboMenu("Boards", "Open", "New Board");
         waitAndAssertEquals(2, panelControl::getPanelCount);
 
 
         // Create a new panel, then save with the same name to show warning dialog,
         // don't save and try to reopen board
         // Expected: Board is not overwritten, should contain 2 panels
-        traverseMenu("Panels", "Create");
-        traverseMenu("Boards", "Save as");
+        traverseHubTurboMenu("Panels", "Create");
+        traverseHubTurboMenu("Boards", "Save as");
         waitUntilNodeAppears(hasText("OK"));
         clickOn("OK");
         clickOn("No");
         clickOn("Cancel");
-        traverseMenu("Boards", "Open", "New Board");
+        traverseHubTurboMenu("Boards", "Open", "New Board");
+
+        // Abort saving changes
+        waitUntilNodeAppears("No");
+        clickOn("No");
+
         waitAndAssertEquals(2, panelControl::getPanelCount);
     }
 }

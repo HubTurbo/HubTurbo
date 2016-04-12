@@ -12,8 +12,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ui.issuepanel.PanelControl;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.Map.Entry;
 
 import static ui.components.KeyboardShortcuts.CLOSE_PANEL;
 import static ui.components.KeyboardShortcuts.CREATE_LEFT_PANEL;
@@ -21,23 +21,17 @@ import static ui.components.KeyboardShortcuts.CREATE_RIGHT_PANEL;
 
 public class PanelMenuCreator {
 
+    private final String currentUsername;
+
     private static final Logger logger = LogManager.getLogger(MenuControl.class.getName());
-
-    public static final String MILESTONE_FILTER_NAME = "milestone:curr sort:status";
-    public static final String MILESTONE_PANEL_NAME = "Current Milestone";
-
-    public static final String ASSIGNEE_FILTER_NAME = "is:open ((is:issue assignee:me) OR (is:pr author:me))";
-    public static final String ASSIGNEE_PANEL_NAME = "Open issues and PR's";
-
-    public static final String UPDATED_FILTER_NAME = "assignee:me updated:<48";
-    public static final String UPDATED_PANEL_NAME = "Recently Updated issues";
 
     private final PanelControl panelControl;
     private final ScrollPane panelsScrollPane;
 
-    public PanelMenuCreator(PanelControl panelControl, ScrollPane panelsScrollPane) {
+    public PanelMenuCreator(PanelControl panelControl, ScrollPane panelsScrollPane, String currentUsername) {
         this.panelsScrollPane = panelsScrollPane;
         this.panelControl = panelControl;
+        this.currentUsername = currentUsername;
     }
 
     public Menu generatePanelMenu() {
@@ -48,13 +42,30 @@ public class PanelMenuCreator {
         items.add(createLeftPanelMenuItem());
         items.add(createRightPanelMenuItem());
         items.add(closePanelMenuItem());
-        autoCreateItems.add(createCustomizedPanelMenuItem(ASSIGNEE_PANEL_NAME, ASSIGNEE_FILTER_NAME));
-        autoCreateItems.add(createCustomizedPanelMenuItem(MILESTONE_PANEL_NAME, MILESTONE_FILTER_NAME));
-        autoCreateItems.add(createCustomizedPanelMenuItem(UPDATED_PANEL_NAME, UPDATED_FILTER_NAME));
+        for (Entry<String, String> entry :
+                generatePanelDetails(currentUsername).entrySet()) {
+            autoCreateItems.add(createPanelMenuItem(entry.getKey(), entry.getValue()));
+        }
         autoCreatePanelMenu.getItems().addAll(autoCreateItems);
         panelMenu.getItems().addAll(items);
         panelMenu.getItems().add(autoCreatePanelMenu);
         return panelMenu;
+    }
+
+    /**
+     * Returns a map of custom panels that can be created using the auto-create menu
+     * with the key of the map as the panel name and the value as the corresponding filter name.
+     * Uses the username as a parameter to construct the filter names.
+     * @param currentUsername
+     */
+    public static Map<String, String> generatePanelDetails(String currentUsername){
+        Map<String, String> customPanels = new LinkedHashMap<>();
+        customPanels.put("Open issues and PR's",
+                String.format("is:open ((is:issue assignee:%1$s) OR (is:pr author:%1$s))", currentUsername));
+        customPanels.put("Current Milestone", "milestone:curr sort:status");
+        customPanels.put("Recently Updated issues",
+                String.format("assignee:%s updated:<48", currentUsername));
+        return Collections.unmodifiableMap(customPanels);
     }
 
     public MenuItem createLeftPanelMenuItem() {
@@ -107,7 +118,7 @@ public class PanelMenuCreator {
         return closePanel;
     }
 
-    public MenuItem createCustomizedPanelMenuItem(String panelName, String panelFilter) {
+    public MenuItem createPanelMenuItem(String panelName, String panelFilter) {
         MenuItem customizedPanel = new MenuItem(panelName);
         customizedPanel.setOnAction(e -> {
             logger.info("Menu: Panels > Auto-create > " + panelName + "panel");

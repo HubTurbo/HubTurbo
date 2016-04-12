@@ -1,14 +1,10 @@
 package util;
 
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonParser;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.eclipse.egit.github.core.RepositoryId;
-import ui.UI;
-import util.events.ShowErrorDialogEvent;
-
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -19,12 +15,26 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TimeZone;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.eclipse.egit.github.core.RepositoryId;
+
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParser;
+
+import ui.UI;
+import util.events.ShowErrorDialogEvent;
 
 public final class Utility {
 
@@ -178,13 +188,6 @@ public final class Utility {
         return obj == null ? replacement : obj;
     }
 
-    public static int safeLongToInt(long l) {
-        if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE) {
-            throw new IllegalArgumentException(l + " cannot be cast to int without changing its value.");
-        }
-        return (int) l;
-    }
-
     public static Date parseHTTPLastModifiedDate(String dateString) {
         assert dateString != null;
         try {
@@ -230,31 +233,6 @@ public final class Utility {
         return millisecToMinutes(targetTime - new Date().getTime());
     }
 
-    /**
-     * Parses a version number string in the format V1.2.3.
-     *
-     * @param version version number string
-     * @return an array of 3 elements, representing the major, minor, and patch versions respectively
-     */
-    public static Optional<int[]> parseVersionNumber(String version) {
-        // Strip non-digits
-        String numericVersion = version.replaceAll("[^0-9.]+", "");
-
-        String[] temp = numericVersion.split("\\.");
-        try {
-            int major = temp.length > 0 ? Integer.parseInt(temp[0]) : 0;
-            int minor = temp.length > 1 ? Integer.parseInt(temp[1]) : 0;
-            int patch = temp.length > 2 ? Integer.parseInt(temp[2]) : 0;
-            return Optional.of(new int[] { major, minor, patch });
-        } catch (NumberFormatException e) {
-            return Optional.empty();
-        }
-    }
-
-    public static String version(int major, int minor, int patch) {
-        return String.format("V%d.%d.%d", major, minor, patch);
-    }
-
     public static String snakeCaseToCamelCase(String str) {
         Pattern p = Pattern.compile("(^|_)([a-z])");
         Matcher m = p.matcher(str);
@@ -278,7 +256,7 @@ public final class Utility {
      * @return
      */
     public static boolean containsIgnoreCase(String source, List<String> queries) {
-        return queries.stream().allMatch(query -> Utility.containsIgnoreCase(source, query));
+        return queries.stream().anyMatch(query -> Utility.containsIgnoreCase(source, query));
     }
 
     public static boolean startsWithIgnoreCase(String source, String query) {
@@ -331,6 +309,19 @@ public final class Utility {
         }
         ifEmpty.run();
         return Optional.empty();
+    }
+
+    /**
+     * Removes the first word from a string. Useful for removing the java exception name from the
+     * full exception message.
+     * @param s
+     */
+    public static String removeFirstWord(String s) {
+        String[] words = s.split(" ", 2);
+        if (words.length <= 1) {
+            return "";
+        }
+        return words[1];
     }
 
     private Utility() {}

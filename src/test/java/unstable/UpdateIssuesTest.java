@@ -1,4 +1,4 @@
-package guitests;
+package unstable;
 
 import static org.junit.Assert.assertEquals;
 
@@ -8,6 +8,7 @@ import java.util.concurrent.FutureTask;
 import org.junit.Test;
 import org.loadui.testfx.GuiTest;
 
+import guitests.UITest;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
 import ui.IdGenerator;
@@ -39,7 +40,7 @@ public class UpdateIssuesTest extends UITest {
         push(KeyCode.ENTER); // 1 call for issue 5, 1 for issue 9, 1 for issue 10.
 
         // Updated view should now contain Issue 5.1, Issue 9 and Issue 10.
-        awaitCondition(() -> 3489 == getApiCount(apiBox.getText()));
+        awaitCondition(() -> 3489 == getApiCount(apiBox.getText()), 10);
         assertEquals(4, countIssuesShown());
 
 
@@ -48,12 +49,12 @@ public class UpdateIssuesTest extends UITest {
         UI.events.triggerEvent(new UILogicRefreshEvent()); // 1 call for issues 5, 9, 10.
         clickFilterTextFieldAtPanel(0);
         push(KeyCode.ENTER); // 1 call for issues 5, 9, 10.
-        awaitCondition(() -> 3481 == getApiCount(apiBox.getText()));
+        awaitCondition(() -> 3481 == getApiCount(apiBox.getText()), 10);
         assertEquals(4, countIssuesShown());
 
         clickFilterTextFieldAtPanel(0);
         push(KeyCode.ENTER); // 1 call for issues 5, 9, 10.
-        awaitCondition(() -> 3477 == getApiCount(apiBox.getText()));
+        awaitCondition(() -> 3477 == getApiCount(apiBox.getText()), 10);
     }
 
     public void resetRepo() {

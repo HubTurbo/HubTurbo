@@ -3,15 +3,11 @@ package ui.listpanel;
 import static ui.components.KeyboardShortcuts.*;
 import util.GithubPageElements.PrTab;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
-import filter.expression.QualifierType;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
+import filter.expression.*;
+import javafx.scene.Node;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
@@ -39,10 +35,11 @@ import backend.resource.TurboIssue;
 import filter.expression.Qualifier;
 import util.events.ShowMilestonePickerEvent;
 
-
 public class ListPanel extends FilterPanel {
 
     private static final Logger logger = HTLog.get(ListPanel.class);
+
+    public static final String WATCH_LIST_FILTER_REGEX = "^id:([^#]+#\\d+;)*([^#]+#\\d+)$";
 
     private final UI ui;
     private int issuesCount = 0;
@@ -62,6 +59,12 @@ public class ListPanel extends FilterPanel {
     Text bracketCloseText;
     Text plusText;
 
+    private static final String APPEND_TO_WATCH_LIST_FORMAT = "%s;%s#%d";
+    private static final String CREATE_WATCH_LIST_FORMAT = "id:%s#%d";
+    private static final String WATCH_LIST_PANEL_NAME_PROMPT_TITLE = "Watch List Panel Name";
+    private static final String WATCH_LIST_PANEL_NAME_PROMPT_HEADER = "Please enter a name for the watch list panel.";
+    private static final String DEFAULT_WATCH_LIST_PANEL_NAME = "New Watch List Panel";
+
     // Context Menu
     private final ContextMenu contextMenu = new ContextMenu();
 
@@ -75,13 +78,18 @@ public class ListPanel extends FilterPanel {
     private static final Boolean READ = true;
     private final MenuItem changeLabelsMenuItem = new MenuItem();
     private static final String CHANGE_LABELS_MENU_ITEM_TEXT = "Change labels (L)";
+    private static final String ADD_TO_WATCH_LIST_MENU_TEXT = "Add to watch list";
+    private final Menu addToWatchListMenu = new Menu();
+    private static final String NEW_WATCH_LIST_MENU_ITEM_TEXT = "New watch list";
+    private final MenuItem newWatchListMenuItem = new MenuItem();
+
     private static final MenuItem changeMilestoneMenuItem = new MenuItem();
     private static final String CHANGE_MILESTONE_MENU_ITEM_TEXT = "Change milestone (M)";
     private final MenuItem changeAssigneeMenuItem = new MenuItem();
     private static final String CHANGE_ASSIGNEE_MENU_ITEM_TEXT = "Change Assignee (A)";
 
     private final MenuItem closeReopenIssueMenuItem = new MenuItem();
-    private static final String closeIssueMenuItemText = "Close issue (C)";
+    private static final String closeIssueMenuItemText = "Close issue (X)";
     private static final String reopenIssueMenuItemText = "Reopen issue (O)";
 
     public ListPanel(UI ui, Stage mainStage, PanelControl parentPanelControl, int panelIndex) {
@@ -250,18 +258,18 @@ public class ListPanel extends FilterPanel {
 
     private void setupKeyboardShortcuts() {
         addEventHandler(KeyEvent.KEY_PRESSED, event -> {
-            // Temporary fix for now since markAsRead and Show Related Issue/PR have same keys.
-            // Will only work if the key for markAsRead is not the default key E.
-            if (KeyboardShortcuts.markAsRead.match(event) && !SHOW_RELATED_ISSUE_OR_PR.match(event)) {
+            // Temporary fix for now since MARK_AS_READ and Show Related Issue/PR have same keys.
+            // Will only work if the key for MARK_AS_READ is not the default key E.
+            if (KeyboardShortcuts.MARK_AS_READ.match(event) && !SHOW_RELATED_ISSUE_OR_PR.match(event)) {
                 markAsRead();
             }
-            if (KeyboardShortcuts.markAsUnread.match(event)) {
+            if (KeyboardShortcuts.MARK_AS_UNREAD.match(event)) {
                 markAsUnread();
             }
-            if (KeyboardShortcuts.closeIssue.match(event)) {
+            if (KeyboardShortcuts.CLOSE_ISSUE.match(event)) {
                 closeIssue();
             }
-            if (KeyboardShortcuts.reopenIssue.match(event)) {
+            if (KeyboardShortcuts.REOPEN_ISSUE.match(event)) {
                 reopenIssue();
             }
             if (SHOW_DOCS.match(event)) {
@@ -293,14 +301,14 @@ public class ListPanel extends FilterPanel {
                 ui.getBrowserComponent().showContributors();
                 event.consume();
             }
-            if (KeyboardShortcuts.scrollToTop.match(event)) {
+            if (KeyboardShortcuts.SCROLL_TO_TOP.match(event)) {
                 ui.getBrowserComponent().scrollToTop();
             }
-            if (KeyboardShortcuts.scrollToBottom.match(event)) {
+            if (KeyboardShortcuts.SCROLL_TO_BOTTOM.match(event)) {
                 ui.getBrowserComponent().scrollToBottom();
             }
-            if (KeyboardShortcuts.scrollUp.match(event) || KeyboardShortcuts.scrollDown.match(event)) {
-                ui.getBrowserComponent().scrollPage(KeyboardShortcuts.scrollDown.match(event));
+            if (KeyboardShortcuts.SCROLL_UP.match(event) || KeyboardShortcuts.SCROLL_DOWN.match(event)) {
+                ui.getBrowserComponent().scrollPage(KeyboardShortcuts.SCROLL_DOWN.match(event));
             }
             if (GOTO_MODIFIER.match(event)) {
                 KeyPress.setLastKeyPressedCodeAndTime(event.getCode());
@@ -362,7 +370,7 @@ public class ListPanel extends FilterPanel {
                 if (KeyPress.isValidKeyCombination(GOTO_MODIFIER.getCode(), event.getCode())) {
                     showRelatedIssueOrPR();
                     // only for default. can remove if default key for MARK_AS_READ_CHANGES
-                } else if (KeyboardShortcuts.markAsRead.match(event)) {
+                } else if (KeyboardShortcuts.MARK_AS_READ.match(event)) {
                     markAsRead();
                 }
             }
@@ -428,12 +436,17 @@ public class ListPanel extends FilterPanel {
             markAllItemsBelow(!READ);
         });
 
-        contextMenu.getItems().addAll(markAsReadUnreadMenuItem,
-                                      markAllBelowAsReadMenuItem, markAllBelowAsUnreadMenuItem,
-                                      changeLabelsMenuItem,
-                                      changeMilestoneMenuItem,
-                                      changeAssigneeMenuItem,
-                                      closeReopenIssueMenuItem);
+        newWatchListMenuItem.setText(NEW_WATCH_LIST_MENU_ITEM_TEXT);
+        newWatchListMenuItem.setOnAction(e -> {
+            createNewWatchListPanel();
+        });
+
+        addToWatchListMenu.setText(ADD_TO_WATCH_LIST_MENU_TEXT);
+        addToWatchListMenu.getItems().add(newWatchListMenuItem);
+
+        contextMenu.getItems().addAll(markAsReadUnreadMenuItem, markAllBelowAsReadMenuItem,
+                markAllBelowAsUnreadMenuItem, changeLabelsMenuItem, changeMilestoneMenuItem, closeReopenIssueMenuItem,
+                changeAssigneeMenuItem, addToWatchListMenu);
 
         contextMenu.setOnShowing(e -> updateContextMenu(contextMenu));
         listView.setContextMenu(contextMenu);
@@ -447,7 +460,64 @@ public class ListPanel extends FilterPanel {
         updateChangeLabelsMenuItem();
         updateChangeMilestoneMenuItem();
         updateChangeAssigneeMenuItem();
+        updateAvailableWatchListPanels();
+
         return contextMenu;
+    }
+
+    private void updateAvailableWatchListPanels() {
+        restoreDefaultAddToWatchListPanelMenu();
+        Optional<GuiElement> item = listView.getSelectedItem();
+
+        if (item.isPresent()) {
+            addToWatchListMenu.setDisable(false);
+        } else {
+            addToWatchListMenu.setDisable(true);
+        }
+
+        parentPanelControl.getChildren().forEach(node -> {
+            if (isWatchListPanel(node)) {
+                MenuItem currentWatchPanel = createWatchListPanelMenuItem((FilterPanel) node);
+                addToWatchListMenu.getItems().add(currentWatchPanel);
+            }
+        });
+    }
+
+    private void restoreDefaultAddToWatchListPanelMenu() {
+        addToWatchListMenu.getItems().clear();
+        addToWatchListMenu.getItems().add(newWatchListMenuItem);
+    }
+
+    /**
+     * Creates a watch panel menu item for an existing watch list panel so that
+     * the user can add an issue to that panel
+     */
+    private MenuItem createWatchListPanelMenuItem(FilterPanel watchListPanel) {
+        MenuItem watchPanelMenu = new MenuItem();
+        String watchListPanelTitle = watchListPanel.getCurrentInfo().getPanelName();
+        watchPanelMenu.setText(watchListPanelTitle);
+        watchPanelMenu.setOnAction(e -> addSelectedIssueToWatchListPanel(watchListPanel));
+        return watchPanelMenu;
+    }
+
+    /**
+     * @return true if the node is a filter panel and its filter is a 'watch list filter'
+     */
+    private boolean isWatchListPanel(Node node) {
+        if (!(node instanceof FilterPanel)) {
+            return false;
+        }
+        FilterPanel currentFilterPanel = (FilterPanel) node;
+        return isWatchListFilter(currentFilterPanel.getFilterTextField().getText());
+    }
+
+    /**
+     * A FilterExpression is a valid watch list filter if :
+     *  - it is an empty string, OR
+     *  - it is in the form of : id:repo1#id1;repo2#id2;repo3#id3;...
+     */
+    public static boolean isWatchListFilter(String filter) {
+        return filter.isEmpty() || filter.matches(WATCH_LIST_FILTER_REGEX);
     }
 
     public ContextMenu getContextMenu() {
@@ -543,6 +613,45 @@ public class ListPanel extends FilterPanel {
             parentPanelControl.refresh();
             listView.selectNextItem();
         }
+    }
+
+    /**
+     * Creates a new watch list panel containing the currently selected issue
+     */
+    private void createNewWatchListPanel() {
+        Optional<GuiElement> item = listView.getSelectedItem();
+        assert item.isPresent();
+
+        TurboIssue issue = item.get().getIssue();
+        int panelCount = parentPanelControl.getPanelCount();
+        FilterPanel newWatchListPanel = parentPanelControl.addPanelAt(panelCount);
+        newWatchListPanel.setFilterByString(String.format(CREATE_WATCH_LIST_FORMAT,
+                ui.logic.getDefaultRepo(), issue.getId()));
+        String newWatchListPanelName = promptUserForNewWatchListPanelName();
+        newWatchListPanel.setPanelName(newWatchListPanelName);
+    }
+
+    private String promptUserForNewWatchListPanelName() {
+        TextInputDialog dialog = new TextInputDialog(DEFAULT_WATCH_LIST_PANEL_NAME);
+        dialog.setTitle(WATCH_LIST_PANEL_NAME_PROMPT_TITLE);
+        dialog.setHeaderText(WATCH_LIST_PANEL_NAME_PROMPT_HEADER);
+        Optional<String> result = dialog.showAndWait();
+        return result.orElse(DEFAULT_WATCH_LIST_PANEL_NAME);
+    }
+
+    private void addSelectedIssueToWatchListPanel(FilterPanel watchListPanel) {
+        Optional<GuiElement> item = listView.getSelectedItem();
+        assert item.isPresent();
+
+        TurboIssue issue = item.get().getIssue();
+        String oldFilter = watchListPanel.getFilterTextField().getText();
+        String newFilter;
+        if (oldFilter.isEmpty()) {
+            newFilter = String.format(CREATE_WATCH_LIST_FORMAT, issue.getRepoId(), issue.getId());
+        } else {
+            newFilter = String.format(APPEND_TO_WATCH_LIST_FORMAT, oldFilter, issue.getRepoId(), issue.getId());
+        }
+        watchListPanel.setFilterByString(newFilter);
     }
 
     /**

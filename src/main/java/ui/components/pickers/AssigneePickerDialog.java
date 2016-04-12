@@ -12,6 +12,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import ui.IdGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,23 +42,18 @@ public class AssigneePickerDialog extends Dialog<AssigneePickerDialog.AssigneePi
         state = new AssigneePickerState(originalUsers);
         initUI();
         setupKeyEvents();
-        fillTextFieldWithExistingAssignee();
-    }
-
-    private void fillTextFieldWithExistingAssignee() {
-        PickerAssignee.getExistingAssignee(originalUsers)
-                .map(PickerAssignee::getLoginName)
-                .ifPresent(this::fillTextFieldWithUsername);
-    }
-
-    private void fillTextFieldWithUsername(String username) {
-        textField.setText(username);
+        Platform.runLater(() -> positionDialog(stage));
     }
 
     private void setupKeyEvents() {
         textField.textProperty().addListener((observable, oldValue, newValue) -> {
             handleUpdatedInput(newValue);
         });
+    }
+
+    private final void positionDialog(Stage stage) {
+        setX(stage.getX() + stage.getWidth() / 2);
+        setY(stage.getY() + stage.getHeight() / 2 - getHeight() / 2);
     }
 
     private void handleUpdatedInput(String userInput) {
@@ -150,7 +146,7 @@ public class AssigneePickerDialog extends Dialog<AssigneePickerDialog.AssigneePi
 
     private void updateNewlyAddedAssignee(List<PickerAssignee> users, FlowPane assignedUserPane) {
         users.stream()
-                .filter(PickerAssignee::isSelected)
+                .filter(user -> !user.isExisting() && user.isSelected())
                 .forEach(user -> assignedUserPane.getChildren().add(
                         setMouseClickForNode(user.getNewlyAssignedAssigneeNode(),
                                 user.getLoginName())
@@ -183,6 +179,7 @@ public class AssigneePickerDialog extends Dialog<AssigneePickerDialog.AssigneePi
         assignedUserPane.setHgap(3);
         assignedUserPane.setVgap(5);
         assignedUserPane.setStyle("-fx-border-radius: 3;");
+        assignedUserPane.setId(IdGenerator.getAssigneePickerAssignedUserPaneId());
         return assignedUserPane;
     }
 

@@ -1,8 +1,8 @@
-package guitests;
+package unstable;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
+import static ui.components.pickers.PickerRepository.COMMON_REPO_LABEL_STYLE;
+import static ui.components.pickers.PickerRepository.SELECTED_REPO_LABEL_STYLE;
 
 import java.io.File;
 import java.util.concurrent.TimeoutException;
@@ -11,6 +11,7 @@ import org.eclipse.egit.github.core.RepositoryId;
 import org.junit.Test;
 import org.testfx.api.FxToolkit;
 
+import guitests.UITest;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -20,7 +21,6 @@ import prefs.Preferences;
 import ui.IdGenerator;
 import ui.TestController;
 import ui.UI;
-import ui.components.pickers.PickerRepository;
 import ui.listpanel.ListPanel;
 import util.PlatformEx;
 import util.events.testevents.PrimaryRepoChangedEventHandler;
@@ -45,13 +45,11 @@ public class RepositoryPickerTest extends UITest {
     }
 
     @Test
-    public void testrepositoryPickerTest() {
+    public void repositoryPickerTest() {
         // check if test json is present
         File testConfig = new File(TestController.TEST_DIRECTORY, TestController.TEST_SESSION_CONFIG_FILENAME);
         boolean testConfigExists = testConfig.exists() && testConfig.isFile();
-        if (!testConfigExists) {
-            fail();
-        }
+        assertTrue(testConfigExists);
 
         ListPanel listPanel;
         VBox suggestedRepositoryList;
@@ -61,8 +59,9 @@ public class RepositoryPickerTest extends UITest {
         // doesn't exist and there are no other valid repo json files
         type("dummy").push(KeyCode.TAB);
         type("dummy").push(KeyCode.ENTER);
-        traverseMenu("Repos", "Show Repository Picker");
+        traverseHubTurboMenu("Repos", "Show Repository Picker");
         PlatformEx.waitOnFxThread();
+        waitUntilNodeAppears(IdGenerator.getRepositoryPickerTextFieldReference());
         suggestedRepositoryList = findOrWaitFor(IdGenerator.getRepositoryPickerSuggestedRepoListReference());
         assertEquals(1, suggestedRepositoryList.getChildren().size());
         assertEquals("dummy/dummy", primaryRepo);
@@ -74,7 +73,7 @@ public class RepositoryPickerTest extends UITest {
         listPanel = getPanel(0);
         listPanel.setFilterByString("repo:dummy2/dummy2");
         waitUntilNodeAppears(IdGenerator.getPanelCellIdReference(0, 11));
-        traverseMenu("Repos", "Show Repository Picker");
+        traverseHubTurboMenu("Repos", "Show Repository Picker");
         PlatformEx.waitOnFxThread();
         suggestedRepositoryList = findOrWaitFor(IdGenerator.getRepositoryPickerSuggestedRepoListReference());
         assertEquals(2, suggestedRepositoryList.getChildren().size());
@@ -83,15 +82,16 @@ public class RepositoryPickerTest extends UITest {
 
         // we check if "dummy3/dummy3" is added to the repository picker
         // and that the primary repo is also changed
-        traverseMenu("Repos", "Show Repository Picker");
+        traverseHubTurboMenu("Repos", "Show Repository Picker");
         PlatformEx.waitOnFxThread();
         userInputField = findOrWaitFor(IdGenerator.getRepositoryPickerTextFieldReference());
-        doubleClickOn(userInputField);
-        doubleClickOn();
         type("dummy3/dummy3");
+        clickOn("Add repository");
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
-        traverseMenu("Repos", "Show Repository Picker");
+        push(KeyCode.ENTER);
+        PlatformEx.waitOnFxThread();
+        traverseHubTurboMenu("Repos", "Show Repository Picker");
         PlatformEx.waitOnFxThread();
         suggestedRepositoryList = findOrWaitFor(IdGenerator.getRepositoryPickerSuggestedRepoListReference());
         assertEquals(3, suggestedRepositoryList.getChildren().size());
@@ -99,77 +99,94 @@ public class RepositoryPickerTest extends UITest {
         push(KeyCode.ESCAPE);
 
         // we check whether the UI is updated under various scenarios
-        traverseMenu("Repos", "Show Repository Picker");
+        traverseHubTurboMenu("Repos", "Show Repository Picker");
         PlatformEx.waitOnFxThread();
         suggestedRepositoryList = findOrWaitFor(IdGenerator.getRepositoryPickerSuggestedRepoListReference());
         userInputField = findOrWaitFor(IdGenerator.getRepositoryPickerTextFieldReference());
         clickOn(userInputField);
         type("dummy");
-        assertEquals(4, suggestedRepositoryList.getChildren().size());
-        assertSelectedPickerRepositoryNode("dummy", suggestedRepositoryList.getChildren().get(0));
+        assertEquals(3, suggestedRepositoryList.getChildren().size());
+        assertSelectedPickerRepositoryNode("dummy/dummy", suggestedRepositoryList.getChildren().get(0));
         push(KeyCode.DOWN);
-        assertSelectedPickerRepositoryNode("dummy/dummy", suggestedRepositoryList.getChildren().get(1));
+        assertSelectedPickerRepositoryNode("dummy2/dummy2", suggestedRepositoryList.getChildren().get(1));
         push(KeyCode.DOWN);
-        assertSelectedPickerRepositoryNode("dummy2/dummy2", suggestedRepositoryList.getChildren().get(2));
+        assertSelectedPickerRepositoryNode("dummy3/dummy3", suggestedRepositoryList.getChildren().get(2));
         push(KeyCode.DOWN);
-        assertSelectedPickerRepositoryNode("dummy3/dummy3", suggestedRepositoryList.getChildren().get(3));
-        push(KeyCode.DOWN);
-        assertSelectedPickerRepositoryNode("dummy", suggestedRepositoryList.getChildren().get(0));
+        assertSelectedPickerRepositoryNode("dummy/dummy", suggestedRepositoryList.getChildren().get(0));
         push(KeyCode.UP);
-        assertSelectedPickerRepositoryNode("dummy3/dummy3", suggestedRepositoryList.getChildren().get(3));
+        assertSelectedPickerRepositoryNode("dummy3/dummy3", suggestedRepositoryList.getChildren().get(2));
         doubleClickOn(userInputField);
         type("dummmy");
-        assertEquals(1, suggestedRepositoryList.getChildren().size());
-        assertSelectedPickerRepositoryNode("dummmy", suggestedRepositoryList.getChildren().get(0));
+        assertEquals(0, suggestedRepositoryList.getChildren().size());
         push(KeyCode.ESCAPE);
 
-        // we check if repo's id with white spaces are handled correctly
-        traverseMenu("Repos", "Show Repository Picker");
+        // we check that the new repo created from user input is not selected anymore upon click
+        traverseHubTurboMenu("Repos", "Show Repository Picker");
         PlatformEx.waitOnFxThread();
+        userInputField = findOrWaitFor(IdGenerator.getRepositoryPickerTextFieldReference());
+        doubleClickOn(userInputField);
+        type("d");
+        suggestedRepositoryList = findOrWaitFor(IdGenerator.getRepositoryPickerSuggestedRepoListReference());
+        assertEquals(3, suggestedRepositoryList.getChildren().size());
+        clickOn("dummy2/dummy2");
+        assertEquals(3, suggestedRepositoryList.getChildren().size());
+        assertTrue(userInputField.isDisabled());
+        push(KeyCode.ENTER);
+        PlatformEx.waitOnFxThread();
+        assertEquals("dummy2/dummy2", primaryRepo);
+
+        // we check if repo's id with white spaces are handled correctly
+        traverseHubTurboMenu("Repos", "Show Repository Picker");
+        PlatformEx.waitOnFxThread();
+        waitUntilNodeAppears("Add repository");
+        clickOn("Add repository");
+        type(" dummy4 / dummy4 ");
+        push(KeyCode.ENTER);
         userInputField = findOrWaitFor(IdGenerator.getRepositoryPickerTextFieldReference());
         doubleClickOn(userInputField);
         doubleClickOn();
         type(" dummy4 / dummy4 ");
         push(KeyCode.ENTER);
-        traverseMenu("Repos", "Show Repository Picker");
+        traverseHubTurboMenu("Repos", "Show Repository Picker");
         PlatformEx.waitOnFxThread();
         suggestedRepositoryList = findOrWaitFor(IdGenerator.getRepositoryPickerSuggestedRepoListReference());
-        assertEquals(4, suggestedRepositoryList.getChildren().size());
+        waitAndAssertEquals(4, suggestedRepositoryList.getChildren()::size);
         assertEquals("dummy4/dummy4", primaryRepo);
         push(KeyCode.ESCAPE);
 
         // we check if deleting used repo does not remove it
-        traverseMenu("Repos", "Remove", "dummy4/dummy4 [in use, not removable]"); // first used repo
+        traverseHubTurboMenu("Repos", "Remove", "dummy4/dummy4 [in use, not removable]"); // first used repo
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
-        traverseMenu("Repos", "Show Repository Picker");
+        traverseHubTurboMenu("Repos", "Show Repository Picker");
         PlatformEx.waitOnFxThread();
         suggestedRepositoryList = findOrWaitFor(IdGenerator.getRepositoryPickerSuggestedRepoListReference());
         assertEquals(4, suggestedRepositoryList.getChildren().size());
         push(KeyCode.ESCAPE);
 
         // we check if delete repo works
-        traverseMenu("Repos", "Remove", "dummy/dummy");
+        traverseHubTurboMenu("Repos", "Remove", "dummy/dummy");
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
-        traverseMenu("Repos", "Show Repository Picker");
+        traverseHubTurboMenu("Repos", "Show Repository Picker");
         PlatformEx.waitOnFxThread();
         suggestedRepositoryList = findOrWaitFor(IdGenerator.getRepositoryPickerSuggestedRepoListReference());
         assertEquals(3, suggestedRepositoryList.getChildren().size());
         push(KeyCode.ESCAPE);
 
         // we check again if deleting used repo does not remove it
-        traverseMenu("Repos", "Remove", "dummy2/dummy2 [in use, not removable]"); // second used repo
+        traverseHubTurboMenu("Repos", "Remove", "dummy2/dummy2 [in use, not removable]"); // second used repo
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
-        traverseMenu("Repos", "Show Repository Picker");
+        traverseHubTurboMenu("Repos", "Show Repository Picker");
         PlatformEx.waitOnFxThread();
         suggestedRepositoryList = findOrWaitFor(IdGenerator.getRepositoryPickerSuggestedRepoListReference());
         assertEquals(3, suggestedRepositoryList.getChildren().size());
         push(KeyCode.ESCAPE);
 
         // exit program
-        traverseMenu("File", "Quit");
+        traverseHubTurboMenu("App", "Quit");
+
         push(KeyCode.ENTER);
 
         // testing that the correct repo was saved in the json
@@ -183,9 +200,49 @@ public class RepositoryPickerTest extends UITest {
         assertEquals("dummy4/dummy4", lastViewedRepository.generateId());
     }
 
+    @Test
+    public void addRepository_repoPickerTextFieldNotEmpty_inputCopiedToAndSelectedInRepoDialog() {
+        File testConfig = new File(TestController.TEST_DIRECTORY, TestController.TEST_SESSION_CONFIG_FILENAME);
+        boolean testConfigExists = testConfig.exists() && testConfig.isFile();
+        assertTrue(testConfigExists);
+
+        // now we check if the login dialog pops up because the "dummy/dummy" json
+        // doesn't exist and there are no other valid repo json files
+        type("dummy").push(KeyCode.TAB);
+        type("dummy").push(KeyCode.ENTER);
+
+        traverseHubTurboMenu("Repos", "Show Repository Picker");
+        PlatformEx.waitOnFxThread();
+        waitUntilNodeAppears("Confirm");
+        PlatformEx.waitOnFxThread();
+        type("atom/atom");
+        clickOn("Add repository");
+        waitUntilNodeAppears("OK");
+        // try prepending text to test whether the text is selected
+        push(KeyCode.LEFT);
+        type("abcd-").press(KeyCode.ENTER);
+        waitUntilNodeAppears("abcd-atom/atom");
+        push(KeyCode.ESCAPE);
+
+        traverseHubTurboMenu("Repos", "Show Repository Picker");
+        PlatformEx.waitOnFxThread();
+        waitUntilNodeAppears("Confirm");
+        PlatformEx.waitOnFxThread();
+        type("atom/atom");
+        clickOn("Add repository");
+        waitUntilNodeAppears("OK");
+        // immediate typing should erase the whole string in addRepo dialog
+        type("abcd-").press(KeyCode.ENTER);
+        waitUntilNodeAppears("abcd-");
+        push(KeyCode.ESCAPE);
+
+        traverseHubTurboMenu("File", "Quit");
+        push(KeyCode.ENTER);
+    }
+
     private void assertSelectedPickerRepositoryNode(String repoId, Node node) {
         assertTrue(node instanceof Label);
         assertEquals(repoId, ((Label) node).getText());
-        assertEquals(PickerRepository.SELECTED_REPO_LABEL_STYLE, node.getStyle());
+        assertEquals(COMMON_REPO_LABEL_STYLE + SELECTED_REPO_LABEL_STYLE, node.getStyle());
     }
 }

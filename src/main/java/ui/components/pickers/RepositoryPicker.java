@@ -15,23 +15,26 @@ import java.util.function.Consumer;
 public class RepositoryPicker {
 
     private final UI ui;
-    private final Stage stage;
     private final Consumer<String> onValueChangeCallback;
 
-    public RepositoryPicker(UI ui, Stage stage, Consumer<String> onValueChangeCallback) {
+    public RepositoryPicker(UI ui, Consumer<String> onValueChangeCallback) {
         this.ui = ui;
-        this.stage = stage;
         this.onValueChangeCallback = onValueChangeCallback;
         ui.registerEvent((ShowRepositoryPickerEventHandler) e -> Platform.runLater(() -> showRepositoryPicker()));
     }
 
     private void showRepositoryPicker() {
         Set<String> storedRepos = ui.logic.getStoredRepos();
+        new RepositoryPickerDialog(storedRepos, this::pickRepository, (repoId) -> ui.logic.isRepositoryValid(repoId));
+    }
+
+    private void pickRepository(Optional<String> repoId) {
         String defaultRepo = ui.logic.getDefaultRepo();
-        RepositoryPickerDialog dialog = new RepositoryPickerDialog(storedRepos, stage);
-        Optional<String> chosenRepo = dialog.showAndWait();
-        if (chosenRepo.isPresent() && !defaultRepo.equals(chosenRepo.get())) {
-            onValueChangeCallback.accept(chosenRepo.get());
+        if (!repoId.isPresent()) {
+            return;
+        }
+        if (!defaultRepo.equals(repoId.get())) {
+            onValueChangeCallback.accept(repoId.get());
         }
     }
 

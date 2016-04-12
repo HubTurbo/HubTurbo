@@ -39,7 +39,6 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.ComboBoxBase;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
@@ -49,6 +48,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.FlowPane;
 import javafx.stage.Stage;
 import ui.IdGenerator;
 import ui.MenuControl;
@@ -66,6 +66,7 @@ public class UITest extends FxRobot {
     protected static final SettableFuture<Stage> STAGE_FUTURE = SettableFuture.create();
     private static final Logger logger = LogManager.getLogger(UITest.class.getName());
     private static final Map<Character, KeyCode> specialCharsMap = getSpecialCharsMap();
+    private static final int EVENT_DELAY = 2000;
 
     /**
      * Sets TestFX properties to run in headless mode with
@@ -124,7 +125,7 @@ public class UITest extends FxRobot {
         clearAllTestConfigs();
         clearTestFolder();
         beforeStageStarts();
-        stage.show();
+        PlatformEx.runAndWait(stage::show);
     }
 
     public static void clearTestFolder() {
@@ -330,22 +331,6 @@ public class UITest extends FxRobot {
     }
 
     /**
-     * Clicks the repository selector's ComboBox
-     */
-    public void clickRepositorySelector() {
-        waitUntilNodeAppears(IdGenerator.getRepositorySelectorIdReference());
-        clickOn(IdGenerator.getRepositorySelectorIdReference());
-    }
-
-    /**
-     * Gets the repository selector's ComboBox
-     */
-    public ComboBox getRepositorySelector() {
-        waitUntilNodeAppears(IdGenerator.getRepositorySelectorIdReference());
-        return GuiTest.find(IdGenerator.getRepositorySelectorIdReference());
-    }
-
-    /**
      * Clicks the label picker's TextField
      */
     public void clickLabelPickerTextField() {
@@ -365,8 +350,8 @@ public class UITest extends FxRobot {
      * Clicks the assignee picker's TextField
      */
     public void clickAssigneePickerTextField() {
-        waitUntilNodeAppears(IdGenerator.getAssigneePickerFieldIdReference());
-        clickOn(IdGenerator.getAssigneePickerFieldIdReference());
+        waitUntilNodeAppears(IdGenerator.getAssigneePickerTextFieldIdReference());
+        clickOn(IdGenerator.getAssigneePickerTextFieldIdReference());
     }
 
     /**
@@ -387,7 +372,14 @@ public class UITest extends FxRobot {
      * Gets the assignee picker's TextField
      */
     public TextField getAssigneePickerTextField() {
-        return GuiTest.find(IdGenerator.getAssigneePickerFieldIdReference());
+        return GuiTest.find(IdGenerator.getAssigneePickerTextFieldIdReference());
+    }
+
+    /**
+     * Gets the assignee picker's AssignedUserPane
+     */
+    public FlowPane getAssigneePickerAssignedUserPane() {
+        return GuiTest.find(IdGenerator.getAssigneePickerAssignedUserPaneIdReference());
     }
 
     /**
@@ -395,8 +387,10 @@ public class UITest extends FxRobot {
      * @param panelIndex
      */
     public void clickFilterTextFieldAtPanel(int panelIndex) {
-        waitUntilNodeAppears(IdGenerator.getPanelFilterTextFieldIdReference(panelIndex));
-        clickOn(IdGenerator.getPanelFilterTextFieldIdReference(panelIndex));
+        // Wait for a node to be associated with a scene to prevent NullPointerException
+        sleep(EVENT_DELAY);
+        TextField field = getFilterTextFieldAtPanel(panelIndex);
+        clickOn(field);
     }
 
     /**
@@ -404,6 +398,7 @@ public class UITest extends FxRobot {
      * @param panelIndex
      */
     public FilterTextField getFilterTextFieldAtPanel(int panelIndex) {
+        waitUntilNodeAppears(IdGenerator.getPanelFilterTextFieldIdReference(panelIndex));
         return GuiTest.find(IdGenerator.getPanelFilterTextFieldIdReference(panelIndex));
     }
 
@@ -475,6 +470,35 @@ public class UITest extends FxRobot {
     }
 
     /**
+     * Traverses menu from the given menu list, looking for a chain of nodes with given names and triggering
+     * their associated action.
+     */
+    private void traverseMenu(List<? extends MenuItem> menus, String... names) {
+        MenuItem current = menus.stream()
+                .filter(m -> m.getText().equals(names[0]))
+                .findFirst()
+                .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                String.format("%s is not a valid menu item", names[0])));
+
+        for (int i = 1; i < names.length; i++) {
+            final int j = i;
+            if (!(current instanceof Menu)) {
+                throw new IllegalArgumentException(
+                        String.format("Menu %s is not as nested as arguments require", names[0]));
+            }
+            current = ((Menu) current).getItems().stream()
+                    .filter(m -> m.getText().equals(names[j]))
+                    .findFirst()
+                    .orElseThrow(() ->
+                            new IllegalArgumentException(
+                                    String.format("%s is not a valid menu item", names[j])));
+        }
+
+        current.getOnAction().handle(new ActionEvent());
+    }
+
+    /**
      * Traverses HubTurbo's menu, looking for a chain of nodes with the
      * given names and triggering their associated action.
      * <p>
@@ -487,32 +511,22 @@ public class UITest extends FxRobot {
      *
      * @param names the chain of menu nodes to visit
      */
-    public void traverseMenu(String... names) {
-        assert names.length > 0 : "traverseMenu called with no arguments";
+    public void traverseHubTurboMenu(String... names) {
+        assert names.length > 0 : "traverseHubTurboMenu called with no arguments";
 
         Platform.runLater(() -> {
             MenuControl root = TestController.getUI().getMenuControl();
-            MenuItem current = root.getMenus().stream()
-                    .filter(m -> m.getText().equals(names[0]))
-                    .findFirst()
-                    .orElseThrow(() ->
-                            new IllegalArgumentException(String.format("%s is not a valid menu item", names[0])));
-
-            for (int i = 1; i < names.length; i++) {
-                final int j = i;
-                if (!(current instanceof Menu)) {
-                    throw new IllegalArgumentException(
-                            String.format("Menu %s is not as nested as arguments require", names[0]));
-                }
-                current = ((Menu) current).getItems().stream()
-                        .filter(m -> m.getText().equals(names[j]))
-                        .findFirst()
-                        .orElseThrow(() ->
-                                new IllegalArgumentException(String.format("%s is not a valid menu item", names[j])));
-            }
-
-            current.getOnAction().handle(new ActionEvent());
+            traverseMenu(root.getMenus(), names);
         });
+    }
+
+    /**
+     * Similar with traverseHubTurboMenu, including the caveats, but this method traverses a ContextMenu instead.
+     */
+    public void traverseContextMenu(ContextMenu contextMenu, String... names) {
+        assert names.length > 0 : "traverseContextMenu called with no arguments";
+
+        Platform.runLater(() -> traverseMenu(contextMenu.getItems(), names));
     }
 
     private List<KeyCode> getKeyCodes(KeyCodeCombination combination) {
@@ -620,7 +634,7 @@ public class UITest extends FxRobot {
      * Performs logout from File -> Logout on HubTurbo's pView.
      */
     public void logout(){
-        clickMenu("File", "Logout");
+        clickMenu("App", "Logout");
     }
 
     /**

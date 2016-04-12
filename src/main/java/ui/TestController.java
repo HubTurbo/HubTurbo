@@ -7,6 +7,8 @@ import backend.json.JSONStoreStub;
 import backend.stub.DummySource;
 import javafx.application.Application;
 import prefs.Preferences;
+import updater.UpdateManager;
+import updater.UpdateManagerStub;
 
 import java.util.HashMap;
 import java.util.Optional;
@@ -127,7 +129,9 @@ public final class TestController {
      * from it if it already exists.
      */
     public static Preferences loadTestPreferences() {
-        return Preferences.load(TEST_DIRECTORY, TEST_SESSION_CONFIG_FILENAME, TEST_USER_CONFIG_FILENAME);
+        Preferences prefs = Preferences.load(TEST_DIRECTORY, TEST_SESSION_CONFIG_FILENAME, TEST_USER_CONFIG_FILENAME);
+        prefs.setLastLoginCredentials("test", "test");
+        return prefs;
     }
 
     /**
@@ -158,5 +162,18 @@ public final class TestController {
     public static RepoIO createTestingRepoIO(Optional<JSONStore> jsonStoreToBeUsed) {
         return new RepoIO(Optional.of(new DummySource()), jsonStoreToBeUsed,
                           Optional.of(RepoStore.TEST_DIRECTORY));
+    }
+
+    /**
+     * Creates update manager if not in test mode, its stub otherwise.
+     * @return update manager to be used
+     */
+    public static UpdateManager createUpdateManager() {
+        if (isTestMode()) {
+            return new UpdateManagerStub();
+        } else {
+            UpdateProgressWindow updateProgressWindow = new UpdateProgressWindow();
+            return new UpdateManager(ui, updateProgressWindow);
+        }
     }
 }

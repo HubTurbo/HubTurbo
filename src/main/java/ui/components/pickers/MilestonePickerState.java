@@ -54,6 +54,57 @@ public class MilestonePickerState {
     }
 
     /**
+     * Selects the next milestone in the list of best matching milestones
+     */
+    public void selectNextBestMatchingMilestone() {
+        Optional<Integer> curSelectedIndex = getSelectedIndex(bestMatchingMilestones);
+        if (canIncreaseIndex(curSelectedIndex, bestMatchingMilestones)) return;
+        selectMilestoneAtIndex(bestMatchingMilestones, curSelectedIndex.get() + 1);
+    }
+
+    /**
+     * Selects the previous milestone in the list of best matching milestones
+     */
+    public void selectPreviousBestMatchingMilestone() {
+        Optional<Integer> curSelectedIndex = getSelectedIndex(bestMatchingMilestones);
+        if (!canDecreaseIndex(curSelectedIndex)) return;
+        selectMilestoneAtIndex(bestMatchingMilestones, curSelectedIndex.get() - 1);
+    }
+
+    private boolean canIncreaseIndex(Optional<Integer> curSelectedIndex, List<PickerMilestone> list) {
+        return curSelectedIndex.isPresent() && curSelectedIndex.get() < list.size() - 1;
+    }
+
+    private boolean canDecreaseIndex(Optional<Integer> curSelectedIndex) {
+        return curSelectedIndex.isPresent() && curSelectedIndex.get() > 0;
+    }
+
+    /**
+     * Returns the first index at which a milestone is selected
+     *
+     * @param milestones
+     */
+    private Optional<Integer> getSelectedIndex(List<PickerMilestone> milestones) {
+        for (int i = 0; i < milestones.size(); i++) {
+            if (milestones.get(i).isSelected()) {
+                return Optional.of(i);
+            }
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * Selects the milestone at the given index and deselects the rest
+     * @param milestones
+     * @param index
+     */
+    private void selectMilestoneAtIndex(List<PickerMilestone> milestones, int index) {
+        for (int i = 0; i < milestones.size(); i++) {
+            milestones.get(i).setSelected(i == index);
+        }
+    }
+
+    /**
      * Toggles the selection status of the milestone whose name is exactly milestoneName. This method is
      * case-sensitive
      * 
@@ -97,7 +148,7 @@ public class MilestonePickerState {
 
     /**
      * Populates bestMatchingMilestones with milestones from allMilestones that best match
-     * {@code querySentence}.
+     * {@code querySentence} and are not already assigned.
      *
      * The added milestones are references to the actual elements in allMilestones, and thus should not be
      * unnecessarily mutated.
@@ -105,13 +156,16 @@ public class MilestonePickerState {
      */
     private void populateBestMatchingMilestones(String querySentence) {
         bestMatchingMilestones.clear();
-        addMatchingMilestones(bestMatchingMilestones, getRemainingBestMatchesToLimit(), allMilestones);
+        List<PickerMilestone> selectableMilestones = PickerMilestone.getSelectableMilestones(allMilestones);
+
+        addMatchingMilestones(bestMatchingMilestones, getRemainingBestMatchesToLimit(), selectableMilestones);
         if (isMilestonesSizeBelowLimit(bestMatchingMilestones, BEST_MATCHING_LIMIT)) {
             addPartiallyMatchingMilestones(bestMatchingMilestones, getRemainingBestMatchesToLimit(), querySentence,
-                                            allMilestones);
+                                           selectableMilestones);
         }
         if (isMilestonesSizeBelowLimit(bestMatchingMilestones, BEST_MATCHING_LIMIT)) {
-            addLikelyUnmatchedMilestones(bestMatchingMilestones, getRemainingBestMatchesToLimit(), allMilestones);
+            addLikelyUnmatchedMilestones(bestMatchingMilestones, getRemainingBestMatchesToLimit(),
+                                         selectableMilestones);
         }
     }
 

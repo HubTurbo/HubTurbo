@@ -56,7 +56,9 @@ public class PickerAssignee extends TurboUser implements Comparable<PickerAssign
 
     public Node getExistingAssigneeNode() {
         Label assignee = getAssigneeLabelWithAvatar();
-        assignee.getStyleClass().add("labels-removed"); // add strikethrough
+        if (!isSelected) {
+            assignee.getStyleClass().add("labels-removed"); // add strikethrough
+        }
         return assignee;
     }
 
