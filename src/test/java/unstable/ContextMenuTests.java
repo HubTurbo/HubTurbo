@@ -120,7 +120,7 @@ public class ContextMenuTests extends UITest {
         ListPanel listPanel = getPanel(0);
 
         clickIssue(0, 9);
-        traverseContextMenu(listPanel.getContextMenu(), "Close issue (C)");
+        traverseContextMenu(listPanel.getContextMenu(), "Close issue (X)");
         PlatformEx.waitOnFxThread();
         waitUntilNodeAppears("OK");
         clickOn("OK");
