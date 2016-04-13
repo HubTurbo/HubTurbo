@@ -101,6 +101,7 @@ public class ListPanel extends FilterPanel {
         setupListView();
         getChildren().add(listView);
         getChildren().add(createPanelFooter());
+        startLoadingAnimation();
     }
 
     /**
