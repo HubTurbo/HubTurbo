@@ -236,17 +236,17 @@ public class Logic {
     /**
      * Updates events related to remaining rate.
      * @param rateLimits The api rate limits for updating of the remaining rate.
-     * @return Return rateLimits instance
+     * @return Returns the rateLimits instance
      */
     public ImmutablePair<Integer, Long> updateRemainingRate(ImmutablePair<Integer, Long> rateLimits) {
-        uiManager.updateRemainingRate(rateLimits);
+        uiManager.updateRateLimits(rateLimits);
         return rateLimits;
     }
 
     /**
      * Updates the sync refresh rate of updating on the current data store.
      * @param rateLimits The api rate limits for calculation of the refresh rate.
-     * @return Return rateLimits instance
+     * @return Returns the rateLimits instance
      */
     public ImmutablePair<Integer, Long> updateSyncRefreshRate(ImmutablePair<Integer, Long> rateLimits) {
         uiManager.updateSyncRefreshRate(rateLimits);

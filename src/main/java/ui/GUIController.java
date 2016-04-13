@@ -28,18 +28,21 @@ public class GUIController {
     private final Label apiBox;
 
     /**
-     * To store the previous amount of the available remaining API request.
+     * The previous amount of the available remaining API request.
      */
     private int previousRemainingApiRequests = 0;
 
     /**
-     * To store the previous amount of api calls used.
+     * The previous amount of api calls used.
      */
-    private int lastNumberOfApiCallsUsed = 0;
+    private int apiCallsUsedInPreviousRefresh = 0;
 
     private String defaultRepoId;
 
-    private long refreshTimeInMin = 1;
+    /**
+     * The duration between each refresh of the data store.
+     */
+    private long refreshDurationInMinutes = 1;
 
     public GUIController(UI ui, PanelControl panelControl, Label apiBox) {
         this.ui = ui;
@@ -55,8 +58,8 @@ public class GUIController {
 
     public final void registerEvents() {
         UI.events.registerEvent((ModelUpdatedEventHandler) this::modelUpdated);
-        UI.events.registerEvent((UpdateRemainingRateEventHandler) this::updateRemainingRateEvent);
-        UI.events.registerEvent((UpdateSyncRefreshRateEventHandler) this::updateSyncRefreshRate);
+        UI.events.registerEvent((RateLimitsUpdatedEventEventHandler) this::updateRateLimits);
+        UI.events.registerEvent((RefreshTimerTriggeredEventHandler) this::updateSyncRefreshRate);
         UI.events.registerEvent((ShowErrorDialogEventHandler) this::showErrorDialog);
         UI.events.registerEvent((PrimaryRepoChangedEventHandler) this::setDefaultRepo);
     }
@@ -117,7 +120,11 @@ public class GUIController {
                 .collect(Collectors.toList());
     }
 
-    private void updateRemainingRateEvent(UpdateRateLimitsEvent e) {
+    /**
+     * Updates components using the api rate limits information.
+     * @param e The current api rate limits
+     */
+    private void updateRateLimits(RateLimitsUpdatedEvent e) {
         updateAPIBox(e.remainingRequests, e.nextRefreshInMillisecs);
     }
 
@@ -125,13 +132,13 @@ public class GUIController {
      * Updates the sync refresh rate of updating on the current data store.
      * @param e The current api rate limits for calculation of the refresh rate.
      */
-    private void updateSyncRefreshRate(UpdateRateLimitsEvent e) {
-        lastNumberOfApiCallsUsed = computePreviousRemainingApiRequests(e.remainingRequests);
-        refreshTimeInMin = RefreshTimer.computeRefreshTimerPeriod(e.remainingRequests,
+    private void updateSyncRefreshRate(RefreshTimerTriggeredEvent e) {
+        apiCallsUsedInPreviousRefresh = computePreviousRemainingApiRequests(e.remainingRequests);
+        refreshDurationInMinutes = RefreshTimer.computeRefreshTimerPeriod(e.remainingRequests,
                                                                   Utility.minutesFromNow(e.nextRefreshInMillisecs),
-                                                                  lastNumberOfApiCallsUsed, RefreshTimer.BUFFER_TIME,
-                                                                  RefreshTimer.DEFAULT_REFRESH_PERIOD_IN_MIN);
-        ui.refreshTimer.changeRefreshPeriod((int) refreshTimeInMin);
+                apiCallsUsedInPreviousRefresh, RefreshTimer.API_QUOTA_BUFFER,
+                                                                  RefreshTimer.DEFAULT_REFRESH_PERIOD_IN_MINS);
+        ui.refreshTimer.changeRefreshPeriod((int) refreshDurationInMinutes);
     }
 
     private int computePreviousRemainingApiRequests(int remainingRequests) {
@@ -141,7 +148,7 @@ public class GUIController {
         if (difference >= 0) {
             return difference;
         }
-        return lastNumberOfApiCallsUsed;
+        return apiCallsUsedInPreviousRefresh;
     }
 
     /**
@@ -153,7 +160,7 @@ public class GUIController {
     private void updateAPIBox(int remainingRequests, long nextRefreshInMillisecs) {
         Platform.runLater(() -> apiBox.setText(String.format("%s/%s[x%d]", remainingRequests,
                                                Utility.minutesFromNow(nextRefreshInMillisecs),
-                                               (int) Math.ceil(refreshTimeInMin))));
+                                               (int) Math.ceil(refreshDurationInMinutes))));
     }
 
     private void showErrorDialog(ShowErrorDialogEvent e) {

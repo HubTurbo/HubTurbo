@@ -1,11 +1,16 @@
 package util.events;
 
-public class UpdateRateLimitsEvent extends Event {
+/**
+ * An event that is called when new api rate limits information is available.
+ */
+public class RateLimitsUpdatedEvent extends Event{
+
     public final int remainingRequests;
     public final long nextRefreshInMillisecs; // Epoch milliseconds
 
-    public UpdateRateLimitsEvent(int remainingRequests, long nextRefreshInMillisecs) {
+    public RateLimitsUpdatedEvent(int remainingRequests, long nextRefreshInMillisecs) {
         this.remainingRequests = remainingRequests;
         this.nextRefreshInMillisecs = nextRefreshInMillisecs;
     }
+
 }

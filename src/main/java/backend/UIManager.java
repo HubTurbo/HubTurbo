@@ -8,8 +8,8 @@ import ui.GuiElement;
 import ui.UI;
 import ui.issuepanel.FilterPanel;
 import util.events.ModelUpdatedEvent;
-import util.events.UpdateRemainingRateEvent;
-import util.events.UpdateSyncRefreshRateEvent;
+import util.events.RateLimitsUpdatedEvent;
+import util.events.RefreshTimerTriggeredEvent;
 
 import java.util.List;
 import java.util.Map;
@@ -27,12 +27,12 @@ public class UIManager {
         Platform.runLater(() -> ui.triggerEvent(new ModelUpdatedEvent(elementsToShow, users)));
     }
 
-    public void updateRemainingRate(ImmutablePair<Integer, Long> rateLimits) {
-        ui.triggerEvent(new UpdateRemainingRateEvent(rateLimits.left, rateLimits.right));
+    public void updateRateLimits(ImmutablePair<Integer, Long> rateLimits) {
+        ui.triggerEvent(new RateLimitsUpdatedEvent(rateLimits.left, rateLimits.right));
     }
 
     public void updateSyncRefreshRate(ImmutablePair<Integer, Long> rateLimits) {
-        ui.triggerEvent(new UpdateSyncRefreshRateEvent(rateLimits.left, rateLimits.right));
+        ui.triggerEvent(new RefreshTimerTriggeredEvent(rateLimits.left, rateLimits.right));
     }
 
     /**

@@ -233,10 +233,6 @@ public final class Utility {
         return minsDuration * 60;
     }
 
-    public static long secsToMins(long secsDuration) {
-        return secsDuration / 60; 
-    }
-
     public static long minutesFromNow(long targetTime) {
         return millisecToMinutes(targetTime - new Date().getTime());
     }
