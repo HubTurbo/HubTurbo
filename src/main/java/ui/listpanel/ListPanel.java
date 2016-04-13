@@ -640,8 +640,7 @@ public class ListPanel extends FilterPanel {
         TextInputDialog dialog = new TextInputDialog(DEFAULT_WATCH_LIST_PANEL_NAME);
         dialog.setTitle(WATCH_LIST_PANEL_NAME_PROMPT_TITLE);
         dialog.setHeaderText(WATCH_LIST_PANEL_NAME_PROMPT_HEADER);
-        Optional<String> result = dialog.showAndWait();
-        return result;
+        return dialog.showAndWait();
     }
 
     private void addSelectedIssueToWatchListPanel(FilterPanel watchListPanel) {

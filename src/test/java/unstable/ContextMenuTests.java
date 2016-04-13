@@ -169,6 +169,26 @@ public class ContextMenuTests extends UITest {
     }
 
     @Test
+    public void addToWatchListPanel_cancelOperation_noNewPanelCreated() {
+        ListPanel listPanel = getPanel(0);
+        assertEquals(1, listPanel.getParentPanelControl().getPanelCount());
+
+        clickIssue(0, 9);
+        traverseContextMenu(listPanel.getContextMenu(), "Add to watch list", "New watch list");
+        waitUntilNodeAppears("Cancel");
+        clickOn("Cancel");
+        PlatformEx.waitOnFxThread();
+        assertEquals(1, listPanel.getParentPanelControl().getPanelCount());
+
+        clickIssue(0, 9);
+        traverseContextMenu(listPanel.getContextMenu(), "Add to watch list", "New watch list");
+        waitUntilNodeAppears("Cancel");
+        push(KeyCode.ESCAPE);
+        PlatformEx.waitOnFxThread();
+        assertEquals(1, listPanel.getParentPanelControl().getPanelCount());
+    }
+
+    @Test
     public void addToWatchListPanel_addToExistingWatchListPanel_issueAddedToExistingPanel() {
         traverseHubTurboMenu("Panels", "Create");
         PlatformEx.waitOnFxThread();
