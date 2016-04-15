@@ -89,7 +89,7 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
         milestoneDetailsBox.setAlignment(Pos.CENTER_RIGHT);
 
         if (getDueDate().isPresent()) {
-            Label dueDate = new Label("Due on: " + getDueDate().get().toString());
+            Label dueDate = new Label(getDueDate().get().toString());
             dueDate.setPrefWidth(150);
             milestoneDetailsBox.getChildren().add(dueDate);
         }
