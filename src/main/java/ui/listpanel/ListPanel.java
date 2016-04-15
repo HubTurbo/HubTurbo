@@ -623,21 +623,24 @@ public class ListPanel extends FilterPanel {
         Optional<GuiElement> item = listView.getSelectedItem();
         assert item.isPresent();
 
+        Optional<String> newWatchListPanelName = promptUserForNewWatchListPanelName();
+        if (!newWatchListPanelName.isPresent()) {
+            return;
+        }
+
         TurboIssue issue = item.get().getIssue();
         int panelCount = parentPanelControl.getPanelCount();
         FilterPanel newWatchListPanel = parentPanelControl.addPanelAt(panelCount);
         newWatchListPanel.setFilterByString(String.format(CREATE_WATCH_LIST_FORMAT,
                 ui.logic.getDefaultRepo(), issue.getId()));
-        String newWatchListPanelName = promptUserForNewWatchListPanelName();
-        newWatchListPanel.setPanelName(newWatchListPanelName);
+        newWatchListPanel.setPanelName(newWatchListPanelName.get());
     }
 
-    private String promptUserForNewWatchListPanelName() {
+    private Optional<String> promptUserForNewWatchListPanelName() {
         TextInputDialog dialog = new TextInputDialog(DEFAULT_WATCH_LIST_PANEL_NAME);
         dialog.setTitle(WATCH_LIST_PANEL_NAME_PROMPT_TITLE);
         dialog.setHeaderText(WATCH_LIST_PANEL_NAME_PROMPT_HEADER);
-        Optional<String> result = dialog.showAndWait();
-        return result.orElse(DEFAULT_WATCH_LIST_PANEL_NAME);
+        return dialog.showAndWait();
     }
 
     private void addSelectedIssueToWatchListPanel(FilterPanel watchListPanel) {
