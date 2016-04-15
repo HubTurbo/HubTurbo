@@ -70,10 +70,9 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
         matchingMilestone.setStyle("-fx-border-width: 0 0 1 0; -fx-border-style: solid;");
 
         HBox milestoneNodeBox = createMilestoneNodeBox();
-        Label separator = new Label("|");
         HBox milestoneDetailsBox = createMilestoneDetailsBox();
 
-        matchingMilestone.getChildren().setAll(milestoneNodeBox, separator, milestoneDetailsBox);
+        matchingMilestone.getChildren().setAll(milestoneNodeBox, milestoneDetailsBox);
         return matchingMilestone;
     }
 
