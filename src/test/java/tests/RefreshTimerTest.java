@@ -62,7 +62,7 @@ public class RefreshTimerTest {
     public void computeTickerTimer_quotaAboveApiQuotaBuffer() {
         long result;
         /*
-        Case #1: when remainingQuota - buffer is less than apiCallsUsedInPreviousRefresh,
+        Case #1: when (apiQuota - apiQuotaBuffer) is less than apiCallsUsedInPreviousRefresh,
         Don't auto refresh until next apiQuota renewal
         */
         result = RefreshTimer.computeRefreshTimerPeriod(201, 35, 25, 200, 1);
@@ -72,7 +72,7 @@ public class RefreshTimerTest {
         assertEquals(result, 36);
 
         /*
-        Case #2: when (remainingQuota - buffer) is more or equal than apiCallsUsedInPreviousRefresh,
+        Case #2: when (apiQuota - apiQuotaBuffer) is more or equal than apiCallsUsedInPreviousRefresh,
         Calculate the refreshTime based on apiQuota, apiCallsUsedInPreviousRefresh, remainingTimeInMins
         and apiQuotaBuffer.
         */

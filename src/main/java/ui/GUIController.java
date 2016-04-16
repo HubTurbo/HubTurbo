@@ -63,7 +63,7 @@ public class GUIController {
 
     public final void registerEvents() {
         UI.events.registerEvent((ModelUpdatedEventHandler) this::modelUpdated);
-        UI.events.registerEvent((RateLimitsUpdatedEventEventHandler) this::updateRateLimits);
+        UI.events.registerEvent((RateLimitsUpdatedEventHandler) this::updateRateLimits);
         UI.events.registerEvent((RefreshTimerTriggeredEventHandler) this::updateSyncRefreshRate);
         UI.events.registerEvent((ShowErrorDialogEventHandler) this::showErrorDialog);
         UI.events.registerEvent((PrimaryRepoChangedEventHandler) this::setDefaultRepo);

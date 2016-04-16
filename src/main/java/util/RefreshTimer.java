@@ -14,7 +14,7 @@ public class RefreshTimer extends TickingTimer{
     public static final int API_QUOTA_BUFFER = 200;
 
     /**
-     * The default refresh period of the refresh rate.
+     * The default refresh period.
      */
     public static final int DEFAULT_REFRESH_PERIOD_IN_MINS = 1;
 
@@ -28,7 +28,7 @@ public class RefreshTimer extends TickingTimer{
      * Assumes future refreshes will take the same number of API calls as the last refresh and find out the refresh
      * duration that will spread out the refreshes until the next API quota top up.
      *
-     * For some cases where the refresh rate is equal to the remainingTimeInMins,
+     * For some cases where the computed refresh rate is equal to the remainingTimeInMins,
      * BUFFER_TIME is added to ensure that the next refresh happens after the apiQuota renewal.
      *
      * PMD is suppressed to allow explicit parenthesis.
