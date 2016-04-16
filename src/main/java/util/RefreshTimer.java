@@ -33,7 +33,7 @@ public class RefreshTimer extends TickingTimer{
      *
      * PMD is suppressed to allow explicit parenthesis.
      *
-     * @param apiQuota The remaining allowed API request until the next API quota renewal.
+     * @param apiQuota The remaining allowed API requests until the next API quota renewal.
      *                 Pre-condition: >= 0
      * @param remainingTimeInMins The remaining time left until the next API quota renewal.
      *                           Pre-condition: >= 0

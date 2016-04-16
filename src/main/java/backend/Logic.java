@@ -233,8 +233,12 @@ public class Logic {
     }
 
     /**
-     * Updates UI components using the GitHub rate limits information.
+     * Updates the UI components that are using GitHub rate limits information.
      * @param rateLimits The GitHub API rate limits information.
+     *                   rateLimits.getLeft() contains the number of API requests remaining
+     *                   in the current rate limit window.
+     *                   rateLimits.getRight() contains the time at which the current
+     *                   API rate limit window resets in UTC epoch milliseconds.
      * @return the rateLimits instance
      */
     public ImmutablePair<Integer, Long> updateRateLimits(ImmutablePair<Integer, Long> rateLimits) {
@@ -243,8 +247,12 @@ public class Logic {
     }
 
     /**
-     * Updates the sync refresh rate on the updating of data store.
-     * @param rateLimits The API rate limits for calculation of the refresh rate.
+     * Updates the period of the refresh timer for synchronization of the data store.
+     * @param rateLimits The GitHub API rate limits information.
+     *                   rateLimits.getLeft() contains the number of API requests remaining
+     *                   in the current rate limit window.
+     *                   rateLimits.getRight() contains the time at which the current
+     *                   API rate limit window resets in UTC epoch milliseconds.
      * @return the rateLimits instance
      */
     public ImmutablePair<Integer, Long> updateSyncRefreshRate(ImmutablePair<Integer, Long> rateLimits) {

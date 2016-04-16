@@ -33,7 +33,7 @@ public class GUIController {
     private final Label apiBox;
 
     /**
-     * The previous amount of the available remaining API request.
+     * The previous amount of the available remaining API requests.
      */
     private int previousRemainingApiRequests = 0;
 
@@ -128,18 +128,14 @@ public class GUIController {
     /**
      * Updates UI components using the API rate limits information.
      * @param e The current API rate limits
-     *        e.remainingRequests : The number of remaining API request.
-     *        e.nextRefreshInMillisecs : The next refresh time in epoch format.
      */
     private void updateRateLimits(RateLimitsUpdatedEvent e) {
         updateAPIBox(e.remainingRequests, e.nextRefreshInMillisecs);
     }
 
     /**
-     * Updates the sync refresh rate on the updating of the current data store.
+     * Updates the period of the refresh timer for synchronization of the data store.
      * @param e The current API rate limits for calculation of the refresh rate.
-     *        e.remainingRequests : The number of remaining API request.
-     *        e.nextRefreshInMillisecs : The next refresh time in epoch format.
      */
     private void updateSyncRefreshRate(RefreshTimerTriggeredEvent e) {
         apiCallsUsedInPreviousRefresh = computePreviousRemainingApiRequests(e.remainingRequests);
@@ -169,8 +165,9 @@ public class GUIController {
     /**
      * Updates the GUI APIBox to indicate the no of remaining API request, time until next API renewal and
      * the current sync refresh rate.
-     * @param remainingRequests The number of remaining API request.
-     * @param nextRefreshInMillisecs The next refresh time in epoch format.
+     * @param remainingRequests The number of API requests remaining in the current rate limit window.
+     * @param nextRefreshInMillisecs The time at which the current API rate limit window resets
+     *                               in UTC epoch milliseconds.
      */
     private void updateAPIBox(int remainingRequests, long nextRefreshInMillisecs) {
         Platform.runLater(() -> apiBox.setText(String.format("%s/%s[x%d]", remainingRequests,

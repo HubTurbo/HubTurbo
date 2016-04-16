@@ -5,8 +5,15 @@ package util.events;
  */
 public class RateLimitsUpdatedEvent extends Event{
 
+    /**
+     * The number of API requests remaining in the current rate limit window.
+     */
     public final int remainingRequests;
-    public final long nextRefreshInMillisecs; // Epoch milliseconds
+
+    /**
+     * The time at which the current API rate limit window resets in UTC epoch milliseconds.
+     */
+    public final long nextRefreshInMillisecs;
 
     public RateLimitsUpdatedEvent(int remainingRequests, long nextRefreshInMillisecs) {
         this.remainingRequests = remainingRequests;

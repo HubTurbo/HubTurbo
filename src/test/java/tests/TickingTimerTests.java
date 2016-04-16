@@ -14,6 +14,9 @@ import static org.junit.Assert.fail;
 
 public class TickingTimerTests {
 
+    /**
+     * Facilitates simulation of the triggering of timer for changePeriodTest().
+     */
     Boolean tickingTimerStatus = false;
 
     private static void delay(double seconds) {
@@ -92,6 +95,7 @@ public class TickingTimerTests {
 
     @Test
     public void changePeriodTest() {
+
         final ArrayList<Integer> ticks = new ArrayList<>();
 
         final TickingTimer tickingTimer = new TickingTimer("test3", 5, (Integer i) -> {}, () -> {
