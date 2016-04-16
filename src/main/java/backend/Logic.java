@@ -243,7 +243,7 @@ public class Logic {
     }
 
     /**
-     * Updates the sync refresh rate of updating on the current data store.
+     * Updates the sync refresh rate on the updating of data store.
      * @param rateLimits The API rate limits for calculation of the refresh rate.
      * @return the rateLimits instance
      */

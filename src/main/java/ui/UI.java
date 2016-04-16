@@ -51,7 +51,6 @@ import java.util.concurrent.TimeUnit;
 
 import static ui.components.KeyboardShortcuts.SHOW_ISSUE_PICKER;
 
-
 public class UI extends Application implements EventDispatcher {
 
     public static final int VERSION_MAJOR = 3;
