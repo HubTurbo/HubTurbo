@@ -13,6 +13,9 @@ import util.events.*;
 import util.events.testevents.PrimaryRepoChangedEvent;
 import util.events.testevents.PrimaryRepoChangedEventHandler;
 
+import util.HTLog;
+import org.apache.logging.log4j.Logger;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -22,6 +25,8 @@ import java.util.stream.Collectors;
  */
 
 public class GUIController {
+
+    private static final Logger logger = HTLog.get(GUIController.class);
 
     private final PanelControl panelControl;
     private final UI ui;
@@ -33,7 +38,7 @@ public class GUIController {
     private int previousRemainingApiRequests = 0;
 
     /**
-     * The previous amount of api calls used.
+     * The previous amount of API calls used.
      */
     private int apiCallsUsedInPreviousRefresh = 0;
 
@@ -121,24 +126,34 @@ public class GUIController {
     }
 
     /**
-     * Updates components using the api rate limits information.
-     * @param e The current api rate limits
+     * Updates UI components using the API rate limits information.
+     * @param e The current API rate limits
+     *        e.remainingRequests : The number of remaining API request.
+     *        e.nextRefreshInMillisecs : The next refresh time in epoch format.
      */
     private void updateRateLimits(RateLimitsUpdatedEvent e) {
         updateAPIBox(e.remainingRequests, e.nextRefreshInMillisecs);
     }
 
     /**
-     * Updates the sync refresh rate of updating on the current data store.
-     * @param e The current api rate limits for calculation of the refresh rate.
+     * Updates the sync refresh rate on the updating of the current data store.
+     * @param e The current API rate limits for calculation of the refresh rate.
+     *        e.remainingRequests : The number of remaining API request.
+     *        e.nextRefreshInMillisecs : The next refresh time in epoch format.
      */
     private void updateSyncRefreshRate(RefreshTimerTriggeredEvent e) {
         apiCallsUsedInPreviousRefresh = computePreviousRemainingApiRequests(e.remainingRequests);
         refreshDurationInMinutes = RefreshTimer.computeRefreshTimerPeriod(e.remainingRequests,
-                                                                  Utility.minutesFromNow(e.nextRefreshInMillisecs),
-                apiCallsUsedInPreviousRefresh, RefreshTimer.API_QUOTA_BUFFER,
-                                                                  RefreshTimer.DEFAULT_REFRESH_PERIOD_IN_MINS);
+                                                                    Utility.minutesFromNow(e.nextRefreshInMillisecs),
+                                                                    apiCallsUsedInPreviousRefresh,
+                                                                    RefreshTimer.API_QUOTA_BUFFER,
+                                                                    RefreshTimer.DEFAULT_REFRESH_PERIOD_IN_MINS);
         ui.refreshTimer.changeRefreshPeriod((int) refreshDurationInMinutes);
+        logger.info("Refresh period updated to " + refreshDurationInMinutes
+                    + "mins with apiCalls used in previous refresh cycle is " + apiCallsUsedInPreviousRefresh
+                    + ", current api quota is " + e.remainingRequests + " and next quota top-up in "
+                    + Utility.minutesFromNow(e.nextRefreshInMillisecs) + "mins.");
+
     }
 
     private int computePreviousRemainingApiRequests(int remainingRequests) {
@@ -152,9 +167,9 @@ public class GUIController {
     }
 
     /**
-     * Updates the GUI APIBox to indicate the no of remaining api request, time until next api renewal and
+     * Updates the GUI APIBox to indicate the no of remaining API request, time until next API renewal and
      * the current sync refresh rate.
-     * @param remainingRequests The number of remaining api request.
+     * @param remainingRequests The number of remaining API request.
      * @param nextRefreshInMillisecs The next refresh time in epoch format.
      */
     private void updateAPIBox(int remainingRequests, long nextRefreshInMillisecs) {

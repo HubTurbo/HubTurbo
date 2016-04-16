@@ -9,11 +9,6 @@ import java.util.function.Consumer;
 public class RefreshTimer extends TickingTimer{
 
     /**
-     * The buffer time to be added to ensure refresh happens after the api quota renewal.
-     */
-    public static final int BUFFER_TIME = 1;
-
-    /**
      * The amount that is set aside for manual operations by the user.
      */
     public static final int API_QUOTA_BUFFER = 200;
@@ -31,18 +26,20 @@ public class RefreshTimer extends TickingTimer{
     /**
      * Computes the TickerTimer period that is used for refreshing the issues periodically
      * Assumes future refreshes will take the same number of API calls as the last refresh and find out the refresh
-     * duration that will spread out the refreshes until the next api quota top up.
+     * duration that will spread out the refreshes until the next API quota top up.
      *
      * For some cases where the refresh rate is equal to the remainingTimeInMins,
      * BUFFER_TIME is added to ensure that the next refresh happens after the apiQuota renewal.
      *
-     * @param apiQuota The remaining allowed api request until the next api quota renewal.
+     * PMD is suppressed to allow explicit parenthesis.
+     *
+     * @param apiQuota The remaining allowed API request until the next API quota renewal.
      *                 Pre-condition: >= 0
-     * @param remainingTimeInMins The remaining time left until the next api quota renewal.
+     * @param remainingTimeInMins The remaining time left until the next API quota renewal.
      *                           Pre-condition: >= 0
-     * @param apiCallsUsedInPreviousRefresh The amount of api used in the last api refresh.
+     * @param apiCallsUsedInPreviousRefresh The amount of API used in the last API refresh.
      *                                      Pre-condition: >= 0
-     * @param apiQuotaBuffer The amount of api calls that is set aside for manual operations by the user.
+     * @param apiQuotaBuffer The amount of API calls that is set aside for manual operations by the user.
      *                       Pre-condition: >= 0
      * @param minRefreshPeriod The minimal refresh period that will be used.
      *                         There are 3 conditions that this will be used.
@@ -52,7 +49,7 @@ public class RefreshTimer extends TickingTimer{
      *                            nearest time possible.
      *                            Recommended value : RefreshTimer.DEFAULT_REFRESH_PERIOD_IN_MINS
      *                         Pre-condition: > 0
-     * @return Returns computed refresh period.
+     * @return the computed refresh period.
      */
     @SuppressWarnings("PMD")
     public static long computeRefreshTimerPeriod(int apiQuota, long remainingTimeInMins,
@@ -62,14 +59,16 @@ public class RefreshTimer extends TickingTimer{
         assert apiQuota >= 0 && remainingTimeInMins >= 0 && apiCallsUsedInPreviousRefresh >= 0
                 && minRefreshPeriod > 0 && apiQuotaBuffer >= 0;
 
+        final int bufferTime = 1;
+
         if ((apiQuota > apiQuotaBuffer && apiCallsUsedInPreviousRefresh == 0) || remainingTimeInMins == 0) {
             return minRefreshPeriod;
         }
 
         long refreshTimeInMins;
 
-        if (isQuotaInsufficient(apiQuota, apiCallsUsedInPreviousRefresh)) {
-            refreshTimeInMins = remainingTimeInMins + BUFFER_TIME;
+        if (isQuotaInsufficient(apiQuota, apiCallsUsedInPreviousRefresh, apiQuotaBuffer)) {
+            refreshTimeInMins = remainingTimeInMins + bufferTime;
             return Math.max(refreshTimeInMins, minRefreshPeriod);
         }
 
@@ -78,7 +77,7 @@ public class RefreshTimer extends TickingTimer{
         refreshTimeInMins = (long) Math.ceil(remainingTimeInMins / (double) noOfRefreshAllowed);
 
         if (refreshTimeInMins == remainingTimeInMins) {
-            refreshTimeInMins = refreshTimeInMins + BUFFER_TIME;
+            refreshTimeInMins = refreshTimeInMins + bufferTime;
         }
 
         return Math.max(refreshTimeInMins, minRefreshPeriod);
@@ -92,10 +91,10 @@ public class RefreshTimer extends TickingTimer{
         this.changePeriod((int) Utility.minsToSecs(periodInMins));
     }
 
-    private static boolean isQuotaInsufficient(int apiQuota, int apiCallsUsedInPreviousRefresh) {
-        boolean isBelowApiQuotaBufferAllowance = apiQuota <= API_QUOTA_BUFFER;
-        boolean isOffsetQuotaLessThanApiCallsUsedInPreviousRefresh = apiQuota - API_QUOTA_BUFFER > 0
-                                                        && apiQuota - API_QUOTA_BUFFER < apiCallsUsedInPreviousRefresh;
+    private static boolean isQuotaInsufficient(int apiQuota, int apiCallsUsedInPreviousRefresh, int apiQuotaBuffer) {
+        boolean isBelowApiQuotaBufferAllowance = apiQuota <= apiQuotaBuffer;
+        boolean isOffsetQuotaLessThanApiCallsUsedInPreviousRefresh = apiQuota - apiQuotaBuffer > 0
+                                                        && apiQuota - apiQuotaBuffer < apiCallsUsedInPreviousRefresh;
 
         return isBelowApiQuotaBufferAllowance || isOffsetQuotaLessThanApiCallsUsedInPreviousRefresh;
     }

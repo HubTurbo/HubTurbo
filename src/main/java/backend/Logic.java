@@ -94,7 +94,7 @@ public class Logic {
                 .thenRun(this::refreshUI)
                 .thenCompose(n -> getRateLimitResetTime())
                 .thenApply(this::updateSyncRefreshRate)
-                .thenApply(this::updateRemainingRate)
+                .thenApply(this::updateRateLimits)
                 .exceptionally(Futures::log);
     }
 
@@ -164,8 +164,7 @@ public class Logic {
                     .thenRun(this::refreshUI)
                     .thenRun(() -> notifyRepoOpened(panel))
                     .thenCompose(n -> getRateLimitResetTime())
-                    .thenApply(this::updateSyncRefreshRate)
-                    .thenApply(this::updateRemainingRate)
+                    .thenApply(this::updateRateLimits)
                     .thenApply(rateLimits -> true)
                     .exceptionally(withResult(false));
         });
@@ -234,19 +233,19 @@ public class Logic {
     }
 
     /**
-     * Updates events related to remaining rate.
-     * @param rateLimits The api rate limits for updating of the remaining rate.
-     * @return Returns the rateLimits instance
+     * Updates UI components using the GitHub rate limits information.
+     * @param rateLimits The GitHub API rate limits information.
+     * @return the rateLimits instance
      */
-    public ImmutablePair<Integer, Long> updateRemainingRate(ImmutablePair<Integer, Long> rateLimits) {
+    public ImmutablePair<Integer, Long> updateRateLimits(ImmutablePair<Integer, Long> rateLimits) {
         uiManager.updateRateLimits(rateLimits);
         return rateLimits;
     }
 
     /**
      * Updates the sync refresh rate of updating on the current data store.
-     * @param rateLimits The api rate limits for calculation of the refresh rate.
-     * @return Returns the rateLimits instance
+     * @param rateLimits The API rate limits for calculation of the refresh rate.
+     * @return the rateLimits instance
      */
     public ImmutablePair<Integer, Long> updateSyncRefreshRate(ImmutablePair<Integer, Long> rateLimits) {
         uiManager.updateSyncRefreshRate(rateLimits);

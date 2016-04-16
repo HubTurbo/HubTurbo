@@ -1,7 +1,7 @@
 package util.events;
 
 /**
- * An event that is called when new api rate limits information is available.
+ * An event that is called when new API rate limits information is available.
  */
 public class RateLimitsUpdatedEvent extends Event{
 
