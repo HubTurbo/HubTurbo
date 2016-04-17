@@ -70,10 +70,9 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
         matchingMilestone.setStyle("-fx-border-width: 0 0 1 0; -fx-border-style: solid;");
 
         HBox milestoneNodeBox = createMilestoneNodeBox();
-        Label separator = new Label("|");
         HBox milestoneDetailsBox = createMilestoneDetailsBox();
 
-        matchingMilestone.getChildren().setAll(milestoneNodeBox, separator, milestoneDetailsBox);
+        matchingMilestone.getChildren().setAll(milestoneNodeBox, milestoneDetailsBox);
         return matchingMilestone;
     }
 
@@ -89,7 +88,7 @@ public class PickerMilestone extends TurboMilestone implements Comparable<Picker
         milestoneDetailsBox.setAlignment(Pos.CENTER_RIGHT);
 
         if (getDueDate().isPresent()) {
-            Label dueDate = new Label("Due on: " + getDueDate().get().toString());
+            Label dueDate = new Label(getDueDate().get().toString());
             dueDate.setPrefWidth(150);
             milestoneDetailsBox.getChildren().add(dueDate);
         }
