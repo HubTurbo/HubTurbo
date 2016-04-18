@@ -94,7 +94,7 @@ public class Logic {
                 .thenRun(this::refreshUI)
                 .thenCompose(n -> getRateLimitResetTime())
                 .thenApply(this::updateSyncRefreshRate)
-                .thenApply(this::updateRateLimits)
+                .thenApply(this::updateApiQuotaInfoInGui)
                 .exceptionally(Futures::log);
     }
 
@@ -164,7 +164,7 @@ public class Logic {
                     .thenRun(this::refreshUI)
                     .thenRun(() -> notifyRepoOpened(panel))
                     .thenCompose(n -> getRateLimitResetTime())
-                    .thenApply(this::updateRateLimits)
+                    .thenApply(this::updateApiQuotaInfoInGui)
                     .thenApply(rateLimits -> true)
                     .exceptionally(withResult(false));
         });
@@ -241,8 +241,8 @@ public class Logic {
      *                   API rate limit window resets in UTC epoch milliseconds.
      * @return the rateLimits instance
      */
-    public ImmutablePair<Integer, Long> updateRateLimits(ImmutablePair<Integer, Long> rateLimits) {
-        uiManager.updateRateLimits(rateLimits);
+    public ImmutablePair<Integer, Long> updateApiQuotaInfoInGui(ImmutablePair<Integer, Long> rateLimits) {
+        uiManager.updateApiQuotaInfo(rateLimits);
         return rateLimits;
     }
 

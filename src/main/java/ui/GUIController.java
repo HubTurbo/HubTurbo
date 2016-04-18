@@ -63,7 +63,7 @@ public class GUIController {
 
     public final void registerEvents() {
         UI.events.registerEvent((ModelUpdatedEventHandler) this::modelUpdated);
-        UI.events.registerEvent((RateLimitsUpdatedEventHandler) this::updateRateLimits);
+        UI.events.registerEvent((NewApiQuotaInfoAvailableEventHandler) this::updateApiQuotaInfo);
         UI.events.registerEvent((RefreshTimerTriggeredEventHandler) this::updateSyncRefreshRate);
         UI.events.registerEvent((ShowErrorDialogEventHandler) this::showErrorDialog);
         UI.events.registerEvent((PrimaryRepoChangedEventHandler) this::setDefaultRepo);
@@ -127,18 +127,18 @@ public class GUIController {
 
     /**
      * Updates UI components using the API rate limits information.
-     * @param e The current API rate limits
+     * @param e NewApiQuotaInfoAvailableEvent object that holds the current API quota information.
      */
-    private void updateRateLimits(RateLimitsUpdatedEvent e) {
+    private void updateApiQuotaInfo(NewApiQuotaInfoAvailableEvent e) {
         updateAPIBox(e.remainingRequests, e.nextRefreshInMillisecs);
     }
 
     /**
      * Updates the period of the refresh timer for synchronization of the data store.
-     * @param e The current API rate limits for calculation of the refresh rate.
+     * @param e RefreshTimerTriggeredEvent object that holds the current API quota information.
      */
     private void updateSyncRefreshRate(RefreshTimerTriggeredEvent e) {
-        apiCallsUsedInPreviousRefresh = computePreviousRemainingApiRequests(e.remainingRequests);
+        apiCallsUsedInPreviousRefresh = computeApiCallsUsedInPreviousRefresh(e.remainingRequests);
         refreshDurationInMinutes = RefreshTimer.computeRefreshTimerPeriod(e.remainingRequests,
                                                                     Utility.minutesFromNow(e.nextRefreshInMillisecs),
                                                                     apiCallsUsedInPreviousRefresh,
@@ -146,13 +146,13 @@ public class GUIController {
                                                                     RefreshTimer.DEFAULT_REFRESH_PERIOD_IN_MINS);
         ui.refreshTimer.changeRefreshPeriod((int) refreshDurationInMinutes);
         logger.info("Refresh period updated to " + refreshDurationInMinutes
-                    + "mins with apiCalls used in previous refresh cycle is " + apiCallsUsedInPreviousRefresh
-                    + ", current api quota is " + e.remainingRequests + " and next quota top-up in "
+                    + "mins with API calls used in previous refresh cycle is " + apiCallsUsedInPreviousRefresh
+                    + ", current API quota is " + e.remainingRequests + " and next API quota top-up in "
                     + Utility.minutesFromNow(e.nextRefreshInMillisecs) + "mins.");
 
     }
 
-    private int computePreviousRemainingApiRequests(int remainingRequests) {
+    private int computeApiCallsUsedInPreviousRefresh(int remainingRequests) {
         int difference = previousRemainingApiRequests - remainingRequests;
         previousRemainingApiRequests = remainingRequests;
 
@@ -163,7 +163,7 @@ public class GUIController {
     }
 
     /**
-     * Updates the GUI APIBox to indicate the no of remaining API request, time until next API renewal and
+     * Updates the GUI APIBox to indicate the no of remaining API requests, time until next API renewal and
      * the current sync refresh rate.
      * @param remainingRequests The number of API requests remaining in the current rate limit window.
      * @param nextRefreshInMillisecs The time at which the current API rate limit window resets

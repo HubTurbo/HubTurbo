@@ -8,7 +8,7 @@ import ui.GuiElement;
 import ui.UI;
 import ui.issuepanel.FilterPanel;
 import util.events.ModelUpdatedEvent;
-import util.events.RateLimitsUpdatedEvent;
+import util.events.NewApiQuotaInfoAvailableEvent;
 import util.events.RefreshTimerTriggeredEvent;
 
 import java.util.List;
@@ -27,8 +27,8 @@ public class UIManager {
         Platform.runLater(() -> ui.triggerEvent(new ModelUpdatedEvent(elementsToShow, users)));
     }
 
-    public void updateRateLimits(ImmutablePair<Integer, Long> rateLimits) {
-        ui.triggerEvent(new RateLimitsUpdatedEvent(rateLimits.left, rateLimits.right));
+    public void updateApiQuotaInfo(ImmutablePair<Integer, Long> rateLimits) {
+        ui.triggerEvent(new NewApiQuotaInfoAvailableEvent(rateLimits.left, rateLimits.right));
     }
 
     public void updateSyncRefreshRate(ImmutablePair<Integer, Long> rateLimits) {

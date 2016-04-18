@@ -1,9 +1,9 @@
 package util.events;
 
 /**
- * An event that is called when new API rate limits information is available.
+ * An event that is generated when new API rate limits information is available.
  */
-public class RateLimitsUpdatedEvent extends Event{
+public class NewApiQuotaInfoAvailableEvent extends Event{
 
     /**
      * The number of API requests remaining in the current rate limit window.
@@ -15,7 +15,7 @@ public class RateLimitsUpdatedEvent extends Event{
      */
     public final long nextRefreshInMillisecs;
 
-    public RateLimitsUpdatedEvent(int remainingRequests, long nextRefreshInMillisecs) {
+    public NewApiQuotaInfoAvailableEvent(int remainingRequests, long nextRefreshInMillisecs) {
         this.remainingRequests = remainingRequests;
         this.nextRefreshInMillisecs = nextRefreshInMillisecs;
     }
