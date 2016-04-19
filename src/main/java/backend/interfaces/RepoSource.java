@@ -2,11 +2,11 @@ package backend.interfaces;
 
 import backend.IssueMetadata;
 import backend.UserCredentials;
+import backend.github.ApiQuotaInfo;
 import backend.github.GitHubModelUpdatesData;
 import backend.resource.Model;
 import backend.resource.TurboIssue;
 import backend.resource.TurboMilestone;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.eclipse.egit.github.core.Issue;
 
 import java.util.List;
@@ -52,6 +52,6 @@ public abstract class RepoSource implements TaskRunner {
 
     public abstract CompletableFuture<Boolean> editIssueState(TurboIssue issue, boolean isOpen);
 
-    public abstract CompletableFuture<ImmutablePair<Integer, Long>> getRateLimitResetTime();
+    public abstract CompletableFuture<ApiQuotaInfo> getRateLimitResetTime();
 
 }

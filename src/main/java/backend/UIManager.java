@@ -1,9 +1,9 @@
 package backend;
 
+import backend.github.ApiQuotaInfo;
 import backend.resource.TurboUser;
 import filter.expression.FilterExpression;
 import javafx.application.Platform;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import ui.GuiElement;
 import ui.UI;
 import ui.issuepanel.FilterPanel;
@@ -27,12 +27,12 @@ public class UIManager {
         Platform.runLater(() -> ui.triggerEvent(new ModelUpdatedEvent(elementsToShow, users)));
     }
 
-    public void updateApiQuotaInfo(ImmutablePair<Integer, Long> rateLimits) {
-        ui.triggerEvent(new NewApiQuotaInfoAvailableEvent(rateLimits.left, rateLimits.right));
+    public void updateApiQuotaInfo(ApiQuotaInfo apiQuotaInfo) {
+        ui.triggerEvent(new NewApiQuotaInfoAvailableEvent(apiQuotaInfo));
     }
 
-    public void updateSyncRefreshRate(ImmutablePair<Integer, Long> rateLimits) {
-        ui.triggerEvent(new RefreshTimerTriggeredEvent(rateLimits.left, rateLimits.right));
+    public void updateSyncRefreshRate(ApiQuotaInfo apiQuotaInfo) {
+        ui.triggerEvent(new RefreshTimerTriggeredEvent(apiQuotaInfo));
     }
 
     /**

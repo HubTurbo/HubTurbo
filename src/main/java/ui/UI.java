@@ -98,7 +98,7 @@ public class UI extends Application implements EventDispatcher {
 
     public UpdateManager updateManager;
 
-    public RefreshTimer refreshTimer;
+    public TickingTimer refreshTimer;
 
     // Main UI elements
 
@@ -247,8 +247,8 @@ public class UI extends Application implements EventDispatcher {
 
         // TODO clear cache if necessary
         
-        refreshTimer = new RefreshTimer("Refresh Timer",
-                                        (int) Utility.minsToSecs(RefreshTimer.DEFAULT_REFRESH_PERIOD_IN_MINS),
+        refreshTimer = new TickingTimer("Refresh Timer",
+                                        (int) Utility.minsToSecs(ApiQuotaManager.DEFAULT_REFRESH_PERIOD_IN_MINS),
                                         status::updateTimeToRefresh, logic::refresh, TimeUnit.SECONDS);
         refreshTimer.start();
 

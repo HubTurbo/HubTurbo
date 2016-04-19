@@ -106,7 +106,7 @@ public class TickingTimerTests {
         tickingTimer.start();
         delay(3.9); //TickingTimer initial timeout is 1 sec less.
         assertTrue(!hasTimeout());
-        tickingTimer.changePeriod(3);
+        tickingTimer.restartTimerBasedOnNewPeriod(3);
         delay(1.5);
         //At t=1.5s, timeout should not be called yet.
         assertTrue(!hasTimeout());
@@ -115,7 +115,7 @@ public class TickingTimerTests {
         assertTrue(hasTimeout());
         resetTimeoutStatus();
 
-        //Second iteration after calling changePeriod method.
+        //Second iteration after calling restartTimerBasedOnNewPeriod method.
         delay(2);
         //At t=2.1s, timeout should not be called yet.
         assertTrue(!hasTimeout());

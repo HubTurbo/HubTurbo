@@ -1,6 +1,7 @@
 package backend;
 
 import backend.control.RepoOpControl;
+import backend.github.ApiQuotaInfo;
 import backend.resource.Model;
 import backend.resource.MultiModel;
 import backend.resource.TurboIssue;
@@ -8,7 +9,6 @@ import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
 import filter.expression.QualifierType;
 import javafx.application.Platform;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.Logger;
 import prefs.Preferences;
 import ui.GuiElement;
@@ -234,30 +234,22 @@ public class Logic {
 
     /**
      * Updates the UI components that are using GitHub rate limits information.
-     * @param rateLimits The GitHub API rate limits information.
-     *                   rateLimits.getLeft() contains the number of API requests remaining
-     *                   in the current rate limit window.
-     *                   rateLimits.getRight() contains the time at which the current
-     *                   API rate limit window resets in UTC epoch milliseconds.
-     * @return the rateLimits instance
+     * @param apiQuotaInfo The GitHub API quota information.
+     * @return the apiQuotaInfo instance
      */
-    public ImmutablePair<Integer, Long> updateApiQuotaInfoInGui(ImmutablePair<Integer, Long> rateLimits) {
-        uiManager.updateApiQuotaInfo(rateLimits);
-        return rateLimits;
+    public ApiQuotaInfo updateApiQuotaInfoInGui(ApiQuotaInfo apiQuotaInfo) {
+        uiManager.updateApiQuotaInfo(apiQuotaInfo);
+        return apiQuotaInfo;
     }
 
     /**
      * Updates the period of the refresh timer for synchronization of the data store.
-     * @param rateLimits The GitHub API rate limits information.
-     *                   rateLimits.getLeft() contains the number of API requests remaining
-     *                   in the current rate limit window.
-     *                   rateLimits.getRight() contains the time at which the current
-     *                   API rate limit window resets in UTC epoch milliseconds.
-     * @return the rateLimits instance
+     * @param apiQuotaInfo The GitHub API quota information.
+     * @return the apiQuotaInfo instance
      */
-    public ImmutablePair<Integer, Long> updateSyncRefreshRate(ImmutablePair<Integer, Long> rateLimits) {
-        uiManager.updateSyncRefreshRate(rateLimits);
-        return rateLimits;
+    public ApiQuotaInfo updateSyncRefreshRate(ApiQuotaInfo apiQuotaInfo) {
+        uiManager.updateSyncRefreshRate(apiQuotaInfo);
+        return apiQuotaInfo;
     }
 
     protected CompletableFuture<Boolean> repoIOLogin(UserCredentials credentials) {
@@ -268,7 +260,7 @@ public class Logic {
         return models.get(repoId);
     }
 
-    public CompletableFuture<ImmutablePair<Integer, Long>> getRateLimitResetTime() {
+    public CompletableFuture<ApiQuotaInfo> getRateLimitResetTime() {
         return repoIO.getRateLimitResetTime();
     }
 

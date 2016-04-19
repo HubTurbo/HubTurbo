@@ -7,7 +7,6 @@ import backend.interfaces.RepoSource;
 import backend.resource.Model;
 import backend.resource.TurboIssue;
 import backend.resource.TurboMilestone;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Issue;
 import util.HTLog;
@@ -85,7 +84,7 @@ public class GitHubSource extends RepoSource {
     }
 
     @Override
-    public CompletableFuture<ImmutablePair<Integer, Long>> getRateLimitResetTime() {
+    public CompletableFuture<ApiQuotaInfo> getRateLimitResetTime() {
         return addTask(new CheckRateLimitTask(this, gitHub)).response;
     }
 

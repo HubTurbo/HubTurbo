@@ -1,19 +1,20 @@
 package ui;
 
+import backend.github.ApiQuotaInfo;
 import filter.expression.FilterExpression;
 import javafx.application.Platform;
 import javafx.scene.control.Label;
 import ui.issuepanel.FilterPanel;
 import ui.issuepanel.PanelControl;
 import ui.issuepanel.UIBrowserBridge;
+import util.ApiQuotaManager;
 import util.DialogMessage;
-import util.RefreshTimer;
+import util.HTLog;
 import util.Utility;
 import util.events.*;
 import util.events.testevents.PrimaryRepoChangedEvent;
 import util.events.testevents.PrimaryRepoChangedEventHandler;
 
-import util.HTLog;
 import org.apache.logging.log4j.Logger;
 
 import java.util.*;
@@ -130,7 +131,7 @@ public class GUIController {
      * @param e NewApiQuotaInfoAvailableEvent object that holds the current API quota information.
      */
     private void updateApiQuotaInfo(NewApiQuotaInfoAvailableEvent e) {
-        updateAPIBox(e.remainingRequests, e.nextRefreshInMillisecs);
+        updateAPIBox(e.getApiQuotaInfo());
     }
 
     /**
@@ -138,20 +139,26 @@ public class GUIController {
      * @param e RefreshTimerTriggeredEvent object that holds the current API quota information.
      */
     private void updateSyncRefreshRate(RefreshTimerTriggeredEvent e) {
-        apiCallsUsedInPreviousRefresh = computeApiCallsUsedInPreviousRefresh(e.remainingRequests);
-        refreshDurationInMinutes = RefreshTimer.computeRefreshTimerPeriod(e.remainingRequests,
-                                                                    Utility.minutesFromNow(e.nextRefreshInMillisecs),
-                                                                    apiCallsUsedInPreviousRefresh,
-                                                                    RefreshTimer.API_QUOTA_BUFFER,
-                                                                    RefreshTimer.DEFAULT_REFRESH_PERIOD_IN_MINS);
-        ui.refreshTimer.changeRefreshPeriod((int) refreshDurationInMinutes);
+        ApiQuotaInfo info = e.getApiQuotaInfo();
+        apiCallsUsedInPreviousRefresh = computeApiCallsUsedInPreviousRefresh(info.getRemainingRequests());
+        refreshDurationInMinutes = ApiQuotaManager.computeRefreshTimerPeriod(info.getRemainingRequests(),
+                                                               Utility.minutesFromNow(info.getNextRefreshInMillisecs()),
+                                                               apiCallsUsedInPreviousRefresh,
+                                                               ApiQuotaManager.API_QUOTA_BUFFER,
+                                                               ApiQuotaManager.DEFAULT_REFRESH_PERIOD_IN_MINS);
+        ui.refreshTimer.restartTimerBasedOnNewPeriod((int) Utility.minsToSecs(refreshDurationInMinutes));
         logger.info("Refresh period updated to " + refreshDurationInMinutes
                     + "mins with API calls used in previous refresh cycle is " + apiCallsUsedInPreviousRefresh
-                    + ", current API quota is " + e.remainingRequests + " and next API quota top-up in "
-                    + Utility.minutesFromNow(e.nextRefreshInMillisecs) + "mins.");
+                    + ", current API quota is " + info.getRemainingRequests() + " and next API quota top-up in "
+                    + info.getNextRefreshInMinutesFromNow() + "mins.");
 
     }
 
+    /**
+     * Computes the API calls used in previous refresh.
+     * @param remainingRequests The number of API requests remaining in the current rate limit window.
+     * @return The number of API calls used in previous refresh.
+     */
     private int computeApiCallsUsedInPreviousRefresh(int remainingRequests) {
         int difference = previousRemainingApiRequests - remainingRequests;
         previousRemainingApiRequests = remainingRequests;
@@ -165,14 +172,12 @@ public class GUIController {
     /**
      * Updates the GUI APIBox to indicate the no of remaining API requests, time until next API renewal and
      * the current sync refresh rate.
-     * @param remainingRequests The number of API requests remaining in the current rate limit window.
-     * @param nextRefreshInMillisecs The time at which the current API rate limit window resets
-     *                               in UTC epoch milliseconds.
+     * @param apiQuotaInfo The GitHub API quota information.
      */
-    private void updateAPIBox(int remainingRequests, long nextRefreshInMillisecs) {
-        Platform.runLater(() -> apiBox.setText(String.format("%s/%s[x%d]", remainingRequests,
-                                               Utility.minutesFromNow(nextRefreshInMillisecs),
-                                               (int) Math.ceil(refreshDurationInMinutes))));
+    private void updateAPIBox(ApiQuotaInfo apiQuotaInfo) {
+        Platform.runLater(() -> apiBox.setText(String.format("%s/%s[x%d]", apiQuotaInfo.getRemainingRequests(),
+                                               apiQuotaInfo.getNextRefreshInMinutesFromNow(),
+                                               (int) refreshDurationInMinutes)));
     }
 
     private void showErrorDialog(ShowErrorDialogEvent e) {

@@ -1,6 +1,7 @@
 package backend;
 
 import backend.control.RepoOpControl;
+import backend.github.ApiQuotaInfo;
 import backend.github.GitHubModelUpdatesData;
 import backend.github.GitHubSource;
 import backend.interfaces.RepoSource;
@@ -10,7 +11,6 @@ import backend.resource.Model;
 import backend.resource.TurboIssue;
 import backend.resource.TurboMilestone;
 import backend.resource.serialization.SerializableModel;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Issue;
 import ui.UI;
@@ -222,7 +222,7 @@ public class RepoIO {
         return repoSource.editIssueState(issue, isOpen);
     }
 
-    public CompletableFuture<ImmutablePair<Integer, Long>> getRateLimitResetTime() {
+    public CompletableFuture<ApiQuotaInfo> getRateLimitResetTime() {
         return repoSource.getRateLimitResetTime();
     }
 
