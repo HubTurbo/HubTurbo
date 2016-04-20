@@ -458,6 +458,10 @@ public class UITest extends FxRobot {
         return GuiTest.find(IdGenerator.getPanelCellIdReference(panelIndex, issueId));
     }
 
+    public void setTextField(int panelIndex, String text) {
+        setTextField(IdGenerator.getPanelFilterTextFieldIdReference(panelIndex), text);
+    }
+
     /**
      * Sets a text field with given text. Does not simulate clicking and typing
      * in the text field.

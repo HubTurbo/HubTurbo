@@ -3,16 +3,16 @@ package guitests;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 
+import java.util.Optional;
+
+import org.junit.Test;
+
 import backend.stub.DummyRepoState;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
-import org.junit.Test;
-
 import ui.listpanel.ListPanel;
 import util.PlatformEx;
-
-import java.util.Optional;
 
 public class FilterTests extends UITest {
 
@@ -36,8 +36,7 @@ public class FilterTests extends UITest {
 
         // test semantic exception
         clickFilterTextFieldAtPanel(0);
-        selectAll();
-        type("id:buggy");
+        setTextField(0, "id:buggy");
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
 
@@ -51,7 +50,7 @@ public class FilterTests extends UITest {
         // test semantic exception dummy/dummy_col0_filterTextField");
         clickFilterTextFieldAtPanel(0);
         selectAll();
-        type("id:buggy u:<24");
+        setTextField(0, "id:buggy u:<24");
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
 
@@ -64,8 +63,7 @@ public class FilterTests extends UITest {
 
         // filter panel 1
         clickFilterTextFieldAtPanel(0);
-        selectAll();
-        type("id:4");
+        setTextField(0, "id:4");
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
         assertEquals(1, issuePanel.getIssuesCount());
@@ -222,7 +220,7 @@ public class FilterTests extends UITest {
                                      int milestoneNumber) {
         clickFilterTextFieldAtPanel(0);
         selectAll();
-        type(milestoneAlias + ":" + currString);
+        setTextField(0, milestoneAlias + ":" + currString);
         push(KeyCode.ENTER);
         PlatformEx.waitOnFxThread();
 
