@@ -19,13 +19,12 @@ public class ApiQuotaManager {
     /**
      * The amount that is set aside for manual operations by the user.
      */
-    public static final int API_QUOTA_BUFFER = 200;
+    private static final int API_QUOTA_BUFFER = 200;
 
     /**
      * The default refresh period.
      */
-    public static final int DEFAULT_REFRESH_PERIOD_IN_MINS = 1;
-
+    private static final int DEFAULT_REFRESH_PERIOD_IN_MINS = 1;
 
     /**
      * The previous amount of the available remaining API requests.
@@ -83,12 +82,11 @@ public class ApiQuotaManager {
                 + "mins with API calls used in previous refresh cycle is " + apiCallsUsedInPreviousRefresh
                 + ", current API quota is " + info.getRemainingRequests() + " and next API quota top-up in "
                 + info.getNextRefreshInMinutesFromNow() + "mins.");
-
     }
 
     /**
      * Computes the API calls used in previous refresh.
-     * @param remainingRequests The number of API requests remaining in the current rate limit window.
+     * @param remainingRequests The number of API requests remaining in the current API quota window.
      * @return The number of API calls used in previous refresh.
      */
     private int computeApiCallsUsedInPreviousRefresh(int remainingRequests) {

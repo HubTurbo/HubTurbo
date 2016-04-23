@@ -8,7 +8,7 @@ import util.Utility;
 public class ApiQuotaInfo {
 
     /**
-     * The number of API requests remaining in the current rate limit window.
+     * The number of API requests remaining in the current API quota window.
      */
     private final int remainingRequests;
 

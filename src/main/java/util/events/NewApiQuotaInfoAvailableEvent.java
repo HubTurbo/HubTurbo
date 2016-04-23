@@ -3,7 +3,7 @@ package util.events;
 import backend.github.ApiQuotaInfo;
 
 /**
- * An event that is generated when new API rate limits information is available.
+ * An event that is generated when new API quota information is available.
  */
 public class NewApiQuotaInfoAvailableEvent extends Event{
 
