@@ -10,12 +10,12 @@ public class ApiQuotaInfo {
     /**
      * The number of API requests remaining in the current rate limit window.
      */
-    public final int remainingRequests;
+    private final int remainingRequests;
 
     /**
-     * The time at which the current API rate limit window resets in UTC epoch milliseconds.
+     * The time at which the current API quota window resets in UTC epoch milliseconds.
      */
-    public final long nextRefreshInMillisecs;
+    private final long nextRefreshInMillisecs;
 
     public ApiQuotaInfo(int remainingRequests, long nextRefreshInMillisecs) {
         this.remainingRequests = remainingRequests;

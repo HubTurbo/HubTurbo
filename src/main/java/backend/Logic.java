@@ -233,7 +233,7 @@ public class Logic {
     }
 
     /**
-     * Updates the UI components that are using GitHub rate limits information.
+     * Updates the GitHub API quota info in the GUI.
      * @param apiQuotaInfo The GitHub API quota information.
      * @return the apiQuotaInfo instance
      */

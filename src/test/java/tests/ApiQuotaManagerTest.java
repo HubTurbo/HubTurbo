@@ -2,7 +2,6 @@ package tests;
 
 import org.junit.Test;
 import util.ApiQuotaManager;
-import util.RefreshTimer;
 
 import static org.junit.Assert.*;
 

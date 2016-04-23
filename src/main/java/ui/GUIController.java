@@ -7,15 +7,10 @@ import javafx.scene.control.Label;
 import ui.issuepanel.FilterPanel;
 import ui.issuepanel.PanelControl;
 import ui.issuepanel.UIBrowserBridge;
-import util.ApiQuotaManager;
 import util.DialogMessage;
-import util.HTLog;
-import util.Utility;
 import util.events.*;
 import util.events.testevents.PrimaryRepoChangedEvent;
 import util.events.testevents.PrimaryRepoChangedEventHandler;
-
-import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -27,28 +22,11 @@ import java.util.stream.Collectors;
 
 public class GUIController {
 
-    private static final Logger logger = HTLog.get(GUIController.class);
-
     private final PanelControl panelControl;
     private final UI ui;
     private final Label apiBox;
 
-    /**
-     * The previous amount of the available remaining API requests.
-     */
-    private int previousRemainingApiRequests = 0;
-
-    /**
-     * The previous amount of API calls used.
-     */
-    private int apiCallsUsedInPreviousRefresh = 0;
-
     private String defaultRepoId;
-
-    /**
-     * The duration between each refresh of the data store.
-     */
-    private long refreshDurationInMinutes = 1;
 
     public GUIController(UI ui, PanelControl panelControl, Label apiBox) {
         this.ui = ui;
@@ -65,7 +43,6 @@ public class GUIController {
     public final void registerEvents() {
         UI.events.registerEvent((ModelUpdatedEventHandler) this::modelUpdated);
         UI.events.registerEvent((NewApiQuotaInfoAvailableEventHandler) this::updateApiQuotaInfo);
-        UI.events.registerEvent((RefreshTimerTriggeredEventHandler) this::updateSyncRefreshRate);
         UI.events.registerEvent((ShowErrorDialogEventHandler) this::showErrorDialog);
         UI.events.registerEvent((PrimaryRepoChangedEventHandler) this::setDefaultRepo);
     }
@@ -135,41 +112,6 @@ public class GUIController {
     }
 
     /**
-     * Updates the period of the refresh timer for synchronization of the data store.
-     * @param e RefreshTimerTriggeredEvent object that holds the current API quota information.
-     */
-    private void updateSyncRefreshRate(RefreshTimerTriggeredEvent e) {
-        ApiQuotaInfo info = e.getApiQuotaInfo();
-        apiCallsUsedInPreviousRefresh = computeApiCallsUsedInPreviousRefresh(info.getRemainingRequests());
-        refreshDurationInMinutes = ApiQuotaManager.computeRefreshTimerPeriod(info.getRemainingRequests(),
-                                                               Utility.minutesFromNow(info.getNextRefreshInMillisecs()),
-                                                               apiCallsUsedInPreviousRefresh,
-                                                               ApiQuotaManager.API_QUOTA_BUFFER,
-                                                               ApiQuotaManager.DEFAULT_REFRESH_PERIOD_IN_MINS);
-        ui.refreshTimer.restartTimerBasedOnNewPeriod((int) Utility.minsToSecs(refreshDurationInMinutes));
-        logger.info("Refresh period updated to " + refreshDurationInMinutes
-                    + "mins with API calls used in previous refresh cycle is " + apiCallsUsedInPreviousRefresh
-                    + ", current API quota is " + info.getRemainingRequests() + " and next API quota top-up in "
-                    + info.getNextRefreshInMinutesFromNow() + "mins.");
-
-    }
-
-    /**
-     * Computes the API calls used in previous refresh.
-     * @param remainingRequests The number of API requests remaining in the current rate limit window.
-     * @return The number of API calls used in previous refresh.
-     */
-    private int computeApiCallsUsedInPreviousRefresh(int remainingRequests) {
-        int difference = previousRemainingApiRequests - remainingRequests;
-        previousRemainingApiRequests = remainingRequests;
-
-        if (difference >= 0) {
-            return difference;
-        }
-        return apiCallsUsedInPreviousRefresh;
-    }
-
-    /**
      * Updates the GUI APIBox to indicate the no of remaining API requests, time until next API renewal and
      * the current sync refresh rate.
      * @param apiQuotaInfo The GitHub API quota information.
@@ -177,7 +119,7 @@ public class GUIController {
     private void updateAPIBox(ApiQuotaInfo apiQuotaInfo) {
         Platform.runLater(() -> apiBox.setText(String.format("%s/%s[x%d]", apiQuotaInfo.getRemainingRequests(),
                                                apiQuotaInfo.getNextRefreshInMinutesFromNow(),
-                                               (int) refreshDurationInMinutes)));
+                                               (int) ui.apiQuotaManager.getRefreshDurationInMinutes())));
     }
 
     private void showErrorDialog(ShowErrorDialogEvent e) {

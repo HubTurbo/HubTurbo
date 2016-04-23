@@ -162,7 +162,7 @@ public class TickingTimer {
      * Changes the timer's period and restart the timer based on the new period.
      * @param periodInSec : the amount of time in second before trigger of the timer.
      */
-    public synchronized void restartTimerBasedOnNewPeriod(int periodInSec){
+    public synchronized void restartTimer(int periodInSec){
         this.period = periodInSec;
         this.time = period;
     }

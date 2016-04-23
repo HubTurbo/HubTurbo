@@ -1,9 +1,20 @@
 package util;
 
+import backend.Logic;
+import backend.github.ApiQuotaInfo;
+import org.apache.logging.log4j.Logger;
+import ui.UI;
+import util.events.RefreshTimerTriggeredEvent;
+import util.events.RefreshTimerTriggeredEventHandler;
+
+import java.util.concurrent.TimeUnit;
+
 /**
- * Provides methods to better manage the API quota usage.
+ * Manages the API quota usage and periodic refreshes of the data store.
  */
 public class ApiQuotaManager {
+
+    private static final Logger logger = HTLog.get(ApiQuotaManager.class);
 
     /**
      * The amount that is set aside for manual operations by the user.
@@ -14,6 +25,81 @@ public class ApiQuotaManager {
      * The default refresh period.
      */
     public static final int DEFAULT_REFRESH_PERIOD_IN_MINS = 1;
+
+
+    /**
+     * The previous amount of the available remaining API requests.
+     */
+    private int previousRemainingApiRequests = 0;
+
+    /**
+     * The previous amount of API calls used.
+     */
+    private int apiCallsUsedInPreviousRefresh = 0;
+
+    /**
+     * The duration between each refresh of the data store.
+     */
+    private long refreshDurationInMinutes = 1;
+
+    private final TickingTimer refreshTimer;
+
+    public ApiQuotaManager(Logic logic) {
+        this.refreshTimer = new TickingTimer("Refresh Timer",
+                (int) Utility.minsToSecs(ApiQuotaManager.DEFAULT_REFRESH_PERIOD_IN_MINS),
+                UI.status::updateTimeToRefresh, logic::refresh, TimeUnit.SECONDS);
+        this.refreshTimer.start();
+        UI.events.registerEvent((RefreshTimerTriggeredEventHandler) this::updateSyncRefreshRate);
+    }
+
+    /**
+     * @return The duration between each refresh of the data store.
+     */
+    public long getRefreshDurationInMinutes() {
+        return refreshDurationInMinutes;
+    }
+
+    /**
+     * Restarts the refreshTimer.
+     */
+    public void restartRefreshTimer(){
+        this.refreshTimer.restart();
+    }
+
+    /**
+     * Updates the period of the refreshTimer for synchronization of the data store.
+     * @param e RefreshTimerTriggeredEvent object that holds the current API quota information.
+     */
+    private void updateSyncRefreshRate(RefreshTimerTriggeredEvent e) {
+        ApiQuotaInfo info = e.getApiQuotaInfo();
+        apiCallsUsedInPreviousRefresh = computeApiCallsUsedInPreviousRefresh(info.getRemainingRequests());
+        refreshDurationInMinutes = ApiQuotaManager.computeRefreshTimerPeriod(info.getRemainingRequests(),
+                Utility.minutesFromNow(info.getNextRefreshInMillisecs()),
+                apiCallsUsedInPreviousRefresh,
+                ApiQuotaManager.API_QUOTA_BUFFER,
+                ApiQuotaManager.DEFAULT_REFRESH_PERIOD_IN_MINS);
+        this.refreshTimer.restartTimer((int) Utility.minsToSecs(refreshDurationInMinutes));
+        logger.info("Refresh period updated to " + refreshDurationInMinutes
+                + "mins with API calls used in previous refresh cycle is " + apiCallsUsedInPreviousRefresh
+                + ", current API quota is " + info.getRemainingRequests() + " and next API quota top-up in "
+                + info.getNextRefreshInMinutesFromNow() + "mins.");
+
+    }
+
+    /**
+     * Computes the API calls used in previous refresh.
+     * @param remainingRequests The number of API requests remaining in the current rate limit window.
+     * @return The number of API calls used in previous refresh.
+     */
+    private int computeApiCallsUsedInPreviousRefresh(int remainingRequests) {
+        int difference = previousRemainingApiRequests - remainingRequests;
+        previousRemainingApiRequests = remainingRequests;
+
+        if (difference >= 0) {
+            return difference;
+        }
+        return apiCallsUsedInPreviousRefresh;
+    }
 
     /**
      * Computes the TickerTimer period that is used for refreshing the issues periodically

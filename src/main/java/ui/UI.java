@@ -97,8 +97,7 @@ public class UI extends Application implements EventDispatcher {
     public UndoController undoController;
 
     public UpdateManager updateManager;
-
-    public TickingTimer refreshTimer;
+    public ApiQuotaManager apiQuotaManager;
 
     // Main UI elements
 
@@ -246,11 +245,8 @@ public class UI extends Application implements EventDispatcher {
         logic = new Logic(uiManager, prefs, Optional.empty(), Optional.empty());
 
         // TODO clear cache if necessary
-        
-        refreshTimer = new TickingTimer("Refresh Timer",
-                                        (int) Utility.minsToSecs(ApiQuotaManager.DEFAULT_REFRESH_PERIOD_IN_MINS),
-                                        status::updateTimeToRefresh, logic::refresh, TimeUnit.SECONDS);
-        refreshTimer.start();
+
+        apiQuotaManager = new ApiQuotaManager(logic);
 
         undoController = new UndoController(notificationController);
     }
@@ -357,7 +353,7 @@ public class UI extends Application implements EventDispatcher {
                     if (shouldRefresh) {
                         logger.info("Browser view has changed; refreshing");
                         logic.refresh();
-                        refreshTimer.restart();
+                        apiQuotaManager.restartRefreshTimer();
                     }
                 }
             });
