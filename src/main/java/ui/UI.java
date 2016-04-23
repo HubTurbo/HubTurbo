@@ -241,13 +241,10 @@ public class UI extends Application implements EventDispatcher {
     private void initApplicationState() {
         // In the future, when more arguments are passed to logic,
         // we can pass them in the form of an array.
-
         logic = new Logic(uiManager, prefs, Optional.empty(), Optional.empty());
 
         // TODO clear cache if necessary
-
         apiQuotaManager = new ApiQuotaManager(logic);
-
         undoController = new UndoController(notificationController);
     }
 

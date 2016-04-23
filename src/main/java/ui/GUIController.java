@@ -104,7 +104,7 @@ public class GUIController {
     }
 
     /**
-     * Updates UI components using the API rate limits information.
+     * Updates UI components using the GitHub API quota information.
      * @param e NewApiQuotaInfoAvailableEvent object that holds the current API quota information.
      */
     private void updateApiQuotaInfo(NewApiQuotaInfoAvailableEvent e) {

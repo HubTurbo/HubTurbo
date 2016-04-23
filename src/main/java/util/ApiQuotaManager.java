@@ -46,7 +46,7 @@ public class ApiQuotaManager {
 
     public ApiQuotaManager(Logic logic) {
         this.refreshTimer = new TickingTimer("Refresh Timer",
-                (int) Utility.minsToSecs(ApiQuotaManager.DEFAULT_REFRESH_PERIOD_IN_MINS),
+                (int) Utility.minsToSecs(DEFAULT_REFRESH_PERIOD_IN_MINS),
                 UI.status::updateTimeToRefresh, logic::refresh, TimeUnit.SECONDS);
         this.refreshTimer.start();
         UI.events.registerEvent((RefreshTimerTriggeredEventHandler) this::updateSyncRefreshRate);
@@ -73,11 +73,11 @@ public class ApiQuotaManager {
     private void updateSyncRefreshRate(RefreshTimerTriggeredEvent e) {
         ApiQuotaInfo info = e.getApiQuotaInfo();
         apiCallsUsedInPreviousRefresh = computeApiCallsUsedInPreviousRefresh(info.getRemainingRequests());
-        refreshDurationInMinutes = ApiQuotaManager.computeRefreshTimerPeriod(info.getRemainingRequests(),
+        refreshDurationInMinutes = computeRefreshTimerPeriod(info.getRemainingRequests(),
                 Utility.minutesFromNow(info.getNextRefreshInMillisecs()),
                 apiCallsUsedInPreviousRefresh,
-                ApiQuotaManager.API_QUOTA_BUFFER,
-                ApiQuotaManager.DEFAULT_REFRESH_PERIOD_IN_MINS);
+                API_QUOTA_BUFFER,
+                DEFAULT_REFRESH_PERIOD_IN_MINS);
         this.refreshTimer.restartTimer((int) Utility.minsToSecs(refreshDurationInMinutes));
         logger.info("Refresh period updated to " + refreshDurationInMinutes
                 + "mins with API calls used in previous refresh cycle is " + apiCallsUsedInPreviousRefresh
@@ -107,7 +107,7 @@ public class ApiQuotaManager {
      * duration that will spread out the refreshes until the next API quota top up.
      *
      * For some cases where the computed refresh rate is equal to the remainingTimeInMins,
-     * BUFFER_TIME is added to ensure that the next refresh happens after the apiQuota renewal.
+     * bufferTime is added to ensure that the next refresh happens after the apiQuota renewal.
      *
      * PMD is suppressed to allow explicit parenthesis.
      *
@@ -115,7 +115,7 @@ public class ApiQuotaManager {
      *                 Pre-condition: >= 0
      * @param remainingTimeInMins The remaining time left until the next API quota renewal.
      *                           Pre-condition: >= 0
-     * @param apiCallsUsedInPreviousRefresh The amount of API used in the last API refresh.
+     * @param apiCallsUsedInPreviousRefresh The amount of API used in the previous API refresh.
      *                                      Pre-condition: >= 0
      * @param apiQuotaBuffer The amount of API calls that is set aside for manual operations by the user.
      *                       Pre-condition: >= 0
@@ -135,7 +135,7 @@ public class ApiQuotaManager {
                                                  int apiQuotaBuffer, int minRefreshPeriod) {
 
         assert apiQuota >= 0 && remainingTimeInMins >= 0 && apiCallsUsedInPreviousRefresh >= 0
-                && minRefreshPeriod > 0 && apiQuotaBuffer >= 0;
+                && apiQuotaBuffer >= 0 && minRefreshPeriod > 0;
 
         final int bufferTime = 1;
 
