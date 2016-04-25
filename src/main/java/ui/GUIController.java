@@ -112,7 +112,7 @@ public class GUIController {
     }
 
     /**
-     * Updates the GUI APIBox to indicate the no of remaining API requests, time until next API renewal and
+     * Updates the GUI APIBox to indicate the number of remaining API requests, time until next API renewal and
      * the current sync refresh rate.
      * @param apiQuotaInfo The GitHub API quota information.
      */
