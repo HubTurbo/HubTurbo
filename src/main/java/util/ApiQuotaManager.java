@@ -99,7 +99,7 @@ public class ApiQuotaManager {
     /**
      * Computes the API calls used in previous refresh.
      * @param newRemainingApiRequests The number of API requests remaining in the current API quota window.
-     * @return The number of API calls used in previous refresh.
+     * @return The number of API calls used in previous refresh or apiCallsUsedInPreviousRefresh.
      *         apiCallsUsedInPreviousRefresh will be returned when newRemainingApiRequests > remainingApiRequests.
      */
     private int computeApiCallsUsedInPreviousRefresh(int newRemainingApiRequests) {
