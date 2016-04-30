@@ -17,7 +17,7 @@ public class TickingTimerTests {
     /**
      * Facilitates simulation of the triggering of timer for changePeriodTest().
      */
-    Boolean tickingTimerStatus = false;
+    Boolean isTriggered = false;
 
     private static void delay(double seconds) {
         int time = (int) (seconds * 1000);
@@ -99,7 +99,7 @@ public class TickingTimerTests {
         final ArrayList<Integer> ticks = new ArrayList<>();
 
         final TickingTimer tickingTimer = new TickingTimer("test3", 5, (Integer i) -> {}, () -> {
-            tickingTimerStatus = true;
+            isTriggered = true;
             ticks.clear();
         }, TimeUnit.SECONDS);
 
@@ -125,10 +125,10 @@ public class TickingTimerTests {
     }
 
     private void resetTimeoutStatus() {
-        tickingTimerStatus = false;
+        isTriggered = false;
     }
 
     private boolean hasTimeout() {
-        return tickingTimerStatus;
+        return isTriggered;
     }
 }

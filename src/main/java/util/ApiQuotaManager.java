@@ -32,19 +32,19 @@ public class ApiQuotaManager {
     private static final int UNINITIALIZED = -1;
 
     /**
-     * The amount of the available remaining API requests.
+     * The amount of the available remaining API quota.
      */
-    private int remainingApiRequests = UNINITIALIZED;
+    public int remainingApiQuota = UNINITIALIZED;
 
     /**
      * The number of API calls used in most recent refresh.
      */
-    private int apiCallsUsedInPreviousRefresh = 0;
+    public int apiCallsUsedInRecentRefresh = UNINITIALIZED;
 
     /**
      * The duration between each refresh of the data store.
      */
-    private long refreshDurationInMinutes = 1;
+    public long refreshDurationInMinutes = DEFAULT_REFRESH_PERIOD_IN_MINS;
 
     private final TickingTimer refreshTimer;
 
@@ -76,56 +76,58 @@ public class ApiQuotaManager {
      * @param e RefreshTimerTriggeredEvent object that holds the current API quota information.
      */
     private void updateSyncRefreshRate(RefreshTimerTriggeredEvent e) {
-        ApiQuotaInfo info = e.getApiQuotaInfo();
+        updateSyncRefreshRate(e.getApiQuotaInfo().getRemainingQuota(),
+                              e.getApiQuotaInfo().getNextRefreshInMinutesFromNow());
+    }
 
-        if (remainingApiRequests == UNINITIALIZED){
-            remainingApiRequests = info.getRemainingRequests();
+    private void updateSyncRefreshRate(int newRemainingQuota, long nextRefreshInMinuteFromNow) {
+
+        if (remainingApiQuota == UNINITIALIZED){
+            remainingApiQuota = newRemainingQuota;
             return;
         }
 
-        apiCallsUsedInPreviousRefresh = computeApiCallsUsedInPreviousRefresh(info.getRemainingRequests());
-        remainingApiRequests = info.getRemainingRequests();
-        refreshDurationInMinutes = computeRefreshTimerPeriod(info.getRemainingRequests(),
-                                                             Utility.minutesFromNow(info.getNextRefreshInMillisecs()),
-                                                             apiCallsUsedInPreviousRefresh, API_QUOTA_BUFFER,
-                                                             DEFAULT_REFRESH_PERIOD_IN_MINS);
-        this.refreshTimer.restartTimer((int) Utility.minsToSecs(refreshDurationInMinutes));
-        logger.info("Refresh period updated to " + refreshDurationInMinutes
-                + "mins with API calls used in previous refresh cycle is " + apiCallsUsedInPreviousRefresh
-                + ", current API quota is " + info.getRemainingRequests() + " and next API quota top-up in "
-                + info.getNextRefreshInMinutesFromNow() + "mins.");
-    }
-
-    /**
-     * Computes the API calls used in previous refresh.
-     * @param newRemainingApiRequests The number of API requests remaining in the current API quota window.
-     * @return The number of API calls used in previous refresh or apiCallsUsedInPreviousRefresh.
-     *         apiCallsUsedInPreviousRefresh will be returned when newRemainingApiRequests > remainingApiRequests.
-     */
-    private int computeApiCallsUsedInPreviousRefresh(int newRemainingApiRequests) {
-        int apiUsageInRecentRefresh = remainingApiRequests - newRemainingApiRequests;
-
-        if (apiUsageInRecentRefresh < 0) {
-            return apiCallsUsedInPreviousRefresh;
+        // apiCallsUsedInRecentRefresh don't get initialised in the first attempt when a top up has occurred
+        // since the recent refresh.
+        if (apiCallsUsedInRecentRefresh == UNINITIALIZED){
+            if (remainingApiQuota >= newRemainingQuota){
+                apiCallsUsedInRecentRefresh = remainingApiQuota - newRemainingQuota;
+            } else {
+                remainingApiQuota = newRemainingQuota;
+                return;
+            }
         }
 
-        return apiUsageInRecentRefresh;
+        // remainingApiQuota < newRemainingQuota indicates that a top up has occurred
+        // since the recent refresh.
+        apiCallsUsedInRecentRefresh = remainingApiQuota < newRemainingQuota
+                                      ? apiCallsUsedInRecentRefresh : remainingApiQuota - newRemainingQuota;
+        remainingApiQuota = newRemainingQuota;
+
+        refreshDurationInMinutes = computeRefreshTimerPeriod(newRemainingQuota,
+                                                             nextRefreshInMinuteFromNow,
+                                                             apiCallsUsedInRecentRefresh,
+                                                             API_QUOTA_BUFFER, DEFAULT_REFRESH_PERIOD_IN_MINS);
+        this.refreshTimer.restartTimer((int) Utility.minsToSecs(refreshDurationInMinutes));
+
+        logger.info("Refresh period updated to " + refreshDurationInMinutes
+                + "mins with API calls used in recent refresh cycle is " + apiCallsUsedInRecentRefresh
+                + ", current API quota is " + newRemainingQuota + " and next API quota top-up in "
+                + nextRefreshInMinuteFromNow + "mins.");
     }
 
     /**
-     * Computes the TickerTimer period that is used for refreshing the issues periodically
+     * Computes the refreshTimer period that is used for refreshing the issues periodically.
      * Assumes future refreshes will take the same number of API calls as the last refresh and finds out the refresh
      * duration that will spread out the refreshes until the next API quota top up.
      *
      * Calculation avoids scheduling a refresh that happens during the same time as the API quota top up.
      *
-     * PMD warning is suppressed to allow explicit parenthesis.
-     *
-     * @param apiQuota The remaining allowed API requests until the next API quota renewal.
+     * @param apiQuota The remaining API quota until the next API quota renewal.
      *                 Pre-condition: >= 0
      * @param remainingTimeInMins The remaining time left until the next API quota renewal.
-     *                           Pre-condition: >= 0
-     * @param apiCallsUsedInPreviousRefresh The amount of API used in the previous API refresh.
+     *                            Pre-condition: >= 0
+     * @param apiCallsUsedInRecentRefresh The amount of API used in the recent API refresh.
      *                                      Pre-condition: >= 0
      * @param apiQuotaBuffer The amount of API calls that is set aside for manual operations by the user.
      *                       Pre-condition: >= 0
@@ -133,49 +135,47 @@ public class ApiQuotaManager {
      *                         Recommended value : ApiQuotaManager.DEFAULT_REFRESH_PERIOD_IN_MINS
      *                         Pre-condition: > 0
      * @return the computed refresh period or minRefreshPeriod.
-     *          There are 3 conditions that minRefreshPeriod will be used.
-     *          1) During application initialisation, when apiCallsUsedInPreviousRefresh is zero.
-     *          2) When computed refresh rate is < minRefreshPeriod.
-     *          3) When remainingTimeInMins = 0. This indicates that refreshes can occur in the
-     *             nearest time possible.
+     *          minRefreshPeriod will be returned if one of the following conditions are met:
+     *          1) When apiCallsUsedInRecentRefresh == 0 (i.e. when no API quota is used in recent refresh)
+     *          2) When computed refresh period < minRefreshPeriod
+     *                  (i.e. when the remaining API quota is enough to maintain the min refresh rate)
+     *          3) When remainingTimeInMins == 0 (i.e. when a refresh is due to happen inside the next minute).
      */
-    @SuppressWarnings("PMD")
+    @SuppressWarnings("PMD") // PMD warning is suppressed to allow explicit parenthesis.
     public static long computeRefreshTimerPeriod(int apiQuota, long remainingTimeInMins,
-                                                 int apiCallsUsedInPreviousRefresh,
+                                                 int apiCallsUsedInRecentRefresh,
                                                  int apiQuotaBuffer, int minRefreshPeriod) {
 
-        assert apiQuota >= 0 && remainingTimeInMins >= 0 && apiCallsUsedInPreviousRefresh >= 0
+        assert apiQuota >= 0 && remainingTimeInMins >= 0 && apiCallsUsedInRecentRefresh >= 0
                 && apiQuotaBuffer >= 0 && minRefreshPeriod > 0;
 
-        int remainingApiQuota = apiQuota - apiQuotaBuffer;
+        int usableApiQuota = apiQuota - apiQuotaBuffer;
 
-        if ((remainingApiQuota > 0 && apiCallsUsedInPreviousRefresh == 0) || remainingTimeInMins == 0) {
+        boolean isZeroApiQuotaUsedWithEnoughApiQuotaForMinimalRefreshPeriod = apiCallsUsedInRecentRefresh == 0
+                                                                      && usableApiQuota > 0;
+
+        if (isZeroApiQuotaUsedWithEnoughApiQuotaForMinimalRefreshPeriod || remainingTimeInMins == 0) {
             return minRefreshPeriod;
         }
 
         long refreshTimeInMins;
-        final int bufferTime = 1;
 
-        if (isQuotaInsufficient(remainingApiQuota, apiCallsUsedInPreviousRefresh)) {
-            refreshTimeInMins = remainingTimeInMins + bufferTime;
+        if (isQuotaInsufficient(usableApiQuota, apiCallsUsedInRecentRefresh)) {
+            refreshTimeInMins = remainingTimeInMins;
             return Math.max(refreshTimeInMins, minRefreshPeriod);
         }
 
-        int noOfRefreshAllowed = remainingApiQuota / apiCallsUsedInPreviousRefresh;
+        int noOfRefreshAllowed = usableApiQuota / apiCallsUsedInRecentRefresh;
         refreshTimeInMins = (long) Math.ceil(remainingTimeInMins / (double) noOfRefreshAllowed);
-
-        if (refreshTimeInMins == remainingTimeInMins) {
-            refreshTimeInMins = refreshTimeInMins + bufferTime;
-        }
 
         return Math.max(refreshTimeInMins, minRefreshPeriod);
     }
 
-    private static boolean isQuotaInsufficient(int remainingApiQuota, int apiCallsUsedInPreviousRefresh) {
-        boolean isBelowApiQuotaBufferAllowance = remainingApiQuota <= 0;
-        boolean isOffsetQuotaLessThanApiCallsUsedInPreviousRefresh = remainingApiQuota > 0
-                && remainingApiQuota < apiCallsUsedInPreviousRefresh;
+    private static boolean isQuotaInsufficient(int usableApiQuota, int apiCallsUsedInRecentRefresh) {
+        boolean isBelowApiQuotaBufferAllowance = usableApiQuota <= 0;
+        boolean isOffsetQuotaLessThanApiCallsUsedInRecentRefresh = usableApiQuota > 0
+                && usableApiQuota < apiCallsUsedInRecentRefresh;
 
-        return isBelowApiQuotaBufferAllowance || isOffsetQuotaLessThanApiCallsUsedInPreviousRefresh;
+        return isBelowApiQuotaBufferAllowance || isOffsetQuotaLessThanApiCallsUsedInRecentRefresh;
     }
 }

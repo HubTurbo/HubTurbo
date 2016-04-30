@@ -8,26 +8,22 @@ import util.Utility;
 public class ApiQuotaInfo {
 
     /**
-     * The number of API requests remaining in the current API quota window.
+     * The remaining API quota in the current window.
      */
-    private final int remainingRequests;
+    private final int remainingQuota;
 
     /**
      * The time at which the current API quota window resets in UTC epoch milliseconds.
      */
     private final long nextRefreshInMillisecs;
 
-    public ApiQuotaInfo(int remainingRequests, long nextRefreshInMillisecs) {
-        this.remainingRequests = remainingRequests;
+    public ApiQuotaInfo(int remainingQuota, long nextRefreshInMillisecs) {
+        this.remainingQuota = remainingQuota;
         this.nextRefreshInMillisecs = nextRefreshInMillisecs;
     }
 
-    public int getRemainingRequests() {
-        return remainingRequests;
-    }
-
-    public long getNextRefreshInMillisecs() {
-        return nextRefreshInMillisecs;
+    public int getRemainingQuota() {
+        return remainingQuota;
     }
 
     public long getNextRefreshInMinutesFromNow(){

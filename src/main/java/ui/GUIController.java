@@ -112,12 +112,12 @@ public class GUIController {
     }
 
     /**
-     * Updates the GUI APIBox to indicate the number of remaining API requests, time until next API renewal and
+     * Updates the GUI APIBox to indicate the number of remaining API quota, time until next API renewal and
      * the current sync refresh rate.
      * @param apiQuotaInfo The GitHub API quota information.
      */
     private void updateAPIBox(ApiQuotaInfo apiQuotaInfo) {
-        Platform.runLater(() -> apiBox.setText(String.format("%s/%s[x%d]", apiQuotaInfo.getRemainingRequests(),
+        Platform.runLater(() -> apiBox.setText(String.format("%s/%s[x%d]", apiQuotaInfo.getRemainingQuota(),
                                                apiQuotaInfo.getNextRefreshInMinutesFromNow(),
                                                (int) ui.apiQuotaManager.getRefreshDurationInMinutes())));
     }
