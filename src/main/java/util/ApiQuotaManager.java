@@ -34,17 +34,17 @@ public class ApiQuotaManager {
     /**
      * The amount of the available remaining API quota.
      */
-    public int remainingApiQuota = UNINITIALIZED;
+    private int remainingApiQuota = UNINITIALIZED;
 
     /**
      * The number of API calls used in most recent refresh.
      */
-    public int apiCallsUsedInRecentRefresh = UNINITIALIZED;
+    private int apiCallsUsedInRecentRefresh = UNINITIALIZED;
 
     /**
      * The duration between each refresh of the data store.
      */
-    public long refreshDurationInMinutes = DEFAULT_REFRESH_PERIOD_IN_MINS;
+    private long refreshDurationInMinutes = DEFAULT_REFRESH_PERIOD_IN_MINS;
 
     private final TickingTimer refreshTimer;
 
