@@ -89,8 +89,8 @@ public class Logic {
         UI.status.displayMessage(message);
 
         Futures.sequence(models.toModels().stream()
-                                 .map((model) -> repoIO.updateModel(model, true))
-                                 .collect(Collectors.toList()))
+                .map((model) -> repoIO.updateModel(model, true))
+                .collect(Collectors.toList()))
                 .thenRun(this::refreshUI)
                 .thenCompose(n -> getRateLimitResetTime())
                 .thenApply(this::updateSyncRefreshRate)

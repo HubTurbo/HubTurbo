@@ -87,7 +87,7 @@ public class ApiQuotaManager {
             return;
         }
 
-        // apiCallsUsedInRecentRefresh don't get initialised in the first attempt when a top up has occurred
+        // apiCallsUsedInRecentRefresh will not get initialised in the first attempt if an API quota top up has occurred
         // since the recent refresh.
         if (apiCallsUsedInRecentRefresh == UNINITIALIZED){
             if (remainingApiQuota >= newRemainingQuota){
@@ -98,7 +98,7 @@ public class ApiQuotaManager {
             }
         }
 
-        // remainingApiQuota < newRemainingQuota indicates that a top up has occurred
+        // remainingApiQuota < newRemainingQuota indicates that an API quota top up has occurred
         // since the recent refresh.
         apiCallsUsedInRecentRefresh = remainingApiQuota < newRemainingQuota
                                       ? apiCallsUsedInRecentRefresh : remainingApiQuota - newRemainingQuota;
@@ -151,10 +151,10 @@ public class ApiQuotaManager {
 
         int usableApiQuota = apiQuota - apiQuotaBuffer;
 
-        boolean isZeroApiQuotaUsedWithEnoughApiQuotaForMinimalRefreshPeriod = apiCallsUsedInRecentRefresh == 0
+        boolean isZeroApiCallsUsedWithEnoughApiQuotaForMinimalRefreshPeriod = apiCallsUsedInRecentRefresh == 0
                                                                       && usableApiQuota > 0;
 
-        if (isZeroApiQuotaUsedWithEnoughApiQuotaForMinimalRefreshPeriod || remainingTimeInMins == 0) {
+        if (isZeroApiCallsUsedWithEnoughApiQuotaForMinimalRefreshPeriod || remainingTimeInMins == 0) {
             return minRefreshPeriod;
         }
 
