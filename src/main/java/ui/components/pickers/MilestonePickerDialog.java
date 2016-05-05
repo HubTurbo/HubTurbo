@@ -167,14 +167,15 @@ public class MilestonePickerDialog extends Dialog<MilestonePickerDialogResponse>
 
     private ScrollPane createAllMilestonesScrollPane() {
         VBox milestonesBox = new VBox();
-        milestonesBox.setStyle("-fx-border-radius: 3;-fx-background-color: white;-fx-border-color: black;");
+        milestonesBox.setPrefWidth(398);
+        milestonesBox.setStyle("-fx-background-color: white;");
         originalMilestones.forEach(milestone ->
                 milestonesBox.getChildren().add(
                 setMouseClickForNode(milestone.getDetailedMilestoneNode(), milestone.getTitle()))
         );
 
         ScrollPane milestonesScrollPane = new ScrollPane();
-        milestonesScrollPane.setMaxHeight(163);
+        milestonesScrollPane.setMaxHeight(160);
         milestonesScrollPane.setContent(milestonesBox);
         return milestonesScrollPane;
     }
@@ -249,7 +250,7 @@ public class MilestonePickerDialog extends Dialog<MilestonePickerDialogResponse>
     private VBox createMatchingMilestonesBox() {
         VBox milestoneGroup = new VBox();
         milestoneGroup.setPrefHeight(DETAILED_MILESTONE_HEIGHT * MilestonePickerState.BEST_MATCHING_LIMIT);
-        milestoneGroup.setStyle("-fx-border-radius: 3;-fx-background-color: white;-fx-border-color: black;");
+        milestoneGroup.setStyle("-fx-background-color: white;-fx-border-color: lightgrey;");
         return milestoneGroup;
     }
 
