@@ -62,7 +62,7 @@ public class MilestonePickerState {
     public void selectNextBestMatchingMilestone() {
         Optional<Integer> curSelectedIndex = getSelectedIndex(bestMatchingMilestones);
         if (!canIncreaseIndex(curSelectedIndex, bestMatchingMilestones)) return;
-        selectMilestoneAtIndex(bestMatchingMilestones, curSelectedIndex.isPresent() ? curSelectedIndex.get() + 1 : 0);
+        selectMilestoneAtIndex(bestMatchingMilestones, curSelectedIndex.orElse(-1) + 1);
     }
 
     /**
