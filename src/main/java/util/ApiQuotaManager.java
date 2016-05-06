@@ -169,12 +169,4 @@ public class ApiQuotaManager {
 
         return Math.max(refreshTimeInMins, minRefreshPeriod);
     }
-
-    private static boolean isQuotaInsufficient(int usableApiQuota, int apiCallsUsedInRecentRefresh) {
-        boolean isBelowApiQuotaBufferAllowance = usableApiQuota <= 0;
-        boolean isOffsetQuotaLessThanApiCallsUsedInRecentRefresh = usableApiQuota > 0
-                && usableApiQuota < apiCallsUsedInRecentRefresh;
-
-        return isBelowApiQuotaBufferAllowance || isOffsetQuotaLessThanApiCallsUsedInRecentRefresh;
-    }
 }
