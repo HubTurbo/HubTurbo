@@ -12,10 +12,8 @@ public class ApiQuotaManagerTest {
 
     @Test
     public void computeRefreshTimerPeriod_zeroApiCallsUsedInRecentRefresh() {
-        long result = ApiQuotaManager.computeRefreshTimerPeriod(100, 10, 0, 200, 1);
-        assertEquals(result, 10);
 
-        result = ApiQuotaManager.computeRefreshTimerPeriod(100, 10, 0, 50, 1);
+        long result = ApiQuotaManager.computeRefreshTimerPeriod(100, 10, 0, 50, 1);
         assertEquals(result, 1);
     }
 
@@ -73,7 +71,7 @@ public class ApiQuotaManagerTest {
 
         /*
         Case #2: when (apiQuota - apiQuotaBuffer) is more or equal than apiCallsUsedInRecentRefresh,
-        Calculate the refreshTime based on apiQuota, apiCallsUsedInRecentRefresh, remainingTimeInMins
+        Calculate the refreshTime based on apiQuota, apiCallsUsedInRecentRefresh, minutesToNextQuotaTopup
         and apiQuotaBuffer.
         */
         result = ApiQuotaManager.computeRefreshTimerPeriod(225, 35, 25, 200, 1);
@@ -99,7 +97,7 @@ public class ApiQuotaManagerTest {
     }
 
     @Test
-    public void computeRefreshTimerPeriod_remainingTimeEqualZero() {
+    public void computeRefreshTimerPeriod_minutesToNextQuotaTopupEqualZero() {
         long result = ApiQuotaManager.computeRefreshTimerPeriod(0, 0, 502, 1, 2);
         assertEquals(result, 2);
     }

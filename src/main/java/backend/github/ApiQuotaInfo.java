@@ -15,18 +15,18 @@ public class ApiQuotaInfo {
     /**
      * The time at which the current API quota window resets in UTC epoch milliseconds.
      */
-    private final long nextRefreshInMillisecs;
+    private final long millisecsToNextTopup;
 
-    public ApiQuotaInfo(int remainingQuota, long nextRefreshInMillisecs) {
+    public ApiQuotaInfo(int remainingQuota, long millisecsToNextTopup) {
         this.remainingQuota = remainingQuota;
-        this.nextRefreshInMillisecs = nextRefreshInMillisecs;
+        this.millisecsToNextTopup = millisecsToNextTopup;
     }
 
     public int getRemainingQuota() {
         return remainingQuota;
     }
 
-    public long getNextRefreshInMinutesFromNow(){
-        return Utility.minutesFromNow(nextRefreshInMillisecs);
+    public long minutesToNextQuotaTopup(){
+        return Utility.minutesFromNow(millisecsToNextTopup);
     }
 }

@@ -118,7 +118,7 @@ public class GUIController {
      */
     private void updateAPIBox(ApiQuotaInfo apiQuotaInfo) {
         Platform.runLater(() -> apiBox.setText(String.format("%s/%s[x%d]", apiQuotaInfo.getRemainingQuota(),
-                                               apiQuotaInfo.getNextRefreshInMinutesFromNow(),
+                                               apiQuotaInfo.minutesToNextQuotaTopup(),
                                                (int) ui.apiQuotaManager.getRefreshDurationInMinutes())));
     }
 
