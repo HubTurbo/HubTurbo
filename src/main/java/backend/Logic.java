@@ -94,7 +94,7 @@ public class Logic {
                 .thenRun(this::refreshUI)
                 .thenCompose(n -> getRateLimitResetTime())
                 .thenApply(this::updateSyncRefreshRate)
-                .thenApply(this::updateApiQuotaInfoInGui)
+                .thenAccept(this::updateApiQuotaInfoInGui)
                 .exceptionally(Futures::log);
     }
 
@@ -164,7 +164,7 @@ public class Logic {
                     .thenRun(this::refreshUI)
                     .thenRun(() -> notifyRepoOpened(panel))
                     .thenCompose(n -> getRateLimitResetTime())
-                    .thenApply(this::updateApiQuotaInfoInGui)
+                    .thenAccept(this::updateApiQuotaInfoInGui)
                     .thenApply(rateLimits -> true)
                     .exceptionally(withResult(false));
         });
@@ -237,9 +237,8 @@ public class Logic {
      * @param apiQuotaInfo The GitHub API quota information.
      * @return the apiQuotaInfo instance
      */
-    public ApiQuotaInfo updateApiQuotaInfoInGui(ApiQuotaInfo apiQuotaInfo) {
+    public void updateApiQuotaInfoInGui(ApiQuotaInfo apiQuotaInfo) {
         uiManager.updateApiQuotaInfo(apiQuotaInfo);
-        return apiQuotaInfo;
     }
 
     /**

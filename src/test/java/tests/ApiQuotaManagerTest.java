@@ -20,7 +20,7 @@ public class ApiQuotaManagerTest {
     @Test
     public void computeRefreshTimerPeriod_outOfQuota() {
         long result = ApiQuotaManager.computeRefreshTimerPeriod(0, 35, 0, 0, 1);
-        assertEquals(result, 35);
+        assertEquals(result, 1);
 
         result = ApiQuotaManager.computeRefreshTimerPeriod(0, 35, 15, 100, 1);
         assertEquals(result, 35);

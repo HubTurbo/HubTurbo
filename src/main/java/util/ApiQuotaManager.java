@@ -149,19 +149,17 @@ public class ApiQuotaManager {
 
         int usableApiQuota = apiQuota - apiQuotaBuffer;
 
-        if (minutesToNextQuotaTopup == 0) {
+        if (minutesToNextQuotaTopup == 0 || apiCallsUsedInRecentRefresh == 0) {
             return minRefreshPeriod;
         }
 
         long refreshTimeInMins;
 
-        if (usableApiQuota <= 0 || usableApiQuota < apiCallsUsedInRecentRefresh) {
+        boolean isQuotaInsufficient = usableApiQuota <= 0 || usableApiQuota < apiCallsUsedInRecentRefresh;
+
+        if (isQuotaInsufficient) {
             refreshTimeInMins = minutesToNextQuotaTopup;
             return Math.max(refreshTimeInMins, minRefreshPeriod);
-        }
-
-        if (apiCallsUsedInRecentRefresh == 0){
-            return minRefreshPeriod;
         }
 
         int noOfRefreshAllowed = usableApiQuota / apiCallsUsedInRecentRefresh;
