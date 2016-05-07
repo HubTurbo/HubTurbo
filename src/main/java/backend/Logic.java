@@ -165,7 +165,7 @@ public class Logic {
                     .thenRun(() -> notifyRepoOpened(panel))
                     .thenCompose(n -> getRateLimitResetTime())
                     .thenAccept(this::updateApiQuotaInfoInGui)
-                    .thenApply(rateLimits -> true)
+                    .thenApply(Void -> true)
                     .exceptionally(withResult(false));
         });
     }
