@@ -26,6 +26,10 @@ public class MilestonePickerDialog extends Dialog<MilestonePickerDialogResponse>
     private static final String TITLE_ALL = "All milestones";
     private static final int DETAILED_MILESTONE_HEIGHT = 30;
     private static final int PREV_ASSIGNED_MILESTONE_HEIGHT = 30;
+    private static final int ALL_MILESTONES_LIMIT = 5;
+    private static final int SCROLLPANE_OFFSET = 10;
+    private static final int MILESTONES_SCROLLPANE_MAX_HEIGHT = DETAILED_MILESTONE_HEIGHT * ALL_MILESTONES_LIMIT
+            + SCROLLPANE_OFFSET;
 
     private final List<PickerMilestone> originalMilestones = new ArrayList<>();
     private FlowPane assignedMilestoneBox;
@@ -167,7 +171,6 @@ public class MilestonePickerDialog extends Dialog<MilestonePickerDialogResponse>
 
     private ScrollPane createAllMilestonesScrollPane() {
         VBox milestonesBox = new VBox();
-        milestonesBox.setPrefWidth(398);
         milestonesBox.setStyle("-fx-background-color: white;");
         originalMilestones.forEach(milestone ->
                 milestonesBox.getChildren().add(
@@ -175,7 +178,7 @@ public class MilestonePickerDialog extends Dialog<MilestonePickerDialogResponse>
         );
 
         ScrollPane milestonesScrollPane = new ScrollPane();
-        milestonesScrollPane.setMaxHeight(160);
+        milestonesScrollPane.setMaxHeight(MILESTONES_SCROLLPANE_MAX_HEIGHT);
         milestonesScrollPane.setContent(milestonesBox);
         return milestonesScrollPane;
     }
