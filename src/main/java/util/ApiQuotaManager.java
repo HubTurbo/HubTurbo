@@ -121,7 +121,7 @@ public class ApiQuotaManager {
      * Assumes future refreshes will take the same number of API calls as the last refresh and finds out the refresh
      * duration that will spread out the refreshes until the next API quota top up.
      *
-     * @param apiQuota The remaining API quota until the next API quota renewal.
+     * @param remainingApiQuota The remaining API quota until the next API quota renewal.
      *                 Pre-condition: >= 0
      * @param minutesToNextQuotaTopup The remaining time left until the next API quota renewal.
      *                            Pre-condition: >= 0
@@ -140,14 +140,14 @@ public class ApiQuotaManager {
      *          3) When minutesToNextQuotaTopup == 0 (i.e. when a refresh is due to happen inside the next minute).
      */
     @SuppressWarnings("PMD") // PMD warning is suppressed to allow explicit parenthesis.
-    public static long computeRefreshTimerPeriod(int apiQuota, long minutesToNextQuotaTopup,
+    public static long computeRefreshTimerPeriod(int remainingApiQuota, long minutesToNextQuotaTopup,
                                                  int apiCallsUsedInRecentRefresh,
                                                  int apiQuotaBuffer, int minRefreshPeriod) {
 
-        assert apiQuota >= 0 && minutesToNextQuotaTopup >= 0 && apiCallsUsedInRecentRefresh >= 0
+        assert remainingApiQuota >= 0 && minutesToNextQuotaTopup >= 0 && apiCallsUsedInRecentRefresh >= 0
                 && apiQuotaBuffer >= 0 && minRefreshPeriod > 0;
 
-        int usableApiQuota = apiQuota - apiQuotaBuffer;
+        int usableApiQuota = remainingApiQuota - apiQuotaBuffer;
 
         if (minutesToNextQuotaTopup == 0 || apiCallsUsedInRecentRefresh == 0) {
             return minRefreshPeriod;
