@@ -257,7 +257,7 @@ public class MilestonePickerDialog extends Dialog<MilestonePickerDialogResponse>
         HBox milestoneBox = new HBox();
         milestoneBox.setPrefWidth(140);
         milestoneBox.setPrefHeight(40);
-        milestoneBox.setStyle("-fx-border-radius: 3;-fx-border-style: dotted;-fx-alignment:center");
+        milestoneBox.setStyle("-fx-border-radius: 3;-fx-border-style: none;-fx-alignment:center");
         return milestoneBox;
     }
 
@@ -266,7 +266,7 @@ public class MilestonePickerDialog extends Dialog<MilestonePickerDialogResponse>
         milestoneBox.setPrefWidth(120);
         milestoneBox.setPrefHeight(PREV_ASSIGNED_MILESTONE_HEIGHT);
         milestoneBox.setMaxHeight(PREV_ASSIGNED_MILESTONE_HEIGHT);
-        milestoneBox.setStyle("-fx-border-radius: 3;-fx-border-style: dotted;-fx-alignment:center");
+        milestoneBox.setStyle("-fx-border-radius: 3;-fx-border-style: none;-fx-alignment:center");
         return milestoneBox;
     }
 
