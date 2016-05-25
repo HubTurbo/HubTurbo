@@ -220,7 +220,10 @@ public class MilestonePickerDialog extends Dialog<MilestonePickerDialogResponse>
         HBox assignedMilestoneBox = createPreviouslyAssignedMilestoneBox();
         assignedMilestonePane.getChildren().add(assignedMilestoneBox);
 
-        if (!existingMilestone.isPresent()) return;
+          if (!existingMilestone.isPresent()){
+            assignedMilestoneBox.setStyle("-fx-border-radius: 3;-fx-border-style: dotted;-fx-alignment:center");
+            return;
+        }
 
         Node existingMilestoneNode = setMouseClickForNode(existingMilestone.get().getExistingMilestoneNode(),
                                                           existingMilestone.get().getTitle());
