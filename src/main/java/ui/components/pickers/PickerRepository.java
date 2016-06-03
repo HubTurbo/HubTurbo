@@ -4,6 +4,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Border;
+import prefs.RepoInfo;
 
 /**
  * This class represents a repository in RepositoryPicker.
@@ -14,6 +15,7 @@ import javafx.scene.layout.Border;
 public class PickerRepository implements Comparable<PickerRepository> {
 
     private final String repositoryId;
+    private final String repositoryAlias;
     private boolean isSelected = false;
 
     private static final int REPO_LABEL_PREFERRED_WIDTH = 340;
@@ -23,8 +25,9 @@ public class PickerRepository implements Comparable<PickerRepository> {
     public static final String SELECTED_REPO_LABEL_STYLE = "-fx-background-color: lightgreen; -fx-border-color:black;";
     public static final String DEFAULT_REPO_LABEL_STYLE = "-fx-background-color: lightblue;";
 
-    public PickerRepository(String repositoryId) {
-        this.repositoryId = repositoryId;
+    public PickerRepository(RepoInfo repository) {
+        this.repositoryId = repository.getId();
+        this.repositoryAlias = repository.getAlias();
     }
 
     public String getRepositoryId() {

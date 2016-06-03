@@ -1,10 +1,13 @@
 package ui.components.pickers;
 
+import backend.interfaces.Repo;
 import javafx.application.Platform;
 import javafx.stage.Stage;
+import prefs.RepoInfo;
 import ui.UI;
 import util.events.ShowRepositoryPickerEventHandler;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -24,7 +27,13 @@ public class RepositoryPicker {
     }
 
     private void showRepositoryPicker() {
-        Set<String> storedRepos = ui.logic.getStoredRepos();
+        Set<String> storedRepos1 = ui.logic.getStoredRepos();
+        // should also have a set of aliased repos
+        // then show all the stored repos
+        // but for repos with aliases, show the alias instead
+        // scratch that
+        // should show a set of repos that is taken from Repos
+        List<RepoInfo> storedRepos = UI.prefs.getRepos();
         new RepositoryPickerDialog(storedRepos, this::pickRepository, (repoId) -> ui.logic.isRepositoryValid(repoId));
     }
 

@@ -13,6 +13,7 @@ import backend.resource.serialization.SerializableModel;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Issue;
+import prefs.RepoInfo;
 import ui.UI;
 import util.HTLog;
 import util.events.ShowErrorDialogEvent;
@@ -126,6 +127,10 @@ public class RepoIO {
                 .thenCompose(newModel -> updateModel(newModel, false, remainingTries))
                 .thenApply(model -> {
                     storedRepos.add(repoId);
+                    // TODO: add something here that also updates the prefs with the newly downloaded repo
+                    UI.prefs.addRepo(new RepoInfo(repoId));
+                    logger.info("Updated the repo collection in prefs as well");
+                    logger.info(UI.prefs.getRepos().toString());
                     return model;
                 })
                 .exceptionally(withResult(new Model(repoId)));

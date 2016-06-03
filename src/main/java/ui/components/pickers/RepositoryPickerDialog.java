@@ -11,6 +11,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import prefs.RepoInfo;
 import ui.IdGenerator;
 import util.DialogMessage;
 import util.Futures;
@@ -45,14 +46,14 @@ public class RepositoryPickerDialog {
     private TextField userInputTextField;
     private RepositoryPickerState state;
 
-    public RepositoryPickerDialog(Set<String> storedRepos, Consumer<Optional<String>> onCloseCallback,
+    public RepositoryPickerDialog(List<RepoInfo> storedRepos, Consumer<Optional<String>> onCloseCallback,
                                   Function<String, CompletableFuture<Boolean>> repoValidator) {
         this.onCloseCallback = onCloseCallback;
         this.repoValidator = repoValidator;
         initUi(storedRepos);
     }
 
-    private void initUi(Set<String> storedRepos) {
+    private void initUi(List<RepoInfo> storedRepos) {
         state = new RepositoryPickerState(storedRepos);
 
         initialiseDialog();
@@ -194,7 +195,8 @@ public class RepositoryPickerDialog {
                         return Futures.unit(false);
                     }
 
-                    Platform.runLater(() -> addRepositoryToState(repoId));
+                    RepoInfo repo = new RepoInfo(repoId);
+                    Platform.runLater(() -> addRepositoryToState(repo));
                     return CompletableFuture.completedFuture(true);
                 }).exceptionally(e -> {
                     Platform.runLater(() -> DialogMessage.showErrorDialog("Error checking the validity of " + repoId,
@@ -203,8 +205,8 @@ public class RepositoryPickerDialog {
                 });
     }
 
-    private void addRepositoryToState(String repoId) {
-        state.addRepository(repoId);
+    private void addRepositoryToState(RepoInfo repo) {
+        state.addRepository(repo);
         updateUserQuery(userInputTextField.getText());
     }
 

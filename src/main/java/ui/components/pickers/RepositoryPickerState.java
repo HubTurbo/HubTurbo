@@ -1,5 +1,8 @@
 package ui.components.pickers;
 
+import org.apache.regexp.RE;
+import prefs.RepoInfo;
+
 import java.util.*;
 import java.util.stream.IntStream;
 
@@ -12,7 +15,7 @@ public class RepositoryPickerState {
     private final List<PickerRepository> repositories = new ArrayList<>();
     private final List<PickerRepository> suggestedRepositories = new ArrayList<>();
 
-    public RepositoryPickerState(Set<String> storedRepositories) {
+    public RepositoryPickerState(List<RepoInfo> storedRepositories) {
         assert !storedRepositories.isEmpty() : "There should be at least one existing repository";
         storedRepositories.stream()
                 .forEach(repo -> repositories.add(new PickerRepository(repo)));
@@ -47,12 +50,12 @@ public class RepositoryPickerState {
      * it will be ignored. This method also invalidates suggestedRepositoryList by clearing it as the current
      * suggestedRepositories might become invalid.
      */
-    public void addRepository(String repoId) {
-        if (getPickerRepositoryById(repositories, repoId).isPresent()) {
+    public void addRepository(RepoInfo repo) {
+        if (getPickerRepositoryById(repositories, repo.getId()).isPresent()) {
             return;
         }
 
-        repositories.add(new PickerRepository(repoId));
+        repositories.add(new PickerRepository(repo));
         Collections.sort(repositories);
         suggestedRepositories.clear();
     }

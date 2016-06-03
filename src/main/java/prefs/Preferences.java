@@ -298,4 +298,20 @@ public class Preferences { // NOPMD
     public Optional<LocalDateTime> getMarkedReadAt(String repoId, int issue) {
         return sessionConfig.getMarkedReadAt(repoId, issue);
     }
+
+    public void addRepo(RepoInfo repo) {
+        userConfig.addRepo(repo);
+    }
+
+    public void getRepoById(String repoId) {
+        userConfig.getRepoById(repoId);
+    }
+
+    public void getRepoByAlias(String repoAlias) {
+        userConfig.getRepoByAlias(repoAlias);
+    }
+
+    public List<RepoInfo> getRepos() {
+        return userConfig.getRepos();
+    }
 }
