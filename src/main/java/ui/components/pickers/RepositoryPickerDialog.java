@@ -7,12 +7,15 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import prefs.RepoInfo;
 import ui.IdGenerator;
+import ui.UI;
 import util.DialogMessage;
 import util.Futures;
 import util.Utility;
@@ -166,27 +169,88 @@ public class RepositoryPickerDialog {
     }
 
     /**
+     * Initialises the dialog for adding a repository.
+     * User can add both the repo id and the optional repo alias.
+     *
+     * @return the RepoInfo object constructed from the user input
+     */
+    private Dialog<RepoInfo> initAddRepositoryDialog() {
+        // Adapted from http://code.makery.ch/blog/javafx-dialogs-official/
+
+        Dialog<RepoInfo> dialog = new Dialog<>();
+        dialog.initStyle(StageStyle.UTILITY);
+        dialog.setHeaderText("Add a new repository");
+
+        // Set the button types.
+        ButtonType addButtonType = new ButtonType("Add", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(addButtonType, ButtonType.CANCEL);
+
+        // Create the repo id and alias labels and fields.
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        TextField repoIdField = new TextField();
+        repoIdField.setPromptText("Repository ID");
+        PasswordField repoAliasField = new PasswordField();
+        repoAliasField.setPromptText("Alias (Optional)");
+
+        grid.add(new Label("Repository ID:"), 0, 0);
+        grid.add(repoIdField, 1, 0);
+        grid.add(new Label("Alias (Optional):"), 0, 1);
+        grid.add(repoAliasField, 1, 1);
+
+        // Enable/Disable add button depending on whether a repo id was entered.
+        Node addButton = dialog.getDialogPane().lookupButton(addButtonType);
+        addButton.setDisable(true);
+
+        // Sets the repo id to the search term automatically
+        repoIdField.setText(userInputTextField.getText());
+        repoIdField.selectAll();
+
+        dialog.getDialogPane().setContent(grid);
+
+        // Validation on repo id.
+        repoIdField.textProperty().addListener((observable, oldValue, newValue) -> {
+            // disable add button if no repo id
+            addButton.setDisable(newValue.trim().isEmpty());
+
+            // prevent user from typing whitespace in repo id
+            String repositoryId = Utility.removeAllWhitespace(newValue);
+            if (!repositoryId.equals(newValue)) {
+                repoIdField.setText(repositoryId);
+                return;
+            }
+        });
+
+        // Request focus on the repo id field by default.
+        Platform.runLater(() -> repoIdField.requestFocus());
+
+        // Convert the result to a RepoInfo object when the add button is clicked.
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == addButtonType) {
+                return new RepoInfo(repoIdField.getText(), repoAliasField.getText());
+            }
+            return null;
+        });
+
+        return dialog;
+    }
+
+    /**
      * Prompts the user for a repository id then return it only if it is a valid github repo. This method also informs
      * the user if the repository that the user is trying to add is not valid.
      */
     private CompletableFuture<Boolean> addRepository() {
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setHeaderText("Add a new repository");
-        dialog.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
-            String repositoryId = Utility.removeAllWhitespace(newValue);
-            if (!repositoryId.equals(newValue)) {
-                dialog.getEditor().setText(repositoryId);
-                return;
-            }
-        });
-        dialog.getEditor().setText(userInputTextField.getText());
-        dialog.getEditor().selectAll();
-        Optional<String> userInput = dialog.showAndWait();
+        Dialog<RepoInfo> dialog = initAddRepositoryDialog();
+        Optional<RepoInfo> userInput = dialog.showAndWait();
         if (!userInput.isPresent()) {
             return CompletableFuture.completedFuture(false);
         }
 
-        String repoId = userInput.get();
+        RepoInfo repoToAdd = userInput.get();
+        String repoId = repoToAdd.getId();
         return repoValidator.apply(repoId)
                 .thenCompose(valid -> {
                     if (!valid) {
@@ -195,8 +259,10 @@ public class RepositoryPickerDialog {
                         return Futures.unit(false);
                     }
 
-                    RepoInfo repo = new RepoInfo(repoId);
-                    Platform.runLater(() -> addRepositoryToState(repo));
+                    // add to the dialog state (non persistent)
+                    Platform.runLater(() -> addRepositoryToState(userInput.get()));
+                    // add to the prefs repo list (persistent)
+                    UI.prefs.addRepo(repoToAdd);
                     return CompletableFuture.completedFuture(true);
                 }).exceptionally(e -> {
                     Platform.runLater(() -> DialogMessage.showErrorDialog("Error checking the validity of " + repoId,

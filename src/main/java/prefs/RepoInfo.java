@@ -11,6 +11,11 @@ public class RepoInfo {
         this.alias = "";
     }
 
+    public RepoInfo(String id, String alias) {
+        this.id = id;
+        this.alias = alias;
+    }
+
     public String getId() {
         return this.id;
     }
