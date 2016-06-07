@@ -27,6 +27,20 @@ public class RepoInfo {
         this.alias = alias;
     }
 
+    public boolean hasSameRepoId(RepoInfo repo) {
+        return repo.getId().equals(this.getId());
+    }
+
+    public boolean hasSameAlias(RepoInfo repo) {
+        if (this.getAlias() == null || this.getAlias().isEmpty()) {
+            return false;
+        }
+        if (repo.getAlias() == null || repo.getAlias().isEmpty()) {
+            return false;
+        }
+        return repo.getAlias().equals(this.getAlias());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

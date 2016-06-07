@@ -301,6 +301,12 @@ public class Preferences { // NOPMD
 
     public void addRepo(RepoInfo repo) {
         userConfig.addRepo(repo);
+        save();
+    }
+
+    public void removeRepo(RepoInfo repo) {
+        userConfig.removeRepo(repo);
+        save();
     }
 
     public void getRepoById(String repoId) {

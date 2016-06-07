@@ -27,14 +27,9 @@ public class RepositoryPicker {
     }
 
     private void showRepositoryPicker() {
-        Set<String> storedRepos1 = ui.logic.getStoredRepos();
-        // should also have a set of aliased repos
-        // then show all the stored repos
-        // but for repos with aliases, show the alias instead
-        // scratch that
-        // should show a set of repos that is taken from Repos
-        List<RepoInfo> storedRepos = UI.prefs.getRepos();
-        new RepositoryPickerDialog(storedRepos, this::pickRepository, (repoId) -> ui.logic.isRepositoryValid(repoId));
+        // Shows the repo list in the prefs
+        List<RepoInfo> repoList = UI.prefs.getRepos();
+        new RepositoryPickerDialog(repoList, this::pickRepository, (repoId) -> ui.logic.isRepositoryValid(repoId));
     }
 
     private void pickRepository(Optional<String> repoId) {
