@@ -34,16 +34,28 @@ public class PickerRepository implements Comparable<PickerRepository> {
         return repositoryId;
     }
 
+    public String getRepositoryAlias() {
+        return repositoryAlias;
+    }
+
+    private boolean hasRepositoryAlias() {
+        return this.repositoryAlias != null && !this.repositoryAlias.isEmpty();
+    }
+
     public Node getNode() {
         Label repoLabel = new Label();
         repoLabel.setPrefWidth(REPO_LABEL_PREFERRED_WIDTH);
         repoLabel.setPadding(DEFAULT_REPO_LABEL_PADDING);
 
-        if (isSelected) {
-            repoLabel.setText(repositoryId);
-            repoLabel.setStyle(COMMON_REPO_LABEL_STYLE + SELECTED_REPO_LABEL_STYLE);
+        if (hasRepositoryAlias()) {
+            repoLabel.setText(repositoryId + " (" + repositoryAlias + ")");
         } else {
             repoLabel.setText(repositoryId);
+        }
+
+        if (isSelected) {
+            repoLabel.setStyle(COMMON_REPO_LABEL_STYLE + SELECTED_REPO_LABEL_STYLE);
+        } else {
             repoLabel.setStyle(COMMON_REPO_LABEL_STYLE + DEFAULT_REPO_LABEL_STYLE);
         }
 

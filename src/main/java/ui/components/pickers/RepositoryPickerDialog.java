@@ -193,7 +193,7 @@ public class RepositoryPickerDialog {
 
         TextField repoIdField = new TextField();
         repoIdField.setPromptText("Repository ID");
-        PasswordField repoAliasField = new PasswordField();
+        TextField repoAliasField = new TextField();
         repoAliasField.setPromptText("Alias (Optional)");
 
         grid.add(new Label("Repository ID:"), 0, 0);

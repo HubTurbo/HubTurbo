@@ -27,6 +27,8 @@ import filter.MetaQualifierInfo;
 import filter.ParseException;
 import filter.QualifierApplicationException;
 import filter.SemanticException;
+import prefs.RepoInfo;
+import ui.UI;
 
 public class Qualifier implements FilterExpression {
 
@@ -92,6 +94,19 @@ public class Qualifier implements FilterExpression {
     public Qualifier(QualifierType type, List<SortKey> keys) {
         this.type = type;
         this.sortKeys = new ArrayList<>(keys);
+    }
+
+    public static FilterExpression replaceAliases(IModel model, FilterExpression expr) {
+        return replaceMilestoneAliases(model, replaceRepoAliases(expr));
+    }
+
+    public static FilterExpression replaceRepoAliases(FilterExpression expr) {
+        return expr.map(q -> {
+            if (isRepoQualifier(q)) {
+                return q.convertRepoAliasQualifier();
+            }
+            return q;
+        });
     }
 
     public static FilterExpression replaceMilestoneAliases(IModel model, FilterExpression expr) {
@@ -593,6 +608,10 @@ public class Qualifier implements FilterExpression {
         default:
             return isUpdatedQualifier(q);
         }
+    }
+
+    public static boolean isRepoQualifier(Qualifier q) {
+        return q.getType() == QualifierType.REPO;
     }
 
     public static boolean isMilestoneQualifier(Qualifier q) {
@@ -1135,6 +1154,17 @@ public class Qualifier implements FilterExpression {
 
     public QualifierType getType() {
         return type;
+    }
+
+    private Qualifier convertRepoAliasQualifier() {
+        if (!content.isPresent()) {
+            return Qualifier.EMPTY;
+        }
+        Optional<RepoInfo> repo = UI.prefs.getRepoByIdOrAlias(content.get());
+        if (repo.isPresent()) {
+            return new Qualifier(type, repo.get().getId());
+        }
+        return this;
     }
 
     private Qualifier convertMilestoneAliasQualifier(Map<Integer, TurboMilestone> milestoneAliasIndex) {

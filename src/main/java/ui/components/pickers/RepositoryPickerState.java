@@ -150,7 +150,9 @@ public class RepositoryPickerState {
     }
 
     private boolean isMatching(PickerRepository repo, String query) {
-        return repo.getRepositoryId().toLowerCase().contains(query.toLowerCase());
+        boolean isIdMatching = repo.getRepositoryId().toLowerCase().contains(query.toLowerCase());
+        boolean isAliasMatching = repo.getRepositoryAlias().toLowerCase().contains(query.toLowerCase());
+        return isIdMatching || isAliasMatching;
     }
 
 }

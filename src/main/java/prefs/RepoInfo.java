@@ -33,7 +33,7 @@ public class RepoInfo {
     }
 
     public boolean hasSameRepoId(RepoInfo repo) {
-        return repo.getId().equals(this.getId());
+        return repo.getId().toLowerCase().equals(this.getId().toLowerCase());
     }
 
     public boolean hasSameAlias(RepoInfo repo) {
@@ -43,7 +43,7 @@ public class RepoInfo {
         if (repo.getAlias() == null || repo.getAlias().isEmpty()) {
             return false;
         }
-        return repo.getAlias().equals(this.getAlias());
+        return repo.getAlias().toLowerCase().equals(this.getAlias().toLowerCase());
     }
 
     @Override

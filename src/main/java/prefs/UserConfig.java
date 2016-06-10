@@ -49,17 +49,29 @@ public class UserConfig {
     }
 
     public RepoInfo getRepoById(String repoId) {
-        return repos.stream()
-                    .filter(e -> e.getId() == repoId)
-                    .collect(Collectors.toList())
-                    .get(0);
+        List<RepoInfo> matchingRepos = repos.stream()
+                .filter(e -> e.getId().toLowerCase().equals(repoId.toLowerCase()))
+                .collect(Collectors.toList());
+        if (matchingRepos.isEmpty()) {
+            return null;
+        }
+        return matchingRepos.get(0);
     }
 
     public RepoInfo getRepoByAlias(String repoAlias) {
-        return repos.stream()
-                    .filter(e -> e.getAlias() == repoAlias)
-                    .collect(Collectors.toList())
-                    .get(0);
+        List<RepoInfo> matchingRepos = repos.stream()
+                .filter(e -> e.getAlias().toLowerCase().equals(repoAlias.toLowerCase()))
+                .collect(Collectors.toList());
+        if (matchingRepos.isEmpty()) {
+            return null;
+        }
+        return matchingRepos.get(0);
     }
 
+    public boolean isExistingAlias(String repoAlias) {
+        List<RepoInfo> matchingRepos = repos.stream()
+                                            .filter(e -> e.getAlias().toLowerCase().equals(repoAlias.toLowerCase()))
+                                            .collect(Collectors.toList());
+        return !matchingRepos.isEmpty();
+    }
 }
