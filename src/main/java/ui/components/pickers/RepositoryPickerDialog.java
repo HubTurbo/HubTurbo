@@ -220,7 +220,15 @@ public class RepositoryPickerDialog {
             String repositoryId = Utility.removeAllWhitespace(newValue);
             if (!repositoryId.equals(newValue)) {
                 repoIdField.setText(repositoryId);
-                return;
+            }
+        });
+
+        // Validation on repo alias.
+        repoAliasField.textProperty().addListener((observable, oldValue, newValue) -> {
+            // prevent user from typing whitespace in repo alias
+            String repositoryAlias = Utility.removeAllWhitespace(newValue);
+            if (!repositoryAlias.equals(newValue)) {
+                repoIdField.setText(repositoryAlias);
             }
         });
 
@@ -251,12 +259,36 @@ public class RepositoryPickerDialog {
 
         RepoInfo repoToAdd = userInput.get();
         String repoId = repoToAdd.getId();
+        String repoAlias = repoToAdd.getAlias();
         return repoValidator.apply(repoId)
                 .thenCompose(valid -> {
+                    // disallow adding if repo is invalid
                     if (!valid) {
-                        Platform.runLater(() -> DialogMessage.showErrorDialog("Cannot add to repository list",
-                                repoId + " is not a valid GitHub repository."));
+                        Platform.runLater(() ->
+                            DialogMessage.showErrorDialog("Invalid Repository ID",
+                                    "\"" + repoId + "\" is not a valid GitHub repository. " +
+                                    "Please check again. \n\nRepository not added.")
+                        );
                         return Futures.unit(false);
+                    }
+
+                    // disallow adding if alias does not match format
+                    if (!Utility.isWellFormedRepoAlias(repoAlias)) {
+                        Platform.runLater(() ->
+                            DialogMessage.showErrorDialog("Invalid Repository Alias",
+                                    "\"" + repoAlias + "\" is not a valid Repository Alias. " +
+                                    "Please use only alphanumeric characters. \n\nRepository not added.")
+                        );
+                        return Futures.unit(false);
+                    }
+
+                    // disallow adding if alias already exists
+                    if (UI.prefs.getRepoByAlias(repoAlias).isPresent()) {
+                        Platform.runLater(() ->
+                            DialogMessage.showErrorDialog("Repository Alias Already Exists",
+                                    "\"" + repoAlias + "\" is already an alias of another repository. " +
+                                    "Please choose another alias. \n\nRepository not added.")
+                        );
                     }
 
                     // add to the dialog state (non persistent)

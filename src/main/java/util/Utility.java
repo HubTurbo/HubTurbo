@@ -51,6 +51,12 @@ public final class Utility {
                 && repoId.equals(repositoryId.generateId());
     }
 
+    public static boolean isWellFormedRepoAlias(String repoAlias) {
+        return repoAlias != null
+                && !repoAlias.isEmpty()
+                && repoAlias.matches("^[a-zA-Z0-9]*$");
+    }
+
     public static Optional<String> readFile(String fileName) {
         boolean validPath = !(fileName == null || fileName.isEmpty());
         if (validPath) {
