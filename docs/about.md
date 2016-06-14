@@ -5,7 +5,7 @@ and funded by the [Center for Development of Teaching and Learning (CDTL)](http:
 
 The HubTurbo project team is listed [here](team.md).
 
-#### Acknowledgements of 3rd party commercial libraries
+#### 3rd party commercial tools used
 
 * HubTurbo uses [**JxBrowser**](http://www.teamdev.com/jxbrowser), which is a proprietary software. The use of JxBrowser is governed by [JxBrowser Product Licence Agreement](http://www.teamdev.com/jxbrowser-licence-agreement). 
 
