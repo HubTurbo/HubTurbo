@@ -159,29 +159,23 @@ If the PR was from a contributor, merge it only after it is approved.
 #### Upload JAR
 
 - `./gradlew clean shadowJar`
+  - You might need `-x test` to skip tests
 - The JAR will be in `build/libs`
 - Name it in the format: `HubTurbo.jar`
 - Upload it to [Releases](https://github.com/HubTurbo/HubTurbo/releases/new) under the tag you just created
 
 ### Prepare next release candidate
 
-#### Document changes
+#### Document changes and bump version numbers
 
 - Check out `master`
 - Update the [changelog](changelog.md)
-
-#### Bump version numbers
-
 - Update version number in [build.gradle](../build.gradle)
 - Update version number in [`ui.UI`](../src/main/java/ui/UI.java)
+- Update [HubTurboUpdate.json](https://raw.githubusercontent.com/HubTurbo/HubTurbo/master/HubTurboUpdate.json)
+  - If the release has a different major version, create a new JSON object containing `version` and `applicationFileLocation`. This is to allow updating data store when there is an update in major version.
 - Commit in the `VMAJOR.MINOR.PATCH` format
 - `git push`
-
-#### Enable automatic updates
-
-- Update [HubTurboUpdate.json](https://raw.githubusercontent.com/HubTurbo/HubTurbo/master/HubTurboUpdate.json)
-  - If the release is a different major, create a new JSON object containing `version` and `applicationFileLocation`. This is to allow updating data store when there is an update in major version.
-- Commit in the `VMAJOR.MINOR.PATCH` format
 
 #### Create release candidate
 
