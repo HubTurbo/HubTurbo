@@ -76,6 +76,12 @@ public class LabelPickerState {
                 addedLabels.add(selectedLabel);
             }
         }
+        if (currentSuggestionIndex.isPresent()) {
+            TurboLabel suggestedLabel = getSuggestedLabel();
+            if (selectedLabel.equals(suggestedLabel)) {
+                currentSuggestionIndex = OptionalInt.empty();
+            }
+        }
     }
 
     /**

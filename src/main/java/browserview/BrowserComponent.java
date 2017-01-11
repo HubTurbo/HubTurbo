@@ -35,7 +35,7 @@ public class BrowserComponent {
 
     private static final Logger logger = LogManager.getLogger(BrowserComponent.class.getName());
 
-    private static final String CHROMEDRIVER_VERSION = "2-18";
+    private static final String CHROMEDRIVER_VERSION = "2-27";
     private static final boolean USE_MOBILE_USER_AGENT = false;
     private final boolean isTestChromeDriver;
 
