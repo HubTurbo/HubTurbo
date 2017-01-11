@@ -15,10 +15,6 @@ public final class IdGenerator {
         return "panel" + panelIndex + "_renameTextField";
     }
 
-    public static String getRepositorySelectorId() {
-        return "repositorySelector";
-    }
-
     public static String getPanelNameAreaId(int panelIndex) {
         return "panel" + panelIndex + "_nameText";
     }
@@ -37,6 +33,10 @@ public final class IdGenerator {
 
     public static String getAssigneePickerTextFieldId() {
         return "assigneePickerTextField";
+    }
+
+    public static String getAssigneePickerAssignedUserPaneId() {
+        return "assigneePickerAssignedUserPane";
     }
 
     public static String getPanelCloseButtonId(int panelIndex) {
@@ -67,6 +67,22 @@ public final class IdGenerator {
         return "apiBox";
     }
 
+    public static String getBoardPickerTextFieldId() {
+        return "queryField";
+    }
+
+    public static String getBoardPickerSuggestedBoardListId() {
+        return "boardList";
+    }
+
+    public static String getBoardPickerTextFieldReference() {
+        return '#' + getBoardPickerTextFieldId();
+    }
+
+    public static String getBoardPickerSuggestedBoardListReference() {
+        return '#' + getBoardPickerSuggestedBoardListId();
+    }
+
     public static String getRepositoryPickerTextFieldId() {
         return "repositoryPickerUserInputField";
     }
@@ -95,10 +111,6 @@ public final class IdGenerator {
         return "#" + getPanelRenameTextFieldId(panelIndex);
     }
 
-    public static String getRepositorySelectorIdReference() {
-        return "#" + getRepositorySelectorId();
-    }
-
     public static String getPanelNameAreaIdReference(int panelIndex) {
         return "#" + getPanelNameAreaId(panelIndex);
     }
@@ -115,8 +127,12 @@ public final class IdGenerator {
         return "#" + getMilestonePickerTextFieldId();
     }
 
-    public static String getAssigneePickerFieldIdReference() {
+    public static String getAssigneePickerTextFieldIdReference() {
         return "#" + getAssigneePickerTextFieldId();
+    }
+
+    public static String getAssigneePickerAssignedUserPaneIdReference() {
+        return "#" + getAssigneePickerAssignedUserPaneId();
     }
 
     public static String getPanelCloseButtonIdReference(int panelIndex) {

@@ -1,6 +1,29 @@
 
 # Changelog
 
+# V3.27.0
+
+- Fix bugs for issue picker
+- Fix bug for author filter
+- Fix bugs for milestone picker
+- Remove default repo drop down box
+- Fix bugs for board menu
+- Support adding issues to watch list
+- Complete new integrated auto-updater
+- Various minor UI changes
+- Fix bugs various keyboard shortcuts and context menu
+- Better feebacks for GitHub requests failure
+
+# V3.26.0
+
+- Added the repo picker
+- Added the assignee picker
+- Added on-demand autocomplete
+- Fix bugs in milestone picker and parser
+- Fix keyboard shortcut bug on the browser view
+- Added headless testing system
+- Updated documentations
+
 # V3.25.0
 
 - Added the milestone picker

@@ -3,7 +3,14 @@ package filter.expression;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -11,10 +18,15 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import backend.resource.*;
-import filter.*;
-import util.Utility;
 import backend.interfaces.IModel;
+import backend.resource.TurboIssue;
+import backend.resource.TurboLabel;
+import backend.resource.TurboMilestone;
+import backend.resource.TurboUser;
+import filter.MetaQualifierInfo;
+import filter.ParseException;
+import filter.QualifierApplicationException;
+import filter.SemanticException;
 
 public class Qualifier implements FilterExpression {
 
@@ -352,7 +364,7 @@ public class Qualifier implements FilterExpression {
         case LABEL:
             return labelsSatisfy(model, issue);
         case AUTHOR:
-            return authorSatisfies(issue);
+            return authorSatisfies(model, issue);
         case ASSIGNEE:
             return assigneeSatisfies(model, issue);
         case INVOLVES:
@@ -782,7 +794,7 @@ public class Qualifier implements FilterExpression {
         }
 
         LocalDateTime dateOfUpdate = issue.getUpdatedAt();
-        int hoursSinceUpdate = Utility.safeLongToInt(dateOfUpdate.until(getCurrentTime(), ChronoUnit.HOURS));
+        int hoursSinceUpdate = Math.toIntExact(dateOfUpdate.until(getCurrentTime(), ChronoUnit.HOURS));
         return updatedRange.encloses(hoursSinceUpdate);
     }
 
@@ -873,15 +885,19 @@ public class Qualifier implements FilterExpression {
         return login.contains(content) || name.contains(content);
     }
 
-    private boolean authorSatisfies(TurboIssue issue) {
+    private boolean authorSatisfies(IModel model, TurboIssue issue) {
         if (!content.isPresent()) return false;
+        Optional<TurboUser> author = model.getAuthorOfIssue(issue);
 
-        String creator = issue.getCreator();
-        return creator.toLowerCase().contains(content.get().toLowerCase());
+        String content = this.content.get().toLowerCase();
+        String login = issue.getCreator().toLowerCase();
+        String name = author.map(TurboUser::getRealName).orElse("").toLowerCase();
+
+        return login.contains(content) || name.contains(content);
     }
 
     private boolean involvesSatisfies(IModel model, TurboIssue issue) {
-        return authorSatisfies(issue) || assigneeSatisfies(model, issue);
+        return authorSatisfies(model, issue) || assigneeSatisfies(model, issue);
     }
 
     public static boolean labelMatches(String input, String candidate) {

@@ -96,19 +96,19 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
         }
         boolean itemFound = index > -1;
 
+        // Figure out what is selected based on previous and current state
         if (itemFound) {
-            // Select that item
+            // Maintain selection
             getSelectionModel().clearAndSelect(index);
             selectedIndex = Optional.of(index);
             // Do not trigger event; selection did not conceptually change
         } else {
             // The item disappeared
-            if (getItems().size() == 0) {
-                // No more items in the list
+            if (getItems().isEmpty()) {
+                // Nothing can be selected
                 selectedIndex = Optional.empty();
-            } else {
-                // The list is non-empty, so we can be sure that we're selecting something
-                // The current index is the same as the next, due to the item disappearing
+            } else if (selectedIndex.isPresent()){
+                // Consider what is currently selected to be the new selection
                 int lastIndex = getItems().size() - 1;
                 int nextIndex = Math.min(selectedIndex.get(), lastIndex);
 
@@ -168,9 +168,9 @@ public abstract class NavigableListView<T> extends ScrollableListView<T> {
                 }
             }
             if (e.getCode() == KeyCode.UP || e.getCode() == KeyCode.DOWN ||
-                    KeyboardShortcuts.upIssue.match(e) || KeyboardShortcuts.downIssue.match(e)) {
+                    KeyboardShortcuts.UP_ISSUE.match(e) || KeyboardShortcuts.DOWN_ISSUE.match(e)) {
                 e.consume();
-                handleUpDownKeys(e.getCode() == KeyCode.DOWN || KeyboardShortcuts.downIssue.match(e));
+                handleUpDownKeys(e.getCode() == KeyCode.DOWN || KeyboardShortcuts.DOWN_ISSUE.match(e));
                 assert selectedIndex.isPresent() : "handleUpDownKeys doesn't set selectedIndex!";
                 if (!e.isShiftDown()) {
                     logger.info("Enter key selection on item index " + selectedIndex.get());

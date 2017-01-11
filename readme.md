@@ -12,11 +12,11 @@ To **know more about using HubTurbo**, check out our [User Guide](https://github
 
 To **contribute to HubTurbo as a developer**, check out our [Developer Guide](docs/developerGuide.md).
 
-**3rd party commercial tools used:**
-
+**3rd party commercial tools used:** (Thanks for the free license!)
+* [**jProfiler** Java profiler tool](http://www.ej-technologies.com/products/jprofiler/overview.html) 
+  from [ej-technologies](https://www.ej-technologies.com/).
 * HubTurbo uses [**JxBrowser**](http://www.teamdev.com/jxbrowser), which is a proprietary software. The use of JxBrowser is governed by [JxBrowser Product Licence Agreement](http://www.teamdev.com/jxbrowser-licence-agreement). 
 If you would like to use JxBrowser in your development, please contact [TeamDev](https://goo.gl/VjG1Fn).
-
 * HubTurbo was developed using [Jet Brains **Intellij IDEA**](https://www.jetbrains.com/idea/) IDE.
 
 <br>

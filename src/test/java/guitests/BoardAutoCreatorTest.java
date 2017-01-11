@@ -51,7 +51,7 @@ public class BoardAutoCreatorTest extends UITest {
         assertEquals(panelCount + 3, panelControl.getPanelCount());
 
         // create milestones board
-        traverseMenu("Boards", "Auto-create", "Milestones");
+        traverseHubTurboMenu("Boards", "Auto-create", "Milestones");
         PlatformEx.waitOnFxThread();
         waitUntilNodeAppears(String.format(SAVE_MESSAGE, "Milestones"));
         // opt to save current board
@@ -68,14 +68,14 @@ public class BoardAutoCreatorTest extends UITest {
         assertEquals(5, panelControl.getPanelCount());
 
         // check that "New Board" is saved correctly
-        traverseMenu("Boards", "Open", "New Board");
+        traverseHubTurboMenu("Boards", "Open", "New Board");
         PlatformEx.waitOnFxThread();
         assertEquals(panelCount + 3, panelControl.getPanelCount());
 
-        traverseMenu("Boards", "Delete", "Milestones");
+        traverseHubTurboMenu("Boards", "Delete", "Milestones");
         waitUntilNodeAppears("OK");
         clickOn("OK");
-        traverseMenu("Boards", "Delete", "New Board");
+        traverseHubTurboMenu("Boards", "Delete", "New Board");
         waitUntilNodeAppears("OK");
         clickOn("OK");
     }
@@ -93,7 +93,7 @@ public class BoardAutoCreatorTest extends UITest {
         assertEquals(panelCount + 3, panelControl.getPanelCount());
 
         // create milestones board
-        traverseMenu("Boards", "Auto-create", "Milestones");
+        traverseHubTurboMenu("Boards", "Auto-create", "Milestones");
         PlatformEx.waitOnFxThread();
         waitUntilNodeAppears(String.format(SAVE_MESSAGE, "Milestones"));
         // do not opt to save current board
@@ -107,7 +107,7 @@ public class BoardAutoCreatorTest extends UITest {
         assertEquals(1, panelControl.getNumberOfSavedBoards());
         assertEquals(5, panelControl.getPanelCount());
 
-        traverseMenu("Boards", "Delete", "Milestones");
+        traverseHubTurboMenu("Boards", "Delete", "Milestones");
         waitUntilNodeAppears("OK");
         clickOn("OK");
     }
@@ -116,7 +116,7 @@ public class BoardAutoCreatorTest extends UITest {
     public void milestoneBoardAutoCreationTest() {
         assertEquals(0, panelControl.getNumberOfSavedBoards());
 
-        traverseMenu("Boards", "Auto-create", "Milestones");
+        traverseHubTurboMenu("Boards", "Auto-create", "Milestones");
 
         PlatformEx.waitOnFxThread();
         waitUntilNodeAppears(String.format(SAVE_MESSAGE, "Milestones"));
@@ -145,7 +145,7 @@ public class BoardAutoCreatorTest extends UITest {
         assertEquals("Next Next Milestone", panelInfos.get(3).getPanelName());
         assertEquals("Next Next Next Milestone", panelInfos.get(4).getPanelName());
 
-        traverseMenu("Boards", "Delete", "Milestones");
+        traverseHubTurboMenu("Boards", "Delete", "Milestones");
         waitUntilNodeAppears("OK");
         clickOn("OK");
     }
@@ -154,7 +154,7 @@ public class BoardAutoCreatorTest extends UITest {
     public void workAllocationBoardAutoCreationTest() {
         assertEquals(0, panelControl.getNumberOfSavedBoards());
 
-        traverseMenu("Boards", "Auto-create", "Work Allocation");
+        traverseHubTurboMenu("Boards", "Auto-create", "Work Allocation");
 
         PlatformEx.waitOnFxThread();
         waitUntilNodeAppears(String.format(SAVE_MESSAGE, "Work Allocation"));
@@ -183,7 +183,7 @@ public class BoardAutoCreatorTest extends UITest {
         assertEquals("Work allocated to User 12", panelInfos.get(3).getPanelName());
         assertEquals("Work allocated to User 2", panelInfos.get(4).getPanelName());
 
-        traverseMenu("Boards", "Delete", "Work Allocation");
+        traverseHubTurboMenu("Boards", "Delete", "Work Allocation");
         waitUntilNodeAppears("OK");
         clickOn("OK");
     }
@@ -192,14 +192,14 @@ public class BoardAutoCreatorTest extends UITest {
     public void sampleBoardAutoCreationTest() {
         assertEquals(0, panelControl.getNumberOfSavedBoards());
 
-        traverseMenu("Boards", "Auto-create", SAMPLE_BOARD);
+        traverseHubTurboMenu("Boards", "Auto-create", SAMPLE_BOARD);
         waitUntilNodeAppears(String.format(SAVE_MESSAGE, SAMPLE_BOARD));
         clickOn("No");
         waitUntilNodeAppears(SAMPLE_BOARD_DIALOG);
         clickOn("OK");
         verifyBoard(panelControl, BoardAutoCreator.getSamplePanelDetails());
 
-        traverseMenu("Boards", "Delete", SAMPLE_BOARD);
+        traverseHubTurboMenu("Boards", "Delete", SAMPLE_BOARD);
         waitUntilNodeAppears("OK");
         clickOn("OK");
     }

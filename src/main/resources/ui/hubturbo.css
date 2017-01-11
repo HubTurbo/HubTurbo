@@ -177,11 +177,11 @@
 }
 
 .issue-cell-closed {
-    -fx-background-color: #e8f1e5;
+    -fx-background-color: #FFE3E3;
 }
 
 .issue-cell-closed:odd {
-    -fx-background-color: derive(#e8f1e5, -3%);
+    -fx-background-color: derive(#FFE3E3, -3%);
 }
 
 .issue-cell-closed:selected {

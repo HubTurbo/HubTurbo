@@ -76,7 +76,7 @@ public class Logic {
         openPrimaryRepository(e.repoId);
     }
 
-    private CompletableFuture<Boolean> isRepositoryValid(String repoId) {
+    public CompletableFuture<Boolean> isRepositoryValid(String repoId) {
         return repoIO.isRepositoryValid(repoId);
     }
 
@@ -257,6 +257,7 @@ public class Logic {
      * @return true if label replacement on GitHub was a success, false otherwise.
      */
     public CompletableFuture<Boolean> replaceIssueLabels(TurboIssue issue, List<String> newLabels) {
+        CompletableFuture<Boolean> result = new CompletableFuture<>();
         List<String> originalLabels = issue.getLabels();
 
         logger.info("Changing labels for " + issue + " on UI");
@@ -264,9 +265,16 @@ public class Logic {
                 repoOpControl.replaceIssueLabelsLocally(issue, newLabels);
         localLabelsReplaceFuture.thenRun(this::refreshUI);
 
-        return updateIssueLabelsOnServer(issue, newLabels)
+        updateIssueLabelsOnServer(issue, newLabels)
+                .exceptionally((e) -> {
+                    result.completeExceptionally(e);
+                    return false;
+                })
                 .thenCombine(localLabelsReplaceFuture, (isUpdateSuccessful, locallyModifiedIssue) ->
-                        handleIssueLabelsUpdateResult(isUpdateSuccessful, locallyModifiedIssue, originalLabels));
+                        handleIssueLabelsUpdateResult(isUpdateSuccessful, locallyModifiedIssue, originalLabels))
+                .thenAccept(result::complete);
+
+        return result;
     }
 
     /**
@@ -278,13 +286,25 @@ public class Logic {
      * @return true if milestone replacements locally and on GitHub were successful
      */
     public CompletableFuture<Boolean> replaceIssueMilestone(TurboIssue issue, Optional<Integer> newMilestone) {
+        CompletableFuture<Boolean> result = new CompletableFuture<>();
+
         logger.info("Changing milestone for " + issue + " in models");
+        Optional<Integer> oldMilestone = issue.getMilestone();
         CompletableFuture<Optional<TurboIssue>> localMilestoneReplaceFuture =
                 repoOpControl.replaceIssueMilestoneLocally(issue, newMilestone);
         localMilestoneReplaceFuture.thenRun(this::refreshUI);
 
-        return updateIssueMilestonesOnServer(issue, newMilestone)
-                .thenCombine(localMilestoneReplaceFuture, this::handleIssueMilestoneUpdateOnServerResult);
+        updateIssueMilestonesOnServer(issue, newMilestone)
+                .exceptionally((e) -> {
+                    result.completeExceptionally(e);
+                    return false;
+                })
+                .thenCombine(localMilestoneReplaceFuture, (isUpdateSuccessful, locallyModifiedIssue) ->
+                        handleIssueMilestoneUpdateOnServerResult(
+                                isUpdateSuccessful, locallyModifiedIssue, oldMilestone))
+                .thenAccept(result::complete);
+
+        return result;
     }
 
     /**
@@ -297,12 +317,20 @@ public class Logic {
      */
     public CompletableFuture<Boolean> replaceIssueAssignee(TurboIssue issue, Optional<String> newAssigneeLoginName){
         logger.info("Changing assignee for " + issue + " on UI");
+        CompletableFuture<Boolean> result = new CompletableFuture<>();
         CompletableFuture<Optional<TurboIssue>> localAssigneeReplaceFuture =
                 repoOpControl.replaceIssueAssigneeLocally(issue, newAssigneeLoginName);
         localAssigneeReplaceFuture.thenRun(this::refreshUI);
 
-        return updateIssueAssigneesOnServer(issue, newAssigneeLoginName)
-                .thenCombine(localAssigneeReplaceFuture, this::handleIssueAssigneeUpdateResult);
+        updateIssueAssigneesOnServer(issue, newAssigneeLoginName)
+                .exceptionally((e) -> {
+                    result.completeExceptionally(e);
+                    return false;
+                })
+                .thenCombine(localAssigneeReplaceFuture, this::handleIssueAssigneeUpdateResult)
+                .thenAccept(result::complete);
+
+        return result;
     }
 
     /**
@@ -369,7 +397,8 @@ public class Logic {
      * @return true if the server update is successful
      */
     private boolean handleIssueMilestoneUpdateOnServerResult(boolean isUpdateSuccessful,
-                                                             Optional<TurboIssue> originalIssue) {
+                                                             Optional<TurboIssue> originalIssue,
+                                                             Optional<Integer> oldMilestone) {
         if (!originalIssue.isPresent()) {
             logger.error("Unable to replace issue milestone locally");
             return false;
@@ -377,7 +406,7 @@ public class Logic {
         if (isUpdateSuccessful) return true;
 
         logger.error("Unable to update model on server");
-        revertLocalMilestoneReplace(originalIssue.get());
+        revertLocalMilestoneReplace(originalIssue.get(), oldMilestone);
         return false;
     }
 
@@ -451,7 +480,7 @@ public class Logic {
      *
      * @param originalIssue
      */
-    private void revertLocalMilestoneReplace(TurboIssue originalIssue) {
+    private void revertLocalMilestoneReplace(TurboIssue originalIssue, Optional<Integer> oldMilestone) {
         TurboIssue currentIssue = getIssue(originalIssue.getRepoId(), originalIssue.getId()).orElse(originalIssue);
         LocalDateTime originalMilestoneModifiedAt = originalIssue.getMilestoneLastModifiedAt();
         LocalDateTime currentMilestoneAssignedAt = currentIssue.getMilestoneLastModifiedAt();
@@ -461,7 +490,7 @@ public class Logic {
         if (!isCurrentMilestoneModifiedFromOriginalMilestone) return;
 
         logger.info("Reverting milestone for issue " + currentIssue);
-        models.replaceIssueMilestone(currentIssue.getRepoId(), currentIssue.getId(), originalIssue.getMilestone());
+        models.replaceIssueMilestone(currentIssue.getRepoId(), currentIssue.getId(), oldMilestone);
         refreshUI();
     }
 
@@ -522,6 +551,7 @@ public class Logic {
      * @return True for success, false otherwise
      */
     public CompletableFuture<Boolean> editIssueState(TurboIssue issue, boolean isOpen) {
+        CompletableFuture<Boolean> result = new CompletableFuture<>();
         boolean isOpenOriginally = issue.isOpen();
 
         String action = isOpen ? "Reopening" : "Closing";
@@ -531,11 +561,16 @@ public class Logic {
                 repoOpControl.editIssueStateLocally(issue, isOpen);
         localStateEditFuture.thenRun(this::refreshUI);
 
-        return repoOpControl.editIssueStateOnServer(issue, isOpen)
-                .thenCombine(localStateEditFuture, (isUpdateSuccessful, locallyModifiedIssue) -> {
-                    return handleIssueStateUpdateResult(
-                            isUpdateSuccessful, locallyModifiedIssue, isOpenOriginally);
-                });
+        repoOpControl.editIssueStateOnServer(issue, isOpen)
+                .exceptionally((e) -> {
+                    result.completeExceptionally(e);
+                    return false;
+                })
+                .thenCombine(localStateEditFuture, (isUpdateSuccessful, locallyModifiedIssue) ->
+                    handleIssueStateUpdateResult(isUpdateSuccessful, locallyModifiedIssue, isOpenOriginally))
+                .thenAccept(result::complete);
+
+        return result;
     }
 
     /**

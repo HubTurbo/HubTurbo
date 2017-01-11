@@ -34,7 +34,7 @@ public class NoPanelAtQuitTest extends UITest {
         waitBeforeClick(panelCloseButtonId);
 
         // Quitting to update json
-        traverseMenu("File", "Quit");
+        traverseHubTurboMenu("App", "Quit");
 
         Preferences testPref = TestController.loadTestPreferences();
         List<PanelInfo> lastSessionPanels = testPref.getPanelInfo();

@@ -10,6 +10,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import ui.IdGenerator;
+import ui.TestController;
 
 public class ValidLoginTest extends UITest {
 
@@ -19,7 +20,7 @@ public class ValidLoginTest extends UITest {
     }
 
     @Test
-    public void validLoginTest() throws InterruptedException {
+    public void validLoginTest() {
         TextField repoOwnerField = GuiTest.find(IdGenerator.getLoginDialogOwnerFieldIdReference());
         clickOn(repoOwnerField);
         selectAll();
@@ -28,7 +29,6 @@ public class ValidLoginTest extends UITest {
         type("test").push(KeyCode.TAB);
         type("test");
         clickOn("Sign in");
-        ComboBox<String> repositorySelector = findOrWaitFor(IdGenerator.getRepositorySelectorIdReference());
-        awaitCondition(() -> "test/test".equals(repositorySelector.getValue()), 10);
+        awaitCondition(() -> "test/test (none)".equals(TestController.getUI().getTitle()), 10);
     }
 }

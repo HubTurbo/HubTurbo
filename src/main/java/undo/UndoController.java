@@ -9,6 +9,7 @@ import ui.NotificationController;
 import ui.components.Notification;
 import undo.actions.Action;
 import util.DialogMessage;
+import util.Utility;
 
 import java.util.Optional;
 
@@ -35,7 +36,7 @@ public class UndoController {
         if (undoBuffer.isPresent()) {
             TurboIssue issue = undoBuffer.get().getKey();
             Action<TurboIssue> action = undoBuffer.get().getValue();
-            action.undo(issue).thenApply(success -> handleActionResult(issue, action, success, true));
+            action.undo(issue).thenApply(isSuccessful -> handleActionResult(issue, action, isSuccessful, true));
             undoBuffer = Optional.empty();
         }
     }
@@ -48,7 +49,9 @@ public class UndoController {
      */
     public void addAction(TurboIssue issue, Action<TurboIssue> action) {
         undoBuffer = Optional.of(new Pair<>(issue, action));
-        action.act(issue).thenApply(success -> handleActionResult(issue, action, success, false));
+        action.act(issue)
+                .thenApply(success -> handleActionResult(issue, action, success, false))
+                .exceptionally((e) -> handleActionException(issue, action, e));
     }
 
     /**
@@ -63,7 +66,8 @@ public class UndoController {
     private boolean handleActionResult(TurboIssue issue, Action<TurboIssue> action, Boolean success,
                                        boolean isUndo) {
         if (!success) {
-            showErrorDialog(issue, action);
+            String errorMessage = "Please check if you have write permissions to " + issue.getRepoId();
+            showErrorDialog(issue, action, errorMessage);
             return success;
         }
         if (!isUndo) {
@@ -71,6 +75,20 @@ public class UndoController {
             return success;
         }
         return success;
+    }
+
+    /**
+     * Shows an error dialog for an {@code action} that has been been carried out with an {@code issue} but
+     * encountered an {@code Exception}. The error dialog shows the message obtained from calling {@code} getMessage
+     * on the exception and removing the Exception Class from the message.
+     * @param issue
+     * @param action
+     * @param exception
+     * @return
+     */
+    private boolean handleActionException(TurboIssue issue, Action<TurboIssue> action, Throwable exception) {
+        showErrorDialog(issue, action, Utility.removeFirstWord(exception.getMessage()));
+        return false;
     }
 
     /**
@@ -91,15 +109,13 @@ public class UndoController {
      * Shows an error dialog with a summary of the attempted action
      * @param issue
      * @param action
+     * @param errorMessage
      */
-    private void showErrorDialog(TurboIssue issue, Action action) {
+    private void showErrorDialog(TurboIssue issue, Action action, String errorMessage) {
         Platform.runLater(() -> DialogMessage.showErrorDialog(
-                "GitHub Write Error",
-                String.format(
-                        "An error occurred while attempting to %s on:\n\n%s\n\n"
-                                + "Please check if you have write permissions to %s.",
-                        action.getDescription(), issue, issue.getRepoId()
-                )
+                "Error Requesting GitHub",
+                String.format("An error occurred while attempting to %s on:\n\n%s\n\n" + errorMessage,
+                              action.getDescription(), issue)
         ));
     }
 

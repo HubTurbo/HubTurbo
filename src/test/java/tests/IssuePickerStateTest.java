@@ -1,6 +1,7 @@
 package tests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,8 +23,8 @@ public class IssuePickerStateTest {
     }
 
     @Test
-    public void determineState_partialMatch_issueNotAdded() {
-        IssuePickerState state = setupState("dummy/dummy", Arrays.asList("test issue bug"), "bug feature");
+    public void determineState_wrongMatch_issueNotAdded() {
+        IssuePickerState state = setupState("dummy/dummy", Arrays.asList("test issue bug"), "1111111");
         assertFalse(state.getSelectedIssue().isPresent());
     }
 

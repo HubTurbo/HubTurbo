@@ -1,15 +1,16 @@
 package guitests;
 
-import javafx.application.Platform;
-import org.junit.Test;
-import util.DialogMessage;
+import static org.junit.Assert.assertEquals;
+import static org.loadui.testfx.Assertions.assertNodeExists;
+import static org.loadui.testfx.controls.Commons.hasText;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
-import static org.junit.Assert.assertEquals;
-import static org.loadui.testfx.Assertions.assertNodeExists;
-import static org.loadui.testfx.controls.Commons.hasText;
+import org.junit.Test;
+
+import javafx.application.Platform;
+import util.DialogMessage;
 
 public class DialogMessageTests extends UITest {
 
@@ -35,7 +36,30 @@ public class DialogMessageTests extends UITest {
         Platform.runLater(noTask);
         waitUntilNodeAppears(hasText("Warning Message"));
         assertNodeExists(hasText("Warning Message"));
+        waitUntilNodeAppears("nO");
         clickOn("nO");
+        assertEquals(false, noTask.get());
+    }
+
+    @Test
+    public void showYesNoConfirmationDialog_tryYesAndNo_getCorrectValue()
+            throws ExecutionException, InterruptedException {
+
+        FutureTask<Boolean> yesTask = new FutureTask<>(() ->
+                DialogMessage.showYesNoConfirmationDialog("Confirm", "Confirm Header", "Confirm Message", "yes", "no"));
+        Platform.runLater(yesTask);
+        waitUntilNodeAppears(hasText("Confirm Header"));
+        assertNodeExists(hasText("Confirm Header"));
+        clickOn("yes");
+        assertEquals(true, yesTask.get());
+
+        FutureTask<Boolean> noTask = new FutureTask<>(() ->
+                DialogMessage.showYesNoWarningDialog("Confirm", "Confirm Header", "Confirm Message",
+                                                     "Non-Standard-Yes", "Non-Standard-No"));
+        Platform.runLater(noTask);
+        waitUntilNodeAppears(hasText("Confirm Message"));
+        assertNodeExists(hasText("Confirm Message"));
+        clickOn("Non-Standard-No");
         assertEquals(false, noTask.get());
     }
 

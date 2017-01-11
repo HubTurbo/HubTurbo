@@ -30,7 +30,7 @@ public class ReplaceIssueLabelsTask extends GitHubRepoTask<Boolean> {
                             .collect(Collectors.toList());
             response.complete(responseLabels.containsAll(labels));
         } catch (IOException e) {
-            response.complete(false);
+            response.completeExceptionally(e);
         }
     }
 }

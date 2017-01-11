@@ -20,6 +20,7 @@ import prefs.Preferences;
 import ui.IdGenerator;
 import ui.TestController;
 import ui.issuepanel.PanelControl;
+import util.PlatformEx;
 
 public class PanelFocusTest extends UITest {
 
@@ -113,10 +114,8 @@ public class PanelFocusTest extends UITest {
          */
         // Setup:
         // 1. Save a board
-        clickOn("Boards");
-        pushKeys(KeyCode.DOWN);
-        pushKeys(KeyCode.DOWN);
-        pushKeys(KeyCode.ENTER);
+        traverseHubTurboMenu("Boards", "Save as");
+        PlatformEx.waitOnFxThread();
         ((TextField) GuiTest.find(IdGenerator.getBoardNameInputFieldIdReference())).setText("Board 1");
         clickOn("OK");
         awaitCondition(() -> 1 == panelControl.getNumberOfSavedBoards());
@@ -126,6 +125,10 @@ public class PanelFocusTest extends UITest {
             panelControl.getPanelCount() - 1);
         // 3. Open board
         pushKeys(SWITCH_BOARD);
+
+        // Abort saving changes to current board
+        waitUntilNodeAppears("No");
+        clickOn("No");
 
         // Check that first panel is on focus
         awaitCondition(() -> 0 == panelControl.getCurrentlySelectedPanel().get());

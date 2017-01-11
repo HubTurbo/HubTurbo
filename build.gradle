@@ -28,7 +28,7 @@ allprojects {
     apply plugin: 'java'
 
     // TODO: add group here (e.g. group = 'sg.edu.nus.comp.hubturbo')
-    version = '3.25.0'
+    version = '3.27.0'
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 
@@ -133,7 +133,13 @@ allprojects {
     assemble.dependsOn shadowJar
 }
 
-test.dependsOn generateUnstableTestResources
+test {
+    dependsOn generateUnstableTestResources
+
+    testLogging {
+        exceptionFormat = 'full'
+    }
+}
 
 task checkstyleHtml << {
     ant.xslt(in: checkstyleMain.reports.xml.destination,
@@ -194,6 +200,23 @@ tasks.coveralls {
     onlyIf { System.env.'CI' }
 }
 
+task compileJarUpdater(type: Jar) {
+    manifest{
+        attributes 'Implementation-Title': 'Jar Updater',
+                'Implementation-Version': '1.0',
+                'Main-Class': 'updater.JarUpdater'
+    }
+    archiveName = 'jarUpdater'
+    destinationDir = file('src/main/resources/updater')
+
+    with jar
+
+    from sourceSets.main.output
+    include('updater/JarUpdater.class')
+    include('updater/JarUpdaterFileHandler.class')
+    include('util/DialogMessage.class')
+}
+
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.4'
+    gradleVersion = '2.12'
 }
