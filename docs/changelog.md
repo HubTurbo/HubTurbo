@@ -1,6 +1,10 @@
 
 # Changelog
 
+# V3.28.0
+
+- Fix bug with watch panel cancellation
+
 # V3.27.0
 
 - Fix bugs for issue picker
