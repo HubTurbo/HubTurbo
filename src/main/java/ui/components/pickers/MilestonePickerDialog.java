@@ -26,6 +26,10 @@ public class MilestonePickerDialog extends Dialog<MilestonePickerDialogResponse>
     private static final String TITLE_ALL = "All milestones";
     private static final int DETAILED_MILESTONE_HEIGHT = 30;
     private static final int PREV_ASSIGNED_MILESTONE_HEIGHT = 30;
+    private static final int ALL_MILESTONES_LIMIT = 5;
+    private static final int SCROLLPANE_OFFSET = 10;
+    private static final int MILESTONES_SCROLLPANE_MAX_HEIGHT = DETAILED_MILESTONE_HEIGHT * ALL_MILESTONES_LIMIT
+            + SCROLLPANE_OFFSET;
 
     private final List<PickerMilestone> originalMilestones = new ArrayList<>();
     private FlowPane assignedMilestoneBox;
@@ -167,14 +171,14 @@ public class MilestonePickerDialog extends Dialog<MilestonePickerDialogResponse>
 
     private ScrollPane createAllMilestonesScrollPane() {
         VBox milestonesBox = new VBox();
-        milestonesBox.setStyle("-fx-border-radius: 3;-fx-background-color: white;-fx-border-color: black;");
+        milestonesBox.setStyle("-fx-background-color: white;");
         originalMilestones.forEach(milestone ->
                 milestonesBox.getChildren().add(
                 setMouseClickForNode(milestone.getDetailedMilestoneNode(), milestone.getTitle()))
         );
 
         ScrollPane milestonesScrollPane = new ScrollPane();
-        milestonesScrollPane.setMaxHeight(163);
+        milestonesScrollPane.setMaxHeight(MILESTONES_SCROLLPANE_MAX_HEIGHT);
         milestonesScrollPane.setContent(milestonesBox);
         return milestonesScrollPane;
     }
@@ -249,7 +253,7 @@ public class MilestonePickerDialog extends Dialog<MilestonePickerDialogResponse>
     private VBox createMatchingMilestonesBox() {
         VBox milestoneGroup = new VBox();
         milestoneGroup.setPrefHeight(DETAILED_MILESTONE_HEIGHT * MilestonePickerState.BEST_MATCHING_LIMIT);
-        milestoneGroup.setStyle("-fx-border-radius: 3;-fx-background-color: white;-fx-border-color: black;");
+        milestoneGroup.setStyle("-fx-background-color: white;-fx-border-color: lightgrey;");
         return milestoneGroup;
     }
 
