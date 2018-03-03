@@ -55,11 +55,14 @@ public class MilestonePickerState {
 
     /**
      * Selects the next milestone in the list of best matching milestones
+     *
+     * If there is no currently selected milestone, the next milestone will be the first one in
+     * the list
      */
     public void selectNextBestMatchingMilestone() {
         Optional<Integer> curSelectedIndex = getSelectedIndex(bestMatchingMilestones);
         if (!canIncreaseIndex(curSelectedIndex, bestMatchingMilestones)) return;
-        selectMilestoneAtIndex(bestMatchingMilestones, curSelectedIndex.get() + 1);
+        selectMilestoneAtIndex(bestMatchingMilestones, curSelectedIndex.orElse(-1) + 1);
     }
 
     /**
@@ -72,7 +75,7 @@ public class MilestonePickerState {
     }
 
     private boolean canIncreaseIndex(Optional<Integer> curSelectedIndex, List<PickerMilestone> list) {
-        return curSelectedIndex.isPresent() && curSelectedIndex.get() < list.size() - 1;
+        return !curSelectedIndex.isPresent() || curSelectedIndex.get() < list.size() - 1;
     }
 
     private boolean canDecreaseIndex(Optional<Integer> curSelectedIndex) {

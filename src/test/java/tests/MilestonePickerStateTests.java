@@ -150,4 +150,17 @@ public class MilestonePickerStateTests {
         assertFalse(state.getBestMatchingMilestones().get(1).isSelected());
         assertFalse(state.getBestMatchingMilestones().get(1).isMatching());
     }
+
+    @Test
+    public void selectNextBestMatch_noSelected_firstBestMatchSelected() {
+        MilestonePickerState state = prepareUnassignedState();
+        assertEquals("milestone1", state.getBestMatchingMilestones().get(0).getTitle());
+        assertFalse(state.getBestMatchingMilestones().get(0).isSelected());
+        assertTrue(state.getBestMatchingMilestones().get(0).isMatching());
+
+        state.selectNextBestMatchingMilestone();
+        assertEquals("milestone1", state.getBestMatchingMilestones().get(0).getTitle());
+        assertTrue(state.getBestMatchingMilestones().get(0).isSelected());
+        assertTrue(state.getBestMatchingMilestones().get(0).isMatching());
+    }
 }
