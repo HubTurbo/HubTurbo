@@ -7,11 +7,15 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import prefs.RepoInfo;
 import ui.IdGenerator;
+import ui.UI;
 import util.DialogMessage;
 import util.Futures;
 import util.Utility;
@@ -45,14 +49,14 @@ public class RepositoryPickerDialog {
     private TextField userInputTextField;
     private RepositoryPickerState state;
 
-    public RepositoryPickerDialog(Set<String> storedRepos, Consumer<Optional<String>> onCloseCallback,
+    public RepositoryPickerDialog(List<RepoInfo> storedRepos, Consumer<Optional<String>> onCloseCallback,
                                   Function<String, CompletableFuture<Boolean>> repoValidator) {
         this.onCloseCallback = onCloseCallback;
         this.repoValidator = repoValidator;
         initUi(storedRepos);
     }
 
-    private void initUi(Set<String> storedRepos) {
+    private void initUi(List<RepoInfo> storedRepos) {
         state = new RepositoryPickerState(storedRepos);
 
         initialiseDialog();
@@ -165,36 +169,132 @@ public class RepositoryPickerDialog {
     }
 
     /**
+     * Initialises the dialog for adding a repository.
+     * User can add both the repo id and the optional repo alias.
+     *
+     * @return the RepoInfo object constructed from the user input
+     */
+    private Dialog<RepoInfo> initAddRepositoryDialog() {
+        // Adapted from http://code.makery.ch/blog/javafx-dialogs-official/
+
+        Dialog<RepoInfo> dialog = new Dialog<>();
+        dialog.initStyle(StageStyle.UTILITY);
+        dialog.setHeaderText("Add a new repository");
+
+        // Set the button types.
+        ButtonType addButtonType = new ButtonType("Add", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(addButtonType, ButtonType.CANCEL);
+
+        // Create the repo id and alias labels and fields.
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(20, 150, 10, 10));
+
+        TextField repoIdField = new TextField();
+        repoIdField.setPromptText("Repository ID");
+        TextField repoAliasField = new TextField();
+        repoAliasField.setPromptText("Alias (Optional)");
+
+        grid.add(new Label("Repository ID:"), 0, 0);
+        grid.add(repoIdField, 1, 0);
+        grid.add(new Label("Alias (Optional):"), 0, 1);
+        grid.add(repoAliasField, 1, 1);
+
+        // Enable/Disable add button depending on whether a repo id was entered.
+        Node addButton = dialog.getDialogPane().lookupButton(addButtonType);
+        addButton.setDisable(true);
+
+        // Sets the repo id to the search term automatically
+        repoIdField.setText(userInputTextField.getText());
+        repoIdField.selectAll();
+
+        dialog.getDialogPane().setContent(grid);
+
+        // Validation on repo id.
+        repoIdField.textProperty().addListener((observable, oldValue, newValue) -> {
+            // disable add button if no repo id
+            addButton.setDisable(newValue.trim().isEmpty());
+
+            // prevent user from typing whitespace in repo id
+            String repositoryId = Utility.removeAllWhitespace(newValue);
+            if (!repositoryId.equals(newValue)) {
+                repoIdField.setText(repositoryId);
+            }
+        });
+
+        // Validation on repo alias.
+        repoAliasField.textProperty().addListener((observable, oldValue, newValue) -> {
+            // prevent user from typing whitespace in repo alias
+            String repositoryAlias = Utility.removeAllWhitespace(newValue);
+            if (!repositoryAlias.equals(newValue)) {
+                repoIdField.setText(repositoryAlias);
+            }
+        });
+
+        // Request focus on the repo id field by default.
+        Platform.runLater(() -> repoIdField.requestFocus());
+
+        // Convert the result to a RepoInfo object when the add button is clicked.
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == addButtonType) {
+                return new RepoInfo(repoIdField.getText(), repoAliasField.getText());
+            }
+            return null;
+        });
+
+        return dialog;
+    }
+
+    /**
      * Prompts the user for a repository id then return it only if it is a valid github repo. This method also informs
      * the user if the repository that the user is trying to add is not valid.
      */
     private CompletableFuture<Boolean> addRepository() {
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setHeaderText("Add a new repository");
-        dialog.getEditor().textProperty().addListener((observable, oldValue, newValue) -> {
-            String repositoryId = Utility.removeAllWhitespace(newValue);
-            if (!repositoryId.equals(newValue)) {
-                dialog.getEditor().setText(repositoryId);
-                return;
-            }
-        });
-        dialog.getEditor().setText(userInputTextField.getText());
-        dialog.getEditor().selectAll();
-        Optional<String> userInput = dialog.showAndWait();
+        Dialog<RepoInfo> dialog = initAddRepositoryDialog();
+        Optional<RepoInfo> userInput = dialog.showAndWait();
         if (!userInput.isPresent()) {
             return CompletableFuture.completedFuture(false);
         }
 
-        String repoId = userInput.get();
+        RepoInfo repoToAdd = userInput.get();
+        String repoId = repoToAdd.getId();
+        String repoAlias = repoToAdd.getAlias();
         return repoValidator.apply(repoId)
                 .thenCompose(valid -> {
+                    // disallow adding if repo is invalid
                     if (!valid) {
-                        Platform.runLater(() -> DialogMessage.showErrorDialog("Cannot add to repository list",
-                                repoId + " is not a valid GitHub repository."));
+                        Platform.runLater(() ->
+                            DialogMessage.showErrorDialog("Invalid Repository ID",
+                                    "\"" + repoId + "\" is not a valid GitHub repository. " +
+                                    "Please check again. \n\nRepository not added.")
+                        );
                         return Futures.unit(false);
                     }
 
-                    Platform.runLater(() -> addRepositoryToState(repoId));
+                    // disallow adding if alias does not match format
+                    if (!Utility.isWellFormedRepoAlias(repoAlias)) {
+                        Platform.runLater(() ->
+                            DialogMessage.showErrorDialog("Invalid Repository Alias",
+                                    "\"" + repoAlias + "\" is not a valid Repository Alias. " +
+                                    "Please use only alphanumeric characters. \n\nRepository not added.")
+                        );
+                        return Futures.unit(false);
+                    }
+
+                    // disallow adding if alias already exists
+                    if (UI.prefs.getRepoByAlias(repoAlias).isPresent()) {
+                        Platform.runLater(() ->
+                            DialogMessage.showErrorDialog("Repository Alias Already Exists",
+                                    "\"" + repoAlias + "\" is already an alias of another repository. " +
+                                    "Please choose another alias. \n\nRepository not added.")
+                        );
+                    }
+
+                    // add to the dialog state (non persistent)
+                    Platform.runLater(() -> addRepositoryToState(userInput.get()));
+                    // add to the prefs repo list (persistent)
+                    UI.prefs.addRepo(repoToAdd);
                     return CompletableFuture.completedFuture(true);
                 }).exceptionally(e -> {
                     Platform.runLater(() -> DialogMessage.showErrorDialog("Error checking the validity of " + repoId,
@@ -203,8 +303,8 @@ public class RepositoryPickerDialog {
                 });
     }
 
-    private void addRepositoryToState(String repoId) {
-        state.addRepository(repoId);
+    private void addRepositoryToState(RepoInfo repo) {
+        state.addRepository(repo);
         updateUserQuery(userInputTextField.getText());
     }
 

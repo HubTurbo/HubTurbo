@@ -26,6 +26,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.NotificationPane;
 import prefs.Preferences;
+import prefs.RepoInfo;
 import ui.components.HTStatusBar;
 import ui.components.KeyboardShortcuts;
 import ui.components.StatusUI;
@@ -174,10 +175,16 @@ public class UI extends Application implements EventDispatcher {
         menuBar.setDisable(disable);
     }
 
+    private void updatePrefsRepoList() {
+        // update the prefs with the currently stored repos
+        logic.getStoredRepos().stream().forEach((storedRepoId) -> prefs.addRepo(new RepoInfo(storedRepoId)));
+    }
+
     private void showMainWindow(String repoId) {
         //We infer this is the first time HT is being used if there are no repo data stored at the start up.
         //This check needs to be done at the very beginning of the startup, before HT downloads any repo data.
         boolean isAFirstTimeUser = logic.getStoredRepos().isEmpty();
+
         logic.openPrimaryRepository(repoId);
         logic.setDefaultRepo(repoId);
         triggerEvent(new PrimaryRepoChangedEvent(repoId));
@@ -251,6 +258,8 @@ public class UI extends Application implements EventDispatcher {
                                         status::updateTimeToRefresh, logic::refresh, TimeUnit.SECONDS);
         refreshTimer.start();
         undoController = new UndoController(notificationController);
+
+        updatePrefsRepoList();
     }
 
     private void initUI(Stage stage) {

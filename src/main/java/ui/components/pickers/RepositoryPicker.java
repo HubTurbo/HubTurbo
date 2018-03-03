@@ -1,10 +1,13 @@
 package ui.components.pickers;
 
+import backend.interfaces.Repo;
 import javafx.application.Platform;
 import javafx.stage.Stage;
+import prefs.RepoInfo;
 import ui.UI;
 import util.events.ShowRepositoryPickerEventHandler;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -24,8 +27,9 @@ public class RepositoryPicker {
     }
 
     private void showRepositoryPicker() {
-        Set<String> storedRepos = ui.logic.getStoredRepos();
-        new RepositoryPickerDialog(storedRepos, this::pickRepository, (repoId) -> ui.logic.isRepositoryValid(repoId));
+        // Shows the repo list in the prefs
+        List<RepoInfo> repoList = UI.prefs.getRepos();
+        new RepositoryPickerDialog(repoList, this::pickRepository, (repoId) -> ui.logic.isRepositoryValid(repoId));
     }
 
     private void pickRepository(Optional<String> repoId) {

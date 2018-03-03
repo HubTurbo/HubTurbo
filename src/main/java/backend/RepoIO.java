@@ -13,6 +13,7 @@ import backend.resource.serialization.SerializableModel;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.egit.github.core.Issue;
+import prefs.RepoInfo;
 import ui.UI;
 import util.HTLog;
 import util.events.ShowErrorDialogEvent;
@@ -107,7 +108,10 @@ public class RepoIO {
     }
 
     public CompletableFuture<Boolean> removeRepository(String repoId) {
+        // remove from the cache
         storedRepos.remove(repoId);
+        // remove from the prefs
+        UI.prefs.removeRepo(new RepoInfo(repoId));
         return jsonStore.removeStoredRepo(repoId);
     }
 
@@ -125,7 +129,12 @@ public class RepoIO {
         return repoSource.downloadRepository(repoId)
                 .thenCompose(newModel -> updateModel(newModel, false, remainingTries))
                 .thenApply(model -> {
+                    // adds new repo to the cache
                     storedRepos.add(repoId);
+                    // add new repo to the prefs
+                    UI.prefs.addRepo(new RepoInfo(repoId));
+                    logger.info("Updated the repo collection in prefs as well");
+                    logger.info(UI.prefs.getRepos().toString());
                     return model;
                 })
                 .exceptionally(withResult(new Model(repoId)));

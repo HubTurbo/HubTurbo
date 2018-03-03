@@ -6,6 +6,7 @@ import org.eclipse.egit.github.core.RepositoryId;
 import util.FileHelper;
 import util.HTLog;
 import util.JsonHelper;
+import util.Utility;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -297,5 +298,40 @@ public class Preferences { // NOPMD
      */
     public Optional<LocalDateTime> getMarkedReadAt(String repoId, int issue) {
         return sessionConfig.getMarkedReadAt(repoId, issue);
+    }
+
+    public void addRepo(RepoInfo repo) {
+        userConfig.addRepo(repo);
+        save();
+    }
+
+    public void removeRepo(RepoInfo repo) {
+        userConfig.removeRepo(repo);
+        save();
+    }
+
+    public Optional<RepoInfo> getRepoByIdOrAlias(String repoIdOrAlias) {
+        // if the string matches a repo id format, treat it as a repo id
+        if (Utility.isWellFormedRepoId(repoIdOrAlias)) {
+            return getRepoById(repoIdOrAlias);
+        }
+        // else treat it as an alias
+        return getRepoByAlias(repoIdOrAlias);
+    }
+
+    public Optional<RepoInfo> getRepoById(String repoId) {
+        return Optional.ofNullable(userConfig.getRepoById(repoId));
+    }
+
+    public Optional<RepoInfo> getRepoByAlias(String repoAlias) {
+        return Optional.ofNullable(userConfig.getRepoByAlias(repoAlias));
+    }
+
+    public List<RepoInfo> getRepos() {
+        return userConfig.getRepos();
+    }
+
+    public boolean isExistingAlias(String repoAlias) {
+        return userConfig.isExistingAlias(repoAlias);
     }
 }

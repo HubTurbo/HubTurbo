@@ -144,7 +144,7 @@ public class UpdateController {
             boolean hasUpdatedQualifier = Qualifier.hasUpdatedQualifier(filterExpr);
 
             try {
-                FilterExpression filterExprNoAlias = Qualifier.replaceMilestoneAliases(models, filterExpr);
+                FilterExpression filterExprNoAlias = Qualifier.replaceAliases(models, filterExpr);
 
                 List<TurboIssue> processedIssues = allModelIssues.stream()
                         .filter(issue -> Qualifier.process(models,

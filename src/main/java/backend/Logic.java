@@ -11,6 +11,7 @@ import javafx.application.Platform;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.Logger;
 import prefs.Preferences;
+import prefs.RepoInfo;
 import ui.GuiElement;
 import ui.TestController;
 import ui.UI;
@@ -105,6 +106,7 @@ public class Logic {
      * @return
      */
     public CompletableFuture<Boolean> openPrimaryRepository(String repoId) {
+        logger.info("Opening primary repository: " + repoId);
         return openRepository(repoId, Optional.empty());
     }
 
@@ -116,12 +118,20 @@ public class Logic {
      * <p>
      * Shortly before this method terminates, an AppliedFilterEvent will be triggered
      *
-     * @param repoId
+     * @param repoIdOrAlias string that could be either a repo Id or a repo alias
      * @param panel  panel that opened the repository
      * @return
      */
-    public CompletableFuture<Boolean> openRepositoryFromFilter(String repoId, FilterPanel panel) {
-        return openRepository(repoId, Optional.of(panel));
+    public CompletableFuture<Boolean> openRepositoryFromFilter(String repoIdOrAlias, FilterPanel panel) {
+        logger.info("Opening repository from filter: " + repoIdOrAlias);
+
+        Optional<RepoInfo> repo = prefs.getRepoByIdOrAlias(repoIdOrAlias);
+        if (repo.isPresent()) {
+            logger.info(repoIdOrAlias + " matches " + repo.toString());
+            return openRepository(repo.get().getId(), Optional.of(panel));
+        }
+        // TODO: throw an error message if repo is optional empty
+        return openRepository(repoIdOrAlias, Optional.of(panel));
     }
 
     /**
