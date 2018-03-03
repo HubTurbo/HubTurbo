@@ -15,7 +15,7 @@ cache:
     - $HOME/.gradle/wrapper/
 
 script:
-    - "./gradlew clean check"
+    - "./gradlew clean unstableTests -i"
 
 before_install:
     - "export DISPLAY=:99.0"

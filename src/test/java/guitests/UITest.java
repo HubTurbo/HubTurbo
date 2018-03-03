@@ -74,6 +74,7 @@ public class UITest extends FxRobot {
      * as suggested by TestFX documentation
      */
     static {
+        System.setProperty("headless", "true");
         if (Boolean.getBoolean("headless")) {
             System.setProperty("java.awt.robot", "true");
             System.setProperty("testfx.robot", "glass");
@@ -455,6 +456,10 @@ public class UITest extends FxRobot {
     public ListPanelCell getIssueCell(int panelIndex, int issueId) {
         waitUntilNodeAppears(IdGenerator.getPanelCellIdReference(panelIndex, issueId));
         return GuiTest.find(IdGenerator.getPanelCellIdReference(panelIndex, issueId));
+    }
+
+    public void setTextField(int panelIndex, String text) {
+        setTextField(IdGenerator.getPanelFilterTextFieldIdReference(panelIndex), text);
     }
 
     /**

@@ -87,7 +87,6 @@ allprojects {
         systemProperty "logback.configurationFile", "${projectDir}/config/mockserver/mockserver.xml"
         forkEvery = 1
         if (System.env.'CI') {
-            exclude 'unstable'
 			jvmArgs '-Dheadless=true'
         }
     }

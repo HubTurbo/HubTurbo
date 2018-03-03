@@ -42,9 +42,6 @@ public class FilterTextFieldTest extends UITest {
         for (int i = 0; i < 3; i++) {
             field.selectBackward();
         }
-        // c[oun]t
-        type("lo").push(KeyCode.TAB); // 'c' + 'lo' is a prefix of 'closed'
-        waitAndAssertEquals("closedt", field::getText);
     }
 
     @Test
