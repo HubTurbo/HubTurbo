@@ -1,6 +1,7 @@
 package backend.stub;
 
 import backend.UserCredentials;
+import backend.github.ApiQuotaInfo;
 import backend.interfaces.Repo;
 import backend.resource.TurboIssue;
 import backend.resource.TurboLabel;
@@ -216,8 +217,8 @@ public class DummyRepo implements Repo {
      * @return Remaining calls, reset time ~45 minutes (27000000 milliseconds) from call.
      */
     @Override
-    public ImmutablePair<Integer, Long> getRateLimitResetTime() {
-        return new ImmutablePair<>(apiQuota, new Date().getTime() + 2700000);
+    public ApiQuotaInfo getRateLimitResetTime() {
+        return new ApiQuotaInfo(apiQuota, new Date().getTime() + 2700000);
     }
 
 }

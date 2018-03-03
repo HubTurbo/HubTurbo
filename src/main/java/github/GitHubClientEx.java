@@ -1,5 +1,6 @@
 package github;
 
+import backend.github.ApiQuotaInfo;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.apache.commons.io.input.NullInputStream;
@@ -137,11 +138,12 @@ public class GitHubClientEx extends GitHubClient {
      * Accesses the Rate Limit API endpoint to retrieve the number of remaining requests for the hour,
      * as well as the next reset time. Calling this function itself does not count towards the API limit.
      *
-     * @return A pair consisting of the number of requests remaining for the hour and the next reset time.
+     * @return ApiQuotaInfo instance that consists of the number of requests remaining for the hour
+     *         and the next reset time.
      * @throws IOException
      */
     @SuppressWarnings("unchecked")
-    public ImmutablePair<Integer, Long> getRateLimitResetTime() throws IOException {
+    public ApiQuotaInfo getRateLimitResetTime() throws IOException {
         HttpURLConnection httpRequest = createGet("/rate_limit");
         if (isOk(httpRequest.getResponseCode())) {
             // We extract from rate, which is similar to resources.core
@@ -155,7 +157,7 @@ public class GitHubClientEx extends GitHubClient {
             long reset = mapRate.get("reset").longValue() * 1000; // seconds to milliseconds
             int remaining = mapRate.get("remaining").intValue();
 
-            return new ImmutablePair<>(remaining, reset);
+            return new ApiQuotaInfo(remaining, reset);
         } else {
             throw new IOException(httpRequest.getResponseCode() + " " + httpRequest.getResponseMessage());
         }

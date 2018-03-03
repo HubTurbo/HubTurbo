@@ -41,7 +41,7 @@ public class TickingTimer {
     private final String name;
 
     // The period after which the timer times out.
-    private final int period;
+    private int period;
 
     // onTick will not pause the timer when run, so it should not be a long-running task.
     // Will run before onTimeout.
@@ -156,6 +156,15 @@ public class TickingTimer {
 
     public boolean isStarted() {
         return started;
+    }
+
+    /**
+     * Changes the timer's period and restart the timer based on the new period.
+     * @param periodInSec : the amount of time in second before trigger of the timer.
+     */
+    public synchronized void restartTimer(int periodInSec){
+        this.period = periodInSec;
+        this.time = period;
     }
 
 }

@@ -2,11 +2,10 @@ package backend.github;
 
 import backend.interfaces.Repo;
 import backend.interfaces.TaskRunner;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import java.io.IOException;
 
-public class CheckRateLimitTask extends GitHubRepoTask<ImmutablePair<Integer, Long>> {
+public class CheckRateLimitTask extends GitHubRepoTask<ApiQuotaInfo> {
 
     public CheckRateLimitTask(TaskRunner taskRunner, Repo repo) {
         super(taskRunner, repo);

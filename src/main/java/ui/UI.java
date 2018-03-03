@@ -27,7 +27,6 @@ import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.NotificationPane;
 import prefs.Preferences;
 import ui.components.HTStatusBar;
-import ui.components.KeyboardShortcuts;
 import ui.components.StatusUI;
 import ui.components.issuepicker.IssuePicker;
 import ui.components.pickers.AssigneePicker;
@@ -51,7 +50,6 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static ui.components.KeyboardShortcuts.SHOW_ISSUE_PICKER;
-import static ui.components.KeyboardShortcuts.SHOW_REPO_PICKER;
 
 public class UI extends Application implements EventDispatcher {
 
@@ -62,8 +60,6 @@ public class UI extends Application implements EventDispatcher {
     private static final Logger logger = LogManager.getLogger(UI.class.getName());
     private static HWND mainWindowHandle;
     private final GlobalHotkey globalHotkey = new GlobalHotkey(this);
-
-    private static final int REFRESH_PERIOD = 60;
 
     /**
      * Minimum Java Version Required by HT.
@@ -96,12 +92,12 @@ public class UI extends Application implements EventDispatcher {
     public static StatusUI status;
     public static EventDispatcher events;
     public EventBus eventBus;
-    private TickingTimer refreshTimer;
     public GUIController guiController;
     private NotificationController notificationController;
     public UndoController undoController;
-    public UpdateManager updateManager;
 
+    public UpdateManager updateManager;
+    public ApiQuotaManager apiQuotaManager;
 
     // Main UI elements
 
@@ -246,10 +242,9 @@ public class UI extends Application implements EventDispatcher {
         // In the future, when more arguments are passed to logic,
         // we can pass them in the form of an array.
         logic = new Logic(uiManager, prefs, Optional.empty(), Optional.empty());
+
         // TODO clear cache if necessary
-        refreshTimer = new TickingTimer("Refresh Timer", REFRESH_PERIOD,
-                                        status::updateTimeToRefresh, logic::refresh, TimeUnit.SECONDS);
-        refreshTimer.start();
+        apiQuotaManager = new ApiQuotaManager(logic);
         undoController = new UndoController(notificationController);
     }
 
@@ -355,7 +350,7 @@ public class UI extends Application implements EventDispatcher {
                     if (shouldRefresh) {
                         logger.info("Browser view has changed; refreshing");
                         logic.refresh();
-                        refreshTimer.restart();
+                        apiQuotaManager.restartRefreshTimer();
                     }
                 }
             });

@@ -1,6 +1,7 @@
 package backend;
 
 import backend.control.RepoOpControl;
+import backend.github.ApiQuotaInfo;
 import backend.resource.Model;
 import backend.resource.MultiModel;
 import backend.resource.TurboIssue;
@@ -8,7 +9,6 @@ import filter.expression.FilterExpression;
 import filter.expression.Qualifier;
 import filter.expression.QualifierType;
 import javafx.application.Platform;
-import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.Logger;
 import prefs.Preferences;
 import ui.GuiElement;
@@ -89,11 +89,12 @@ public class Logic {
         UI.status.displayMessage(message);
 
         Futures.sequence(models.toModels().stream()
-                                 .map((model) -> repoIO.updateModel(model, true))
-                                 .collect(Collectors.toList()))
+                .map((model) -> repoIO.updateModel(model, true))
+                .collect(Collectors.toList()))
                 .thenRun(this::refreshUI)
                 .thenCompose(n -> getRateLimitResetTime())
-                .thenApply(this::updateRemainingRate)
+                .thenApply(this::updateSyncRefreshRate)
+                .thenAccept(this::updateApiQuotaInfoInGui)
                 .exceptionally(Futures::log);
     }
 
@@ -163,8 +164,8 @@ public class Logic {
                     .thenRun(this::refreshUI)
                     .thenRun(() -> notifyRepoOpened(panel))
                     .thenCompose(n -> getRateLimitResetTime())
-                    .thenApply(this::updateRemainingRate)
-                    .thenApply(rateLimits -> true)
+                    .thenAccept(this::updateApiQuotaInfoInGui)
+                    .thenApply(Void -> true)
                     .exceptionally(withResult(false));
         });
     }
@@ -231,9 +232,23 @@ public class Logic {
                 .forEach(models::removeRepoModelById);
     }
 
-    public ImmutablePair<Integer, Long> updateRemainingRate(ImmutablePair<Integer, Long> rateLimits) {
-        uiManager.updateRateLimits(rateLimits);
-        return rateLimits;
+    /**
+     * Updates the GitHub API quota info in the GUI.
+     * @param apiQuotaInfo The GitHub API quota information.
+     * @return the apiQuotaInfo instance
+     */
+    public void updateApiQuotaInfoInGui(ApiQuotaInfo apiQuotaInfo) {
+        uiManager.updateApiQuotaInfo(apiQuotaInfo);
+    }
+
+    /**
+     * Updates the period of the refresh timer for synchronization of the data store.
+     * @param apiQuotaInfo The GitHub API quota information.
+     * @return the apiQuotaInfo instance
+     */
+    public ApiQuotaInfo updateSyncRefreshRate(ApiQuotaInfo apiQuotaInfo) {
+        uiManager.updateSyncRefreshRate(apiQuotaInfo);
+        return apiQuotaInfo;
     }
 
     protected CompletableFuture<Boolean> repoIOLogin(UserCredentials credentials) {
@@ -244,7 +259,7 @@ public class Logic {
         return models.get(repoId);
     }
 
-    public CompletableFuture<ImmutablePair<Integer, Long>> getRateLimitResetTime() {
+    public CompletableFuture<ApiQuotaInfo> getRateLimitResetTime() {
         return repoIO.getRateLimitResetTime();
     }
 

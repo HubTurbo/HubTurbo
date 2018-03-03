@@ -1,6 +1,7 @@
 package backend.interfaces;
 
 import backend.UserCredentials;
+import backend.github.ApiQuotaInfo;
 import backend.resource.TurboIssue;
 import backend.resource.TurboLabel;
 import backend.resource.TurboMilestone;
@@ -63,6 +64,6 @@ public interface Repo {
 
     boolean editIssueState(String repoId, int issueId, boolean isOpen) throws IOException;
 
-    ImmutablePair<Integer, Long> getRateLimitResetTime() throws IOException;
+    ApiQuotaInfo getRateLimitResetTime() throws IOException;
 
 }

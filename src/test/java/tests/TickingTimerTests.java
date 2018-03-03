@@ -9,9 +9,15 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 public class TickingTimerTests {
+
+    /**
+     * Facilitates simulation of the triggering of timer for changePeriodTest().
+     */
+    private Boolean isTriggered = false;
 
     private static void delay(double seconds) {
         int time = (int) (seconds * 1000);
@@ -85,5 +91,44 @@ public class TickingTimerTests {
                 fail();
             }
         }
+    }
+
+    @Test
+    public void changePeriodTest() {
+
+        final ArrayList<Integer> ticks = new ArrayList<>();
+
+        final TickingTimer tickingTimer = new TickingTimer("test3", 5, (Integer i) -> {}, () -> {
+            isTriggered = true;
+            ticks.clear();
+        }, TimeUnit.SECONDS);
+
+        tickingTimer.start();
+        delay(3.9); //TickingTimer initial timeout is 1 sec less.
+        assertTrue(!isTriggered());
+        tickingTimer.restartTimer(3);
+        delay(1.5);
+        //At t=1.5s, timeout should not be called yet.
+        assertTrue(!isTriggered());
+        delay(1.6);
+        //At t=3.1s, timeout should be called already.
+        assertTrue(isTriggered());
+        resetTimeoutStatus();
+
+        //Second iteration after calling restartTimer method.
+        delay(2);
+        //At t=2.1s, timeout should not be called yet.
+        assertTrue(!isTriggered());
+        delay(1.5);
+        //At t=3.6s, timeout should be called already.
+        assertTrue(isTriggered());
+    }
+
+    private void resetTimeoutStatus() {
+        isTriggered = false;
+    }
+
+    private boolean isTriggered() {
+        return isTriggered;
     }
 }

@@ -339,7 +339,7 @@ public class GitHubRepo implements Repo {
     }
 
     @Override
-    public ImmutablePair<Integer, Long> getRateLimitResetTime() throws IOException {
+    public ApiQuotaInfo getRateLimitResetTime() throws IOException {
         return client.getRateLimitResetTime();
     }
 }

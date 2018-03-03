@@ -1,5 +1,6 @@
 package ui;
 
+import backend.github.ApiQuotaInfo;
 import filter.expression.FilterExpression;
 import javafx.application.Platform;
 import javafx.scene.control.Label;
@@ -7,7 +8,6 @@ import ui.issuepanel.FilterPanel;
 import ui.issuepanel.PanelControl;
 import ui.issuepanel.UIBrowserBridge;
 import util.DialogMessage;
-import util.Utility;
 import util.events.*;
 import util.events.testevents.PrimaryRepoChangedEvent;
 import util.events.testevents.PrimaryRepoChangedEventHandler;
@@ -25,6 +25,7 @@ public class GUIController {
     private final PanelControl panelControl;
     private final UI ui;
     private final Label apiBox;
+
     private String defaultRepoId;
 
     public GUIController(UI ui, PanelControl panelControl, Label apiBox) {
@@ -41,7 +42,7 @@ public class GUIController {
 
     public final void registerEvents() {
         UI.events.registerEvent((ModelUpdatedEventHandler) this::modelUpdated);
-        UI.events.registerEvent((UpdateRateLimitsEventHandler) this::updateAPIBox);
+        UI.events.registerEvent((NewApiQuotaInfoAvailableEventHandler) this::updateApiQuotaInfo);
         UI.events.registerEvent((ShowErrorDialogEventHandler) this::showErrorDialog);
         UI.events.registerEvent((PrimaryRepoChangedEventHandler) this::setDefaultRepo);
     }
@@ -102,11 +103,23 @@ public class GUIController {
                 .collect(Collectors.toList());
     }
 
-    private void updateAPIBox(UpdateRateLimitsEvent e) {
-        Platform.runLater(() -> apiBox.setText(String.format("%s/%s",
-                                                             e.remainingRequests,
-                                                             Utility.minutesFromNow(e.nextRefreshInMillisecs)))
-        );
+    /**
+     * Updates UI components using the GitHub API quota information.
+     * @param e NewApiQuotaInfoAvailableEvent object that holds the current API quota information.
+     */
+    private void updateApiQuotaInfo(NewApiQuotaInfoAvailableEvent e) {
+        updateAPIBox(e.getApiQuotaInfo());
+    }
+
+    /**
+     * Updates the GUI APIBox to indicate the number of remaining API quota, time until next API renewal and
+     * the current sync refresh rate.
+     * @param apiQuotaInfo The GitHub API quota information.
+     */
+    private void updateAPIBox(ApiQuotaInfo apiQuotaInfo) {
+        Platform.runLater(() -> apiBox.setText(String.format("%s/%s[x%d]", apiQuotaInfo.getRemainingQuota(),
+                                               apiQuotaInfo.minutesToNextQuotaTopup(),
+                                               (int) ui.apiQuotaManager.getRefreshDurationInMinutes())));
     }
 
     private void showErrorDialog(ShowErrorDialogEvent e) {
